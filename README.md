@@ -59,7 +59,9 @@ Push this folder to a GitHub repository. No secrets are stored in the code; they
 * Optional extra failover: **Groq** (`GROQ_API_KEY`) and/or **OpenRouter** (`OPENROUTER_API_KEY`).
 * With no key at all, the system falls back to Pollinations' keyless endpoint. That works (it's how this build was tested), but it's slower and less reliable.
 
-### Step 3: YouTube API credentials (20 min)
+### Step 3: YouTube API credentials (20 min, **no credit card**)
+> 💳 **You do not need billing or a credit card for anything in this project.** The YouTube Data API and YouTube Analytics API are free and work in a project with no billing account. If Google shows a "Start free trial" / "Activate" banner or asks for a card, that's the optional $300 Cloud trial. Close it or click *Dismiss*, and **never click "Enable billing"**. Always go straight to `https://console.cloud.google.com` rather than the `cloud.google.com/free` marketing page, which leads into the card-required trial signup.
+
 1. Go to https://console.cloud.google.com, create a project, then **APIs & Services → Library**. Enable **YouTube Data API v3** and **YouTube Analytics API**.
 2. Open **Google Auth Platform → Branding**: add an app name, support email and developer email.
 3. Under **Audience**, choose External, add yourself as a test user, then click **Publish app → In production**. ⚠️ If you skip this, refresh tokens expire every 7 days and automation silently stops.
