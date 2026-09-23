@@ -32,7 +32,7 @@ jobs:
           cache: pip
       - run: pip install -q -r requirements.txt
       - run: python -m autotube analytics
-        if: ${{ env.YT_REFRESH_TOKEN != '' }}
+        if: ${{ env.YT_REFRESH_TOKEN != '' && env.YT_CLIENT_ID != '' && env.YT_CLIENT_SECRET != '' }}
       - name: Commit state
         run: |
           git config user.name "autotube-bot"

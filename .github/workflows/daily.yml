@@ -61,14 +61,17 @@ jobs:
           key: piper-ryan-high
 
       - name: Learn from previous videos
-        if: ${{ env.YT_REFRESH_TOKEN != '' }}
+        if: ${{ env.YT_REFRESH_TOKEN != '' && env.YT_CLIENT_ID != '' && env.YT_CLIENT_SECRET != '' }}
         run: python -m autotube analytics || true
 
       - name: Produce & schedule today's videos
         run: |
           ARGS=""
           if [ -n "${{ github.event.inputs.count }}" ]; then ARGS="$ARGS -n ${{ github.event.inputs.count }}"; fi
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ] || [ -z "$YT_REFRESH_TOKEN" ]; then ARGS="$ARGS --dry-run"; fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ] || [ -z "$YT_REFRESH_TOKEN" ] || [ -z "$YT_CLIENT_ID" ] || [ -z "$YT_CLIENT_SECRET" ]; then
+            echo "::notice::Dry run (render only): YouTube secrets incomplete or dry_run selected."
+            ARGS="$ARGS --dry-run"
+          fi
           python -m autotube run $ARGS
 
       - name: Keep rendered videos for 7 days (download from the run page)
