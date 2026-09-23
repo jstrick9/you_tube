@@ -73,8 +73,20 @@ def cmd_doctor(cfg: dict) -> int:
         except Exception as e:  # noqa: BLE001
             ok = False
             print("✗ YouTube auth FAILED:", e)
-            print("  Common causes: client ID/secret typo, token created with a different client, or the app "
-                  "was left in 'Testing' (tokens expire after 7 days).")
+            msg = str(e)
+            if "unauthorized_client" in msg:
+                print("  → The refresh token was created with a DIFFERENT OAuth client than YT_CLIENT_ID/YT_CLIENT_SECRET.\n"
+                      "    Fix: in the OAuth Playground ⚙️ tick 'Use your own OAuth credentials', paste the SAME client ID\n"
+                      "    and secret that are in your GitHub secrets, re-authorize, and save the new refresh token.")
+            elif "invalid_client" in msg:
+                print("  → Google doesn't recognise YT_CLIENT_ID / YT_CLIENT_SECRET (typo, extra characters, deleted client,\n"
+                      "    or the ID and secret come from two different clients). Re-copy both from Google Auth Platform → Clients.")
+            elif "invalid_grant" in msg:
+                print("  → The refresh token is expired or revoked (app left in 'Testing' = 7-day expiry, access removed at\n"
+                      "    myaccount.google.com/permissions, or token superseded). Publish the app and generate a new token.")
+            else:
+                print("  Common causes: client ID/secret typo, token created with a different client, or the app "
+                      "was left in 'Testing' (tokens expire after 7 days).")
     else:
         print("YouTube secrets not set — skipping YouTube check.")
     return 0 if ok else 1
