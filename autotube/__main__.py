@@ -48,15 +48,36 @@ def cmd_doctor(cfg: dict) -> int:
         print("LLM:", r)
     except Exception as e:  # noqa: BLE001
         print("LLM FAILED:", e)
+    ok = True
     if os.environ.get("YT_REFRESH_TOKEN"):
         try:
-            from .youtube import service
-            ch = service().channels().list(part="snippet,statistics", mine=True).execute()
-            it = ch["items"][0]
-            print("YouTube channel:", it["snippet"]["title"], it["statistics"])
+            from .common import http
+            from .youtube import credentials, service
+            creds = credentials()
+            info = http().get("https://oauth2.googleapis.com/tokeninfo",
+                              params={"access_token": creds.token}, timeout=15).json()
+            granted = set((info.get("scope") or "").split())
+            print("Granted scopes:")
+            for sc in ("youtube.upload", "youtube.readonly", "yt-analytics.readonly"):
+                has = f"https://www.googleapis.com/auth/{sc}" in granted
+                print(f"  {'✓' if has else '✗'} {sc}{'' if has else '   ← MISSING: re-authorize with this scope'}")
+                ok &= has or sc == "yt-analytics.readonly"
+            items = service().channels().list(part="snippet,statistics", mine=True).execute().get("items", [])
+            if items:
+                it = items[0]
+                print(f"✓ YouTube channel: {it['snippet']['title']} (id {it['id']}) {it['statistics']}")
+            else:
+                ok = False
+                print("✗ Token works but this Google account has no YouTube channel. Re-authorize and pick the "
+                      "account / Brand Account that owns the channel.")
         except Exception as e:  # noqa: BLE001
-            print("YouTube auth FAILED:", e)
-    return 0
+            ok = False
+            print("✗ YouTube auth FAILED:", e)
+            print("  Common causes: client ID/secret typo, token created with a different client, or the app "
+                  "was left in 'Testing' (tokens expire after 7 days).")
+    else:
+        print("YouTube secrets not set — skipping YouTube check.")
+    return 0 if ok else 1
 
 
 def main(argv=None) -> int:

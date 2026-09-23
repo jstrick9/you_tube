@@ -32,8 +32,10 @@ def credentials():
     cid, secret, refresh = (os.environ.get(k) for k in ("YT_CLIENT_ID", "YT_CLIENT_SECRET", "YT_REFRESH_TOKEN"))
     if not all((cid, secret, refresh)):
         raise RuntimeError("Missing YT_CLIENT_ID / YT_CLIENT_SECRET / YT_REFRESH_TOKEN")
-    creds = Credentials(None, refresh_token=refresh, client_id=cid, client_secret=secret,
-                        token_uri="https://oauth2.googleapis.com/token", scopes=SCOPES)
+    # scopes=None → reuse exactly what was granted at consent time (works whether the token
+    # came from scripts/get_refresh_token.py or the browser-based OAuth Playground).
+    creds = Credentials(None, refresh_token=refresh.strip(), client_id=cid.strip(), client_secret=secret.strip(),
+                        token_uri="https://oauth2.googleapis.com/token", scopes=None)
     creds.refresh(Request())
     return creds
 

@@ -65,14 +65,18 @@ Push this folder to a GitHub repository. No secrets are stored in the code; they
 1. Go to https://console.cloud.google.com, create a project, then **APIs & Services → Library**. Enable **YouTube Data API v3** and **YouTube Analytics API**.
 2. Open **Google Auth Platform → Branding**: add an app name, support email and developer email.
 3. Under **Audience**, choose External, add yourself as a test user, then click **Publish app → In production**. ⚠️ If you skip this, refresh tokens expire every 7 days and automation silently stops.
-4. Under **Clients**, create an OAuth client of type **Desktop app** and download the JSON.
-5. On your own computer, run:
-   ```bash
-   pip install google-auth-oauthlib
-   python scripts/get_refresh_token.py client_secret.json
-   ```
-   Sign in with the account that owns the channel. For the unverified-app warning, click *Advanced → Continue*; that's fine because it's your own app.
-6. Add the printed values as repo secrets: `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN`.
+4. Under **Clients → Create client**, choose **Web application**. Under **Authorized redirect URIs**, add exactly `https://developers.google.com/oauthplayground` and click **Create**. Copy the **Client ID** and **Client secret** (no need to download the JSON).
+5. **Get the refresh token in your browser** (nothing to install):
+   1. Open https://developers.google.com/oauthplayground and click the ⚙️ gear (top right).
+   2. Tick **Use your own OAuth credentials**, then paste your Client ID and Client secret. Leave *Access type* on **Offline**. Close the panel.
+   3. In the left box **"Input your own scopes"**, paste this line (space-separated) and click **Authorize APIs**:
+      `https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/yt-analytics.readonly`
+   4. Choose the Google account (or Brand Account) that **owns the channel**. At "Google hasn't verified this app", click *Advanced → Go to … (unsafe)*, then allow all permissions.
+   5. Back in the Playground, under Step 2, click **Exchange authorization code for tokens** and copy the **Refresh token** (starts with `1//`).
+   6. Optional: click ⚙️ and untick "Use your own OAuth credentials" so the Playground forgets them.
+   *(Alternative for people with Python locally: create a **Desktop app** client instead and run `python scripts/get_refresh_token.py client_secret.json`.)*
+6. Add repo secrets: `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN`. **Never commit** the client secret JSON or these values to the repo.
+7. **Verify:** Actions → **AutoTube check connection** → *Run workflow*. The log shows your channel name and ✓ for each permission.
 
 ### Step 4: ⚠️ request the API compliance audit (required for public videos)
 YouTube locks **every video uploaded by an unaudited API project created after 28 July 2020 as private**. This is documented Google policy, and there's no way around it within the Terms of Service.
