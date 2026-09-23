@@ -1,0 +1,123 @@
+{
+  "meta": {
+    "title": "How Do Solar Panels Turn Light Into Electricity? #shorts",
+    "description": "Learn how solar panels convert sunlight into electricity using PV cells that excite electrons, create direct current, and an inverter changes it to alternating current. Discover why they lower greenhouse gas emissions and the importance of sunlight intensity and cleaning.\n\n\ud83d\udcda Source: Solar panel \u2014 https://en.wikipedia.org/wiki/Solar_panel\n\n\u2139\ufe0f This video was researched from the cited source and produced with AI-assisted scripting and a synthetic narrator voice. Facts are checked against the source before publishing.\n\n\ud83d\uddbc\ufe0f Image credits:\n\u2022 \"Agrivoltaic installation Foulum.jpg\" by Marta Victoria \u2014 CC BY-SA 4.0 (Wikimedia Commons) https://commons.wikimedia.org/wiki/File:Agrivoltaic_installation_Foulum.jpg\n\u2022 \"Eco-Camper 125W Flexible Solar Panel\" by sridgway \u2014 CC BY 2.0 (Openverse/flickr) https://www.flickr.com/photos/68132273@N00/5388987683\n\u2022 \"Solar Panel install\" by Richard Masoner / Cyclelicious \u2014 CC BY-SA 2.0 (Openverse/flickr) https://www.flickr.com/photos/99247795@N00/540944183\n\u2022 \"Children of the Sun Solar Initiative (48132850231).jpg\" by U.S. Department of Energy from United States \u2014 Public domain (Wikimedia Commons) https://commons.wikimedia.org/wiki/File:Children_of_the_Sun_Solar_Initiative_(48132850231).jpg\n\u2022 \"Reduce Greenhouse gas emissions, use solar Panel.jpg\" by Beendy234 \u2014 CC0 (Wikimedia Commons) https://commons.wikimedia.org/wiki/File:Reduce_Greenhouse_gas_emissions,_use_solar_Panel.jpg\n\u2022 \"Renewable generators - wind turbine - solar panel icon.png\" by Tommaso.sansone91 \u2014 CC0 (Wikimedia Commons) https://commons.wikimedia.org/wiki/File:Renewable_generators_-_wind_turbine_-_solar_panel_icon.png\n\u2022 \"fltr: Solar sill, solar panel, solar cooker\" by Nadya Peek \u2014 CC BY 2.0 (Openverse/flickr) https://www.flickr.com/photos/79234916@N00/3871317114\n\ud83c\udfb5 Music: original, procedurally generated for this video.\n\nFollow Curious Minute for a new fascinating fact every day!\n\n#SolarEnergy #RenewablePower #GreenTech #shorts",
+    "tags": [
+      "solar energy",
+      "photovoltaics",
+      "solar panels",
+      "renewable energy",
+      "greenhouse gases",
+      "clean energy",
+      "solar power",
+      "solar electricity",
+      "sustainability",
+      "solar technology",
+      "shorts",
+      "facts"
+    ]
+  },
+  "script": {
+    "title": "How Do Solar Panels Turn Light Into Electricity?",
+    "segments": [
+      {
+        "text": "Ever wondered how solar panels turn light into power?",
+        "keywords": [
+          "solar panels",
+          "sunlight"
+        ],
+        "evidence": "converts sunlight into electricity by using"
+      },
+      {
+        "text": "PV cells are made of materials that produce excited electrons when exposed to light.",
+        "keywords": [
+          "photovoltaic cells",
+          "electrons"
+        ],
+        "evidence": "PV cells are made of materials that produce excited electrons"
+      },
+      {
+        "text": "The electrons flow through a circuit and produce direct current electricity.",
+        "keywords": [
+          "electricity",
+          "direct current"
+        ],
+        "evidence": "electrons flow through a circuit and produce direct current electricity"
+      },
+      {
+        "text": "An inverter converts that direct current to alternating current where needed.",
+        "keywords": [
+          "inverter",
+          "AC power"
+        ],
+        "evidence": "an inverter that converts direct current electricity to alternating current"
+      },
+      {
+        "text": "Solar panels reduce greenhouse gas emissions compared to hydrocarbon energy.",
+        "keywords": [
+          "greenhouse gases",
+          "renewable energy"
+        ],
+        "evidence": "reduce greenhouse gas emissions compared to hydrocarbon-sourced energy"
+      },
+      {
+        "text": "They depend on sunlight intensity and must be cleaned regularly.",
+        "keywords": [
+          "sunlight intensity",
+          "cleaning"
+        ],
+        "evidence": "depend on the availability and intensity of sunlight"
+      },
+      {
+        "text": "Follow for more solar insights",
+        "keywords": [
+          "follow",
+          "solar"
+        ],
+        "evidence": "Solar panels use a renewable and clean source of energy"
+      }
+    ],
+    "description": "Learn how solar panels convert sunlight into electricity using PV cells that excite electrons, create direct current, and an inverter changes it to alternating current. Discover why they lower greenhouse gas emissions and the importance of sunlight intensity and cleaning.",
+    "tags": [
+      "solar energy",
+      "photovoltaics",
+      "solar panels",
+      "renewable energy",
+      "greenhouse gases",
+      "clean energy",
+      "solar power",
+      "solar electricity",
+      "sustainability",
+      "solar technology"
+    ],
+    "hashtags": [
+      "#SolarEnergy",
+      "#RenewablePower",
+      "#GreenTech"
+    ],
+    "thumbnail_text": "Light to Power"
+  },
+  "review": {
+    "score": 9,
+    "issues": [],
+    "programmatic_ok": true,
+    "factual_errors": [],
+    "misleading_title": false,
+    "advertiser_friendly": true,
+    "policy_concerns": [],
+    "value_add": "Viewers learn the basic photovoltaic process: how light excites electrons in PV cells, how DC is generated and converted to AC, and why solar panels are environmentally beneficial while also noting practical limitations such as sunlight dependence and maintenance.",
+    "hook_strength": 9,
+    "fixes": []
+  },
+  "source": {
+    "title": "Solar panel",
+    "url": "https://en.wikipedia.org/wiki/Solar_panel"
+  },
+  "plan": {
+    "format": "by_the_numbers",
+    "hook_style": "question",
+    "voice": "en-US-BrianNeural"
+  },
+  "tts_engine": "edge-tts",
+  "duration": 29.50002267573696
+}

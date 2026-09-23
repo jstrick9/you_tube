@@ -1,0 +1,175 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  AutoTube — channel configuration
+#  Everything the system does is driven from this file. Secrets (API keys,
+#  OAuth tokens) are NEVER stored here — they come from environment variables
+#  (GitHub Actions secrets). See README.md → "Setup".
+# ─────────────────────────────────────────────────────────────────────────────
+
+channel:
+  name: "Curious Minute"                 # shown in CTA / description footer
+  niche: >-
+    Fascinating, verified facts and quick explainers about science, space,
+    history, nature, technology and the stories behind things people are
+    searching for today.
+  language: en
+  region: US                             # trend region (Google Trends geo / YouTube chart)
+  timezone: America/New_York
+  # Topic categories the system can choose from. The analytics loop learns
+  # which of these perform best and shifts output toward them automatically.
+  categories: [science, space, history, nature, technology, geography, culture, sports, entertainment]
+  # Evergreen seeds used when no trending topic passes the filters.
+  evergreen_seeds:
+    - Octopus
+    - Great Pyramid of Giza
+    - Black hole
+    - Tardigrade
+    - Mariana Trench
+    - Voyager 1
+    - Honey
+    - Northern lights
+    - Roman concrete
+    - Bioluminescence
+    - Titanic
+    - Mount Everest
+    - Venus flytrap
+    - Saturn's rings
+    - Easter Island
+
+schedule:
+  videos_per_day: 3                      # keep modest: quality > quantity (see README → Compliance)
+  publish_times: ["12:00", "17:30", "20:30"]   # local time slots (channel.timezone)
+  notify_subscribers: true
+  max_run_minutes: 120                   # stop producing after this (GitHub job timeout is 150)
+
+video:
+  kind: short                            # 1080x1920 vertical YouTube Short
+  target_seconds: [35, 55]               # script length window
+  fps: 30
+  width: 1080
+  height: 1920
+  voices:                                # rotated/learned by the bandit (edge-tts neural voices)
+    - en-US-AndrewNeural
+    - en-US-AvaNeural
+    - en-US-BrianNeural
+    - en-US-EmmaNeural
+    - en-US-ChristopherNeural
+  speech_rate: "+8%"
+  background_music: true                 # procedurally generated, copyright-free ambient bed
+  music_volume_db: -26
+  loudness_lufs: -14
+
+content:
+  # Script formats — rotated and learned. Different formats = genuinely
+  # different videos, which matters for YouTube's "inauthentic content" policy.
+  formats: [facts3, backstory, myth_vs_fact, timeline, by_the_numbers, what_if]
+  hook_styles: [question, bold_claim, number_first, you_statement]
+  require_grounding: true                # every claim must be supported by fetched source text
+  min_grounded_segments: 3
+  allow_living_people: false             # skip topics that are biographies of living people
+  dedupe_days: 45                        # don't repeat a topic within N days
+  min_trend_score: 0.35
+
+compliance:
+  made_for_kids: false
+  # Set true only if a video contains *realistic* altered/synthetic content
+  # (e.g. AI-generated realistic scenes). Our pipeline uses real licensed
+  # photos + narration, so the default is false. See README → Compliance.
+  contains_synthetic_media: false
+  ai_disclosure_in_description: true     # transparent "AI-assisted narration" line
+  allowed_licenses: [cc0, pdm, "public domain", "cc by", "cc-by", "cc by-sa", "cc-by-sa", pexels]
+  blocked_topics:                        # never produce videos about these
+    - death
+    - dies
+    - dead
+    - killed
+    - killing
+    - killer
+    - serial killer
+    - massacre
+    - crime
+    - criminal
+    - convicted
+    - executed
+    - execution
+    - kidnapping
+    - assault
+    - abuse
+    - rape
+    - xxx
+    - sex
+    - courtesan
+    - gore
+    - shooting
+    - murder
+    - suicide
+    - overdose
+    - war
+    - attack
+    - terror
+    - hostage
+    - crash
+    - election
+    - candidate
+    - vote
+    - poll
+    - abortion
+    - vaccine
+    - cancer
+    - cure
+    - diet pill
+    - crypto
+    - stock tip
+    - lottery
+    - casino
+    - betting
+    - odds
+    - porn
+    - onlyfans
+    - nude
+    - leak
+    - lawsuit
+    - arrested
+    - charged
+    - trial
+    - scandal
+    - obituary
+    - funeral
+    - hurricane
+    - earthquake
+    - wildfire
+    - flood
+    - tornado
+  quality_gate_min_score: 7              # LLM reviewer score (0-10) required to publish
+
+llm:
+  # Providers are tried in order; any provider without a key is skipped.
+  # All have free tiers. Pollinations needs no key at all (last-resort fallback).
+  providers: [gemini, groq, openrouter, pollinations]
+  gemini_models: [gemini-flash-lite-latest, gemini-flash-latest, gemini-2.5-flash-lite, gemini-2.5-flash]
+  groq_models: [llama-3.3-70b-versatile, llama-3.1-8b-instant]
+  openrouter_models: ["meta-llama/llama-3.3-70b-instruct:free", "deepseek/deepseek-chat-v3-0324:free"]
+  pollinations_models: [openai-fast, openai]
+  temperature: 0.8
+
+media:
+  sources: [pexels, wikimedia, openverse]   # pexels used only if PEXELS_API_KEY is set
+  images_per_video: 6
+  min_image_width: 900
+
+upload:
+  enabled: true                           # false = render only (dry run)
+  category_id: "27"                       # 27 = Education
+  default_privacy: public                 # applied via scheduled publishAt
+  playlist_per_category: false
+
+analytics:
+  enabled: true
+  evaluate_after_hours: 48                # judge a video's performance after N hours
+  retention_weight: 0.4                   # reward = 0.6*views-rank + 0.4*retention-rank
+  exploration: 0.15                       # extra random exploration on top of Thompson sampling
+
+notify:
+  # Optional free push notifications via ntfy.sh (no account) or a Discord webhook.
+  # Set NTFY_TOPIC or DISCORD_WEBHOOK_URL as secrets to enable.
+  on_success: true
+  on_failure: true

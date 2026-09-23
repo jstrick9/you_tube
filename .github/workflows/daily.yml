@@ -1,0 +1,90 @@
+# AutoTube — daily production run.
+# Runs once a day (a single run produces all of the day's videos and schedules
+# them to go public at the configured time slots via YouTube's publishAt).
+# State (history, learned strategy, analytics) is committed back to the repo,
+# which doubles as free persistence AND keeps the repo "active" so GitHub never
+# disables the schedule.
+name: AutoTube daily
+
+on:
+  schedule:
+    - cron: "17 13 * * *"        # 13:17 UTC ≈ 9:17 AM New York (odd minute avoids top-of-hour queue delays)
+  workflow_dispatch:
+    inputs:
+      count:
+        description: "Number of videos (blank = config default)"
+        required: false
+      dry_run:
+        description: "Render only, don't upload"
+        type: boolean
+        default: false
+
+concurrency:
+  group: autotube
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+      YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+      YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+      YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core > /dev/null
+          pip install -q -r requirements.txt
+
+      - name: Cache offline TTS voice (fallback only)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/piper
+          key: piper-ryan-high
+
+      - name: Learn from previous videos
+        if: ${{ env.YT_REFRESH_TOKEN != '' }}
+        run: python -m autotube analytics || true
+
+      - name: Produce & schedule today's videos
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.count }}" ]; then ARGS="$ARGS -n ${{ github.event.inputs.count }}"; fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ] || [ -z "$YT_REFRESH_TOKEN" ]; then ARGS="$ARGS --dry-run"; fi
+          python -m autotube run $ARGS
+
+      - name: Keep rendered videos for 7 days (download from the run page)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos-${{ github.run_number }}
+          path: output/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Commit state
+        if: always()
+        run: |
+          git config user.name "autotube-bot"
+          git config user.email "autotube-bot@users.noreply.github.com"
+          git add state/
+          git diff --cached --quiet || git commit -m "state: $(date -u +%F) run ${{ github.run_number }}"
+          git pull --rebase -q && git push -q || echo "push skipped"

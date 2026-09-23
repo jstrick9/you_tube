@@ -1,0 +1,14 @@
+# Self-hosted alternative to GitHub Actions (any always-on Linux box: old laptop,
+# Raspberry Pi 4/5, or Oracle Cloud "Always Free" ARM VM).
+#
+#   1. git clone <your repo> ~/autotube && cd ~/autotube
+#   2. sudo apt install -y ffmpeg python3-venv && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+#   3. cp deploy/env.example .env && nano .env     (fill in keys)
+#   4. crontab -e   → paste the lines below
+#
+# Times are in the machine's local timezone.
+CRON_TZ=America/New_York
+17 9 * * *  cd $HOME/autotube && set -a && . ./.env && set +a && .venv/bin/python -m autotube analytics >> logs/cron.log 2>&1; .venv/bin/python -m autotube run >> logs/cron.log 2>&1
+43 21 * * * cd $HOME/autotube && set -a && . ./.env && set +a && .venv/bin/python -m autotube analytics >> logs/cron.log 2>&1
+# weekly cleanup of rendered files older than 7 days
+0 4 * * 0   find $HOME/autotube/output -type f -mtime +7 -delete
