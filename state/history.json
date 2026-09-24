@@ -27,11 +27,87 @@
       "views": 0,
       "likes": 0,
       "comments": 0,
-      "privacy": "private",
+      "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1.0,
-      "vph": 0.0
+      "hours_live": 1.9,
+      "vph": 0.0,
+      "checked_at": "2026-09-24T17:53:26.373793+00:00"
     }
+  },
+  {
+    "created_at": "2026-09-24T18:04:52.429562+00:00",
+    "run_id": "20260924-1753",
+    "title": "When the Catholic Church Banned Heliocentrism #shorts",
+    "topic": "the Catholic Church officially censored the heliocentric theory (Earth orbiting the Sun) for over 200 years, but never placed Darwin's Theory of Evolution (The Origin of Species) on its list of banned books.",
+    "topic_key": "the catholic church officially censored the heliocentric theory earth orbiting the sun for over 200 years but never placed darwins theory of evolution the origin of species on its list of banned books",
+    "wiki_title": "Galileo affair",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "history",
+      "format": "backstory",
+      "hook_style": "you_statement",
+      "voice": "en-US-ChristopherNeural"
+    },
+    "review_score": 9,
+    "duration": 43.75605442176871,
+    "tts_engine": "edge-tts",
+    "file": "20260924-1753-01-galileo-affair.mp4",
+    "publish_at": "2026-09-24T21:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "vBTIN-iRO9k",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-09-24T18:04:55.259364+00:00",
+    "run_id": "20260924-1753",
+    "title": "The Surprising History of Barbie and Mattel #shorts",
+    "topic": "a 1963 Barbie outfit \"Barbie Baby-Sits\" came with a bathroom scale set at 50 kg (110 pounds). To scale Barbie is 1.75 m (5'9\"), so this is underweight. It also included a book titled How to Lose Weight which advised \"Don't eat!\"",
+    "topic_key": "a 1963 barbie outfit barbie babysits came with a bathroom scale set at 50 kg 110 pounds to scale barbie is 175 m 59 so this is underweight it also included a book titled how to lose weight which advised dont eat",
+    "wiki_title": "Barbie",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "culture",
+      "format": "myth_vs_fact",
+      "hook_style": "question",
+      "voice": "en-US-ChristopherNeural"
+    },
+    "review_score": 10,
+    "duration": 35.82408163265306,
+    "tts_engine": "edge-tts",
+    "file": "20260924-1753-02-barbie.mp4",
+    "publish_at": "2026-09-25T00:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "kM3myuf1c-Y",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-09-24T18:04:58.142709+00:00",
+    "run_id": "20260924-1753",
+    "title": "Surprising Facts About the Octopus #shorts",
+    "topic": "Octopus",
+    "topic_key": "octopus",
+    "wiki_title": "Octopus",
+    "trend_sources": [
+      "evergreen"
+    ],
+    "choice": {
+      "category": "science",
+      "format": "by_the_numbers",
+      "hook_style": "you_statement",
+      "voice": "en-US-EmmaNeural"
+    },
+    "review_score": 9,
+    "duration": 30.592018140589566,
+    "tts_engine": "edge-tts",
+    "file": "20260924-1753-03-octopus.mp4",
+    "publish_at": "2026-09-25T16:00:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "jnlRW0Ca1o8",
+    "status": "scheduled"
   }
 ]
