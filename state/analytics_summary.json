@@ -1,0 +1,146 @@
+{
+  "updated": "2026-09-24T06:43:21.889248+00:00",
+  "videos_total": 1,
+  "videos_7d": 1,
+  "views_7d": 0,
+  "learned_this_run": 0,
+  "strategy": {
+    "category": [
+      {
+        "arm": "science",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "space",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "history",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "nature",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "technology",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "geography",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "culture",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "sports",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "entertainment",
+        "mean": 0.5,
+        "n": 0
+      }
+    ],
+    "format": [
+      {
+        "arm": "facts3",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "backstory",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "myth_vs_fact",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "timeline",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "by_the_numbers",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "what_if",
+        "mean": 0.5,
+        "n": 0
+      }
+    ],
+    "hook_style": [
+      {
+        "arm": "question",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "bold_claim",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "number_first",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "you_statement",
+        "mean": 0.5,
+        "n": 0
+      }
+    ],
+    "voice": [
+      {
+        "arm": "en-US-AndrewNeural",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "en-US-AvaNeural",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "en-US-BrianNeural",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "en-US-EmmaNeural",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "en-US-ChristopherNeural",
+        "mean": 0.5,
+        "n": 0
+      }
+    ]
+  },
+  "top_videos": [
+    {
+      "title": "The World's Highest Bottle Return Scheme #shorts",
+      "id": "q5lleO0lrkI",
+      "views": 0,
+      "avg_view_pct": null
+    }
+  ],
+  "rejected": []
+}

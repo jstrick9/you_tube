@@ -1,0 +1,133 @@
+{
+  "arms": {
+    "category": {
+      "science": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "space": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "history": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "nature": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "technology": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "geography": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "culture": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "sports": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "entertainment": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      }
+    },
+    "format": {
+      "facts3": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "backstory": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "myth_vs_fact": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "timeline": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "by_the_numbers": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "what_if": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      }
+    },
+    "hook_style": {
+      "question": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "bold_claim": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "number_first": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "you_statement": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      }
+    },
+    "voice": {
+      "en-US-AndrewNeural": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "en-US-AvaNeural": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "en-US-BrianNeural": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "en-US-EmmaNeural": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      },
+      "en-US-ChristopherNeural": {
+        "a": 1.0,
+        "b": 1.0,
+        "n": 0
+      }
+    }
+  },
+  "updates": 0
+}
