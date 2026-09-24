@@ -6,7 +6,8 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 channel:
-  name: "Curious Minute"                 # shown in CTA / description footer
+  name: "Proof in a Minute"              # shown on-screen (brand tag) and in the description footer
+  handle: "@proofinaminute"              # YouTube handle, used in the description call-to-action
   niche: >-
     Fascinating, verified facts and quick explainers about science, space,
     history, nature, technology and the stories behind things people are

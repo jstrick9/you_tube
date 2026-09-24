@@ -55,7 +55,7 @@ def build_description(script: dict, source: dict, visuals: list[dict], cfg: dict
                       "scripting and a synthetic narrator voice. Facts are checked against the source before publishing."]
     parts += ["", "🖼️ Image credits:", media.credits_text(visuals),
               "🎵 Music: original, procedurally generated for this video.", "",
-              f"Follow {cfg['channel']['name']} for a new fascinating fact every day!", "", f"{tags} #shorts"]
+              f"Follow {cfg['channel'].get('handle') or cfg['channel']['name']} for a surprising fact, with sources, every day!", "", f"{tags} #shorts"]
     return "\n".join(parts)
 
 
