@@ -37,10 +37,19 @@ def run(cfg: dict) -> dict:
     ret = youtube.retention(ids, start, now_utc().date().isoformat())
 
     now = now_utc()
+    if ids and not stats:
+        # Nothing came back at all → treat as an API/auth problem, not mass deletion; change nothing.
+        log.warning("no statistics returned for %d videos — skipping this analytics pass", len(ids))
+        return {"evaluated": 0}
+    checked = set(ids)
     for h in uploaded:
+        if h["video_id"] not in checked:
+            continue
         s = stats.get(h["video_id"])
         if not s:
+            # Video deleted/unavailable: YouTube API policy III.E.4 → stop keeping its API data.
             h["status"] = "missing"
+            h.pop("metrics", None)
             continue
         pub = datetime.fromisoformat(h.get("publish_at") or h["created_at"])
         hours = max(1.0, (now - pub).total_seconds() / 3600)
@@ -48,8 +57,16 @@ def run(cfg: dict) -> dict:
         h["metrics"].update(ret.get(h["video_id"], {}))
         h["metrics"]["hours_live"] = round(hours, 1)
         h["metrics"]["vph"] = round(s["views"] / hours, 3)
+        h["metrics"]["checked_at"] = now.isoformat()
         if s.get("rejection") or s.get("upload_status") in ("rejected", "failed"):
             h["status"] = "rejected"
+
+    # YouTube API policy III.E.4: stored statistics must be re-verified at least every 30 days.
+    # Anything not re-checked within 30 days (e.g. very old videos outside the refresh window) is dropped.
+    for h in uploaded:
+        m = h.get("metrics")
+        if m and (now - datetime.fromisoformat(m.get("checked_at") or h["created_at"])).days >= 30:
+            h.pop("metrics", None)
 
     # learn from matured, not-yet-scored videos
     min_h = cfg["analytics"]["evaluate_after_hours"]
