@@ -24,15 +24,15 @@
     "video_id": "q5lleO0lrkI",
     "status": "scheduled",
     "metrics": {
-      "views": 0,
+      "views": 8,
       "likes": 0,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1.9,
-      "vph": 0.0,
-      "checked_at": "2026-09-24T17:53:26.373793+00:00"
+      "hours_live": 14.6,
+      "vph": 0.549,
+      "checked_at": "2026-09-25T06:34:31.961035+00:00"
     }
   },
   {
@@ -58,7 +58,18 @@
     "publish_at": "2026-09-24T21:30:00+00:00",
     "llm": "gemini:gemini-flash-lite-latest",
     "video_id": "vBTIN-iRO9k",
-    "status": "scheduled"
+    "status": "scheduled",
+    "metrics": {
+      "views": 354,
+      "likes": 10,
+      "comments": 0,
+      "privacy": "public",
+      "upload_status": "processed",
+      "rejection": null,
+      "hours_live": 9.1,
+      "vph": 39.006,
+      "checked_at": "2026-09-25T06:34:31.961035+00:00"
+    }
   },
   {
     "created_at": "2026-09-24T18:04:55.259364+00:00",
@@ -83,7 +94,18 @@
     "publish_at": "2026-09-25T00:30:00+00:00",
     "llm": "gemini:gemini-flash-lite-latest",
     "video_id": "kM3myuf1c-Y",
-    "status": "scheduled"
+    "status": "scheduled",
+    "metrics": {
+      "views": 428,
+      "likes": 9,
+      "comments": 0,
+      "privacy": "public",
+      "upload_status": "processed",
+      "rejection": null,
+      "hours_live": 6.1,
+      "vph": 70.446,
+      "checked_at": "2026-09-25T06:34:31.961035+00:00"
+    }
   },
   {
     "created_at": "2026-09-24T18:04:58.142709+00:00",
@@ -108,6 +130,17 @@
     "publish_at": "2026-09-25T16:00:00+00:00",
     "llm": "gemini:gemini-flash-lite-latest",
     "video_id": "jnlRW0Ca1o8",
-    "status": "scheduled"
+    "status": "scheduled",
+    "metrics": {
+      "views": 3,
+      "likes": 0,
+      "comments": 0,
+      "privacy": "private",
+      "upload_status": "processed",
+      "rejection": null,
+      "hours_live": 1.0,
+      "vph": 3.0,
+      "checked_at": "2026-09-25T06:34:31.961035+00:00"
+    }
   }
 ]

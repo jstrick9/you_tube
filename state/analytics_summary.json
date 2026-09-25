@@ -1,8 +1,8 @@
 {
-  "updated": "2026-09-24T17:53:26.373793+00:00",
-  "videos_total": 1,
-  "videos_7d": 1,
-  "views_7d": 0,
+  "updated": "2026-09-25T06:34:31.961035+00:00",
+  "videos_total": 4,
+  "videos_7d": 4,
+  "views_7d": 793,
   "learned_this_run": 0,
   "strategy": {
     "category": [
@@ -136,9 +136,27 @@
   },
   "top_videos": [
     {
+      "title": "The Surprising History of Barbie and Mattel #shorts",
+      "id": "kM3myuf1c-Y",
+      "views": 428,
+      "avg_view_pct": null
+    },
+    {
+      "title": "When the Catholic Church Banned Heliocentrism #shorts",
+      "id": "vBTIN-iRO9k",
+      "views": 354,
+      "avg_view_pct": null
+    },
+    {
       "title": "The World's Highest Bottle Return Scheme #shorts",
       "id": "q5lleO0lrkI",
-      "views": 0,
+      "views": 8,
+      "avg_view_pct": null
+    },
+    {
+      "title": "Surprising Facts About the Octopus #shorts",
+      "id": "jnlRW0Ca1o8",
+      "views": 3,
       "avg_view_pct": null
     }
   ],
