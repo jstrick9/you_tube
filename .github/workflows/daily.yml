@@ -8,7 +8,9 @@ name: AutoTube daily
 
 on:
   schedule:
-    - cron: "17 13 * * *"        # 13:17 UTC ≈ 9:17 AM New York (odd minute avoids top-of-hour queue delays)
+    # GitHub often starts scheduled runs late (we've seen 4–5 hours), so:
+    - cron: "17 10 * * *"        # main run   10:17 UTC = 6:17 AM EDT / 5:17 AM EST
+    - cron: "47 15 * * *"        # backup     15:47 UTC = 11:47 AM EDT / 10:47 AM EST (only fills what's missing)
   workflow_dispatch:
     inputs:
       count:
@@ -72,6 +74,8 @@ jobs:
             echo "::notice::Dry run (render only): YouTube secrets incomplete or dry_run selected."
             ARGS="$ARGS --dry-run"
           fi
+          # scheduled runs use --top-up: they only make the videos still missing today, so the backup never duplicates
+          if [ "${{ github.event_name }}" = "schedule" ]; then ARGS="$ARGS --top-up"; fi
           python -m autotube run $ARGS
 
       - name: Keep rendered videos for 7 days (download from the run page)

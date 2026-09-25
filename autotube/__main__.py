@@ -98,6 +98,8 @@ def main(argv=None) -> int:
     ap.add_argument("-n", "--count", type=int)
     ap.add_argument("--dry-run", action="store_true", help="render but do not upload")
     ap.add_argument("--keep-work", action="store_true")
+    ap.add_argument("--top-up", action="store_true",
+                    help="only make the videos still missing for today (safe to run several times a day)")
     ap.add_argument("--config")
     ap.add_argument("-v", "--verbose", action="store_true")
     a = ap.parse_args(argv)
@@ -128,6 +130,13 @@ def main(argv=None) -> int:
             return 1
 
     from . import pipeline
+    if a.top_up and not a.count:
+        left = pipeline.remaining_today(cfg, upload=not a.dry_run and cfg["upload"]["enabled"])
+        if left == 0:
+            print("Today's videos are already done — nothing to do (top-up run).")
+            return 0
+        log.info("top-up: %d video(s) still needed today", left)
+        a.count = left
     try:
         res = pipeline.run(cfg, a.count, upload=False if a.dry_run else None, keep_work=a.keep_work)
     except Exception as e:  # noqa: BLE001

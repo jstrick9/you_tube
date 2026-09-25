@@ -25,22 +25,54 @@ from .tts import synthesize
 log = logging.getLogger("autotube.pipeline")
 
 
-def publish_slots(cfg: dict, n: int) -> list[datetime | None]:
+def _slot_key(ts) -> str:
+    d = ts if isinstance(ts, datetime) else datetime.fromisoformat(str(ts))
+    return d.astimezone(ZoneInfo("UTC")).strftime("%Y-%m-%dT%H:%M")
+
+
+def taken_slots(hist: list[dict]) -> set[str]:
+    """Publish slots already used by successfully uploaded videos that haven't gone live yet."""
+    now = now_utc()
+    out = set()
+    for h in hist:
+        if h.get("video_id") and h.get("publish_at"):
+            try:
+                if datetime.fromisoformat(h["publish_at"]) > now:
+                    out.add(_slot_key(h["publish_at"]))
+            except ValueError:
+                pass
+    return out
+
+
+def publish_slots(cfg: dict, n: int, taken: set[str] | None = None) -> list[datetime | None]:
+    """Next n free publish slots (local schedule times), skipping past slots and ones already booked."""
     tz = ZoneInfo(cfg["channel"].get("timezone", "UTC"))
     now_local = now_utc().astimezone(tz)
+    taken = taken or set()
     slots = []
     times = cfg["schedule"]["publish_times"]
     day = now_local.date()
-    while len(slots) < n:
+    for _ in range(60):                                  # hard stop: never loop forever
         for t in times:
             hh, mm = map(int, t.split(":"))
             dt = datetime(day.year, day.month, day.day, hh, mm, tzinfo=tz)
-            if dt > now_local + timedelta(minutes=20):   # YouTube needs publishAt in the future
+            if dt > now_local + timedelta(minutes=20) and _slot_key(dt) not in taken:   # publishAt must be future
                 slots.append(dt.astimezone(ZoneInfo("UTC")))
             if len(slots) >= n:
-                break
+                return slots
         day += timedelta(days=1)
     return slots
+
+
+def remaining_today(cfg: dict, upload: bool = True) -> int:
+    """How many of today's videos (channel timezone) still need to be made. Used by scheduled top-up runs."""
+    tz = ZoneInfo(cfg["channel"].get("timezone", "UTC"))
+    today = now_utc().astimezone(tz).date()
+    ok = {"scheduled"} if upload else {"scheduled", "rendered"}
+    done = sum(1 for h in read_json("history.json", [])
+               if h.get("status") in ok and h.get("created_at")
+               and datetime.fromisoformat(h["created_at"]).astimezone(tz).date() == today)
+    return max(0, int(cfg["schedule"]["videos_per_day"]) - done)
 
 
 def build_description(script: dict, source: dict, visuals: list[dict], cfg: dict, tts_engine: str) -> str:
@@ -149,7 +181,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
 
     # 3. upload (scheduled)
     hist = read_json("history.json", [])
-    slots = publish_slots(cfg, len(results))
+    slots = publish_slots(cfg, len(results), taken_slots(hist))
     for res, slot in zip(results, slots):
         entry = {
             "created_at": now_utc().isoformat(), "run_id": run_id, "title": res["meta"]["title"],
