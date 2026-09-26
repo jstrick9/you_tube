@@ -1,9 +1,9 @@
 {
-  "updated": "2026-09-26T14:33:58.214050+00:00",
-  "videos_total": 7,
-  "videos_7d": 7,
-  "views_7d": 3816,
-  "learned_this_run": 0,
+  "updated": "2026-09-26T18:44:39.101511+00:00",
+  "videos_total": 10,
+  "videos_7d": 10,
+  "views_7d": 4111,
+  "learned_this_run": 1,
   "strategy": {
     "category": [
       {
@@ -34,7 +34,7 @@
       {
         "arm": "geography",
         "mean": 0.5,
-        "n": 0
+        "n": 1
       },
       {
         "arm": "culture",
@@ -56,7 +56,7 @@
       {
         "arm": "facts3",
         "mean": 0.5,
-        "n": 0
+        "n": 1
       },
       {
         "arm": "backstory",
@@ -93,7 +93,7 @@
       {
         "arm": "bold_claim",
         "mean": 0.5,
-        "n": 0
+        "n": 1
       },
       {
         "arm": "number_first",
@@ -115,7 +115,7 @@
       {
         "arm": "en-US-AvaNeural",
         "mean": 0.5,
-        "n": 0
+        "n": 1
       },
       {
         "arm": "en-US-BrianNeural",
@@ -136,33 +136,39 @@
   },
   "top_videos": [
     {
+      "title": "When the Catholic Church Banned Heliocentrism #shorts",
+      "id": "vBTIN-iRO9k",
+      "views": 1141,
+      "avg_view_pct": null
+    },
+    {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
       "views": 1131,
       "avg_view_pct": null
     },
     {
-      "title": "When the Catholic Church Banned Heliocentrism #shorts",
-      "id": "vBTIN-iRO9k",
-      "views": 1128,
-      "avg_view_pct": null
-    },
-    {
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
-      "views": 1064,
+      "views": 1074,
       "avg_view_pct": null
     },
     {
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
-      "views": 345,
+      "views": 575,
       "avg_view_pct": null
     },
     {
       "title": "How Your Liver Rebuilds Itself #shorts",
       "id": "oTgoKlCkGE0",
-      "views": 135,
+      "views": 141,
+      "avg_view_pct": null
+    },
+    {
+      "title": "Can you win chess by losing everything? #shorts",
+      "id": "OyHMkwqEOKo",
+      "views": 36,
       "avg_view_pct": null
     },
     {
@@ -172,8 +178,20 @@
       "avg_view_pct": null
     },
     {
-      "title": "Can you win chess by losing everything? #shorts",
-      "id": "OyHMkwqEOKo",
+      "title": "The Long Development of Ant-Man #shorts",
+      "id": "tFm3Zuu2kGA",
+      "views": 0,
+      "avg_view_pct": null
+    },
+    {
+      "title": "Why speaking another language changes you #shorts",
+      "id": "laRBRQqcE0E",
+      "views": 0,
+      "avg_view_pct": null
+    },
+    {
+      "title": "The Only Governor Of Two Different States #shorts",
+      "id": "lUA-2zrFHGc",
       "views": 0,
       "avg_view_pct": null
     }
