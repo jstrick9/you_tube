@@ -30,9 +30,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 38.6,
-      "vph": 0.337,
-      "checked_at": "2026-09-26T06:36:00.551846+00:00"
+      "hours_live": 46.6,
+      "vph": 0.279,
+      "checked_at": "2026-09-26T14:33:58.214050+00:00"
     }
   },
   {
@@ -60,15 +60,15 @@
     "video_id": "vBTIN-iRO9k",
     "status": "scheduled",
     "metrics": {
-      "views": 898,
-      "likes": 26,
+      "views": 1128,
+      "likes": 27,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 33.1,
-      "vph": 27.13,
-      "checked_at": "2026-09-26T06:36:00.551846+00:00"
+      "hours_live": 41.1,
+      "vph": 27.468,
+      "checked_at": "2026-09-26T14:33:58.214050+00:00"
     }
   },
   {
@@ -96,15 +96,15 @@
     "video_id": "kM3myuf1c-Y",
     "status": "scheduled",
     "metrics": {
-      "views": 1126,
+      "views": 1131,
       "likes": 17,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 30.1,
-      "vph": 37.408,
-      "checked_at": "2026-09-26T06:36:00.551846+00:00"
+      "hours_live": 38.1,
+      "vph": 29.711,
+      "checked_at": "2026-09-26T14:33:58.214050+00:00"
     }
   },
   {
@@ -132,15 +132,15 @@
     "video_id": "jnlRW0Ca1o8",
     "status": "scheduled",
     "metrics": {
-      "views": 1058,
+      "views": 1064,
       "likes": 21,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 14.6,
-      "vph": 72.465,
-      "checked_at": "2026-09-26T06:36:00.551846+00:00"
+      "hours_live": 22.6,
+      "vph": 47.15,
+      "checked_at": "2026-09-26T14:33:58.214050+00:00"
     }
   },
   {
@@ -168,15 +168,15 @@
     "video_id": "M1QR18R35Bc",
     "status": "scheduled",
     "metrics": {
-      "views": 108,
-      "likes": 1,
+      "views": 345,
+      "likes": 6,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 9.1,
-      "vph": 11.868,
-      "checked_at": "2026-09-26T06:36:00.551846+00:00"
+      "hours_live": 17.1,
+      "vph": 20.215,
+      "checked_at": "2026-09-26T14:33:58.214050+00:00"
     }
   },
   {
@@ -204,15 +204,15 @@
     "video_id": "oTgoKlCkGE0",
     "status": "scheduled",
     "metrics": {
-      "views": 110,
+      "views": 135,
       "likes": 0,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 6.1,
-      "vph": 18.032,
-      "checked_at": "2026-09-26T06:36:00.551846+00:00"
+      "hours_live": 14.1,
+      "vph": 9.597,
+      "checked_at": "2026-09-26T14:33:58.214050+00:00"
     }
   },
   {
@@ -248,7 +248,82 @@
       "rejection": null,
       "hours_live": 1.0,
       "vph": 0.0,
-      "checked_at": "2026-09-26T06:36:00.551846+00:00"
+      "checked_at": "2026-09-26T14:33:58.214050+00:00"
     }
+  },
+  {
+    "created_at": "2026-09-26T14:36:59.067500+00:00",
+    "run_id": "20260926-1433",
+    "title": "The Long Development of Ant-Man #shorts",
+    "topic": "Marvel secured permission to use Thomas the Tank Engine in \"Ant-Man\" after the rights holders approved the presentation, with conditions that Thomas could not run over anyone, be portrayed as evil, or take sides in the battle.",
+    "topic_key": "marvel secured permission to use thomas the tank engine in antman after the rights holders approved the presentation with conditions that thomas could not run over anyone be portrayed as evil or take sides in the battle",
+    "wiki_title": "Ant-Man (film)",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "entertainment",
+      "format": "backstory",
+      "hook_style": "you_statement",
+      "voice": "en-US-ChristopherNeural"
+    },
+    "review_score": 10,
+    "duration": 38.33206349206349,
+    "tts_engine": "edge-tts",
+    "file": "20260926-1433-01-ant-man-film.mp4",
+    "publish_at": "2026-09-26T21:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "tFm3Zuu2kGA",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-09-26T14:37:01.717296+00:00",
+    "run_id": "20260926-1433",
+    "title": "Why speaking another language changes you #shorts",
+    "topic": "studies show bilingual people often display different personality traits depending on the language they are speaking, scoring higher in traits like extraversion or agreeableness in one language over another.",
+    "topic_key": "studies show bilingual people often display different personality traits depending on the language they are speaking scoring higher in traits like extraversion or agreeableness in one language over another",
+    "wiki_title": "Multilingualism",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "science",
+      "format": "timeline",
+      "hook_style": "question",
+      "voice": "en-US-ChristopherNeural"
+    },
+    "review_score": 9,
+    "duration": 36.47204081632653,
+    "tts_engine": "edge-tts",
+    "file": "20260926-1433-02-multilingualism.mp4",
+    "publish_at": "2026-09-27T00:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "laRBRQqcE0E",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-09-26T14:37:04.673832+00:00",
+    "run_id": "20260926-1433",
+    "title": "The Only Governor Of Two Different States #shorts",
+    "topic": "Sam Houston is the only person in US history to serve as the governor of two different states (Tennessee and Texas), and he also served as the President of the Republic of Texas.",
+    "topic_key": "sam houston is the only person in us history to serve as the governor of two different states tennessee and texas and he also served as the president of the republic of texas",
+    "wiki_title": "Sam Houston",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "history",
+      "format": "facts3",
+      "hook_style": "number_first",
+      "voice": "en-US-ChristopherNeural"
+    },
+    "review_score": 10,
+    "duration": 29.692063492063486,
+    "tts_engine": "edge-tts",
+    "file": "20260926-1433-03-sam-houston.mp4",
+    "publish_at": "2026-09-27T16:00:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "lUA-2zrFHGc",
+    "status": "scheduled"
   }
 ]
