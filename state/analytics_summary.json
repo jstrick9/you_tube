@@ -1,20 +1,20 @@
 {
-  "updated": "2026-09-27T15:12:03.474353+00:00",
-  "videos_total": 10,
-  "videos_7d": 10,
-  "views_7d": 8205,
-  "learned_this_run": 0,
+  "updated": "2026-09-27T19:19:38.692922+00:00",
+  "videos_total": 13,
+  "videos_7d": 13,
+  "views_7d": 8462,
+  "learned_this_run": 1,
   "strategy": {
     "category": [
+      {
+        "arm": "science",
+        "mean": 0.558,
+        "n": 1
+      },
       {
         "arm": "culture",
         "mean": 0.522,
         "n": 1
-      },
-      {
-        "arm": "science",
-        "mean": 0.5,
-        "n": 0
       },
       {
         "arm": "space",
@@ -54,6 +54,11 @@
     ],
     "format": [
       {
+        "arm": "by_the_numbers",
+        "mean": 0.558,
+        "n": 1
+      },
+      {
         "arm": "myth_vs_fact",
         "mean": 0.522,
         "n": 1
@@ -74,17 +79,17 @@
         "n": 0
       },
       {
-        "arm": "by_the_numbers",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
         "arm": "what_if",
         "mean": 0.5,
         "n": 0
       }
     ],
     "hook_style": [
+      {
+        "arm": "you_statement",
+        "mean": 0.544,
+        "n": 2
+      },
       {
         "arm": "question",
         "mean": 0.522,
@@ -99,14 +104,14 @@
         "arm": "number_first",
         "mean": 0.5,
         "n": 0
-      },
-      {
-        "arm": "you_statement",
-        "mean": 0.5,
-        "n": 1
       }
     ],
     "voice": [
+      {
+        "arm": "en-US-EmmaNeural",
+        "mean": 0.558,
+        "n": 1
+      },
       {
         "arm": "en-US-ChristopherNeural",
         "mean": 0.517,
@@ -126,11 +131,6 @@
         "arm": "en-US-BrianNeural",
         "mean": 0.5,
         "n": 0
-      },
-      {
-        "arm": "en-US-EmmaNeural",
-        "mean": 0.5,
-        "n": 0
       }
     ]
   },
@@ -138,20 +138,20 @@
     {
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
-      "views": 1274,
-      "avg_view_pct": 27.940000000000005
+      "views": 1275,
+      "avg_view_pct": 56.32
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
       "views": 1180,
-      "avg_view_pct": 45.76
+      "avg_view_pct": 41.51
     },
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1177,
-      "avg_view_pct": 116.29
+      "views": 1179,
+      "avg_view_pct": 82.28
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -162,25 +162,31 @@
     {
       "title": "How Your Liver Rebuilds Itself #shorts",
       "id": "oTgoKlCkGE0",
-      "views": 1138,
-      "avg_view_pct": null
+      "views": 1139,
+      "avg_view_pct": 32.56
     },
     {
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
-      "views": 1130,
-      "avg_view_pct": null
+      "views": 1137,
+      "avg_view_pct": 51.190000000000005
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
       "id": "OyHMkwqEOKo",
-      "views": 755,
+      "views": 808,
       "avg_view_pct": null
     },
     {
       "title": "Why speaking another language changes you #shorts",
       "id": "laRBRQqcE0E",
-      "views": 359,
+      "views": 393,
+      "avg_view_pct": null
+    },
+    {
+      "title": "The Only Governor Of Two Different States #shorts",
+      "id": "lUA-2zrFHGc",
+      "views": 159,
       "avg_view_pct": null
     },
     {
@@ -188,12 +194,6 @@
       "id": "q5lleO0lrkI",
       "views": 18,
       "avg_view_pct": 6862.8
-    },
-    {
-      "title": "The Only Governor Of Two Different States #shorts",
-      "id": "lUA-2zrFHGc",
-      "views": 0,
-      "avg_view_pct": null
     }
   ],
   "rejected": []
