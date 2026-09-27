@@ -30,9 +30,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 63.1,
-      "vph": 0.285,
-      "checked_at": "2026-09-27T07:04:35.962111+00:00",
+      "hours_live": 71.2,
+      "vph": 0.253,
+      "checked_at": "2026-09-27T15:12:03.474353+00:00",
       "a_views": 13,
       "avg_view_pct": 6862.8,
       "avg_view_dur": 2264
@@ -64,15 +64,15 @@
     "video_id": "vBTIN-iRO9k",
     "status": "scheduled",
     "metrics": {
-      "views": 1169,
+      "views": 1177,
       "likes": 27,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 57.6,
-      "vph": 20.303,
-      "checked_at": "2026-09-27T07:04:35.962111+00:00",
+      "hours_live": 65.7,
+      "vph": 17.915,
+      "checked_at": "2026-09-27T15:12:03.474353+00:00",
       "a_views": 373,
       "avg_view_pct": 116.29,
       "avg_view_dur": 51
@@ -110,9 +110,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 54.6,
-      "vph": 21.621,
-      "checked_at": "2026-09-27T07:04:35.962111+00:00",
+      "hours_live": 62.7,
+      "vph": 18.819,
+      "checked_at": "2026-09-27T15:12:03.474353+00:00",
       "a_views": 548,
       "avg_view_pct": 45.76,
       "avg_view_dur": 16
@@ -144,15 +144,15 @@
     "video_id": "jnlRW0Ca1o8",
     "status": "scheduled",
     "metrics": {
-      "views": 1071,
-      "likes": 21,
+      "views": 1274,
+      "likes": 26,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 39.1,
-      "vph": 27.408,
-      "checked_at": "2026-09-27T07:04:35.962111+00:00",
+      "hours_live": 47.2,
+      "vph": 26.991,
+      "checked_at": "2026-09-27T15:12:03.474353+00:00",
       "a_views": 3,
       "avg_view_pct": 27.940000000000005,
       "avg_view_dur": 8
@@ -183,15 +183,15 @@
     "video_id": "M1QR18R35Bc",
     "status": "scheduled",
     "metrics": {
-      "views": 1056,
+      "views": 1130,
       "likes": 16,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 33.6,
-      "vph": 31.45,
-      "checked_at": "2026-09-27T07:04:35.962111+00:00"
+      "hours_live": 41.7,
+      "vph": 27.098,
+      "checked_at": "2026-09-27T15:12:03.474353+00:00"
     }
   },
   {
@@ -219,15 +219,15 @@
     "video_id": "oTgoKlCkGE0",
     "status": "scheduled",
     "metrics": {
-      "views": 938,
+      "views": 1138,
       "likes": 13,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 30.6,
-      "vph": 30.677,
-      "checked_at": "2026-09-27T07:04:35.962111+00:00"
+      "hours_live": 38.7,
+      "vph": 29.405,
+      "checked_at": "2026-09-27T15:12:03.474353+00:00"
     }
   },
   {
@@ -255,15 +255,15 @@
     "video_id": "OyHMkwqEOKo",
     "status": "scheduled",
     "metrics": {
-      "views": 436,
-      "likes": 7,
-      "comments": 0,
+      "views": 755,
+      "likes": 9,
+      "comments": 1,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 15.1,
-      "vph": 28.919,
-      "checked_at": "2026-09-27T07:04:35.962111+00:00"
+      "hours_live": 23.2,
+      "vph": 32.542,
+      "checked_at": "2026-09-27T15:12:03.474353+00:00"
     }
   },
   {
@@ -291,15 +291,15 @@
     "video_id": "tFm3Zuu2kGA",
     "status": "scheduled",
     "metrics": {
-      "views": 699,
-      "likes": 8,
+      "views": 1174,
+      "likes": 10,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 9.6,
-      "vph": 72.99,
-      "checked_at": "2026-09-27T07:04:35.962111+00:00"
+      "hours_live": 17.7,
+      "vph": 66.324,
+      "checked_at": "2026-09-27T15:12:03.474353+00:00"
     }
   },
   {
@@ -327,15 +327,15 @@
     "video_id": "laRBRQqcE0E",
     "status": "scheduled",
     "metrics": {
-      "views": 232,
-      "likes": 4,
+      "views": 359,
+      "likes": 5,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 6.6,
-      "vph": 35.276,
-      "checked_at": "2026-09-27T07:04:35.962111+00:00"
+      "hours_live": 14.7,
+      "vph": 24.42,
+      "checked_at": "2026-09-27T15:12:03.474353+00:00"
     }
   },
   {
@@ -371,7 +371,82 @@
       "rejection": null,
       "hours_live": 1.0,
       "vph": 0.0,
-      "checked_at": "2026-09-27T07:04:35.962111+00:00"
+      "checked_at": "2026-09-27T15:12:03.474353+00:00"
     }
+  },
+  {
+    "created_at": "2026-09-27T15:15:47.468680+00:00",
+    "run_id": "20260927-1512",
+    "title": "Which Substance Has the Highest Melting Point? #shorts",
+    "topic": "there is no current universal agreement on what compound has the highest melting point. At extreme temperatures material composition and structure change. A Ta-Hf-C alloy has been confirmed to melt at 4215 C (7619 F). Other candidates are Tantalum Carbide and a carbonitride compound.",
+    "topic_key": "there is no current universal agreement on what compound has the highest melting point at extreme temperatures material composition and structure change a tahfc alloy has been confirmed to melt at 4215 c 7619 f other candidates are tantalum carbide and a carbonitride compound",
+    "wiki_title": "Melting point",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "science",
+      "format": "facts3",
+      "hook_style": "you_statement",
+      "voice": "en-US-BrianNeural"
+    },
+    "review_score": 10,
+    "duration": 37.33605442176871,
+    "tts_engine": "edge-tts",
+    "file": "20260927-1512-01-melting-point.mp4",
+    "publish_at": "2026-09-27T21:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "4WkKoRw9r00",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-09-27T15:15:50.159261+00:00",
+    "run_id": "20260927-1512",
+    "title": "Inside the 80 Billion Dollar Grand Inga Dam Project #shorts",
+    "topic": "the proposed Grand Inga Dam in the DR Congo would be the largest power plant ever. With a capacity double that of the Three Gorges Dam, the series of seven dams would be the largest clean energy project ever. At an estimated cost of $80 billion the project remains on hold.",
+    "topic_key": "the proposed grand inga dam in the dr congo would be the largest power plant ever with a capacity double that of the three gorges dam the series of seven dams would be the largest clean energy project ever at an estimated cost of 80 billion the project remains on hold",
+    "wiki_title": "Grand Inga Dam",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "geography",
+      "format": "timeline",
+      "hook_style": "number_first",
+      "voice": "en-US-AvaNeural"
+    },
+    "review_score": 10,
+    "duration": 37.864058956916104,
+    "tts_engine": "edge-tts",
+    "file": "20260927-1512-02-grand-inga-dam.mp4",
+    "publish_at": "2026-09-28T00:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "SBETRh-FF_I",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-09-27T15:15:52.827506+00:00",
+    "run_id": "20260927-1512",
+    "title": "How Does Canadian Rain Reach the Gulf of Mexico? #shorts",
+    "topic": "parts of Alberta and Saskatchewan, Canada, are actually within the Mississippi River Basin, meaning some water that falls in Canada eventually flows all the way to the Gulf of Mexico.",
+    "topic_key": "parts of alberta and saskatchewan canada are actually within the mississippi river basin meaning some water that falls in canada eventually flows all the way to the gulf of mexico",
+    "wiki_title": "Mississippi River",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "geography",
+      "format": "backstory",
+      "hook_style": "question",
+      "voice": "en-US-AndrewNeural"
+    },
+    "review_score": 10,
+    "duration": 38.4040589569161,
+    "tts_engine": "edge-tts",
+    "file": "20260927-1512-03-mississippi-river.mp4",
+    "publish_at": "2026-09-28T16:00:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "6dO8y_ojGhI",
+    "status": "scheduled"
   }
 ]

@@ -1,9 +1,9 @@
 {
-  "updated": "2026-09-27T07:04:35.962111+00:00",
+  "updated": "2026-09-27T15:12:03.474353+00:00",
   "videos_total": 10,
   "videos_7d": 10,
-  "views_7d": 6799,
-  "learned_this_run": 2,
+  "views_7d": 8205,
+  "learned_this_run": 0,
   "strategy": {
     "category": [
       {
@@ -136,6 +136,12 @@
   },
   "top_videos": [
     {
+      "title": "Surprising Facts About the Octopus #shorts",
+      "id": "jnlRW0Ca1o8",
+      "views": 1274,
+      "avg_view_pct": 27.940000000000005
+    },
+    {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
       "views": 1180,
@@ -144,43 +150,37 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1169,
+      "views": 1177,
       "avg_view_pct": 116.29
     },
     {
-      "title": "Surprising Facts About the Octopus #shorts",
-      "id": "jnlRW0Ca1o8",
-      "views": 1071,
-      "avg_view_pct": 27.940000000000005
-    },
-    {
-      "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
-      "id": "M1QR18R35Bc",
-      "views": 1056,
+      "title": "The Long Development of Ant-Man #shorts",
+      "id": "tFm3Zuu2kGA",
+      "views": 1174,
       "avg_view_pct": null
     },
     {
       "title": "How Your Liver Rebuilds Itself #shorts",
       "id": "oTgoKlCkGE0",
-      "views": 938,
+      "views": 1138,
       "avg_view_pct": null
     },
     {
-      "title": "The Long Development of Ant-Man #shorts",
-      "id": "tFm3Zuu2kGA",
-      "views": 699,
+      "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
+      "id": "M1QR18R35Bc",
+      "views": 1130,
       "avg_view_pct": null
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
       "id": "OyHMkwqEOKo",
-      "views": 436,
+      "views": 755,
       "avg_view_pct": null
     },
     {
       "title": "Why speaking another language changes you #shorts",
       "id": "laRBRQqcE0E",
-      "views": 232,
+      "views": 359,
       "avg_view_pct": null
     },
     {
