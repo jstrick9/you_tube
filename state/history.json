@@ -24,15 +24,18 @@
     "video_id": "q5lleO0lrkI",
     "status": "scheduled",
     "metrics": {
-      "views": 13,
+      "views": 18,
       "likes": 0,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 50.7,
-      "vph": 0.256,
-      "checked_at": "2026-09-26T18:44:39.101511+00:00"
+      "hours_live": 63.1,
+      "vph": 0.285,
+      "checked_at": "2026-09-27T07:04:35.962111+00:00",
+      "a_views": 13,
+      "avg_view_pct": 6862.8,
+      "avg_view_dur": 2264
     },
     "reward": 0.5
   },
@@ -61,16 +64,20 @@
     "video_id": "vBTIN-iRO9k",
     "status": "scheduled",
     "metrics": {
-      "views": 1141,
+      "views": 1169,
       "likes": 27,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 45.2,
-      "vph": 25.219,
-      "checked_at": "2026-09-26T18:44:39.101511+00:00"
-    }
+      "hours_live": 57.6,
+      "vph": 20.303,
+      "checked_at": "2026-09-27T07:04:35.962111+00:00",
+      "a_views": 373,
+      "avg_view_pct": 116.29,
+      "avg_view_dur": 51
+    },
+    "reward": 0.5
   },
   {
     "created_at": "2026-09-24T18:04:55.259364+00:00",
@@ -97,16 +104,20 @@
     "video_id": "kM3myuf1c-Y",
     "status": "scheduled",
     "metrics": {
-      "views": 1131,
+      "views": 1180,
       "likes": 17,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 42.2,
-      "vph": 26.773,
-      "checked_at": "2026-09-26T18:44:39.101511+00:00"
-    }
+      "hours_live": 54.6,
+      "vph": 21.621,
+      "checked_at": "2026-09-27T07:04:35.962111+00:00",
+      "a_views": 548,
+      "avg_view_pct": 45.76,
+      "avg_view_dur": 16
+    },
+    "reward": 0.5667
   },
   {
     "created_at": "2026-09-24T18:04:58.142709+00:00",
@@ -133,15 +144,18 @@
     "video_id": "jnlRW0Ca1o8",
     "status": "scheduled",
     "metrics": {
-      "views": 1074,
+      "views": 1071,
       "likes": 21,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 26.7,
-      "vph": 40.158,
-      "checked_at": "2026-09-26T18:44:39.101511+00:00"
+      "hours_live": 39.1,
+      "vph": 27.408,
+      "checked_at": "2026-09-27T07:04:35.962111+00:00",
+      "a_views": 3,
+      "avg_view_pct": 27.940000000000005,
+      "avg_view_dur": 8
     }
   },
   {
@@ -169,15 +183,15 @@
     "video_id": "M1QR18R35Bc",
     "status": "scheduled",
     "metrics": {
-      "views": 575,
-      "likes": 9,
+      "views": 1056,
+      "likes": 16,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 21.2,
-      "vph": 27.066,
-      "checked_at": "2026-09-26T18:44:39.101511+00:00"
+      "hours_live": 33.6,
+      "vph": 31.45,
+      "checked_at": "2026-09-27T07:04:35.962111+00:00"
     }
   },
   {
@@ -205,15 +219,15 @@
     "video_id": "oTgoKlCkGE0",
     "status": "scheduled",
     "metrics": {
-      "views": 141,
-      "likes": 0,
+      "views": 938,
+      "likes": 13,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 18.2,
-      "vph": 7.728,
-      "checked_at": "2026-09-26T18:44:39.101511+00:00"
+      "hours_live": 30.6,
+      "vph": 30.677,
+      "checked_at": "2026-09-27T07:04:35.962111+00:00"
     }
   },
   {
@@ -241,15 +255,15 @@
     "video_id": "OyHMkwqEOKo",
     "status": "scheduled",
     "metrics": {
-      "views": 36,
-      "likes": 2,
+      "views": 436,
+      "likes": 7,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 2.7,
-      "vph": 13.119,
-      "checked_at": "2026-09-26T18:44:39.101511+00:00"
+      "hours_live": 15.1,
+      "vph": 28.919,
+      "checked_at": "2026-09-27T07:04:35.962111+00:00"
     }
   },
   {
@@ -277,15 +291,15 @@
     "video_id": "tFm3Zuu2kGA",
     "status": "scheduled",
     "metrics": {
-      "views": 0,
-      "likes": 0,
+      "views": 699,
+      "likes": 8,
       "comments": 0,
-      "privacy": "private",
+      "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1.0,
-      "vph": 0.0,
-      "checked_at": "2026-09-26T18:44:39.101511+00:00"
+      "hours_live": 9.6,
+      "vph": 72.99,
+      "checked_at": "2026-09-27T07:04:35.962111+00:00"
     }
   },
   {
@@ -313,15 +327,15 @@
     "video_id": "laRBRQqcE0E",
     "status": "scheduled",
     "metrics": {
-      "views": 0,
-      "likes": 0,
+      "views": 232,
+      "likes": 4,
       "comments": 0,
-      "privacy": "private",
+      "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1.0,
-      "vph": 0.0,
-      "checked_at": "2026-09-26T18:44:39.101511+00:00"
+      "hours_live": 6.6,
+      "vph": 35.276,
+      "checked_at": "2026-09-27T07:04:35.962111+00:00"
     }
   },
   {
@@ -357,7 +371,7 @@
       "rejection": null,
       "hours_live": 1.0,
       "vph": 0.0,
-      "checked_at": "2026-09-26T18:44:39.101511+00:00"
+      "checked_at": "2026-09-27T07:04:35.962111+00:00"
     }
   }
 ]

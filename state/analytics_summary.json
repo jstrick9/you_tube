@@ -1,11 +1,16 @@
 {
-  "updated": "2026-09-26T18:44:39.101511+00:00",
+  "updated": "2026-09-27T07:04:35.962111+00:00",
   "videos_total": 10,
   "videos_7d": 10,
-  "views_7d": 4111,
-  "learned_this_run": 1,
+  "views_7d": 6799,
+  "learned_this_run": 2,
   "strategy": {
     "category": [
+      {
+        "arm": "culture",
+        "mean": 0.522,
+        "n": 1
+      },
       {
         "arm": "science",
         "mean": 0.5,
@@ -19,7 +24,7 @@
       {
         "arm": "history",
         "mean": 0.5,
-        "n": 0
+        "n": 1
       },
       {
         "arm": "nature",
@@ -37,11 +42,6 @@
         "n": 1
       },
       {
-        "arm": "culture",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
         "arm": "sports",
         "mean": 0.5,
         "n": 0
@@ -54,6 +54,11 @@
     ],
     "format": [
       {
+        "arm": "myth_vs_fact",
+        "mean": 0.522,
+        "n": 1
+      },
+      {
         "arm": "facts3",
         "mean": 0.5,
         "n": 1
@@ -61,12 +66,7 @@
       {
         "arm": "backstory",
         "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "myth_vs_fact",
-        "mean": 0.5,
-        "n": 0
+        "n": 1
       },
       {
         "arm": "timeline",
@@ -87,8 +87,8 @@
     "hook_style": [
       {
         "arm": "question",
-        "mean": 0.5,
-        "n": 0
+        "mean": 0.522,
+        "n": 1
       },
       {
         "arm": "bold_claim",
@@ -103,10 +103,15 @@
       {
         "arm": "you_statement",
         "mean": 0.5,
-        "n": 0
+        "n": 1
       }
     ],
     "voice": [
+      {
+        "arm": "en-US-ChristopherNeural",
+        "mean": 0.517,
+        "n": 2
+      },
       {
         "arm": "en-US-AndrewNeural",
         "mean": 0.5,
@@ -126,68 +131,63 @@
         "arm": "en-US-EmmaNeural",
         "mean": 0.5,
         "n": 0
-      },
-      {
-        "arm": "en-US-ChristopherNeural",
-        "mean": 0.5,
-        "n": 0
       }
     ]
   },
   "top_videos": [
     {
-      "title": "When the Catholic Church Banned Heliocentrism #shorts",
-      "id": "vBTIN-iRO9k",
-      "views": 1141,
-      "avg_view_pct": null
-    },
-    {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
-      "views": 1131,
-      "avg_view_pct": null
+      "views": 1180,
+      "avg_view_pct": 45.76
+    },
+    {
+      "title": "When the Catholic Church Banned Heliocentrism #shorts",
+      "id": "vBTIN-iRO9k",
+      "views": 1169,
+      "avg_view_pct": 116.29
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
-      "views": 1074,
-      "avg_view_pct": null
+      "views": 1071,
+      "avg_view_pct": 27.940000000000005
     },
     {
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
-      "views": 575,
+      "views": 1056,
       "avg_view_pct": null
     },
     {
       "title": "How Your Liver Rebuilds Itself #shorts",
       "id": "oTgoKlCkGE0",
-      "views": 141,
-      "avg_view_pct": null
-    },
-    {
-      "title": "Can you win chess by losing everything? #shorts",
-      "id": "OyHMkwqEOKo",
-      "views": 36,
-      "avg_view_pct": null
-    },
-    {
-      "title": "The World's Highest Bottle Return Scheme #shorts",
-      "id": "q5lleO0lrkI",
-      "views": 13,
+      "views": 938,
       "avg_view_pct": null
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
       "id": "tFm3Zuu2kGA",
-      "views": 0,
+      "views": 699,
+      "avg_view_pct": null
+    },
+    {
+      "title": "Can you win chess by losing everything? #shorts",
+      "id": "OyHMkwqEOKo",
+      "views": 436,
       "avg_view_pct": null
     },
     {
       "title": "Why speaking another language changes you #shorts",
       "id": "laRBRQqcE0E",
-      "views": 0,
+      "views": 232,
       "avg_view_pct": null
+    },
+    {
+      "title": "The World's Highest Bottle Return Scheme #shorts",
+      "id": "q5lleO0lrkI",
+      "views": 18,
+      "avg_view_pct": 6862.8
     },
     {
       "title": "The Only Governor Of Two Different States #shorts",
