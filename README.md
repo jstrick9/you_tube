@@ -35,6 +35,7 @@ After a one-time setup of about 45 minutes it runs on GitHub Actions' free tier.
 | **Variety** | 6 formats (facts, backstory, myth-vs-fact, timeline, by-the-numbers, what-if) × 4 hook styles × 5 voices × 5 caption themes × 7 transition styles × a unique soundtrack per video. | – |
 | **Voice** | edge-tts neural voices with exact word timings. If that fails, it falls back automatically to **Piper**, which is fully offline and open source. | Free |
 | **Visuals** | Wikimedia Commons (images from the source article first), Openverse, and Pexels (optional key). **Only PD/CC0/CC-BY/CC-BY-SA licenses are accepted, never NC/ND.** Each asset's author and license go into the description. | Free |
+| **Visual match check** | The script gives every line a concrete shot description and specific searches. Candidate images are **looked at, not matched by file name**: CLIP (local, CPU) pre-ranks them, then Gemini's free vision model scores a numbered contact sheet against the exact narration line. Same-name buildings/streets/logos, text, maps, generic stand-ins and bystanders are rejected; only images scoring ≥ 7/10 are used, long lines get 2 shots, and topics where fewer than 60% of lines find a real match are skipped. Scores and "what the image shows" are saved per shot in the run's JSON, plus a `*.shots.jpg` contact sheet. | Free |
 | **Music** | Synthesized per video (random key, tempo and progression), so there's zero Content ID risk. | Free |
 | **Render** | 1080×1920 at 30 fps, Ken Burns motion, crossfades, word-by-word karaoke captions, a hook title card, a progress bar, sidechain-ducked music, and loudness normalized to −14 LUFS. | Free (ffmpeg) |
 | **Publishing** | YouTube Data API resumable upload with `publishAt` scheduling (3 daily slots), `containsSyntheticMedia` disclosure, the made-for-kids flag, and full metadata. | Free quota |
@@ -156,7 +157,8 @@ autotube/
   llm.py           free-tier LLM router with failover + truncated-JSON repair
   strategy.py      Thompson-sampling bandit (category/format/hook/voice) with decay
   tts.py           edge-tts (word timings) → Piper offline fallback
-  media.py         licensed image sourcing, relevance filter, attribution
+  media.py         licensed image sourcing, per-line shot selection, attribution
+  vision.py        pixel-level relevance check (CLIP + Gemini vision contact sheets)
   music.py         procedural copyright-free soundtrack
   render.py        ffmpeg graph: Ken Burns, xfade, ASS karaoke captions, ducking, loudnorm
   youtube.py       OAuth refresh, resumable upload, publishAt, stats, analytics
