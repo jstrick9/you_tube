@@ -205,7 +205,7 @@ class LLM:
         """Like json(), but sends JPEG images to vision-capable models only (never the keyless tier)."""
         order = [p for p in self.cfg.get("vision_providers", ["gemini", "groq", "openrouter"]) if p in PROVIDERS]
         return self.json(system, user, temperature=0.1, validate=validate, images=images, order=order,
-                         models_of=self._vision_models)
+                         models_of=self._vision_models, attempts_per_model=1)
 
     def json(self, system: str, user: str, temperature: float | None = None,
              validate=None, attempts_per_model: int = 2, images: list[bytes] | None = None,

@@ -101,6 +101,24 @@ def same_image(h1: int, h2: int) -> bool:
     return bin(h1 ^ h2).count("1") <= 6
 
 
+def _title_sig(t: str) -> set[str]:
+    return set(re.findall(r"[a-z]{3,}", (t or "").lower())) - {"jpg", "jpeg", "png", "tif", "tiff", "webp", "file",
+                                                                 "the", "and", "photo", "image"}
+
+
+def near_duplicate(e1: list[float] | None, e2: list[float] | None, thr: float = 0.93,
+                   t1: str = "", t2: str = "") -> bool:
+    """Same photo re-cropped / mirrored / re-hosted: CLIP embeddings almost identical, or very similar AND
+    (near-)identical titles (e.g. the same Flickr photo mirrored on Commons)."""
+    if not e1 or not e2:
+        return False
+    cos = sum(a * b for a, b in zip(e1, e2))
+    if cos >= thr:
+        return True
+    s1, s2 = _title_sig(t1), _title_sig(t2)
+    return bool(s1 and s2) and len(s1 & s2) / len(s1 | s2) >= 0.75 and cos >= 0.85
+
+
 # ── contact sheet ─────────────────────────────────────────────────────────────
 def contact_sheet(imgs: list[Image.Image], tile: int = 340, cols: int = 3) -> bytes:
     rows = math.ceil(len(imgs) / cols)
@@ -173,6 +191,8 @@ class _Clip:
         for i in range(0, len(cands), 32):
             batch = cands[i:i + 32]
             imf = self.images([c["_img"] for c in batch])
+            for j, c in enumerate(batch):
+                c["_emb"] = imf[j].tolist()
             raw_pos = imf @ tf_pos.T                     # cosine
             raw_neg = imf @ tf_neg.T
             for j, c in enumerate(batch):
@@ -204,6 +224,7 @@ class Judge:
         self.clip_pretrained = m.get("clip_pretrained", "laion2b_s34b_b79k")
         self.calls = 0
         self.fail_streak = 0
+        self.retry_pause = 15
         self.llm_failed = False
 
     @property
@@ -244,9 +265,15 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0}}]}} with
             for it in items:
                 int(it["n"]), float(it["score"])
 
+        sheet = contact_sheet([c["_img"] for c in cands])
         try:
             self.calls += 1
-            out = self.llm.vision_json(VISION_SYSTEM, user, [contact_sheet([c["_img"] for c in cands])], validate)
+            try:
+                out = self.llm.vision_json(VISION_SYSTEM, user, [sheet], validate)
+            except Exception:  # noqa: BLE001  — usually "503 high demand": wait a moment and try once more
+                time.sleep(self.retry_pause)
+                self.calls += 1
+                out = self.llm.vision_json(VISION_SYSTEM, user, [sheet], validate)
         except Exception as e:  # noqa: BLE001
             codes = re.findall(r"^\s*(\S+?):vision: .*?(HTTP \d{3}|no \w+_API_KEY|\w+Error)", str(e), re.M)
             summary = ", ".join(f"{m} {c}" for m, c in dict(codes).items()) or str(e)[:300]

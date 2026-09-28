@@ -199,15 +199,18 @@ def _download(asset: dict, dest_dir: Path) -> Path | None:
 
 
 def _candidates_for(queries: list[str], sources: list[str], allowed: list[str], min_w: int) -> list[dict]:
-    found: list[dict] = []
+    from concurrent.futures import ThreadPoolExecutor
+    jobs = []
     for qi, q in enumerate(queries[:3]):
-        if "pexels" in sources:
-            found += pexels_search(q, 6)
+        if "pexels" in sources and os.environ.get("PEXELS_API_KEY"):
+            jobs.append((pexels_search, (q, 6)))
         if "wikimedia" in sources:
-            found += commons_search(q, allowed, min_w, 10)
+            jobs.append((commons_search, (q, allowed, min_w, 10)))
         if "openverse" in sources and qi < 2:
-            found += openverse_search(q, min_w, 8)
-    return found
+            jobs.append((openverse_search, (q, min_w, 8)))
+    with ThreadPoolExecutor(4) as ex:
+        results = list(ex.map(lambda j: j[0](*j[1]), jobs))
+    return [a for r in results for a in r]
 
 
 def _usable(a: dict, work: Path) -> Path | None:
@@ -267,14 +270,18 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
     used_hashes: list[int] = []
     shots: list[dict] = []
 
+    used_embs: list = []
+
     def take(c, i, want) -> bool:
-        if c["url"] in used_urls or any(vision.same_image(c["_hash"], h) for h in used_hashes):
+        if c["url"] in used_urls or any(vision.same_image(c["_hash"], h) for h in used_hashes) \
+                or any(vision.near_duplicate(c.get("_emb"), e, t1=c.get("title", ""), t2=t) for e, t in used_embs):
             return False
         p = _usable(c, work)
         if not p:
             return False
         used_urls.add(c["url"])
         used_hashes.append(c["_hash"])
+        used_embs.append((c.get("_emb"), c.get("title", "")))
         credit = {k: v for k, v in c.items() if not k.startswith("_") and k not in
                   ("vscore", "vshows", "vjudge", "clip", "clip_cos", "thumb")}
         shots.append({"path": p, "credit": credit, "seg": i, "score": c["vscore"], "shows": c.get("vshows", ""),

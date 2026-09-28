@@ -48,6 +48,7 @@ def test_llm_scores_are_applied_and_sorted():
 
 def test_no_judge_means_no_verdict():
     j = vision.Judge({"media": {"clip": False}}, FakeLLM([9, 9], fail=True))
+    j.retry_pause = 0
     out = j.score(_cands(2), "x", "y", "z")
     assert out == []                      # LLM failed and no CLIP → nothing is "verified"
 
@@ -82,3 +83,15 @@ def test_writer_validation_requires_visuals():
     import inspect
     src = inspect.getsource(ScriptWriter.write)
     assert '"visual"' in src and "queries" in src
+
+
+def test_near_duplicate():
+    assert vision.near_duplicate([1.0, 0.0], [0.99, 0.141])
+    assert not vision.near_duplicate([1.0, 0.0], [0.0, 1.0])
+    assert not vision.near_duplicate(None, [1.0])
+
+
+def test_near_duplicate_same_title():
+    a, b = [1.0, 0.0], [0.87, 0.493]            # cos 0.87: similar but not identical pixels
+    assert vision.near_duplicate(a, b, t1="Tardigrade", t2="A Tardigrade")
+    assert not vision.near_duplicate(a, b, t1="Cat face", t2="Tabby kitten")
