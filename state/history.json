@@ -30,9 +30,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 100.5,
-      "vph": 0.199,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00",
+      "hours_live": 101.2,
+      "vph": 0.198,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00",
       "a_views": 18,
       "avg_view_pct": 4627.33,
       "avg_view_dur": 1527
@@ -64,15 +64,15 @@
     "video_id": "vBTIN-iRO9k",
     "status": "scheduled",
     "metrics": {
-      "views": 1209,
+      "views": 1212,
       "likes": 27,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 95.0,
-      "vph": 12.724,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00",
+      "hours_live": 95.7,
+      "vph": 12.668,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00",
       "a_views": 1194,
       "avg_view_pct": 81.43,
       "avg_view_dur": 35
@@ -110,9 +110,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 92.0,
-      "vph": 12.824,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00",
+      "hours_live": 92.7,
+      "vph": 12.733,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00",
       "a_views": 1206,
       "avg_view_pct": 41.89,
       "avg_view_dur": 15
@@ -150,9 +150,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 76.5,
-      "vph": 16.715,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00",
+      "hours_live": 77.2,
+      "vph": 16.572,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00",
       "a_views": 1109,
       "avg_view_pct": 56.06,
       "avg_view_dur": 17
@@ -190,9 +190,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 71.0,
-      "vph": 16.221,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00",
+      "hours_live": 71.7,
+      "vph": 16.072,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00",
       "a_views": 1132,
       "avg_view_pct": 59.62,
       "avg_view_dur": 18
@@ -230,9 +230,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 68.0,
-      "vph": 16.643,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00",
+      "hours_live": 68.7,
+      "vph": 16.483,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00",
       "a_views": 1129,
       "avg_view_pct": 30.070000000000004,
       "avg_view_dur": 13
@@ -270,9 +270,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 52.5,
-      "vph": 22.031,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00",
+      "hours_live": 53.2,
+      "vph": 21.758,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00",
       "a_views": 543,
       "avg_view_pct": 42.33,
       "avg_view_dur": 13
@@ -304,15 +304,15 @@
     "video_id": "tFm3Zuu2kGA",
     "status": "scheduled",
     "metrics": {
-      "views": 1203,
+      "views": 1204,
       "likes": 11,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 47.0,
-      "vph": 25.586,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00",
+      "hours_live": 47.7,
+      "vph": 25.254,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00",
       "a_views": 858,
       "avg_view_pct": 40.65,
       "avg_view_dur": 15
@@ -343,15 +343,15 @@
     "video_id": "laRBRQqcE0E",
     "status": "scheduled",
     "metrics": {
-      "views": 520,
+      "views": 526,
       "likes": 7,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 44.0,
-      "vph": 11.813,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00",
+      "hours_live": 44.7,
+      "vph": 11.774,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00",
       "a_views": 279,
       "avg_view_pct": 71.46,
       "avg_view_dur": 26
@@ -388,9 +388,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 28.5,
-      "vph": 31.839,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00"
+      "hours_live": 29.2,
+      "vph": 31.121,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00"
     }
   },
   {
@@ -418,15 +418,15 @@
     "video_id": "4WkKoRw9r00",
     "status": "scheduled",
     "metrics": {
-      "views": 1006,
+      "views": 1023,
       "likes": 9,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 23.0,
-      "vph": 43.705,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00"
+      "hours_live": 23.7,
+      "vph": 43.208,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00"
     }
   },
   {
@@ -454,15 +454,15 @@
     "video_id": "SBETRh-FF_I",
     "status": "scheduled",
     "metrics": {
-      "views": 59,
+      "views": 57,
       "likes": 1,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 20.0,
-      "vph": 2.947,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00"
+      "hours_live": 20.7,
+      "vph": 2.757,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00"
     }
   },
   {
@@ -490,21 +490,21 @@
     "video_id": "6dO8y_ojGhI",
     "status": "scheduled",
     "metrics": {
-      "views": 18,
+      "views": 59,
       "likes": 0,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 4.5,
-      "vph": 3.984,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00"
+      "hours_live": 5.2,
+      "vph": 11.399,
+      "checked_at": "2026-09-28T21:10:33.844207+00:00"
     }
   },
   {
     "created_at": "2026-09-28T18:24:54.310876+00:00",
     "run_id": "20260928-1812",
-    "title": "Your Fighter Jet Runs on Invisible Computers\u2014How Does It Stay Balanced? #shorts",
+    "title": "Your Fighter Jet Runs on Invisible Computers—How Does It Stay Balanced? #shorts",
     "topic": "modern jet fighters are designed to be inherently unstable in flight - tactical Supermaneuvrability dictates aircraft have enhanced responsiveness. On the downside it means pilots are no longer flying the airplanes - most control actions are performed by an onboard computer.",
     "topic_key": "modern jet fighters are designed to be inherently unstable in flight  tactical supermaneuvrability dictates aircraft have enhanced responsiveness on the downside it means pilots are no longer flying the airplanes  most control actions are performed by an onboard computer",
     "wiki_title": "Fly-by-wire",
@@ -524,18 +524,7 @@
     "publish_at": "2026-09-28T21:30:00+00:00",
     "llm": "gemini:gemini-flash-lite-latest",
     "video_id": "CMJX5IcrEeI",
-    "status": "withdrawn",
-    "metrics": {
-      "views": 1,
-      "likes": 0,
-      "comments": 0,
-      "privacy": "private",
-      "upload_status": "processed",
-      "rejection": null,
-      "hours_live": 1.0,
-      "vph": 1.0,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00"
-    },
+    "status": "missing",
     "withdrawn_reason": "made before visual verification; owner set to Private"
   },
   {
@@ -561,18 +550,7 @@
     "publish_at": "2026-09-29T00:30:00+00:00",
     "llm": "gemini:gemini-flash-lite-latest",
     "video_id": "XMsYZIM52bI",
-    "status": "withdrawn",
-    "metrics": {
-      "views": 3,
-      "likes": 0,
-      "comments": 0,
-      "privacy": "private",
-      "upload_status": "processed",
-      "rejection": null,
-      "hours_live": 1.0,
-      "vph": 3.0,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00"
-    },
+    "status": "missing",
     "withdrawn_reason": "made before visual verification; owner set to Private"
   },
   {
@@ -598,18 +576,7 @@
     "publish_at": "2026-09-29T16:00:00+00:00",
     "llm": "gemini:gemini-flash-lite-latest",
     "video_id": "A_dIXq9uSYE",
-    "status": "withdrawn",
-    "metrics": {
-      "views": 0,
-      "likes": 0,
-      "comments": 0,
-      "privacy": "private",
-      "upload_status": "processed",
-      "rejection": null,
-      "hours_live": 1.0,
-      "vph": 0.0,
-      "checked_at": "2026-09-28T20:31:04.938919+00:00"
-    },
+    "status": "missing",
     "withdrawn_reason": "made before visual verification; owner set to Private"
   }
 ]
