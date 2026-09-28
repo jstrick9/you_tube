@@ -234,3 +234,13 @@ def test_script_fact_check_outage_fails_closed(monkeypatch):
     monkeypatch.setitem(cfg["content"], "require_grounding", False)
     ok, review = sw.check(script, src)
     assert ok is False and review.get("unavailable")
+
+
+def test_only_scheduled_videos_hold_publish_slots():
+    from datetime import timedelta
+    from autotube import pipeline
+    fut = (common.now_utc() + timedelta(days=1)).replace(second=0, microsecond=0)
+    hist = [{"video_id": v, "publish_at": (fut + timedelta(hours=i)).isoformat(), "status": st}
+            for i, (v, st) in enumerate([("a", "scheduled"), ("b", "withdrawn"), ("c", "missing"),
+                                          ("d", "rejected"), ("e", "upload_failed: x")])]
+    assert pipeline.taken_slots(hist) == {pipeline._slot_key(fut)}

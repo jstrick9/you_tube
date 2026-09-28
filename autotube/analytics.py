@@ -48,7 +48,8 @@ def run(cfg: dict) -> dict:
         s = stats.get(h["video_id"])
         if not s:
             # Video deleted/unavailable: YouTube API policy III.E.4 → stop keeping its API data.
-            h["status"] = "missing"
+            if h.get("status") != "withdrawn":
+                h["status"] = "missing"
             h.pop("metrics", None)
             continue
         pub = datetime.fromisoformat(h.get("publish_at") or h["created_at"])

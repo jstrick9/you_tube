@@ -32,11 +32,13 @@ def _slot_key(ts) -> str:
 
 
 def taken_slots(hist: list[dict]) -> set[str]:
-    """Publish slots already used by successfully uploaded videos that haven't gone live yet."""
+    """Publish slots booked by live uploads that haven't gone public yet.
+    Only status 'scheduled' holds a slot — withdrawn (set Private), missing (deleted) or rejected
+    videos free their slot so it can be refilled."""
     now = now_utc()
     out = set()
     for h in hist:
-        if h.get("video_id") and h.get("publish_at") and h.get("status") != "withdrawn":
+        if h.get("video_id") and h.get("publish_at") and h.get("status") == "scheduled":
             try:
                 if datetime.fromisoformat(h["publish_at"]) > now:
                     out.add(_slot_key(h["publish_at"]))
