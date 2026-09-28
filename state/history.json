@@ -30,9 +30,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 99.5,
+      "hours_live": 99.7,
       "vph": 0.201,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00",
+      "checked_at": "2026-09-28T19:42:46.866096+00:00",
       "a_views": 18,
       "avg_view_pct": 4627.33,
       "avg_view_dur": 1527
@@ -70,9 +70,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 94.0,
-      "vph": 12.855,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00",
+      "hours_live": 94.2,
+      "vph": 12.833,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00",
       "a_views": 1194,
       "avg_view_pct": 81.43,
       "avg_view_dur": 35
@@ -110,9 +110,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 91.0,
-      "vph": 12.96,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00",
+      "hours_live": 91.2,
+      "vph": 12.937,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00",
       "a_views": 1206,
       "avg_view_pct": 41.89,
       "avg_view_dur": 15
@@ -150,9 +150,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 75.5,
-      "vph": 16.93,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00",
+      "hours_live": 75.7,
+      "vph": 16.893,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00",
       "a_views": 1109,
       "avg_view_pct": 56.06,
       "avg_view_dur": 17
@@ -190,9 +190,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 70.0,
-      "vph": 16.446,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00",
+      "hours_live": 70.2,
+      "vph": 16.407,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00",
       "a_views": 1132,
       "avg_view_pct": 59.62,
       "avg_view_dur": 18
@@ -230,9 +230,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 67.0,
-      "vph": 16.883,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00",
+      "hours_live": 67.2,
+      "vph": 16.842,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00",
       "a_views": 1129,
       "avg_view_pct": 30.070000000000004,
       "avg_view_dur": 13
@@ -264,15 +264,15 @@
     "video_id": "OyHMkwqEOKo",
     "status": "scheduled",
     "metrics": {
-      "views": 1157,
+      "views": 1159,
       "likes": 13,
       "comments": 1,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 51.5,
-      "vph": 22.445,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00",
+      "hours_live": 51.7,
+      "vph": 22.412,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00",
       "a_views": 543,
       "avg_view_pct": 42.33,
       "avg_view_dur": 13
@@ -304,15 +304,15 @@
     "video_id": "tFm3Zuu2kGA",
     "status": "scheduled",
     "metrics": {
-      "views": 1192,
+      "views": 1203,
       "likes": 11,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 46.0,
-      "vph": 25.886,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00",
+      "hours_live": 46.2,
+      "vph": 26.032,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00",
       "a_views": 858,
       "avg_view_pct": 40.65,
       "avg_view_dur": 15
@@ -343,15 +343,15 @@
     "video_id": "laRBRQqcE0E",
     "status": "scheduled",
     "metrics": {
-      "views": 520,
+      "views": 526,
       "likes": 7,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 43.0,
-      "vph": 12.08,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00",
+      "hours_live": 43.2,
+      "vph": 12.172,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00",
       "a_views": 279,
       "avg_view_pct": 71.46,
       "avg_view_dur": 26
@@ -388,9 +388,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 27.5,
-      "vph": 32.961,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00"
+      "hours_live": 27.7,
+      "vph": 32.764,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00"
     }
   },
   {
@@ -418,15 +418,15 @@
     "video_id": "4WkKoRw9r00",
     "status": "scheduled",
     "metrics": {
-      "views": 883,
+      "views": 892,
       "likes": 9,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 22.0,
-      "vph": 40.049,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00"
+      "hours_live": 22.2,
+      "vph": 40.157,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00"
     }
   },
   {
@@ -454,15 +454,15 @@
     "video_id": "SBETRh-FF_I",
     "status": "scheduled",
     "metrics": {
-      "views": 54,
+      "views": 58,
       "likes": 1,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 19.0,
-      "vph": 2.835,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00"
+      "hours_live": 19.2,
+      "vph": 3.019,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00"
     }
   },
   {
@@ -490,15 +490,15 @@
     "video_id": "6dO8y_ojGhI",
     "status": "scheduled",
     "metrics": {
-      "views": 18,
+      "views": 17,
       "likes": 0,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 3.5,
-      "vph": 5.073,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00"
+      "hours_live": 3.7,
+      "vph": 4.578,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00"
     }
   },
   {
@@ -526,15 +526,15 @@
     "video_id": "CMJX5IcrEeI",
     "status": "scheduled",
     "metrics": {
-      "views": 1,
+      "views": 2,
       "likes": 0,
       "comments": 0,
       "privacy": "private",
       "upload_status": "processed",
       "rejection": null,
       "hours_live": 1.0,
-      "vph": 1.0,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00"
+      "vph": 2.0,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00"
     }
   },
   {
@@ -562,15 +562,15 @@
     "video_id": "XMsYZIM52bI",
     "status": "scheduled",
     "metrics": {
-      "views": 1,
+      "views": 2,
       "likes": 0,
       "comments": 0,
       "privacy": "private",
       "upload_status": "processed",
       "rejection": null,
       "hours_live": 1.0,
-      "vph": 1.0,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00"
+      "vph": 2.0,
+      "checked_at": "2026-09-28T19:42:46.866096+00:00"
     }
   },
   {
@@ -606,7 +606,7 @@
       "rejection": null,
       "hours_live": 1.0,
       "vph": 0.0,
-      "checked_at": "2026-09-28T19:32:52.688512+00:00"
+      "checked_at": "2026-09-28T19:42:46.866096+00:00"
     }
   },
   {
@@ -631,6 +631,30 @@
     "file": "20260928-1932-01-loneliness.mp4",
     "publish_at": "2026-09-29T21:30:00+00:00",
     "llm": "gemini:gemini-flash-lite-latest",
+    "status": "rendered"
+  },
+  {
+    "created_at": "2026-09-28T19:50:33.276933+00:00",
+    "run_id": "20260928-1942",
+    "title": "The True Origin of Winamp's Famous Slogan #shorts",
+    "topic": "Winamp's slogan \"It really whips the llama's ass!\" comes from the Wesley Willis song \"Whip the Llama's Ass\". Willis was a schizophrenic musician and artist who released over 48 albums in his lifetime.",
+    "topic_key": "winamps slogan it really whips the llamas ass comes from the wesley willis song whip the llamas ass willis was a schizophrenic musician and artist who released over 48 albums in his lifetime",
+    "wiki_title": "Wesley Willis",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "culture",
+      "format": "myth_vs_fact",
+      "hook_style": "bold_claim",
+      "voice": "en-US-EmmaNeural"
+    },
+    "review_score": 9,
+    "duration": 31.096054421768706,
+    "tts_engine": "edge-tts",
+    "file": "20260928-1942-01-wesley-willis.mp4",
+    "publish_at": "2026-09-29T21:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
     "status": "rendered"
   }
 ]
