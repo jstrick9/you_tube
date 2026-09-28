@@ -1,30 +1,30 @@
 {
-  "updated": "2026-09-27T19:19:38.692922+00:00",
+  "updated": "2026-09-28T07:36:18.883478+00:00",
   "videos_total": 13,
   "videos_7d": 13,
-  "views_7d": 8462,
-  "learned_this_run": 1,
+  "views_7d": 9458,
+  "learned_this_run": 2,
   "strategy": {
     "category": [
       {
         "arm": "science",
-        "mean": 0.558,
-        "n": 1
+        "mean": 0.563,
+        "n": 2
       },
       {
         "arm": "culture",
-        "mean": 0.522,
+        "mean": 0.521,
         "n": 1
+      },
+      {
+        "arm": "history",
+        "mean": 0.504,
+        "n": 2
       },
       {
         "arm": "space",
         "mean": 0.5,
         "n": 0
-      },
-      {
-        "arm": "history",
-        "mean": 0.5,
-        "n": 1
       },
       {
         "arm": "nature",
@@ -55,21 +55,21 @@
     "format": [
       {
         "arm": "by_the_numbers",
-        "mean": 0.558,
-        "n": 1
+        "mean": 0.546,
+        "n": 2
+      },
+      {
+        "arm": "backstory",
+        "mean": 0.521,
+        "n": 2
       },
       {
         "arm": "myth_vs_fact",
-        "mean": 0.522,
+        "mean": 0.521,
         "n": 1
       },
       {
         "arm": "facts3",
-        "mean": 0.5,
-        "n": 1
-      },
-      {
-        "arm": "backstory",
         "mean": 0.5,
         "n": 1
       },
@@ -87,18 +87,18 @@
     "hook_style": [
       {
         "arm": "you_statement",
-        "mean": 0.544,
+        "mean": 0.543,
         "n": 2
       },
       {
         "arm": "question",
-        "mean": 0.522,
+        "mean": 0.521,
         "n": 1
       },
       {
         "arm": "bold_claim",
-        "mean": 0.5,
-        "n": 1
+        "mean": 0.521,
+        "n": 3
       },
       {
         "arm": "number_first",
@@ -109,18 +109,18 @@
     "voice": [
       {
         "arm": "en-US-EmmaNeural",
-        "mean": 0.558,
-        "n": 1
-      },
-      {
-        "arm": "en-US-ChristopherNeural",
-        "mean": 0.517,
+        "mean": 0.546,
         "n": 2
       },
       {
         "arm": "en-US-AndrewNeural",
-        "mean": 0.5,
-        "n": 0
+        "mean": 0.528,
+        "n": 1
+      },
+      {
+        "arm": "en-US-ChristopherNeural",
+        "mean": 0.516,
+        "n": 2
       },
       {
         "arm": "en-US-AvaNeural",
@@ -138,62 +138,62 @@
     {
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
-      "views": 1275,
+      "views": 1279,
       "avg_view_pct": 56.32
-    },
-    {
-      "title": "The Surprising History of Barbie and Mattel #shorts",
-      "id": "kM3myuf1c-Y",
-      "views": 1180,
-      "avg_view_pct": 41.51
     },
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1179,
+      "views": 1193,
       "avg_view_pct": 82.28
+    },
+    {
+      "title": "The Surprising History of Barbie and Mattel #shorts",
+      "id": "kM3myuf1c-Y",
+      "views": 1179,
+      "avg_view_pct": 41.51
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
       "id": "tFm3Zuu2kGA",
-      "views": 1174,
+      "views": 1161,
       "avg_view_pct": null
-    },
-    {
-      "title": "How Your Liver Rebuilds Itself #shorts",
-      "id": "oTgoKlCkGE0",
-      "views": 1139,
-      "avg_view_pct": 32.56
     },
     {
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
-      "views": 1137,
+      "views": 1149,
       "avg_view_pct": 51.190000000000005
+    },
+    {
+      "title": "How Your Liver Rebuilds Itself #shorts",
+      "id": "oTgoKlCkGE0",
+      "views": 1132,
+      "avg_view_pct": 32.56
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
       "id": "OyHMkwqEOKo",
-      "views": 808,
-      "avg_view_pct": null
-    },
-    {
-      "title": "Why speaking another language changes you #shorts",
-      "id": "laRBRQqcE0E",
-      "views": 393,
+      "views": 1013,
       "avg_view_pct": null
     },
     {
       "title": "The Only Governor Of Two Different States #shorts",
       "id": "lUA-2zrFHGc",
-      "views": 159,
+      "views": 594,
       "avg_view_pct": null
     },
     {
-      "title": "The World's Highest Bottle Return Scheme #shorts",
-      "id": "q5lleO0lrkI",
-      "views": 18,
-      "avg_view_pct": 6862.8
+      "title": "Why speaking another language changes you #shorts",
+      "id": "laRBRQqcE0E",
+      "views": 456,
+      "avg_view_pct": null
+    },
+    {
+      "title": "Which Substance Has the Highest Melting Point? #shorts",
+      "id": "4WkKoRw9r00",
+      "views": 253,
+      "avg_view_pct": null
     }
   ],
   "rejected": []
