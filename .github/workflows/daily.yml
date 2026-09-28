@@ -55,7 +55,19 @@ jobs:
             requirements.txt
             .github/workflows/daily.yml
 
+      # Scheduled backup/catch-up runs: find out first whether anything is still needed today, so a run
+      # with nothing to do ends in seconds instead of spending free Actions minutes on the heavy install.
+      - name: Anything left to make today?
+        id: need
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            pip install -q pyyaml && python scripts/needed_today.py
+          else
+            echo "needed=manual" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install
+        if: steps.need.outputs.needed != '0'
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core > /dev/null
           pip install -q -r requirements.txt
@@ -64,22 +76,25 @@ jobs:
           pip install -q open_clip_torch
 
       - name: Cache CLIP model weights
+        if: steps.need.outputs.needed != '0'
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
           key: clip-vit-b-32-laion2b
 
       - name: Cache offline TTS voice (fallback only)
+        if: steps.need.outputs.needed != '0'
         uses: actions/cache@v4
         with:
           path: ~/.cache/piper
           key: piper-ryan-high
 
       - name: Learn from previous videos
-        if: ${{ env.YT_REFRESH_TOKEN != '' && env.YT_CLIENT_ID != '' && env.YT_CLIENT_SECRET != '' }}
+        if: ${{ steps.need.outputs.needed != '0' && env.YT_REFRESH_TOKEN != '' && env.YT_CLIENT_ID != '' && env.YT_CLIENT_SECRET != '' }}
         run: python -m autotube analytics || true
 
       - name: Produce & schedule today's videos
+        if: steps.need.outputs.needed != '0'
         run: |
           ARGS=""
           if [ -n "${{ github.event.inputs.count }}" ]; then ARGS="$ARGS -n ${{ github.event.inputs.count }}"; fi
