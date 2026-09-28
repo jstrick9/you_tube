@@ -24,15 +24,15 @@
     "video_id": "q5lleO0lrkI",
     "status": "scheduled",
     "metrics": {
-      "views": 18,
+      "views": 19,
       "likes": 0,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 87.6,
-      "vph": 0.205,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00",
+      "hours_live": 98.2,
+      "vph": 0.193,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00",
       "a_views": 13,
       "avg_view_pct": 6862.8,
       "avg_view_dur": 2264
@@ -64,15 +64,15 @@
     "video_id": "vBTIN-iRO9k",
     "status": "scheduled",
     "metrics": {
-      "views": 1193,
+      "views": 1208,
       "likes": 27,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 82.1,
-      "vph": 14.53,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00",
+      "hours_live": 92.7,
+      "vph": 13.031,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00",
       "a_views": 1006,
       "avg_view_pct": 82.28,
       "avg_view_dur": 36
@@ -110,9 +110,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 79.1,
-      "vph": 14.904,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00",
+      "hours_live": 89.7,
+      "vph": 13.143,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00",
       "a_views": 1155,
       "avg_view_pct": 41.51,
       "avg_view_dur": 14
@@ -150,9 +150,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 63.6,
-      "vph": 20.108,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00",
+      "hours_live": 74.2,
+      "vph": 17.236,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00",
       "a_views": 1094,
       "avg_view_pct": 56.32,
       "avg_view_dur": 17
@@ -184,15 +184,15 @@
     "video_id": "M1QR18R35Bc",
     "status": "scheduled",
     "metrics": {
-      "views": 1149,
+      "views": 1152,
       "likes": 16,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 58.1,
-      "vph": 19.774,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00",
+      "hours_live": 68.7,
+      "vph": 16.767,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00",
       "a_views": 126,
       "avg_view_pct": 51.190000000000005,
       "avg_view_dur": 15
@@ -230,9 +230,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 55.1,
-      "vph": 20.543,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00",
+      "hours_live": 65.7,
+      "vph": 17.229,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00",
       "a_views": 132,
       "avg_view_pct": 32.56,
       "avg_view_dur": 14
@@ -264,16 +264,17 @@
     "video_id": "OyHMkwqEOKo",
     "status": "scheduled",
     "metrics": {
-      "views": 1013,
-      "likes": 12,
+      "views": 1125,
+      "likes": 13,
       "comments": 1,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 39.6,
-      "vph": 25.577,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00"
-    }
+      "hours_live": 50.2,
+      "vph": 22.408,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00"
+    },
+    "reward": 0.9286
   },
   {
     "created_at": "2026-09-26T14:36:59.067500+00:00",
@@ -300,15 +301,15 @@
     "video_id": "tFm3Zuu2kGA",
     "status": "scheduled",
     "metrics": {
-      "views": 1161,
-      "likes": 10,
+      "views": 1192,
+      "likes": 11,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 34.1,
-      "vph": 34.042,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00"
+      "hours_live": 44.7,
+      "vph": 26.664,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00"
     }
   },
   {
@@ -336,15 +337,15 @@
     "video_id": "laRBRQqcE0E",
     "status": "scheduled",
     "metrics": {
-      "views": 456,
-      "likes": 6,
+      "views": 526,
+      "likes": 7,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 31.1,
-      "vph": 14.66,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00"
+      "hours_live": 41.7,
+      "vph": 12.612,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00"
     }
   },
   {
@@ -372,15 +373,15 @@
     "video_id": "lUA-2zrFHGc",
     "status": "scheduled",
     "metrics": {
-      "views": 594,
-      "likes": 7,
+      "views": 884,
+      "likes": 11,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 15.6,
-      "vph": 38.064,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00"
+      "hours_live": 26.2,
+      "vph": 33.734,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00"
     }
   },
   {
@@ -408,15 +409,15 @@
     "video_id": "4WkKoRw9r00",
     "status": "scheduled",
     "metrics": {
-      "views": 253,
-      "likes": 3,
+      "views": 653,
+      "likes": 8,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 10.1,
-      "vph": 25.037,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00"
+      "hours_live": 20.7,
+      "vph": 31.539,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00"
     }
   },
   {
@@ -444,15 +445,15 @@
     "video_id": "SBETRh-FF_I",
     "status": "scheduled",
     "metrics": {
-      "views": 31,
+      "views": 57,
       "likes": 1,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 7.1,
-      "vph": 4.363,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00"
+      "hours_live": 17.7,
+      "vph": 3.219,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00"
     }
   },
   {
@@ -480,15 +481,90 @@
     "video_id": "6dO8y_ojGhI",
     "status": "scheduled",
     "metrics": {
-      "views": 0,
+      "views": 18,
       "likes": 0,
       "comments": 0,
-      "privacy": "private",
+      "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1.0,
-      "vph": 0.0,
-      "checked_at": "2026-09-28T07:36:18.883478+00:00"
+      "hours_live": 2.2,
+      "vph": 8.164,
+      "checked_at": "2026-09-28T18:12:17.169618+00:00"
     }
+  },
+  {
+    "created_at": "2026-09-28T18:24:54.310876+00:00",
+    "run_id": "20260928-1812",
+    "title": "Your Fighter Jet Runs on Invisible Computers—How Does It Stay Balanced? #shorts",
+    "topic": "modern jet fighters are designed to be inherently unstable in flight - tactical Supermaneuvrability dictates aircraft have enhanced responsiveness. On the downside it means pilots are no longer flying the airplanes - most control actions are performed by an onboard computer.",
+    "topic_key": "modern jet fighters are designed to be inherently unstable in flight  tactical supermaneuvrability dictates aircraft have enhanced responsiveness on the downside it means pilots are no longer flying the airplanes  most control actions are performed by an onboard computer",
+    "wiki_title": "Fly-by-wire",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "technology",
+      "format": "what_if",
+      "hook_style": "question",
+      "voice": "en-US-BrianNeural"
+    },
+    "review_score": 10,
+    "duration": 38.212108843537415,
+    "tts_engine": "edge-tts",
+    "file": "20260928-1812-01-fly-by-wire.mp4",
+    "publish_at": "2026-09-28T21:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "CMJX5IcrEeI",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-09-28T18:24:56.610973+00:00",
+    "run_id": "20260928-1812",
+    "title": "Why Cat Whiskers Are Ultra-Sensitive Feelers #shorts",
+    "topic": "whisker fatigue is a type of sensory overload in cats caused when their sensitive whiskers constantly brush against the sides of a deep or narrow food and water, and it can lead to cat acting tense or aggressive during mealtimes or pacing near the food bowl or acting hungry but refusing to eat.",
+    "topic_key": "whisker fatigue is a type of sensory overload in cats caused when their sensitive whiskers constantly brush against the sides of a deep or narrow food and water and it can lead to cat acting tense or aggressive during mealtimes or pacing near the food bowl or acting hungry but refusing to eat",
+    "wiki_title": "Whiskers",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "science",
+      "format": "timeline",
+      "hook_style": "you_statement",
+      "voice": "en-US-EmmaNeural"
+    },
+    "review_score": 9,
+    "duration": 35.80009070294785,
+    "tts_engine": "edge-tts",
+    "file": "20260928-1812-02-whiskers.mp4",
+    "publish_at": "2026-09-29T00:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "XMsYZIM52bI",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-09-28T18:24:58.750726+00:00",
+    "run_id": "20260928-1812",
+    "title": "When Bread Became a City Guild #shorts",
+    "topic": "from 1790 until 2015 bakers in Paris had to tell city hall before closing for holiday, so that half the city's bakeries shut in July and the other half in August. The rule was passed after the Revolution to make sure no neighbourhood ever ran out of bread.",
+    "topic_key": "from 1790 until 2015 bakers in paris had to tell city hall before closing for holiday so that half the citys bakeries shut in july and the other half in august the rule was passed after the revolution to make sure no neighbourhood ever ran out of bread",
+    "wiki_title": "History of bread",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "history",
+      "format": "myth_vs_fact",
+      "hook_style": "bold_claim",
+      "voice": "en-US-AndrewNeural"
+    },
+    "review_score": 10,
+    "duration": 34.276031746031755,
+    "tts_engine": "edge-tts",
+    "file": "20260928-1812-03-history-of-bread.mp4",
+    "publish_at": "2026-09-29T16:00:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest",
+    "video_id": "A_dIXq9uSYE",
+    "status": "scheduled"
   }
 ]

@@ -1,20 +1,20 @@
 {
-  "updated": "2026-09-28T07:36:18.883478+00:00",
+  "updated": "2026-09-28T18:12:17.169618+00:00",
   "videos_total": 13,
   "videos_7d": 13,
-  "views_7d": 9458,
-  "learned_this_run": 2,
+  "views_7d": 10424,
+  "learned_this_run": 1,
   "strategy": {
     "category": [
       {
-        "arm": "science",
-        "mean": 0.563,
+        "arm": "culture",
+        "mean": 0.625,
         "n": 2
       },
       {
-        "arm": "culture",
-        "mean": 0.521,
-        "n": 1
+        "arm": "science",
+        "mean": 0.562,
+        "n": 2
       },
       {
         "arm": "history",
@@ -54,6 +54,11 @@
     ],
     "format": [
       {
+        "arm": "myth_vs_fact",
+        "mean": 0.625,
+        "n": 2
+      },
+      {
         "arm": "by_the_numbers",
         "mean": 0.546,
         "n": 2
@@ -62,11 +67,6 @@
         "arm": "backstory",
         "mean": 0.521,
         "n": 2
-      },
-      {
-        "arm": "myth_vs_fact",
-        "mean": 0.521,
-        "n": 1
       },
       {
         "arm": "facts3",
@@ -86,18 +86,18 @@
     ],
     "hook_style": [
       {
-        "arm": "you_statement",
-        "mean": 0.543,
+        "arm": "question",
+        "mean": 0.625,
         "n": 2
       },
       {
-        "arm": "question",
-        "mean": 0.521,
-        "n": 1
+        "arm": "you_statement",
+        "mean": 0.542,
+        "n": 2
       },
       {
         "arm": "bold_claim",
-        "mean": 0.521,
+        "mean": 0.52,
         "n": 3
       },
       {
@@ -108,24 +108,24 @@
     ],
     "voice": [
       {
+        "arm": "en-US-AvaNeural",
+        "mean": 0.612,
+        "n": 2
+      },
+      {
         "arm": "en-US-EmmaNeural",
         "mean": 0.546,
         "n": 2
       },
       {
         "arm": "en-US-AndrewNeural",
-        "mean": 0.528,
+        "mean": 0.527,
         "n": 1
       },
       {
         "arm": "en-US-ChristopherNeural",
         "mean": 0.516,
         "n": 2
-      },
-      {
-        "arm": "en-US-AvaNeural",
-        "mean": 0.5,
-        "n": 1
       },
       {
         "arm": "en-US-BrianNeural",
@@ -144,8 +144,14 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1193,
+      "views": 1208,
       "avg_view_pct": 82.28
+    },
+    {
+      "title": "The Long Development of Ant-Man #shorts",
+      "id": "tFm3Zuu2kGA",
+      "views": 1192,
+      "avg_view_pct": null
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
@@ -154,15 +160,9 @@
       "avg_view_pct": 41.51
     },
     {
-      "title": "The Long Development of Ant-Man #shorts",
-      "id": "tFm3Zuu2kGA",
-      "views": 1161,
-      "avg_view_pct": null
-    },
-    {
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
-      "views": 1149,
+      "views": 1152,
       "avg_view_pct": 51.190000000000005
     },
     {
@@ -174,25 +174,25 @@
     {
       "title": "Can you win chess by losing everything? #shorts",
       "id": "OyHMkwqEOKo",
-      "views": 1013,
+      "views": 1125,
       "avg_view_pct": null
     },
     {
       "title": "The Only Governor Of Two Different States #shorts",
       "id": "lUA-2zrFHGc",
-      "views": 594,
-      "avg_view_pct": null
-    },
-    {
-      "title": "Why speaking another language changes you #shorts",
-      "id": "laRBRQqcE0E",
-      "views": 456,
+      "views": 884,
       "avg_view_pct": null
     },
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
-      "views": 253,
+      "views": 653,
+      "avg_view_pct": null
+    },
+    {
+      "title": "Why speaking another language changes you #shorts",
+      "id": "laRBRQqcE0E",
+      "views": 526,
       "avg_view_pct": null
     }
   ],
