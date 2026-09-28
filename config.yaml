@@ -161,16 +161,26 @@ media:
   sources: [pexels, wikimedia, openverse]   # pexels used only if PEXELS_API_KEY is set
   min_image_width: 900
   # Every image is LOOKED AT before use (see autotube/vision.py): CLIP pre-ranks candidates, then a
-  # vision LLM (Gemini free tier) scores a contact sheet of the best ones against the narration line.
-  min_match_score: 7                     # 0-10; nothing below this ever appears in a video
-  require_vision_check: true             # no judge available → skip the video rather than guess
-  min_distinct_images: 3                 # fewer verified images than this → pick another topic
-  min_matched_ratio: 0.6                 # share of lines that must get their OWN matching image, else skip topic
+  # vision LLM (Gemini free tier) scores a contact sheet against the exact narration line.
+  require_llm_verdict: true              # ONLY a vision model may approve an image; if none is reachable the
+                                         # video is not made (nothing unverified is ever published)
+  min_match_score: 7                     # 0-10; every line needs its own image scoring at least this
+  requery: true                          # a line with no match gets a second search with new queries
+  min_distinct_images: 3                 # fewer distinct verified images → pick another topic
   multi_shot_seconds: 4.5                # lines longer than this get 2 different verified shots
   vision_sheet_size: 9                   # candidates per vision-LLM call (3x3 contact sheet)
   clip: true
   clip_model: ViT-B-32
   clip_pretrained: laion2b_s34b_b79k
+
+qa:
+  # Final gate on the FINISHED video, right before upload (autotube/qa.py): one frame from every shot is
+  # checked by a vision model against the words being spoken at that moment, plus the title and hook text,
+  # and the speech is checked word-for-word against the script. Fail → swap in a verified spare and re-check;
+  # still failing → the video is NOT uploaded (kept as *-REJECTED.mp4 in the run artifact for inspection).
+  min_frame_score: 7
+  max_repairs: 2
+  frames_per_sheet: 8
 
 upload:
   enabled: true                           # false = render only (dry run)

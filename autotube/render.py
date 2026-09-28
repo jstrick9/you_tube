@@ -276,4 +276,8 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         raise RuntimeError("ffmpeg failed:\n" + res.stderr[-3000:])
-    return {"duration": total, "theme": theme_idx, "first_frame": frames[0]}
+    timeline, t = [], 0.0
+    for v, d in zip(shots, durs):
+        timeline.append({"seg": v["seg"], "path": str(v["path"]), "start": round(t, 3), "end": round(t + d, 3)})
+        t += d
+    return {"duration": total, "theme": theme_idx, "first_frame": frames[0], "timeline": timeline}

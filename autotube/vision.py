@@ -207,6 +207,8 @@ class _Clip:
 
 
 # ── the judge ─────────────────────────────────────────────────────────────────
+class VisionUnavailable(RuntimeError):
+    """No vision model could give a verdict. In strict mode nothing unverified is ever used → stop, retry later."""
 VISION_SYSTEM = ("You are a strict photo editor for an educational short-video channel. You check whether candidate "
                  "images really show what the narration is talking about. Judge ONLY the pixels, never file names. "
                  "Return strict JSON only.")
@@ -222,9 +224,10 @@ class Judge:
         self.sheet_size = int(m.get("vision_sheet_size", 9))
         self.clip_model = m.get("clip_model", "ViT-B-32")
         self.clip_pretrained = m.get("clip_pretrained", "laion2b_s34b_b79k")
+        self.strict = bool(m.get("require_llm_verdict", True))
         self.calls = 0
         self.fail_streak = 0
-        self.retry_pause = 15
+        self.retry_pauses = [15, 45, 90] if self.strict else [15]
         self.llm_failed = False
 
     @property
@@ -232,6 +235,8 @@ class Judge:
         return _Clip.get(self.clip_model, self.clip_pretrained) if self.use_clip else None
 
     def available(self) -> bool:
+        if self.strict:
+            return bool(self.llm and self.llm.vision_available())
         return bool((self.llm and self.llm.vision_available()) or self.clip)
 
     def _llm_score(self, cands: list[dict], want: str, narration: str, subject: str, context: str) -> bool:
@@ -266,17 +271,21 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0}}]}} with
                 int(it["n"]), float(it["score"])
 
         sheet = contact_sheet([c["_img"] for c in cands])
-        try:
-            self.calls += 1
+        out, err = None, None
+        for attempt in range(len(self.retry_pauses) + 1):
             try:
-                out = self.llm.vision_json(VISION_SYSTEM, user, [sheet], validate)
-            except Exception:  # noqa: BLE001  — usually "503 high demand": wait a moment and try once more
-                time.sleep(self.retry_pause)
                 self.calls += 1
                 out = self.llm.vision_json(VISION_SYSTEM, user, [sheet], validate)
-        except Exception as e:  # noqa: BLE001
-            codes = re.findall(r"^\s*(\S+?):vision: .*?(HTTP \d{3}|no \w+_API_KEY|\w+Error)", str(e), re.M)
-            summary = ", ".join(f"{m} {c}" for m, c in dict(codes).items()) or str(e)[:300]
+                break
+            except Exception as e:  # noqa: BLE001  — usually "503 high demand": wait and try again
+                err = e
+                if attempt < len(self.retry_pauses):
+                    time.sleep(self.retry_pauses[attempt])
+        if out is None:
+            codes = re.findall(r"^\s*(\S+?):vision: .*?(HTTP \d{3}|no \w+_API_KEY|\w+Error)", str(err), re.M)
+            summary = ", ".join(f"{m} {c}" for m, c in dict(codes).items()) or str(err)[:300]
+            if self.strict:
+                raise VisionUnavailable(f"vision model unavailable after {len(self.retry_pauses) + 1} tries: {summary}")
             self.fail_streak += 1
             if self.fail_streak >= 2:
                 self.llm_failed = True
@@ -296,8 +305,9 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0}}]}} with
         return True
 
     def score(self, cands: list[dict], want: str, narration: str, subject: str, context: str = "",
-              keep: int | None = None) -> list[dict]:
-        """Score candidates; returns them sorted best-first (only those with a verdict)."""
+              keep: int | None = None, page: int = 0) -> list[dict]:
+        """Score candidates; returns them sorted best-first (only those with a verdict).
+        `page` = which contact sheet of the CLIP-ranked list to judge (0 = best 9, 1 = next 9 …)."""
         cands = fetch_thumbs(cands)
         if not cands:
             return []
@@ -308,10 +318,15 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0}}]}} with
             clip.score(cands, want, subject)
             cands.sort(key=lambda c: -c["clip"])
             cands = [c for c in cands if c["clip"] >= 1.0] or cands[:3]   # obvious junk never reaches the LLM
-        top = cands[: keep or self.sheet_size]
+        k = keep or self.sheet_size
+        top = cands[page * k:(page + 1) * k]
+        if not top:
+            return []
+        if self.strict and not self.available():
+            raise VisionUnavailable("no vision model configured (set GEMINI_API_KEY)")
         pending = [c for c in top if "vscore" not in c]
-        if pending and not self._llm_score(pending, want, narration, subject, context) and clip:
-            for c in pending:          # CLIP-only verdict: stricter mapping (needs clip ≥ 9.0 to reach 7)
+        if pending and not self._llm_score(pending, want, narration, subject, context) and clip and not self.strict:
+            for c in pending:          # CLIP-only verdict (non-strict mode only)
                 c["vscore"] = round(max(0.0, (c["clip"] - 3.6) * 1.3), 1)
                 c["vshows"] = f"clip match {c['clip']:.1f}/10 (cos {c['clip_cos']})"
                 c["vjudge"] = "clip"

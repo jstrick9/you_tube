@@ -120,43 +120,6 @@ def pexels_search(query: str, limit: int = 8) -> list[dict]:
              "w": p["width"], "h": p["height"]} for p in data.get("photos", [])]
 
 
-STOP = set("the a an of and in on for to with from by at is are was were its it this that as or de la le".split())
-
-
-def _tokens(text: str) -> set[str]:
-    return {w for w in re.findall(r"[a-z]{3,}", (text or "").lower()) if w not in STOP}
-
-
-DOC_WORDS = {"screenshot", "document", "register", "federal", "pdf", "page", "report", "chart", "graph",
-             "diagram", "table", "establishment", "nonessential", "letter", "form", "certificate", "scan",
-             "text", "title", "cover", "brochure", "leaflet", "infographic", "slide", "website",
-             "icon", "icons", "clipart", "clip", "svg", "vector", "pictogram", "emoji", "silhouette", "cartoon"}
-PLACE_WORDS = {"wharf", "street", "station", "stadium", "hotel", "building", "tower", "bridge", "road",
-               "avenue", "square", "city", "town", "village", "airport", "mall", "church", "school",
-               "district", "skyline", "london", "downtown", "harbour", "harbor", "sign", "logo", "poster"}
-
-
-def relevant(asset: dict, subject: str, keyword: str = "", context: str = "") -> bool:
-    """Title-based relevance: must match the subject's key words (or the keyword + subject),
-    and must not look like a same-name place/building unless the subject is one."""
-    t = _tokens(asset.get("title", ""))
-    subj = _tokens(subject)
-    kw = _tokens(keyword)
-    ctx = _tokens(context)
-    if (t & PLACE_WORDS) and not ((subj | kw | ctx) & PLACE_WORDS):
-        return False
-    if (t & DOC_WORDS) and not ((subj | kw) & DOC_WORDS):
-        return False
-    if not subj:
-        return bool(t & kw)
-    head = sorted(subj, key=lambda w: subject.lower().rfind(w))[-1]   # last word ≈ head noun
-    if head not in t:
-        return len(subj) > 1 and len(t & subj) >= 2
-    if len(subj) == 1:
-        return True
-    return bool(t & ((subj | ctx | kw) - {head}))
-
-
 def _looks_like_document(im: Image.Image) -> bool:
     """Reject screenshots/scans/text pages: lots of flat near-white area + low colour variance."""
     small = im.resize((96, 96)).convert("RGB")
@@ -222,13 +185,41 @@ def _usable(a: dict, work: Path) -> Path | None:
     return p
 
 
-def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
-           seg_durs: list[float] | None = None) -> list[dict]:
-    """Pick visually VERIFIED shots for every segment.
+class NoVisualMatch(RuntimeError):
+    """A narration line has no image that verifiably shows it → the topic is skipped."""
 
-    Returns shots in order: [{'path','credit','seg','score','shows','judge','want'}]. A segment may get 2 shots
-    when it is long. Every image has been looked at (vision LLM, or CLIP as fallback) and scored against that
-    segment's narration; nothing below `media.min_match_score` is ever used.
+
+REQUERY_SYSTEM = ("You help an educational video editor find photos in free libraries (Wikimedia Commons, Openverse). "
+                  "Return strict JSON only.")
+
+
+def _requery(llm, subject: str, line: str, want: str, rejected: list[str]) -> tuple[str, list[str]]:
+    """Ask for a different, findable shot + searches for a line whose first searches found nothing suitable."""
+    user = f"""VIDEO SUBJECT: {subject}
+NARRATION LINE: "{line}"
+FIRST SHOT IDEA: {want}
+WHAT THE SEARCHES FOUND (all rejected as not matching): {'; '.join(rejected[:8]) or 'nothing usable'}
+
+Suggest ONE different real, photographable shot that literally shows what this line is about (the specific subject,
+its actual parts, place, specimen, artwork, or a real photo/illustration of it) and is LIKELY to exist on Wikimedia
+Commons — e.g. museum specimens, historical photos, scientific illustrations, photos of the actual place/object.
+Return JSON: {{"shows": "...", "queries": ["3 short searches, 2-4 words, each containing the physical noun"]}}"""
+    o = llm.json(REQUERY_SYSTEM, user, temperature=0.4,
+                 validate=lambda o: o["shows"] and isinstance(o["queries"], list) and o["queries"])
+    return str(o["shows"]), [str(q) for q in o["queries"]][:3]
+
+
+def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
+           seg_durs: list[float] | None = None) -> dict:
+    """Pick visually VERIFIED shots for every narration line.
+
+    Strict rules (media.require_llm_verdict: true, the default):
+      • every image is judged by a vision model against THAT line's narration; CLIP only pre-ranks;
+      • every line gets its own image scoring ≥ media.min_match_score for that line (a repeat is allowed only if it
+        also scored ≥ threshold for that line); no blind fill-ins;
+      • a line with no match gets a second search round with new queries; still nothing → NoVisualMatch (skip topic);
+      • vision model unreachable → vision.VisionUnavailable (nothing unverified is ever used).
+    Returns {"shots": [...], "alts": {seg: [verified spare candidates]}, "calls": n}.
     """
     from . import vision
 
@@ -242,9 +233,7 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
 
     judge = vision.Judge(cfg, llm)
     if not judge.available():
-        if mcfg.get("require_vision_check", True):
-            raise RuntimeError("no vision judge available (need GEMINI_API_KEY or CLIP) — refusing unverified images")
-        log.warning("no vision judge — falling back to unverified title matching")
+        raise vision.VisionUnavailable("no vision model available (need GEMINI_API_KEY) — refusing unverified images")
 
     subject = re.sub(r"\s*\(.*?\)", "", source["title"])
     context = source.get("description", "")
@@ -258,101 +247,118 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
             out.append(by_url[a["url"]])
         return list({id(a): a for a in out}.values())
 
-    article = canon(_commons_info(source.get("images", [])[:20], allowed, min_w)) if "wikimedia" in sources else []
+    # images about the subject itself: candidates for EVERY line (still judged per line)
+    common: list[dict] = []
+    if "wikimedia" in sources:
+        common += _commons_info(source.get("images", [])[:20], allowed, min_w)
+        common += commons_search(f'"{subject}"' if len(subject.split()) > 1 else subject, allowed, min_w, 12)
+    if "openverse" in sources:
+        common += openverse_search(subject, min_w, 8)
+    common = canon(common)
 
-    def score(cands, want, narration):
-        cands = vision.fetch_thumbs(cands)                     # thumbs cached on the shared originals
-        copies = [{k: v for k, v in c.items() if k not in ("vscore", "vshows", "vjudge", "clip", "clip_cos")}
-                  for c in cands]
-        return judge.score(copies, want, narration, subject, context)
+    def judge_line(cands, want, line):
+        cands = vision.fetch_thumbs(list({id(c): c for c in cands}.values()))
+        fresh = lambda: [{k: v for k, v in c.items() if k not in ("vscore", "vshows", "vjudge", "clip", "clip_cos")}
+                         for c in cands]
+        judged = judge.score(fresh(), want, line, subject, context)
+        if not any(c["vscore"] >= min_score for c in judged):          # look at the next sheet too
+            judged += judge.score(fresh(), want, line, subject, context, page=1)
+        return sorted(judged, key=lambda c: -c["vscore"])
 
-    used_urls: set[str] = set()
-    used_hashes: list[int] = []
+    used: list[dict] = []          # {"url","hash","emb","title","seg"}
     shots: list[dict] = []
+    alts: dict[int, list[dict]] = {}
 
-    used_embs: list = []
+    def is_used(c, allow_seg_gap: int | None = None):
+        for u in used:
+            dup = (c["url"] == u["url"] or vision.same_image(c["_hash"], u["hash"])
+                   or vision.near_duplicate(c.get("_emb"), u["emb"], t1=c.get("title", ""), t2=u["title"]))
+            if dup:
+                return u
+        return None
 
-    def take(c, i, want) -> bool:
-        if c["url"] in used_urls or any(vision.same_image(c["_hash"], h) for h in used_hashes) \
-                or any(vision.near_duplicate(c.get("_emb"), e, t1=c.get("title", ""), t2=t) for e, t in used_embs):
-            return False
+    def add_shot(c, i, want, reused=False) -> bool:
         p = _usable(c, work)
         if not p:
             return False
-        used_urls.add(c["url"])
-        used_hashes.append(c["_hash"])
-        used_embs.append((c.get("_emb"), c.get("title", "")))
+        if not reused:
+            used.append({"url": c["url"], "hash": c["_hash"], "emb": c.get("_emb"), "title": c.get("title", ""), "seg": i})
         credit = {k: v for k, v in c.items() if not k.startswith("_") and k not in
                   ("vscore", "vshows", "vjudge", "clip", "clip_cos", "thumb")}
         shots.append({"path": p, "credit": credit, "seg": i, "score": c["vscore"], "shows": c.get("vshows", ""),
-                      "judge": c.get("vjudge", ""), "want": want})
-        log.info("    seg %d ← %.1f/10 [%s] %s  (%s)", i, c["vscore"], c.get("vjudge"), c.get("vshows", "")[:70],
-                 c["title"][:50])
+                      "judge": c.get("vjudge", ""), "want": want, "reused": reused})
+        log.info("    seg %d ← %.1f/10 [%s]%s %s  (%s)", i, c["vscore"], c.get("vjudge"), " (repeat)" if reused else "",
+                 c.get("vshows", "")[:70], c["title"][:45])
         return True
 
-    subject_pool: list[dict] | None = None
-
-    def subject_level() -> list[dict]:
-        nonlocal subject_pool
-        if subject_pool is None:
-            q = f'"{subject}"' if len(subject.split()) > 1 else subject
-            extra = canon(commons_search(q, allowed, min_w, 15) + openverse_search(subject, min_w, 10))
-            subject_pool = score(article + extra, f"a clear, recognisable photo of {subject}",
-                                 f"This video is about {subject}. {context}")
-        return subject_pool
-
-    matched = 0
     for i, seg in enumerate(segments):
         vis = seg.get("visual") if isinstance(seg.get("visual"), dict) else {}
         kws = [k for k in (seg.get("keywords") or []) if isinstance(k, str)]
-        want = (vis.get("shows") or "").strip() or (f"{subject}: " + ", ".join(kws) if kws else f"{subject}")
+        want = (vis.get("shows") or "").strip() or (f"{subject}: " + ", ".join(kws) if kws else subject)
         queries = [q for q in (vis.get("queries") or []) if isinstance(q, str) and q.strip()]
         if not queries:
             queries = [f"{subject} {k}" for k in kws] or [subject]
-        cands = canon(_candidates_for(queries, sources, allowed, min_w)) + article
-        judged = score(list({id(c): c for c in cands}.values()), want, seg["text"])
+        judged = judge_line(canon(_candidates_for(queries, sources, allowed, min_w)) + common, want, seg["text"])
         good = [c for c in judged if c["vscore"] >= min_score]
+        if not good and llm is not None and mcfg.get("requery", True):
+            try:
+                want2, q2 = _requery(llm, subject, seg["text"], want, [c.get("vshows", "") for c in judged])
+                log.info("    seg %d: no match for %r → retrying with %r %s", i, want[:50], want2[:50], q2)
+                judged2 = judge_line(canon(_candidates_for(q2, sources, allowed, min_w)), want2, seg["text"])
+                good = [c for c in judged2 if c["vscore"] >= min_score]
+                want = want2 if good else want
+            except vision.VisionUnavailable:
+                raise
+            except Exception as e:  # noqa: BLE001
+                log.debug("requery failed: %s", e)
         want_n = 2 if seg_durs and i < len(seg_durs) and seg_durs[i] > multi_after else 1
         got = 0
+        spare = []
         for c in good:
-            if got >= want_n:
-                break
-            got += take(c, i, want)
-        if not got:                          # nothing fits this exact line → a verified photo of the subject
-            for c in subject_level():
-                if c["vscore"] >= min_score and take(c, i, f"a clear photo of {subject}"):
+            if got < want_n and not is_used(c) and add_shot(c, i, want):
+                got += 1
+            elif not is_used(c):
+                spare.append(c)
+        if not got:
+            # every verified match for this line is already on screen elsewhere → repeat the best one,
+            # but never right after the line that already shows it
+            for c in good:
+                u = is_used(c)
+                if u and abs(u["seg"] - i) > 1 and add_shot(c, i, want, reused=True):
                     got = 1
                     break
-        if got:
-            matched += 1
         if not got:
-            log.info("    seg %d: no verified match yet (best %s) — will reuse a verified shot", i,
-                     f"{judged[0]['vscore']:.1f}" if judged else "n/a")
+            best = f"{judged[0]['vscore']:.0f}/10 ({judged[0].get('vshows', '')[:60]})" if judged else "none"
+            raise NoVisualMatch(f"line {i + 1} has no image that shows it (best: {best}): {seg['text'][:80]!r}")
+        alts[i] = spare
 
-    if not shots:
-        raise RuntimeError(f"no images passed the visual relevance check for {subject!r}")
-    ratio = float(mcfg.get("min_matched_ratio", 0.6))
-    if matched < ratio * len(segments):
-        raise RuntimeError(f"only {matched}/{len(segments)} lines have a matching image for {subject!r} "
-                           f"(need {ratio:.0%}) — skipping topic")
     distinct = len({s["path"] for s in shots})
     need = int(mcfg.get("min_distinct_images", 3))
     if distinct < need:
-        raise RuntimeError(f"only {distinct} verified images for {subject!r} (need {need}) — skipping topic")
-
-    # segments without their own shot reuse the best verified shots (renderer varies the motion)
-    covered = {s["seg"] for s in shots}
-    best = sorted({s["path"]: s for s in shots}.values(), key=lambda s: -s["score"])
-    k = 0
-    for i in range(len(segments)):
-        if i not in covered:
-            src = best[k % len(best)]
-            k += 1
-            shots.append({**src, "seg": i, "reused": True})
+        raise NoVisualMatch(f"only {distinct} distinct verified images for {subject!r} (need {need})")
     shots.sort(key=lambda s: (s["seg"], s.get("reused", False)))
-    log.info("  visuals: %d shots, %d distinct images, %d vision-LLM calls, judge=%s", len(shots), distinct,
-             judge.calls, "llm" if judge.calls and not judge.llm_failed else "clip")
-    return shots
+    log.info("  visuals: %d shots, %d distinct images, every line verified, %d vision calls", len(shots), distinct,
+             judge.calls)
+    return {"shots": shots, "alts": alts, "calls": judge.calls}
+
+
+def use_alternative(visuals: dict, seg: int, bad_path: str, work: Path) -> bool:
+    """Replace a shot that failed final QA with the next verified spare for that line."""
+    from . import vision  # noqa: F401
+    for c in list(visuals["alts"].get(seg, [])):
+        visuals["alts"][seg].remove(c)
+        p = _usable(c, work)
+        if not p or str(p) == str(bad_path) or any(str(s["path"]) == str(p) for s in visuals["shots"]):
+            continue
+        for s in visuals["shots"]:
+            if s["seg"] == seg and str(s["path"]) == str(bad_path):
+                credit = {k: v for k, v in c.items() if not k.startswith("_") and k not in
+                          ("vscore", "vshows", "vjudge", "clip", "clip_cos", "thumb")}
+                s.update({"path": p, "credit": credit, "score": c["vscore"], "shows": c.get("vshows", ""),
+                          "judge": c.get("vjudge", ""), "reused": False})
+                log.info("    QA repair: seg %d → %s", seg, c.get("vshows", "")[:70])
+                return True
+    return False
 
 
 def credits_text(visuals: list[dict]) -> str:

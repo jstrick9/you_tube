@@ -15,7 +15,8 @@ import time
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from . import media, music, render, trends
+from . import media, music, qa, render, trends
+from .vision import VisionUnavailable
 from .common import OUTPUT_DIR, WORK_DIR, now_utc, read_json, slugify, write_json
 from .llm import LLM
 from .scriptwriter import ScriptWriter
@@ -35,7 +36,7 @@ def taken_slots(hist: list[dict]) -> set[str]:
     now = now_utc()
     out = set()
     for h in hist:
-        if h.get("video_id") and h.get("publish_at"):
+        if h.get("video_id") and h.get("publish_at") and h.get("status") != "withdrawn":
             try:
                 if datetime.fromisoformat(h["publish_at"]) > now:
                     out.add(_slot_key(h["publish_at"]))
@@ -119,20 +120,41 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     seg_durs = [starts[i + 1] - starts[i] for i in range(len(tsegs))]
     try:
         visuals = media.gather(source, script["segments"], cfg, work / "img", llm=writer.llm, seg_durs=seg_durs)
-    except RuntimeError as e:
-        log.info("  ✗ visuals: %s", e)
+    except media.NoVisualMatch as e:
+        log.info("  ✗ visuals: %s — skipping topic", e)
         return None
     mus = music.generate(tts["duration"] + 1, work / "music.wav", seed) if cfg["video"]["background_music"] else None
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     out = OUTPUT_DIR / f"{run_id}-{idx:02d}-{slug}.mp4"
     hook_card = script.get("thumbnail_text") or ""
-    r = render.render(tts, visuals, mus, hook_card, cfg["channel"]["name"], cfg, work, out, seed)
+    title = script["title"].strip()
+    if "#shorts" not in title.lower() and len(title) <= 90:
+        title = f"{title} #shorts"
+    subject = source["title"]
+
+    # render → final QA on the finished file → (repair a failed shot with a verified spare, re-render) → …
+    repairs = int(cfg.get("qa", {}).get("max_repairs", 2))
+    report: dict = {"passed": False}
+    for attempt in range(repairs + 1):
+        r = render.render(tts, visuals["shots"], mus, hook_card, cfg["channel"]["name"], cfg, work, out, seed)
+        report = qa.verify(out, r["timeline"], visuals["shots"], tts, script, title, hook_card, subject,
+                           writer.llm, cfg)
+        report["attempt"] = attempt + 1
+        if report["passed"]:
+            log.info("  ✓ final QA passed: %d frames checked against the narration", len(report["frames"]))
+            break
+        log.info("  ✗ final QA attempt %d: %s", attempt + 1, "; ".join(report["issues"])[:500])
+        if not report["failed"] or len(report["failed"]) < len(report["issues"]):
+            break                    # a non-image problem (narration/title/hook) can't be fixed by swapping photos
+        if not all(media.use_alternative(visuals, seg, path, work / "img") for seg, path in report["failed"]):
+            break
+
     thumb = render.thumbnail(r["first_frame"], hook_card or source["title"], out.with_suffix(".jpg"), r["theme"])
-    try:   # QA contact sheet of the shots actually used (kept with the run artifact)
+    try:   # contact sheet of the shots actually used (kept with the run artifact)
         from PIL import Image
         from .vision import contact_sheet
         ims = []
-        for v in visuals:
+        for v in visuals["shots"]:
             with Image.open(v["path"]) as im:
                 im = im.convert("RGB")
                 im.thumbnail((400, 400))
@@ -141,27 +163,29 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     except Exception as e:  # noqa: BLE001
         log.debug("shots sheet failed: %s", e)
 
-    title = script["title"].strip()
-    if "#shorts" not in title.lower() and len(title) <= 90:
-        title = f"{title} #shorts"
     meta = {
         "title": title,
-        "description": build_description(script, source, visuals, cfg, tts["engine"]),
+        "description": build_description(script, source, visuals["shots"], cfg, tts["engine"]),
         "tags": list(dict.fromkeys([t.strip("#") for t in script.get("tags", [])] + ["shorts", "facts"]))[:25],
     }
-    (out.with_suffix(".json")).write_text(json.dumps({"meta": meta, "script": script, "review": review,
-                                                       "source": {k: source[k] for k in ("title", "url")},
-                                                       "plan": plan, "tts_engine": tts["engine"],
-                                                       "duration": r["duration"],
-                                                       "shots": [{"seg": v["seg"], "score": v.get("score"),
-                                                                  "judge": v.get("judge"), "shows": v.get("shows"),
-                                                                  "want": v.get("want"), "reused": v.get("reused", False),
-                                                                  "image": v["credit"].get("title"),
-                                                                  "page": v["credit"].get("page")} for v in visuals]},
-                                                      indent=2))
+    record = {"meta": meta, "script": script, "review": review, "source": {k: source[k] for k in ("title", "url")},
+              "plan": plan, "tts_engine": tts["engine"], "duration": r["duration"],
+              "qa": {k: report.get(k) for k in ("passed", "attempt", "issues", "frames", "meta")},
+              "shots": [{"seg": v["seg"], "score": v.get("score"), "judge": v.get("judge"), "shows": v.get("shows"),
+                         "want": v.get("want"), "reused": v.get("reused", False), "image": v["credit"].get("title"),
+                         "page": v["credit"].get("page")} for v in visuals["shots"]],
+              "timeline": r["timeline"]}
+    if not report["passed"]:
+        # keep the evidence in the run artifact, clearly marked, and never hand it to the uploader
+        rejected = out.with_name(out.stem + "-REJECTED.mp4")
+        out.replace(rejected)
+        rejected.with_suffix(".json").write_text(json.dumps(record, indent=2, default=str))
+        log.info("  ✗ NOT publishing %r — final QA failed", source["title"])
+        return None
+    out.with_suffix(".json").write_text(json.dumps(record, indent=2, default=str))
     log.info("  ✓ rendered %s (%.1fs, review=%s)", out.name, r["duration"], review.get("score"))
     return {"file": out, "thumb": thumb, "meta": meta, "script": script, "source": source, "review": review,
-            "topic": topic, "plan": plan, "duration": r["duration"], "tts_engine": tts["engine"]}
+            "topic": topic, "plan": plan, "duration": r["duration"], "tts_engine": tts["engine"], "qa": report}
 
 
 def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_work: bool = False) -> list[dict]:
@@ -184,7 +208,10 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     results, used_titles = [], set()
     pi = 0
     deadline = time.time() + 60 * float(cfg["schedule"].get("max_run_minutes", 120))
+    vision_down = False
     for i in range(n):
+        if vision_down:
+            break
         plan = plans[i]
         while pi < len(picks):
             if time.time() > deadline:
@@ -195,6 +222,10 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             topic["category"] = topic.get("category") or random.choice(cfg["channel"]["categories"])
             try:
                 res = make_one(cfg, writer, topic, plan, i + 1, run_id)
+            except VisionUnavailable as e:
+                log.error("  ✗ %s — stopping this run (nothing unverified is published; the next run retries)", e)
+                vision_down = True
+                break
             except Exception as e:  # noqa: BLE001
                 log.exception("  ✗ failed on %r: %s", topic["topic"], e)
                 res = None
@@ -217,6 +248,9 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             "tts_engine": res["tts_engine"], "file": res["file"].name, "publish_at": slot.isoformat() if slot else None,
             "llm": llm.last_used,
         }
+        if not (res.get("qa") or {}).get("passed"):
+            log.error("refusing to upload %s: final QA did not pass", res["file"].name)
+            continue
         if do_upload:
             from . import youtube
             try:
@@ -228,8 +262,10 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
         else:
             entry["status"] = "rendered"
         res["entry"] = entry
-        hist.append(entry)
-    write_json("history.json", hist[-2000:])
+        if do_upload:            # dry runs never touch history (no topic dedupe / slot booking side effects)
+            hist.append(entry)
+    if do_upload:
+        write_json("history.json", hist[-2000:])
     if not keep_work:
         shutil.rmtree(WORK_DIR / run_id, ignore_errors=True)
     return results

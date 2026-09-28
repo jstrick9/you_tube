@@ -504,7 +504,7 @@
   {
     "created_at": "2026-09-28T18:24:54.310876+00:00",
     "run_id": "20260928-1812",
-    "title": "Your Fighter Jet Runs on Invisible Computers—How Does It Stay Balanced? #shorts",
+    "title": "Your Fighter Jet Runs on Invisible Computers\u2014How Does It Stay Balanced? #shorts",
     "topic": "modern jet fighters are designed to be inherently unstable in flight - tactical Supermaneuvrability dictates aircraft have enhanced responsiveness. On the downside it means pilots are no longer flying the airplanes - most control actions are performed by an onboard computer.",
     "topic_key": "modern jet fighters are designed to be inherently unstable in flight  tactical supermaneuvrability dictates aircraft have enhanced responsiveness on the downside it means pilots are no longer flying the airplanes  most control actions are performed by an onboard computer",
     "wiki_title": "Fly-by-wire",
@@ -524,7 +524,7 @@
     "publish_at": "2026-09-28T21:30:00+00:00",
     "llm": "gemini:gemini-flash-lite-latest",
     "video_id": "CMJX5IcrEeI",
-    "status": "scheduled",
+    "status": "withdrawn",
     "metrics": {
       "views": 1,
       "likes": 0,
@@ -535,7 +535,8 @@
       "hours_live": 1.0,
       "vph": 1.0,
       "checked_at": "2026-09-28T20:31:04.938919+00:00"
-    }
+    },
+    "withdrawn_reason": "made before visual verification; owner set to Private"
   },
   {
     "created_at": "2026-09-28T18:24:56.610973+00:00",
@@ -560,7 +561,7 @@
     "publish_at": "2026-09-29T00:30:00+00:00",
     "llm": "gemini:gemini-flash-lite-latest",
     "video_id": "XMsYZIM52bI",
-    "status": "scheduled",
+    "status": "withdrawn",
     "metrics": {
       "views": 3,
       "likes": 0,
@@ -571,7 +572,8 @@
       "hours_live": 1.0,
       "vph": 3.0,
       "checked_at": "2026-09-28T20:31:04.938919+00:00"
-    }
+    },
+    "withdrawn_reason": "made before visual verification; owner set to Private"
   },
   {
     "created_at": "2026-09-28T18:24:58.750726+00:00",
@@ -596,7 +598,7 @@
     "publish_at": "2026-09-29T16:00:00+00:00",
     "llm": "gemini:gemini-flash-lite-latest",
     "video_id": "A_dIXq9uSYE",
-    "status": "scheduled",
+    "status": "withdrawn",
     "metrics": {
       "views": 0,
       "likes": 0,
@@ -607,150 +609,7 @@
       "hours_live": 1.0,
       "vph": 0.0,
       "checked_at": "2026-09-28T20:31:04.938919+00:00"
-    }
-  },
-  {
-    "created_at": "2026-09-28T19:38:53.503041+00:00",
-    "run_id": "20260928-1932",
-    "title": "How Loneliness Affects Millions Globally #shorts",
-    "topic": "a Dutch supermarket chain has \"chat checkouts\" for customers who aren't in a hurry and want to talk to the cashier. The first opened in 2019 to tackle loneliness among older people, and it was popular enough that the chain announced 200 more.",
-    "topic_key": "a dutch supermarket chain has chat checkouts for customers who arent in a hurry and want to talk to the cashier the first opened in 2019 to tackle loneliness among older people and it was popular enough that the chain announced 200 more",
-    "wiki_title": "Loneliness",
-    "trend_sources": [
-      "reddit_todayilearned"
-    ],
-    "choice": {
-      "category": "culture",
-      "format": "what_if",
-      "hook_style": "number_first",
-      "voice": "en-US-BrianNeural"
     },
-    "review_score": 10,
-    "duration": 30.064058956916096,
-    "tts_engine": "edge-tts",
-    "file": "20260928-1932-01-loneliness.mp4",
-    "publish_at": "2026-09-29T21:30:00+00:00",
-    "llm": "gemini:gemini-flash-lite-latest",
-    "status": "rendered"
-  },
-  {
-    "created_at": "2026-09-28T19:50:33.276933+00:00",
-    "run_id": "20260928-1942",
-    "title": "The True Origin of Winamp's Famous Slogan #shorts",
-    "topic": "Winamp's slogan \"It really whips the llama's ass!\" comes from the Wesley Willis song \"Whip the Llama's Ass\". Willis was a schizophrenic musician and artist who released over 48 albums in his lifetime.",
-    "topic_key": "winamps slogan it really whips the llamas ass comes from the wesley willis song whip the llamas ass willis was a schizophrenic musician and artist who released over 48 albums in his lifetime",
-    "wiki_title": "Wesley Willis",
-    "trend_sources": [
-      "reddit_todayilearned"
-    ],
-    "choice": {
-      "category": "culture",
-      "format": "myth_vs_fact",
-      "hook_style": "bold_claim",
-      "voice": "en-US-EmmaNeural"
-    },
-    "review_score": 9,
-    "duration": 31.096054421768706,
-    "tts_engine": "edge-tts",
-    "file": "20260928-1942-01-wesley-willis.mp4",
-    "publish_at": "2026-09-29T21:30:00+00:00",
-    "llm": "gemini:gemini-flash-lite-latest:vision",
-    "status": "rendered"
-  },
-  {
-    "created_at": "2026-09-28T20:27:12.676685+00:00",
-    "run_id": "20260928-1953",
-    "title": "How 5 Billion Birds Went Extinct in North America #shorts",
-    "topic": "Passenger pigeon",
-    "topic_key": "passenger pigeon",
-    "wiki_title": "Passenger pigeon",
-    "trend_sources": [
-      "wikipedia"
-    ],
-    "choice": {
-      "category": "nature",
-      "format": "facts3",
-      "hook_style": "number_first",
-      "voice": "en-US-ChristopherNeural"
-    },
-    "review_score": 10,
-    "duration": 45.16006802721088,
-    "tts_engine": "edge-tts",
-    "file": "20260928-1953-01-passenger-pigeon.mp4",
-    "publish_at": "2026-09-29T21:30:00+00:00",
-    "llm": "gemini:gemini-flash-lite-latest:vision",
-    "status": "rendered"
-  },
-  {
-    "created_at": "2026-09-28T20:27:12.676709+00:00",
-    "run_id": "20260928-1953",
-    "title": "The Incredible Survival Secrets of Tardigrades #shorts",
-    "topic": "Tardigrade",
-    "topic_key": "tardigrade",
-    "wiki_title": "Tardigrade",
-    "trend_sources": [
-      "evergreen"
-    ],
-    "choice": {
-      "category": "geography",
-      "format": "by_the_numbers",
-      "hook_style": "question",
-      "voice": "en-US-AvaNeural"
-    },
-    "review_score": 9,
-    "duration": 35.20004535147392,
-    "tts_engine": "edge-tts",
-    "file": "20260928-1953-02-tardigrade.mp4",
-    "publish_at": "2026-09-30T00:30:00+00:00",
-    "llm": "gemini:gemini-flash-lite-latest:vision",
-    "status": "rendered"
-  },
-  {
-    "created_at": "2026-09-28T20:47:52.324288+00:00",
-    "run_id": "20260928-2031",
-    "title": "The Hidden History and Massive Scale of Data Centers #shorts",
-    "topic": "data center",
-    "topic_key": "data center",
-    "wiki_title": "Data center",
-    "trend_sources": [
-      "google_trends"
-    ],
-    "choice": {
-      "category": "technology",
-      "format": "backstory",
-      "hook_style": "question",
-      "voice": "en-US-ChristopherNeural"
-    },
-    "review_score": 9,
-    "duration": 35.75206349206349,
-    "tts_engine": "edge-tts",
-    "file": "20260928-2031-01-data-center.mp4",
-    "publish_at": "2026-09-29T21:30:00+00:00",
-    "llm": "gemini:gemini-flash-lite-latest:vision",
-    "status": "rendered"
-  },
-  {
-    "created_at": "2026-09-28T20:47:52.324342+00:00",
-    "run_id": "20260928-2031",
-    "title": "The Fascinating History and Science of Dog Walking #shorts",
-    "topic": "a nationwide US study found that only 42% of dog owners reported walking their dog during a typical week.",
-    "topic_key": "a nationwide us study found that only 42 of dog owners reported walking their dog during a typical week",
-    "wiki_title": "Dog walking",
-    "trend_sources": [
-      "reddit_todayilearned"
-    ],
-    "choice": {
-      "category": "technology",
-      "format": "timeline",
-      "hook_style": "bold_claim",
-      "voice": "en-US-AndrewNeural"
-    },
-    "review_score": 9,
-    "duration": 31.024058956916097,
-    "tts_engine": "edge-tts",
-    "file": "20260928-2031-02-dog-walking.mp4",
-    "publish_at": "2026-09-30T00:30:00+00:00",
-    "llm": "gemini:gemini-flash-lite-latest:vision",
-    "status": "rendered"
+    "withdrawn_reason": "made before visual verification; owner set to Private"
   }
 ]

@@ -5,7 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from autotube.llm import _extract_json  # noqa: E402
-from autotube.media import _license_ok, relevant  # noqa: E402
+from autotube.media import _license_ok  # noqa: E402
 from autotube.research import unsupported_numbers  # noqa: E402
 from autotube.strategy import Strategy  # noqa: E402
 from autotube.trends import _blocked, is_living_person  # noqa: E402
@@ -50,10 +50,6 @@ def test_licenses():
     assert not _license_ok("", allowed)
 
 
-def test_image_relevance():
-    assert not relevant({"title": "Canary Wharf London.jpg"}, "Domestic canary", "mine")
-    assert relevant({"title": "Canary in a coal mine.jpg"}, "Domestic canary", "mine")
-    assert not relevant({"title": "Tower crane.jpg"}, "Whooping crane")
 
 
 def test_bandit_learns():

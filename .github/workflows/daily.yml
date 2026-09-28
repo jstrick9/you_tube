@@ -11,6 +11,7 @@ on:
     # GitHub often starts scheduled runs late (we've seen 4–5 hours), so:
     - cron: "17 10 * * *"        # main run   10:17 UTC = 6:17 AM EDT / 5:17 AM EST
     - cron: "47 15 * * *"        # backup     15:47 UTC = 11:47 AM EDT / 10:47 AM EST (only fills what's missing)
+    - cron: "17 19 * * *"        # catch-up   19:17 UTC =  3:17 PM EDT /  2:17 PM EST (e.g. after a vision-model outage)
   workflow_dispatch:
     inputs:
       count:

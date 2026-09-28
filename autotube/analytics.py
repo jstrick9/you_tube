@@ -60,6 +60,9 @@ def run(cfg: dict) -> dict:
         h["metrics"]["checked_at"] = now.isoformat()
         if s.get("rejection") or s.get("upload_status") in ("rejected", "failed"):
             h["status"] = "rejected"
+        elif s.get("privacy") == "private" and pub < now - timedelta(hours=1) and h.get("status") == "scheduled":
+            # its publish time has passed but it's still private → the owner pulled it; don't learn from it
+            h["status"] = "withdrawn"
 
     # YouTube API policy III.E.4: stored statistics must be re-verified at least every 30 days.
     # Anything not re-checked within 30 days (e.g. very old videos outside the refresh window) is dropped.
@@ -77,7 +80,7 @@ def run(cfg: dict) -> dict:
     strat = Strategy(cfg)
     learned = 0
     for h in matured:
-        if h.get("reward") is not None:
+        if h.get("reward") is not None or h.get("status") == "withdrawn":
             continue
         if h.get("status") == "rejected":
             r = 0.0

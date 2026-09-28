@@ -47,10 +47,14 @@ def test_llm_scores_are_applied_and_sorted():
 
 
 def test_no_judge_means_no_verdict():
-    j = vision.Judge({"media": {"clip": False}}, FakeLLM([9, 9], fail=True))
-    j.retry_pause = 0
-    out = j.score(_cands(2), "x", "y", "z")
-    assert out == []                      # LLM failed and no CLIP → nothing is "verified"
+    import pytest
+    j = vision.Judge({"media": {"clip": False}}, FakeLLM([9, 9], fail=True))       # strict (default)
+    j.retry_pauses = []
+    with pytest.raises(vision.VisionUnavailable):
+        j.score(_cands(2), "x", "y", "z")
+    j = vision.Judge({"media": {"clip": False, "require_llm_verdict": False}}, FakeLLM([9, 9], fail=True))
+    j.retry_pauses = []
+    assert j.score(_cands(2), "x", "y", "z") == []      # non-strict, no CLIP → still nothing "verified"
 
 
 def test_contact_sheet_is_jpeg():
