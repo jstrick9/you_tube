@@ -114,13 +114,32 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
             log.info("  ✗ still too long (%.1fs), skipping", tts["duration"])
             return None
 
-    visuals = media.gather(source, script["segments"], cfg, work / "img")
+    tsegs = tts["segments"]
+    starts = [x["start"] for x in tsegs] + [tts["duration"]]
+    seg_durs = [starts[i + 1] - starts[i] for i in range(len(tsegs))]
+    try:
+        visuals = media.gather(source, script["segments"], cfg, work / "img", llm=writer.llm, seg_durs=seg_durs)
+    except RuntimeError as e:
+        log.info("  ✗ visuals: %s", e)
+        return None
     mus = music.generate(tts["duration"] + 1, work / "music.wav", seed) if cfg["video"]["background_music"] else None
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     out = OUTPUT_DIR / f"{run_id}-{idx:02d}-{slug}.mp4"
     hook_card = script.get("thumbnail_text") or ""
     r = render.render(tts, visuals, mus, hook_card, cfg["channel"]["name"], cfg, work, out, seed)
     thumb = render.thumbnail(r["first_frame"], hook_card or source["title"], out.with_suffix(".jpg"), r["theme"])
+    try:   # QA contact sheet of the shots actually used (kept with the run artifact)
+        from PIL import Image
+        from .vision import contact_sheet
+        ims = []
+        for v in visuals:
+            with Image.open(v["path"]) as im:
+                im = im.convert("RGB")
+                im.thumbnail((400, 400))
+                ims.append(im)
+        out.with_suffix(".shots.jpg").write_bytes(contact_sheet(ims, tile=300, cols=4))
+    except Exception as e:  # noqa: BLE001
+        log.debug("shots sheet failed: %s", e)
 
     title = script["title"].strip()
     if "#shorts" not in title.lower() and len(title) <= 90:
@@ -133,7 +152,13 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     (out.with_suffix(".json")).write_text(json.dumps({"meta": meta, "script": script, "review": review,
                                                        "source": {k: source[k] for k in ("title", "url")},
                                                        "plan": plan, "tts_engine": tts["engine"],
-                                                       "duration": r["duration"]}, indent=2))
+                                                       "duration": r["duration"],
+                                                       "shots": [{"seg": v["seg"], "score": v.get("score"),
+                                                                  "judge": v.get("judge"), "shows": v.get("shows"),
+                                                                  "want": v.get("want"), "reused": v.get("reused", False),
+                                                                  "image": v["credit"].get("title"),
+                                                                  "page": v["credit"].get("page")} for v in visuals]},
+                                                      indent=2))
     log.info("  ✓ rendered %s (%.1fs, review=%s)", out.name, r["duration"], review.get("score"))
     return {"file": out, "thumb": thumb, "meta": meta, "script": script, "source": source, "review": review,
             "topic": topic, "plan": plan, "duration": r["duration"], "tts_engine": tts["engine"]}

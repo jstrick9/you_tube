@@ -150,12 +150,26 @@ llm:
   groq_models: [llama-3.3-70b-versatile, llama-3.1-8b-instant]
   openrouter_models: ["meta-llama/llama-3.3-70b-instruct:free", "deepseek/deepseek-chat-v3-0324:free"]
   pollinations_models: [openai-fast, openai]
+  # image-checking models (keyless Pollinations can't see images, so it's never used for this)
+  vision_providers: [gemini, groq, openrouter]
+  gemini_vision_models: [gemini-flash-lite-latest, gemini-flash-latest, gemini-2.5-flash-lite, gemini-2.5-flash]
+  groq_vision_models: [meta-llama/llama-4-scout-17b-16e-instruct]
+  openrouter_vision_models: ["google/gemma-3-27b-it:free"]
   temperature: 0.8
 
 media:
   sources: [pexels, wikimedia, openverse]   # pexels used only if PEXELS_API_KEY is set
-  images_per_video: 6
   min_image_width: 900
+  # Every image is LOOKED AT before use (see autotube/vision.py): CLIP pre-ranks candidates, then a
+  # vision LLM (Gemini free tier) scores a contact sheet of the best ones against the narration line.
+  min_match_score: 7                     # 0-10; nothing below this ever appears in a video
+  require_vision_check: true             # no judge available → skip the video rather than guess
+  min_distinct_images: 3                 # fewer verified images than this → pick another topic
+  multi_shot_seconds: 4.5                # lines longer than this get 2 different verified shots
+  vision_sheet_size: 9                   # candidates per vision-LLM call (3x3 contact sheet)
+  clip: true
+  clip_model: ViT-B-32
+  clip_pretrained: laion2b_s34b_b79k
 
 upload:
   enabled: true                           # false = render only (dry run)

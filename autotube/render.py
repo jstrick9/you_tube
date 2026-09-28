@@ -164,6 +164,19 @@ def thumbnail(frame: Path, text: str, out: Path, theme_idx: int) -> Path:
     return out
 
 
+def shot_plan(visuals: list[dict], n_segs: int) -> list[dict]:
+    """Normalise visuals to an ordered shot list covering every segment (old format = one per segment)."""
+    if visuals and all("seg" in v for v in visuals):
+        shots = sorted([v for v in visuals if v["seg"] < n_segs], key=lambda v: v["seg"])
+    else:
+        shots = [dict(v, seg=i) for i, v in enumerate(visuals[:n_segs])]
+    have = {v["seg"] for v in shots}
+    for i in range(n_segs):
+        if i not in have and shots:
+            shots.append(dict(shots[i % len(shots)], seg=i))
+    return sorted(shots, key=lambda v: v["seg"])
+
+
 # ── main render ───────────────────────────────────────────────────────────────
 def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: str, channel: str,
            cfg: dict, work: Path, out_mp4: Path, seed: int) -> dict:
@@ -174,12 +187,18 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
     segs = tts["segments"]
     total = tts["duration"] + TAIL
 
-    # segment display windows (each visual shows from its segment start to next start)
+    # segment display windows (each segment runs from its start to the next segment's start);
+    # a segment with k shots splits its window into k equal cuts
     bounds = [s["start"] for s in segs] + [total]
-    durs = [bounds[i + 1] - bounds[i] for i in range(len(segs))]
+    seg_durs = [bounds[i + 1] - bounds[i] for i in range(len(segs))]
+    shots = shot_plan(visuals, len(segs))
+    per_seg: dict[int, int] = {}
+    for v in shots:
+        per_seg[v["seg"]] = per_seg.get(v["seg"], 0) + 1
+    durs = [seg_durs[v["seg"]] / per_seg[v["seg"]] for v in shots]
 
     frames = []
-    for i, v in enumerate(visuals[:len(segs)]):
+    for i, v in enumerate(shots):
         frames.append(compose_frame(Path(v["path"]), work / f"frame{i:02d}.jpg", W, H))
 
     ass = build_ass(segs, hook_text, channel, W, H, theme, "Anton", work / "captions.ass", total)
@@ -195,8 +214,9 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
     m_idx = n + 1
 
     fg = []
-    motions = ["in", "out", "left", "right", "up", "in"]
-    rng.shuffle(motions)
+    motions: list[str] = []
+    for _ in range(n):             # never the same camera move twice in a row
+        motions.append(rng.choice([m for m in ("in", "out", "left", "right", "up") if not motions or m != motions[-1]]))
     cw, ch = int(W * SS), int(H * SS)
     for i in range(n):
         d = durs[i] + (XF if i < n - 1 else 0)

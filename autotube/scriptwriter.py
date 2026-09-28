@@ -144,18 +144,28 @@ Write the script as 6-7 segments:
   - last segment = payoff + natural call to follow (e.g. "Follow for more."), 8-14 words.
 The TOPIC line is just a trend headline — do NOT repeat its claims or numbers unless the SOURCE TEXT states them.
 TOTAL narration MUST be {words_lo}-{words_hi} words. Count them. Too short = rejected.
-For each segment give 1-2 visual search keywords (concrete nouns that could be found in a photo library) and
-"evidence": a VERBATIM {ev_len} word quote copied from the SOURCE TEXT that supports the segment ("" only for hook/CTA).
+For each segment give:
+  "visual": what the viewer SEES while that line is spoken — it must literally depict what the line is about:
+     "shows": one concrete, photographable scene (e.g. "close-up of a cat's face with long white whiskers"),
+     "queries": 2-3 short photo-library searches (2-4 words each) that ALWAYS include the physical thing's noun
+                (e.g. "cat whiskers close-up", "kitten face macro") — never a bare topic word that could also be
+                a place, business, film or brand name. Never ask for text, charts, maps or abstract ideas; for an
+                abstract line, show the video's main subject in a way that fits it. Hook/CTA: show the main subject.
+  "evidence": a VERBATIM {ev_len} word quote copied from the SOURCE TEXT that supports the segment ("" only for hook/CTA).
 
 Return JSON:
 {{"title": "<= 70 chars, curiosity-driven but accurate, no emojis, no clickbait lies",
- "segments": [{{"text": "...", "keywords": ["..."], "evidence": "..."}}]}}"""
+ "segments": [{{"text": "...", "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "..."}}]}}"""
 
         def validate(o):
             segs = o.get("segments")
             assert isinstance(segs, list) and 4 <= len(segs) <= 10, "need 6-7 segments"
             assert all(isinstance(s.get("text"), str) and s["text"].strip() for s in segs), "empty segment"
             assert o.get("title"), "missing title"
+            vis = [s.get("visual") for s in segs]
+            bad = [i + 1 for i, v in enumerate(vis) if not (isinstance(v, dict) and str(v.get("shows", "")).strip()
+                                                             and isinstance(v.get("queries"), list) and v["queries"])]
+            assert len(bad) <= 1, f"segments {bad} are missing \"visual\": {{\"shows\": ..., \"queries\": [...]}}"
             words = sum(len(s["text"].split()) for s in segs)
             assert words_lo * 0.75 <= words <= words_hi * 1.3, (
                 f"narration is {words} words but must be {words_lo}-{words_hi} words — "

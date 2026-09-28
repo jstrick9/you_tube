@@ -8,3 +8,5 @@ pyyaml>=6.0
 google-api-python-client>=2.120
 google-auth>=2.28
 google-auth-oauthlib>=1.2
+# Visual relevance check (installed CPU-only in the workflow):
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu && pip install open_clip_torch

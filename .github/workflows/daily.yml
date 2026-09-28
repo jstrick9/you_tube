@@ -55,6 +55,15 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core > /dev/null
           pip install -q -r requirements.txt
+          # CLIP (CPU-only torch) — local image↔text matching used to verify every visual
+          pip install -q torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install -q open_clip_torch
+
+      - name: Cache CLIP model weights
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: clip-vit-b-32-laion2b
 
       - name: Cache offline TTS voice (fallback only)
         uses: actions/cache@v4

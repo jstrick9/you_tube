@@ -7,6 +7,7 @@ and is parsed defensively, so a flaky model never crashes the pipeline.
 """
 from __future__ import annotations
 
+import base64
 import json
 import logging
 import os
@@ -91,14 +92,17 @@ def _repair_truncated(text: str):
 
 
 # ── providers ─────────────────────────────────────────────────────────────────
-def _gemini(model: str, system: str, user: str, temperature: float) -> str:
+def _gemini(model: str, system: str, user: str, temperature: float, images: list[bytes] | None = None) -> str:
     key = os.environ.get("GEMINI_API_KEY")
     if not key:
         raise LLMError("no GEMINI_API_KEY")
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+    parts: list[dict] = [{"text": user}]
+    for img in images or []:
+        parts.append({"inline_data": {"mime_type": "image/jpeg", "data": base64.b64encode(img).decode()}})
     body = {
         "systemInstruction": {"parts": [{"text": system}]},
-        "contents": [{"role": "user", "parts": [{"text": user}]}],
+        "contents": [{"role": "user", "parts": parts}],
         "generationConfig": {"temperature": temperature, "responseMimeType": "application/json"},
     }
     r = http().post(url, params={"key": key}, json=body, timeout=90)
@@ -113,7 +117,7 @@ def _gemini(model: str, system: str, user: str, temperature: float) -> str:
 
 def _openai_compatible(base: str, key: str | None, model: str, system: str, user: str,
                        temperature: float, json_mode: bool = True, extra_headers: dict | None = None,
-                       extra_body: dict | None = None) -> str:
+                       extra_body: dict | None = None, images: list[bytes] | None = None) -> str:
     headers = {"Content-Type": "application/json"}
     if key:
         headers["Authorization"] = f"Bearer {key}"
@@ -121,7 +125,10 @@ def _openai_compatible(base: str, key: str | None, model: str, system: str, user
         headers.update(extra_headers)
     body: dict[str, Any] = {
         "model": model,
-        "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+        "messages": [{"role": "system", "content": system}, {"role": "user", "content": user if not images else
+                     [{"type": "text", "text": user}] + [
+                         {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(i).decode()}}
+                         for i in images]}],
         "temperature": temperature,
     }
     if json_mode:
@@ -141,19 +148,20 @@ def _openai_compatible(base: str, key: str | None, model: str, system: str, user
         raise LLMError(f"bad response: {str(data)[:200]}") from e
 
 
-def _groq(model, system, user, temperature):
+def _groq(model, system, user, temperature, images=None):
     key = os.environ.get("GROQ_API_KEY")
     if not key:
         raise LLMError("no GROQ_API_KEY")
-    return _openai_compatible("https://api.groq.com/openai/v1/chat/completions", key, model, system, user, temperature)
+    return _openai_compatible("https://api.groq.com/openai/v1/chat/completions", key, model, system, user, temperature,
+                              images=images)
 
 
-def _openrouter(model, system, user, temperature):
+def _openrouter(model, system, user, temperature, images=None):
     key = os.environ.get("OPENROUTER_API_KEY")
     if not key:
         raise LLMError("no OPENROUTER_API_KEY")
     return _openai_compatible("https://openrouter.ai/api/v1/chat/completions", key, model, system, user,
-                              temperature, extra_headers={"X-Title": "AutoTube"})
+                              temperature, extra_headers={"X-Title": "AutoTube"}, images=images)
 
 
 def _pollinations(model, system, user, temperature):
@@ -184,15 +192,32 @@ class LLM:
         # "lite" = only the keyless fallback is available → callers send smaller prompts
         self.lite = not any(os.environ.get(keyed[p]) for p in self.order if p in keyed)
 
+    def vision_available(self) -> bool:
+        keyed = {"gemini": "GEMINI_API_KEY", "groq": "GROQ_API_KEY", "openrouter": "OPENROUTER_API_KEY"}
+        return any(os.environ.get(keyed.get(p, "-")) and self._vision_models(p)
+                   for p in self.cfg.get("vision_providers", ["gemini", "groq", "openrouter"]))
+
+    def _vision_models(self, pname: str) -> list[str]:
+        default = self.cfg.get("gemini_models", []) if pname == "gemini" else []
+        return self.cfg.get(f"{pname}_vision_models", default)
+
+    def vision_json(self, system: str, user: str, images: list[bytes], validate=None) -> Any:
+        """Like json(), but sends JPEG images to vision-capable models only (never the keyless tier)."""
+        order = [p for p in self.cfg.get("vision_providers", ["gemini", "groq", "openrouter"]) if p in PROVIDERS]
+        return self.json(system, user, temperature=0.1, validate=validate, images=images, order=order,
+                         models_of=self._vision_models)
+
     def json(self, system: str, user: str, temperature: float | None = None,
-             validate=None, attempts_per_model: int = 2) -> Any:
+             validate=None, attempts_per_model: int = 2, images: list[bytes] | None = None,
+             order: list[str] | None = None, models_of=None) -> Any:
         """Return parsed JSON. `validate(obj)` may raise to force a retry/failover."""
         temp = self.temperature if temperature is None else temperature
         errors = []
-        for pname in self.order:
+        for pname in (order or self.order):
             fn, models_key = PROVIDERS[pname]
-            for model in self.cfg.get(models_key, []):
-                tag = f"{pname}:{model}"
+            models = models_of(pname) if models_of else self.cfg.get(models_key, [])
+            for model in models:
+                tag = f"{pname}:{model}" + (":vision" if images else "")
                 if tag in self._dead:
                     continue
                 feedback = ""
@@ -200,7 +225,7 @@ class LLM:
                     try:
                         prompt = user + (f"\n\nIMPORTANT — your previous answer was rejected: {feedback}. Fix this."
                                          if feedback else "")
-                        raw = fn(model, system, prompt, temp)
+                        raw = fn(model, system, prompt, temp, images) if images else fn(model, system, prompt, temp)
                         obj = _extract_json(raw)
                         if validate:
                             validate(obj)
