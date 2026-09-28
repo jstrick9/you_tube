@@ -30,9 +30,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 99.9,
-      "vph": 0.2,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00",
+      "hours_live": 100.5,
+      "vph": 0.199,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00",
       "a_views": 18,
       "avg_view_pct": 4627.33,
       "avg_view_dur": 1527
@@ -70,9 +70,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 94.4,
-      "vph": 12.807,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00",
+      "hours_live": 95.0,
+      "vph": 12.724,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00",
       "a_views": 1194,
       "avg_view_pct": 81.43,
       "avg_view_dur": 35
@@ -110,9 +110,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 91.4,
-      "vph": 12.91,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00",
+      "hours_live": 92.0,
+      "vph": 12.824,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00",
       "a_views": 1206,
       "avg_view_pct": 41.89,
       "avg_view_dur": 15
@@ -150,9 +150,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 75.9,
-      "vph": 16.851,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00",
+      "hours_live": 76.5,
+      "vph": 16.715,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00",
       "a_views": 1109,
       "avg_view_pct": 56.06,
       "avg_view_dur": 17
@@ -190,9 +190,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 70.4,
-      "vph": 16.364,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00",
+      "hours_live": 71.0,
+      "vph": 16.221,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00",
       "a_views": 1132,
       "avg_view_pct": 59.62,
       "avg_view_dur": 18
@@ -230,9 +230,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 67.4,
-      "vph": 16.795,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00",
+      "hours_live": 68.0,
+      "vph": 16.643,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00",
       "a_views": 1129,
       "avg_view_pct": 30.070000000000004,
       "avg_view_dur": 13
@@ -264,15 +264,15 @@
     "video_id": "OyHMkwqEOKo",
     "status": "scheduled",
     "metrics": {
-      "views": 1159,
+      "views": 1157,
       "likes": 13,
       "comments": 1,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 51.9,
-      "vph": 22.332,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00",
+      "hours_live": 52.5,
+      "vph": 22.031,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00",
       "a_views": 543,
       "avg_view_pct": 42.33,
       "avg_view_dur": 13
@@ -310,9 +310,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 46.4,
-      "vph": 25.927,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00",
+      "hours_live": 47.0,
+      "vph": 25.586,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00",
       "a_views": 858,
       "avg_view_pct": 40.65,
       "avg_view_dur": 15
@@ -343,15 +343,15 @@
     "video_id": "laRBRQqcE0E",
     "status": "scheduled",
     "metrics": {
-      "views": 526,
+      "views": 520,
       "likes": 7,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 43.4,
-      "vph": 12.12,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00",
+      "hours_live": 44.0,
+      "vph": 11.813,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00",
       "a_views": 279,
       "avg_view_pct": 71.46,
       "avg_view_dur": 26
@@ -388,9 +388,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 27.9,
-      "vph": 32.546,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00"
+      "hours_live": 28.5,
+      "vph": 31.839,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00"
     }
   },
   {
@@ -418,15 +418,15 @@
     "video_id": "4WkKoRw9r00",
     "status": "scheduled",
     "metrics": {
-      "views": 930,
+      "views": 1006,
       "likes": 9,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 22.4,
-      "vph": 41.52,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00"
+      "hours_live": 23.0,
+      "vph": 43.705,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00"
     }
   },
   {
@@ -454,15 +454,15 @@
     "video_id": "SBETRh-FF_I",
     "status": "scheduled",
     "metrics": {
-      "views": 58,
+      "views": 59,
       "likes": 1,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 19.4,
-      "vph": 2.99,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00"
+      "hours_live": 20.0,
+      "vph": 2.947,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00"
     }
   },
   {
@@ -490,15 +490,15 @@
     "video_id": "6dO8y_ojGhI",
     "status": "scheduled",
     "metrics": {
-      "views": 17,
+      "views": 18,
       "likes": 0,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 3.9,
-      "vph": 4.36,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00"
+      "hours_live": 4.5,
+      "vph": 3.984,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00"
     }
   },
   {
@@ -526,15 +526,15 @@
     "video_id": "CMJX5IcrEeI",
     "status": "scheduled",
     "metrics": {
-      "views": 2,
+      "views": 1,
       "likes": 0,
       "comments": 0,
       "privacy": "private",
       "upload_status": "processed",
       "rejection": null,
       "hours_live": 1.0,
-      "vph": 2.0,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00"
+      "vph": 1.0,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00"
     }
   },
   {
@@ -562,15 +562,15 @@
     "video_id": "XMsYZIM52bI",
     "status": "scheduled",
     "metrics": {
-      "views": 2,
+      "views": 3,
       "likes": 0,
       "comments": 0,
       "privacy": "private",
       "upload_status": "processed",
       "rejection": null,
       "hours_live": 1.0,
-      "vph": 2.0,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00"
+      "vph": 3.0,
+      "checked_at": "2026-09-28T20:31:04.938919+00:00"
     }
   },
   {
@@ -606,7 +606,7 @@
       "rejection": null,
       "hours_live": 1.0,
       "vph": 0.0,
-      "checked_at": "2026-09-28T19:53:56.588384+00:00"
+      "checked_at": "2026-09-28T20:31:04.938919+00:00"
     }
   },
   {
@@ -701,6 +701,54 @@
     "duration": 35.20004535147392,
     "tts_engine": "edge-tts",
     "file": "20260928-1953-02-tardigrade.mp4",
+    "publish_at": "2026-09-30T00:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "status": "rendered"
+  },
+  {
+    "created_at": "2026-09-28T20:47:52.324288+00:00",
+    "run_id": "20260928-2031",
+    "title": "The Hidden History and Massive Scale of Data Centers #shorts",
+    "topic": "data center",
+    "topic_key": "data center",
+    "wiki_title": "Data center",
+    "trend_sources": [
+      "google_trends"
+    ],
+    "choice": {
+      "category": "technology",
+      "format": "backstory",
+      "hook_style": "question",
+      "voice": "en-US-ChristopherNeural"
+    },
+    "review_score": 9,
+    "duration": 35.75206349206349,
+    "tts_engine": "edge-tts",
+    "file": "20260928-2031-01-data-center.mp4",
+    "publish_at": "2026-09-29T21:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "status": "rendered"
+  },
+  {
+    "created_at": "2026-09-28T20:47:52.324342+00:00",
+    "run_id": "20260928-2031",
+    "title": "The Fascinating History and Science of Dog Walking #shorts",
+    "topic": "a nationwide US study found that only 42% of dog owners reported walking their dog during a typical week.",
+    "topic_key": "a nationwide us study found that only 42 of dog owners reported walking their dog during a typical week",
+    "wiki_title": "Dog walking",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "technology",
+      "format": "timeline",
+      "hook_style": "bold_claim",
+      "voice": "en-US-AndrewNeural"
+    },
+    "review_score": 9,
+    "duration": 31.024058956916097,
+    "tts_engine": "edge-tts",
+    "file": "20260928-2031-02-dog-walking.mp4",
     "publish_at": "2026-09-30T00:30:00+00:00",
     "llm": "gemini:gemini-flash-lite-latest:vision",
     "status": "rendered"
