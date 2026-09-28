@@ -20,6 +20,7 @@ import io
 import logging
 import math
 import re
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 from PIL import Image, ImageDraw, ImageFont
@@ -192,6 +193,8 @@ VISION_SYSTEM = ("You are a strict photo editor for an educational short-video c
 
 
 class Judge:
+    _down_until = 0.0          # shared across videos in a run: back off after repeated outages
+
     def __init__(self, cfg: dict, llm=None):
         m = cfg.get("media", {})
         self.llm = llm
@@ -200,6 +203,7 @@ class Judge:
         self.clip_model = m.get("clip_model", "ViT-B-32")
         self.clip_pretrained = m.get("clip_pretrained", "laion2b_s34b_b79k")
         self.calls = 0
+        self.fail_streak = 0
         self.llm_failed = False
 
     @property
@@ -210,7 +214,7 @@ class Judge:
         return bool((self.llm and self.llm.vision_available()) or self.clip)
 
     def _llm_score(self, cands: list[dict], want: str, narration: str, subject: str, context: str) -> bool:
-        if not self.llm or self.llm_failed or not self.llm.vision_available():
+        if not self.llm or self.llm_failed or not self.llm.vision_available() or time.time() < Judge._down_until:
             return False
         n = len(cands)
         user = f"""VIDEO TOPIC: {subject}{f' — {context}' if context else ''}
@@ -236,9 +240,17 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0}}]}} with
             self.calls += 1
             out = self.llm.vision_json(VISION_SYSTEM, user, [contact_sheet([c["_img"] for c in cands])], validate)
         except Exception as e:  # noqa: BLE001
-            log.warning("vision LLM unavailable, falling back to CLIP: %s", str(e)[:300])
-            self.llm_failed = True
+            codes = re.findall(r"^\s*(\S+?):vision: .*?(HTTP \d{3}|no \w+_API_KEY|\w+Error)", str(e), re.M)
+            summary = ", ".join(f"{m} {c}" for m, c in dict(codes).items()) or str(e)[:300]
+            self.fail_streak += 1
+            if self.fail_streak >= 2:
+                self.llm_failed = True
+                Judge._down_until = time.time() + 15 * 60
+                log.warning("vision LLM failed twice in a row (%s) — CLIP-only for the next 15 min", summary)
+            else:
+                log.warning("vision LLM call failed (%s) — CLIP for this line, will retry on the next", summary)
             return False
+        self.fail_streak = 0
         by_n = {int(it["n"]): it for it in out["images"]}
         for i, c in enumerate(cands, 1):
             it = by_n.get(i)
@@ -264,8 +276,8 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0}}]}} with
         top = cands[: keep or self.sheet_size]
         pending = [c for c in top if "vscore" not in c]
         if pending and not self._llm_score(pending, want, narration, subject, context) and clip:
-            for c in pending:          # CLIP-only verdict: stricter mapping (needs clip ≥ 8.5 to reach 7)
-                c["vscore"] = round(max(0.0, (c["clip"] - 3.5) * 1.4), 1)
+            for c in pending:          # CLIP-only verdict: stricter mapping (needs clip ≥ 9.0 to reach 7)
+                c["vscore"] = round(max(0.0, (c["clip"] - 3.6) * 1.3), 1)
                 c["vshows"] = f"clip match {c['clip']:.1f}/10 (cos {c['clip_cos']})"
                 c["vjudge"] = "clip"
         judged = [c for c in top if "vscore" in c]

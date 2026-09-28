@@ -243,6 +243,8 @@ class LLM:
                             break
                         if "HTTP 429" in msg or "HTTP 402" in msg:
                             time.sleep(6 + 6 * attempt)
+                        elif re.search(r"HTTP 50[0234]", msg):      # overloaded / transient
+                            time.sleep(8 + 8 * attempt)
                         else:
                             time.sleep(1.5)
                     except Exception as e:  # validation or network
