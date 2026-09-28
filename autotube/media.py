@@ -294,6 +294,7 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
                                  f"This video is about {subject}. {context}")
         return subject_pool
 
+    matched = 0
     for i, seg in enumerate(segments):
         vis = seg.get("visual") if isinstance(seg.get("visual"), dict) else {}
         kws = [k for k in (seg.get("keywords") or []) if isinstance(k, str)]
@@ -315,12 +316,18 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
                 if c["vscore"] >= min_score and take(c, i, f"a clear photo of {subject}"):
                     got = 1
                     break
+        if got:
+            matched += 1
         if not got:
             log.info("    seg %d: no verified match yet (best %s) — will reuse a verified shot", i,
                      f"{judged[0]['vscore']:.1f}" if judged else "n/a")
 
     if not shots:
         raise RuntimeError(f"no images passed the visual relevance check for {subject!r}")
+    ratio = float(mcfg.get("min_matched_ratio", 0.6))
+    if matched < ratio * len(segments):
+        raise RuntimeError(f"only {matched}/{len(segments)} lines have a matching image for {subject!r} "
+                           f"(need {ratio:.0%}) — skipping topic")
     distinct = len({s["path"] for s in shots})
     need = int(mcfg.get("min_distinct_images", 3))
     if distinct < need:

@@ -146,7 +146,11 @@ The TOPIC line is just a trend headline — do NOT repeat its claims or numbers 
 TOTAL narration MUST be {words_lo}-{words_hi} words. Count them. Too short = rejected.
 For each segment give:
   "visual": what the viewer SEES while that line is spoken — it must literally depict what the line is about:
-     "shows": one concrete, photographable scene (e.g. "close-up of a cat's face with long white whiskers"),
+     "shows": one concrete, photographable scene of the SPECIFIC thing the line is about — the named person, place,
+              object, species, artwork or event itself (e.g. "close-up of a cat's face with long white whiskers",
+              "Wesley Willis performing on stage", "Winamp player window on a 1990s PC"). NEVER a generic stand-in
+              (random strangers, a generic office, street or computer) for a named subject, and never unrelated real
+              people next to health, crime or other sensitive facts — show the subject or their actual work instead,
      "queries": 2-3 short photo-library searches (2-4 words each) that ALWAYS include the physical thing's noun
                 (e.g. "cat whiskers close-up", "kitten face macro") — never a bare topic word that could also be
                 a place, business, film or brand name. Never ask for text, charts, maps or abstract ideas; for an

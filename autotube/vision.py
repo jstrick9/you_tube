@@ -217,15 +217,23 @@ class Judge:
         if not self.llm or self.llm_failed or not self.llm.vision_available() or time.time() < Judge._down_until:
             return False
         n = len(cands)
+        titles = "\n".join(f"  {i}. {str(c.get('title', ''))[:70]}" for i, c in enumerate(cands, 1))
         user = f"""VIDEO TOPIC: {subject}{f' — {context}' if context else ''}
 NARRATION LINE: "{narration}"
 SHOT NEEDED: {want}
 
 The attached contact sheet has {n} candidate images, numbered 1-{n} (black number in the yellow box at each tile's top-left).
+File titles (unreliable — same-name things exist; use a title ONLY to confirm the identity of something the pixels
+already plausibly show, e.g. which person or which species):
+{titles}
 For EACH image: say what it literally shows, then score 0-10 how well it works as the on-screen visual while this narration line plays.
-  10-9 = clearly and recognisably shows exactly the thing being narrated
-  8-7  = clearly shows the video's topic in a way that fits this line
-  6-4  = loosely related, generic, or the subject is tiny/unclear
+  10-9 = clearly and recognisably shows exactly the specific thing being narrated
+  8-7  = clearly shows the video's SPECIFIC subject (that exact person, place, object, species, work or event) in a way
+         that fits this line
+  6-5  = loosely related, or the subject is tiny/unclear
+  4    = MAXIMUM for a generic stand-in: random people, a generic office/computer/street/crowd standing in for a
+         named subject
+  2    = MAXIMUM for identifiable people who are not the subject (never pair strangers with facts about someone)
   3-0  = wrong thing: a building, bar, street, sign, shop, logo, product, person or place that merely SHARES THE NAME;
          mostly text, a map, diagram, chart, document or screenshot; heavy watermark; very blurry; graphic or disturbing
 Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0}}]}} with one entry per image."""

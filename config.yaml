@@ -152,7 +152,7 @@ llm:
   pollinations_models: [openai-fast, openai]
   # image-checking models (keyless Pollinations can't see images, so it's never used for this)
   vision_providers: [gemini, groq, openrouter]
-  gemini_vision_models: [gemini-2.5-flash-lite, gemini-flash-lite-latest, gemini-2.5-flash, gemini-flash-latest]
+  gemini_vision_models: [gemini-flash-lite-latest, gemini-flash-latest]   # gemini-2.5-* now return 404
   groq_vision_models: [meta-llama/llama-4-scout-17b-16e-instruct]
   openrouter_vision_models: ["google/gemma-3-27b-it:free"]
   temperature: 0.8
@@ -165,6 +165,7 @@ media:
   min_match_score: 7                     # 0-10; nothing below this ever appears in a video
   require_vision_check: true             # no judge available → skip the video rather than guess
   min_distinct_images: 3                 # fewer verified images than this → pick another topic
+  min_matched_ratio: 0.6                 # share of lines that must get their OWN matching image, else skip topic
   multi_shot_seconds: 4.5                # lines longer than this get 2 different verified shots
   vision_sheet_size: 9                   # candidates per vision-LLM call (3x3 contact sheet)
   clip: true
