@@ -140,6 +140,7 @@ compliance:
     - wildfire
     - flood
     - tornado
+  require_llm_review: true              # fail closed: never publish a script the fact-checker could not review
   quality_gate_min_score: 7              # LLM reviewer score (0-10) required to publish
 
 llm:

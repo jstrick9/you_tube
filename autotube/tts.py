@@ -11,6 +11,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import sys
 import re
 import subprocess
 import wave
@@ -65,14 +66,15 @@ async def _edge_all(texts, voice, rate, work: Path):
 
     async def run(i, t):
         async with sem:
-            for attempt in range(3):
+            pauses = [3, 8, 20, 40]
+            for attempt in range(len(pauses) + 1):
                 try:
                     return await _edge_one(t, voice, rate, work / f"seg{i:02d}.mp3")
                 except Exception as e:  # noqa: BLE001
-                    if attempt == 2:
+                    if attempt == len(pauses):
                         raise
-                    log.debug("edge retry %d: %s", attempt, e)
-                    await asyncio.sleep(2 * (attempt + 1))
+                    log.info("edge-tts retry %d for segment %d: %s", attempt + 1, i, e)
+                    await asyncio.sleep(pauses[attempt])
     return await asyncio.gather(*[run(i, t) for i, t in enumerate(texts)])
 
 
@@ -97,7 +99,7 @@ def _piper_model() -> Path:
 
 def _piper_one(text: str, out_wav: Path) -> list[dict]:
     model = _piper_model()
-    subprocess.run(["python", "-m", "piper", "-m", str(model), "-f", str(out_wav)], input=text.encode(),
+    subprocess.run([sys.executable, "-m", "piper", "-m", str(model), "-f", str(out_wav)], input=text.encode(),
                    check=True, capture_output=True)
     dur = _probe_duration(out_wav)
     toks = text.split()

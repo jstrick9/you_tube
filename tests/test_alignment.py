@@ -214,3 +214,23 @@ def test_final_qa_outage_raises(tiny_video, monkeypatch):
     with pytest.raises(vision.VisionUnavailable):
         qa.verify(tiny_video, [{"seg": 0, "start": 0, "end": 2, "path": "a"}], [{"seg": 0, "score": 9, "judge": "g"}],
                   _tts(lines), {"segments": [{"text": lines[0]}]}, "T", "H", "S", QALLM(down=True), CFG)
+
+
+def test_script_fact_check_outage_fails_closed(monkeypatch):
+    """If the fact-checking LLM is unavailable the script is NOT approved (and not rewritten)."""
+    from autotube import scriptwriter
+    from autotube.llm import LLMError
+    cfg = common.load_config()
+
+    class DownLLM:
+        def json(self, *a, **k):
+            raise LLMError("all providers down")
+
+    sw = scriptwriter.ScriptWriter.__new__(scriptwriter.ScriptWriter)
+    sw.cfg, sw.llm, sw.src_chars = cfg, DownLLM(), 4000
+    src = {"title": "Honey", "text": "Honey is a sweet substance made by bees. " * 20}
+    ev = "Honey is a sweet substance made by bees."
+    script = {"title": "Honey facts", "segments": [{"text": "Bees make honey.", "evidence": ev}] * 4}
+    monkeypatch.setitem(cfg["content"], "require_grounding", False)
+    ok, review = sw.check(script, src)
+    assert ok is False and review.get("unavailable")

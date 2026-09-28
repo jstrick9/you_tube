@@ -35,11 +35,14 @@ After a one-time setup of about 45 minutes it runs on GitHub Actions' free tier.
 | **Variety** | 6 formats (facts, backstory, myth-vs-fact, timeline, by-the-numbers, what-if) × 4 hook styles × 5 voices × 5 caption themes × 7 transition styles × a unique soundtrack per video. | – |
 | **Voice** | edge-tts neural voices with exact word timings. If that fails, it falls back automatically to **Piper**, which is fully offline and open source. | Free |
 | **Visuals** | Wikimedia Commons (images from the source article first), Openverse, and Pexels (optional key). **Only PD/CC0/CC-BY/CC-BY-SA licenses are accepted, never NC/ND.** Each asset's author and license go into the description. | Free |
-| **Visual match check** | The script gives every line a concrete shot description and specific searches. Candidate images are **looked at, not matched by file name**: CLIP (local, CPU) pre-ranks them, then Gemini's free vision model scores a numbered contact sheet against the exact narration line. Same-name buildings/streets/logos, text, maps, generic stand-ins and bystanders are rejected; only images scoring ≥ 7/10 are used, long lines get 2 shots, and topics where fewer than 60% of lines find a real match are skipped. Scores and "what the image shows" are saved per shot in the run's JSON, plus a `*.shots.jpg` contact sheet. | Free |
+| **Visual match check (fail-closed)** | The script gives every line a concrete shot description and specific searches. Candidate images are **looked at, not matched by file name**: CLIP (local, CPU) pre-ranks them, then Gemini's free vision model scores a numbered contact sheet against the exact narration line. Same-name buildings/streets/logos, text, maps, generic stand-ins and bystanders are rejected. **Every line** must get an image scoring ≥ 7/10. A line with no match gets one re-search with new queries; if it still fails, the whole topic is skipped. There's no "close enough" fallback. | Free |
+| **Final QA gate** | After rendering, one frame per shot is pulled **from the finished MP4** and judged again against the words being spoken at that moment, together with checks of the title, hook text and narration. A failed shot is swapped for a spare that was verified for that line and the video is re-rendered (up to 2 repairs). Anything still failing is saved as `*-REJECTED` and **never uploaded**. The QA verdicts go into the run's JSON, plus a `*.shots.jpg` contact sheet. | Free |
+| **Fails closed** | If the vision judge or the script fact-checker can't be reached (for example, a Gemini outage), nothing is published and the run stops. The 3 daily runs (main, backup, catch-up) fill the missing slots later. A run that produces nothing fails the workflow, and GitHub emails you. | – |
 | **Music** | Synthesized per video (random key, tempo and progression), so there's zero Content ID risk. | Free |
 | **Render** | 1080×1920 at 30 fps, Ken Burns motion, crossfades, word-by-word karaoke captions, a hook title card, a progress bar, sidechain-ducked music, and loudness normalized to −14 LUFS. | Free (ffmpeg) |
 | **Publishing** | YouTube Data API resumable upload with `publishAt` scheduling (3 daily slots), `containsSyntheticMedia` disclosure, the made-for-kids flag, and full metadata. | Free quota |
 | **Learning** | Each video is scored at 48 h: 0.6 × views/hour percentile + 0.4 × average-view-% percentile, relative to your own channel. That score updates a decaying Thompson-sampling bandit over category, format, hook and voice. | Free |
+| **Withdrawn videos** | If you set a scheduled video to Private in Studio, the nightly analytics run notices and marks it `withdrawn`. It then gets no reward or learning, and its slot is freed. | Free |
 | **Ops** | State is committed to the repo, which also keeps the cron alive. Failure alerts go to ntfy/Discord, rendered videos are kept as artifacts for 7 days, and there's a dashboard. | Free |
 
 ---
@@ -92,6 +95,7 @@ YouTube locks **every video uploaded by an unaudited API project created after 2
 | `YOUTUBE_API_KEY` | Adds the YouTube trending chart as a trend source (costs 1 quota unit per run) |
 | `NTFY_TOPIC` | Push notifications to your phone via the free ntfy app, no account needed |
 | `DISCORD_WEBHOOK_URL` | Notifications in Discord |
+| `GROQ_API_KEY` | Backup LLM (https://console.groq.com, free, no card). Fewer outage days because the script writer, fact-checker and image judge (Llama 4 Scout vision) can all fail over when Gemini is busy. |
 
 ### Step 6: first run
 **Actions → AutoTube daily → Run workflow**, with `dry_run` ticked. Download the videos from the run's artifacts, check them, then run again without dry run. From then on it runs every day on its own.
@@ -143,6 +147,7 @@ python tests/test_core.py                # safety-logic unit tests
 * **GitHub Actions:** GitHub's terms say Actions should relate to the repository's software project. Running the project's own production pipeline on a schedule is a common, low-burden use, but it's a grey area. If you'd rather avoid it, use `deploy/crontab.txt` on any always-on machine (old laptop, Raspberry Pi, or an Oracle Cloud Always-Free VM). Scheduled workflows in public repos are disabled after 60 days without activity. The daily state commit prevents this.
 * **Free LLM tiers change often.** Gemini's free quotas were cut in late 2025 and 2026. That's why the router fails over across Gemini, Groq, OpenRouter and Pollinations, and why each video needs only about 4–8 calls.
 * **edge-tts** uses Microsoft's public Edge read-aloud endpoint, which is unofficial. If it breaks, the offline Piper fallback takes over automatically.
+* **Alignment is enforced, but by an AI judge.** Every shot is checked twice (on selection and again on the final frames), and anything unverified is withheld rather than published. The trade-off: on days when the free vision model is overloaded, fewer (or zero) videos go out.
 * **"Viral" can't be guaranteed.** The system maximizes the controllable factors (trend timing, hooks, retention-friendly pacing, captions) and learns from results, but reach is up to the algorithm and the audience.
 
 ---
@@ -159,6 +164,7 @@ autotube/
   tts.py           edge-tts (word timings) → Piper offline fallback
   media.py         licensed image sourcing, per-line shot selection, attribution
   vision.py        pixel-level relevance check (CLIP + Gemini vision contact sheets)
+  qa.py            final gate: frames of the rendered MP4 re-judged vs. the spoken words
   music.py         procedural copyright-free soundtrack
   render.py        ffmpeg graph: Ken Burns, xfade, ASS karaoke captions, ducking, loudnorm
   youtube.py       OAuth refresh, resumable upload, publishAt, stats, analytics

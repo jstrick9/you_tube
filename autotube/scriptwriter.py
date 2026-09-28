@@ -242,6 +242,11 @@ Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; <7 = do not publi
                               validate=lambda o: float(o["score"]))
         except LLMError as e:
             log.warning("review LLM unavailable: %s", e)
+            if self.cfg["compliance"].get("require_llm_review", True):
+                # fail closed: a script nobody fact-checked is never published
+                review["unavailable"] = True
+                review["issues"].append("fact-check unavailable — not publishing an unchecked script")
+                return False, review
             review["score"] = 7
             review["issues"].append("llm review unavailable; programmatic checks passed")
             return True, review
@@ -275,6 +280,8 @@ Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; <7 = do not publi
                      review.get("score"), (review.get("issues") or review.get("factual_errors") or [])[:2])
             if ok:
                 return script, source, review
+            if review.get("unavailable"):
+                return None
             feedback = "; ".join((review.get("issues") or []) + (review.get("factual_errors") or [])
                                  + (review.get("policy_concerns") or []) + (review.get("fixes") or []))[:600]
         return None
