@@ -16,6 +16,7 @@ description → CC-BY compliance and a clean copyright trail.
 from __future__ import annotations
 
 import hashlib
+import time
 import html
 import logging
 import os
@@ -296,7 +297,14 @@ def _download_video(asset: dict, dest_dir: Path, max_mb: float) -> Path | None:
         if dest.exists():
             return dest
         try:
-            with http().get(url, timeout=60, stream=True) as r:
+            for attempt in range(3):                  # Wikimedia rate-limits bursts (429): back off politely
+                r = http().get(url, timeout=60, stream=True)
+                if r.status_code != 429 or attempt == 2:
+                    break
+                wait = min(20.0, float(r.headers.get("retry-after") or 0) or 4.0 * (attempt + 1))
+                r.close()
+                time.sleep(wait)
+            with r:
                 r.raise_for_status()
                 size = int(r.headers.get("content-length") or 0)
                 if size > max_mb * 1e6:
