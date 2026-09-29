@@ -84,13 +84,19 @@ def http() -> requests.Session:
 
 
 def get_json(url: str, params: dict | None = None, headers: dict | None = None,
-             timeout: int = 20, retries: int = 2) -> Any:
+             timeout: int = 20, retries: int = 4) -> Any:
     last = None
     for attempt in range(retries + 1):
         try:
             r = http().get(url, params=params, headers=headers, timeout=timeout)
-            if r.status_code == 429:
-                time.sleep(3 * (attempt + 1))
+            if r.status_code in (429, 503):
+                # rate-limited (Wikimedia does this under heavy image searching): honour Retry-After, back off
+                last = f"HTTP {r.status_code} (rate-limited)"
+                try:
+                    wait = float(r.headers.get("Retry-After", 0))
+                except ValueError:
+                    wait = 0
+                time.sleep(min(60.0, max(wait, 4 * 2 ** attempt)))
                 continue
             r.raise_for_status()
             return r.json()
