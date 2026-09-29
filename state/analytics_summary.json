@@ -1,8 +1,8 @@
 {
-  "updated": "2026-09-29T01:42:09.906701+00:00",
+  "updated": "2026-09-29T02:49:24.968444+00:00",
   "videos_total": 17,
   "videos_7d": 17,
-  "views_7d": 11129,
+  "views_7d": 11152,
   "learned_this_run": 0,
   "strategy": {
     "category": [
@@ -132,6 +132,48 @@
         "mean": 0.5,
         "n": 0
       }
+    ],
+    "source": [
+      {
+        "arm": "youtube_outliers",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "wikipedia",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "google_trends",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "reddit",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "hackernews",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "on_this_day",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "youtube_chart",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "evergreen",
+        "mean": 0.5,
+        "n": 0
+      }
     ]
   },
   "top_videos": [
@@ -144,19 +186,19 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1218,
+      "views": 1219,
       "avg_view_pct": 81.43
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
       "id": "tFm3Zuu2kGA",
-      "views": 1206,
+      "views": 1204,
       "avg_view_pct": 40.65
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
-      "views": 1181,
+      "views": 1182,
       "avg_view_pct": 41.89
     },
     {
@@ -192,7 +234,7 @@
     {
       "title": "Why speaking another language changes you #shorts",
       "id": "laRBRQqcE0E",
-      "views": 601,
+      "views": 621,
       "avg_view_pct": 71.46
     }
   ],
