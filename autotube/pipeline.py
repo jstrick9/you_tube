@@ -84,6 +84,7 @@ def build_description(script: dict, source: dict, visuals: list[dict], cfg: dict
         script.get("description", "").strip(),
         "",
         f"📚 Source: {source['title']} — {source['url']}",
+        *[f"📚 Also: {a['title']} — {a['url']}" for a in source.get("also", [])[:4]],
     ]
     if cfg["compliance"].get("ai_disclosure_in_description", True):
         parts += ["", "ℹ️ This video was researched from the cited source and produced with AI-assisted "
@@ -202,7 +203,10 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     recent = trends.recent_topics(cfg["content"]["dedupe_days"])
     cands = trends.collect(cfg)
     picks = writer.select_topics(cands, n, recent) if cands else []
-    picks += writer.evergreen(recent)     # safety net
+    tried: set[str] = set()
+    rounds = 1
+    if cfg["content"].get("allow_evergreen", False):
+        picks += writer.evergreen(recent)     # optional safety net (off by default: every video rides a live trend)
     plans = strat.plan(n)
     log.info("topic queue: %s", [p["topic"][:40] for p in picks[: n + 4]])
 
@@ -215,12 +219,23 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
         if vision_down:
             break
         plan = plans[i]
-        while pi < len(picks):
+        while True:
+            if pi >= len(picks):
+                # every pick so far failed the accuracy/visual checks → pick again from the remaining live trends
+                if rounds >= int(cfg["content"].get("selection_rounds", 3)) or not cands or time.time() > deadline:
+                    break
+                rounds += 1
+                more = writer.select_topics(cands, n - len(results), recent, exclude=tried)
+                if not more:
+                    break
+                log.info("selection round %d: %d more viral picks", rounds, len(more))
+                picks += more
             if time.time() > deadline:
                 log.warning("time budget reached — stopping with %d videos", len(results))
                 break
             topic = picks[pi]
             pi += 1
+            tried.add(topic.get("topic_key", ""))
             topic["category"] = topic.get("category") or random.choice(cfg["channel"]["categories"])
             try:
                 res = make_one(cfg, writer, topic, plan, i + 1, run_id)
@@ -245,7 +260,10 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             "created_at": now_utc().isoformat(), "run_id": run_id, "title": res["meta"]["title"],
             "topic": res["topic"]["topic"], "topic_key": res["topic"].get("topic_key", res["topic"]["topic"].lower()),
             "wiki_title": res["source"]["title"], "trend_sources": res["topic"].get("sources", []),
-            "choice": {"category": res["topic"].get("category"), **res["plan"]},
+            "choice": {"category": res["topic"].get("category"), **res["plan"],
+                       "source": trends.primary_source(res["topic"].get("sources", []))},
+            "viral_score": res["topic"].get("viral_score"), "why_trending": res["topic"].get("why_trending"),
+            "trend_evidence": (res["topic"].get("context") or [])[:2],
             "review_score": res["review"].get("score"), "duration": res["duration"],
             "tts_engine": res["tts_engine"], "file": res["file"].name, "publish_at": slot.isoformat() if slot else None,
             "llm": llm.last_used,

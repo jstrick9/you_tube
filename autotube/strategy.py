@@ -19,7 +19,7 @@ from .common import read_json, write_json
 
 log = logging.getLogger("autotube.strategy")
 
-DIMENSIONS = ("category", "format", "hook_style", "voice")
+DIMENSIONS = ("category", "format", "hook_style", "voice", "source")
 DECAY = 0.97          # applied on every update → recent results matter more
 PRIOR = (1.0, 1.0)    # Beta(1,1)
 
@@ -43,6 +43,8 @@ class Strategy:
             "format": list(c["content"]["formats"]),
             "hook_style": list(c["content"]["hook_styles"]),
             "voice": list(c["video"]["voices"]),
+            "source": ["youtube_outliers", "wikipedia", "google_trends", "reddit", "hackernews", "on_this_day",
+                       "youtube_chart", "evergreen"],
         }
 
     # ── sampling ──────────────────────────────────────────────────────────────
@@ -55,6 +57,11 @@ class Strategy:
             return random.choice(list(arms))
         draws = {k: random.betavariate(max(v["a"], 0.05), max(v["b"], 0.05)) for k, v in arms.items()}
         return max(draws, key=draws.get)
+
+    def source_weight(self, source: str) -> float:
+        """Posterior mean for a trend source (which kind of trend actually gets OUR videos views)."""
+        v = self.state["arms"].get("source", {}).get(source)
+        return v["a"] / (v["a"] + v["b"]) if v else 0.5
 
     def category_weight(self, category: str) -> float:
         """Posterior mean for a category, used to re-rank trending topics."""

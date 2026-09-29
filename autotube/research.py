@@ -42,6 +42,47 @@ def article_text(title: str, lang: str = "en", max_chars: int = 9000) -> str:
     return text[:max_chars]
 
 
+def mentions(title: str, lang: str = "en", max_articles: int = 6, max_chars: int = 5000) -> tuple[str, list[str]]:
+    """Paragraphs from OTHER Wikipedia articles that talk about `title` (for short but viral subjects).
+
+    Only paragraphs that actually mention the subject are kept, each labelled with its article, so every fact
+    in the script still comes from Wikipedia and still goes through the same evidence/number/LLM fact-checks.
+    """
+    subject = re.sub(r"\s*\(.*?\)", "", title).strip()
+    stem = re.escape(subject.lower().rstrip("s"))
+    forms = [subject, subject[:-1] if subject.endswith("s") else subject + "s"]     # singular + plural
+    hits: list[str] = []
+    for f in forms:
+        try:
+            data = get_json(API.format(lang=lang), params={
+                "action": "query", "list": "search", "srsearch": f'"{f}"', "srlimit": max_articles + 2,
+                "format": "json", "srnamespace": 0})
+            hits += [h["title"] for h in data.get("query", {}).get("search", [])
+                     if h["title"] != title and h["title"] not in hits]
+        except Exception as e:  # noqa: BLE001
+            log.warning("wiki mention search failed for %r: %s", f, e)
+    max_articles = max_articles * 2
+    parts, used = [], []
+    total = 0
+    for h in hits[:max_articles]:
+        if re.match(r"^(List|Lists|Timeline|Index|Outline|Glossary) of ", h):
+            continue
+        try:
+            txt = article_text(h, lang, max_chars=200000)
+        except Exception:  # noqa: BLE001
+            continue
+        paras = [x.strip() for x in txt.split("\n") if len(x.strip()) > 80 and re.search(stem, x.lower())][:3]
+        if not paras:
+            continue
+        block = f'From the Wikipedia article "{h}": ' + " ".join(paras)
+        parts.append(block[:1600])
+        used.append(h)
+        total += len(parts[-1])
+        if total >= max_chars:
+            break
+    return "\n".join(parts), used
+
+
 def article_images(title: str, lang: str = "en", limit: int = 25) -> list[str]:
     """File titles used on the article (for on-topic visuals)."""
     try:
@@ -86,6 +127,13 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
         log.info("skip %r: looks like a living person (%s)", title, summ.get("description"))
         return None
     text = article_text(title, lang)
+    also: list[str] = []
+    if len(text) < 3000:
+        # short article (common for viral oddities like "Hunger stone"): add what other articles say about it
+        extra, also = mentions(title, lang)
+        if extra:
+            log.info("  %r is short (%d chars) → +%d chars from %s", title, len(text), len(extra), also)
+            text = text + "\n" + extra
     if len(text) < 1500:
         log.info("skip %r: source text too thin (%d chars)", title, len(text))
         return None
@@ -95,6 +143,7 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
         "description": summ.get("description", ""),
         "summary": summ.get("extract", ""),
         "text": text,
+        "also": [{"title": a, "url": f"https://{lang}.wikipedia.org/wiki/{quote(a.replace(' ', '_'))}"} for a in also],
         "images": article_images(title, lang),
         "lead_image": (summ.get("originalimage") or {}).get("source"),
     }

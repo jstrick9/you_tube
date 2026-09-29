@@ -18,7 +18,8 @@ channel:
   # Topic categories the system can choose from. The analytics loop learns
   # which of these perform best and shifts output toward them automatically.
   categories: [science, space, history, nature, technology, geography, culture, sports, entertainment]
-  # Evergreen seeds used when no trending topic passes the filters.
+  # Evergreen seeds: only used when content.allow_evergreen is true (off by default — every video must ride a
+  # live trend signal: a viral Short, a Wikipedia spike, Google Trends, Reddit, HN or a same-day anniversary).
   evergreen_seeds:
     - Octopus
     - Great Pyramid of Giza
@@ -44,7 +45,7 @@ schedule:
 
 video:
   kind: short                            # 1080x1920 vertical YouTube Short
-  target_seconds: [35, 55]               # script length window
+  target_seconds: [24, 36]               # 2026 data: ~20-35 s Shorts get the highest completion/replay rates
   fps: 30
   width: 1080
   height: 1920
@@ -69,6 +70,22 @@ content:
   allow_living_people: false             # skip topics that are biographies of living people
   dedupe_days: 45                        # don't repeat a topic within N days
   min_trend_score: 0.35
+  # ── virality ──
+  min_viral_score: 7                     # LLM viral-potential score (0-10) a topic needs, judged with its trend evidence
+  min_hook_score: 8                      # reviewer's hook_strength (0-10) a script needs; weaker hooks are rewritten
+  allow_evergreen: false                 # never fall back to un-trending evergreen topics
+  max_drafts: 4                          # script rewrites allowed (feedback from the fact-checker/hook gate)
+  selection_rounds: 3                    # if every pick fails the checks, pick again from the remaining trends
+  loop_ending: true                      # last line flows back into the first line (replays count as watch time)
+
+trends:
+  # Proven-viral signal: fact/explainer Shorts that took off in the last N hours (YouTube search, uses the
+  # channel's own OAuth token: 100 quota units per query, cached once per day → ~600 units/day of the 10,000).
+  youtube_outlier_queries: ["facts", "did you know", "science facts", "history facts", "space facts", "animal facts"]
+  outlier_window_hours: 96
+  outlier_min_views: 30000
+  wikipedia_spike_check: 40              # top-N Wikipedia pages compared with their own 30-day normal
+  on_this_day: true                      # same-day / next-day anniversaries (round numbers boosted)
 
 compliance:
   made_for_kids: false
@@ -78,6 +95,10 @@ compliance:
   contains_synthetic_media: false
   ai_disclosure_in_description: true     # transparent "AI-assisted narration" line
   allowed_licenses: [cc0, pdm, "public domain", "cc by", "cc-by", "cc by-sa", "cc-by-sa", pexels]
+  # Words allowed as a passing, non-graphic historical mention in narration (e.g. "during the Thirty Years' War")
+  # even though they stay blocked as a video's TOPIC — YouTube's advertiser-friendly guidelines allow educational,
+  # non-graphic references. The title may still never contain them.
+  script_mention_ok: [war]
   blocked_topics:                        # never produce videos about these
     - death
     - dies
@@ -148,13 +169,13 @@ llm:
   # All have free tiers. Pollinations needs no key at all (last-resort fallback).
   providers: [gemini, groq, openrouter, pollinations]
   gemini_models: [gemini-flash-lite-latest, gemini-flash-latest, gemini-2.5-flash-lite, gemini-2.5-flash]
-  groq_models: [llama-3.3-70b-versatile, llama-3.1-8b-instant]
+  groq_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b, openai/gpt-oss-20b]   # verified on Groq Sep 2026
   openrouter_models: ["meta-llama/llama-3.3-70b-instruct:free", "deepseek/deepseek-chat-v3-0324:free"]
   pollinations_models: [openai-fast, openai]
   # image-checking models (keyless Pollinations can't see images, so it's never used for this)
   vision_providers: [gemini, groq, openrouter]
   gemini_vision_models: [gemini-flash-lite-latest, gemini-flash-latest]   # gemini-2.5-* now return 404
-  groq_vision_models: [meta-llama/llama-4-scout-17b-16e-instruct]
+  groq_vision_models: [qwen/qwen3.8-27b]                                     # verified: reads images correctly
   openrouter_vision_models: ["google/gemma-3-27b-it:free"]
   temperature: 0.8
 
@@ -168,7 +189,7 @@ media:
   min_match_score: 7                     # 0-10; every line needs its own image scoring at least this
   requery: true                          # a line with no match gets a second search with new queries
   min_distinct_images: 3                 # fewer distinct verified images → pick another topic
-  multi_shot_seconds: 4.5                # lines longer than this get 2 different verified shots
+  multi_shot_seconds: 3.5                # lines longer than this get 2 different verified shots
   vision_sheet_size: 9                   # candidates per vision-LLM call (3x3 contact sheet)
   clip: true
   clip_model: ViT-B-32
