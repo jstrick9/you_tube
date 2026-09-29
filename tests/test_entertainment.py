@@ -235,3 +235,30 @@ def test_narration_check_includes_asides():
 def test_description_has_the_brand_promise():
     d = build_description({"description": "About hunger stones.", "hashtags": ["#history"]}, SOURCE, [], CFG, "edge")
     assert "Sounds fake. It's proven." in d and "Source: Hunger stone" in d
+
+
+def test_fit_avoids_repeating_a_format_in_one_run(monkeypatch):
+    s = _strategy()
+    monkeypatch.setattr(s, "formats_in_season", lambda month=None: [f for f in CFG["content"]["formats"]
+                                                                     if f != "creepy_true"])
+    monkeypatch.setattr(s, "seasonal_now", lambda: [])
+    topic = {"formats": ["scale_shock", "backstory"]}
+    for _ in range(10):
+        assert s.fit({"format": "scale_shock"}, topic, {"scale_shock"})["format"] == "backstory"
+    assert s.fit({"format": "scale_shock"}, {"formats": ["scale_shock"]}, {"scale_shock"})["format"] == "scale_shock"
+
+
+def test_plan_varies_voices():
+    s = _strategy()
+    plans = s.plan(3)
+    assert len({p["voice"] for p in plans}) == 3
+
+
+def test_flat_scripts_are_rewritten():
+    class Flat(ReviewLLM):
+        def json(self, system, user, **kw):
+            o = super().json(system, user, **kw)
+            o["entertainment"] = 5
+            return o
+    ok, review = ScriptWriter(CFG, Flat(), Strat()).check(_script("Cheerful bunch."), SOURCE)
+    assert not ok and any("not entertaining enough" in i for i in review["issues"])

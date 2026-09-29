@@ -271,7 +271,7 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
         max_asides = int(persona.get("max_asides", 2)) if persona.get("asides", True) else 0
         fmt = plan["format"] if plan["format"] in FORMAT_GUIDE else "sounds_fake"
         reveal_rule = ('  "reveal": true on exactly ONE segment — the line with the biggest surprise/answer/twist (the video adds '
-                       'a beat of silence, a riser and a flash right before it). Never the hook.\n')
+                       'a beat of silence, a riser and a flash right before it). Never the hook; usually the last BODY line.\n')
         aside_rule = (
             f'  "aside" (optional, at most {max_asides} in the whole script, never on the hook): a 2-8 word deadpan\n'
             '     reaction the narrator says right AFTER that line — e.g. "Which is, frankly, rude.", "Nature, please.",\n'
@@ -296,7 +296,8 @@ SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of fact
 Write the script as 5-6 segments:
   - segment 1 = HOOK (see rules), spoken in under 3 seconds;
   - segments 2..N-1 = BODY, each 14-22 words (1-2 sentences, one concrete fact with a specific detail each —
-    every line must add something new; no filler, no repetition, escalate toward the most surprising fact);
+    every line must add something new; no filler, no repetition). The body is a mini STORY, not a list: setup →
+    "and it gets stranger" escalation → the reveal. Use contrast and consequence ("so", "which meant", "except");
   - last segment = PAYOFF, 8-16 words: {loop_rule}
 The TOPIC line is just a trend headline — do NOT repeat its claims or numbers unless the SOURCE TEXT states them.
 ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with
@@ -416,8 +417,10 @@ it in factual_errors even if the gist is right.
 ASIDES are humour, not claims: never list an aside in factual_errors for being a joke, exaggerated opinion or
 sarcasm. Put an aside in policy_concerns ONLY if it states a new specific fact as true, mocks real people, groups,
 victims or a tragedy, or is not family-friendly. A joke must never change what the facts say.
-entertainment: 9-10 = funny/gripping, you'd send it to a friend; 5-6 = accurate but flat. If < 8, add a punchier
-TRUE rewrite idea (comic timing, contrast, a better aside) to "fixes".
+entertainment — BE HARSH, this channel competes with comedians: a list of accurate facts read in a neutral tone is 5
+at most, however interesting. 7 = has a story shape (setup, escalation, payoff) and personality. 8 = also at least one
+genuinely funny or gasp-out-loud moment. 9-10 = you would send it to a friend. If < 8, put a concrete TRUE rewrite
+idea in "fixes" (story tension, comic contrast, a sharper aside, a stronger reveal).
 hook_strength: 9-10 = the first line alone would stop a stranger scrolling (specific, surprising, opens a question the
 video answers); 7-8 = decent; <=6 = generic ('Did you know', 'Here are some facts', topic name, slow setup).
 If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
@@ -443,7 +446,15 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
         if hook < min_hook:
             review["issues"].append(f"hook too weak ({hook:.0f}/10, need {min_hook:.0f}) — open with the single most "
                                     "surprising specific fact; no 'Did you know' or slow setup")
-        ok = (hook >= min_hook and score >= self.cfg["compliance"]["quality_gate_min_score"] and not r.get("factual_errors")
+        min_ent = float(self.cfg["content"].get("min_entertainment", 0))
+        try:
+            ent = float(r.get("entertainment", 10))
+        except (TypeError, ValueError):
+            ent = 0.0
+        if ent < min_ent:
+            review["issues"].append(f"not entertaining enough ({ent:.0f}/10, need {min_ent:.0f}) — tell it as a story "
+                                    "with tension and a payoff, add comic contrast or a sharper aside; facts unchanged")
+        ok = (ent >= min_ent and hook >= min_hook and score >= self.cfg["compliance"]["quality_gate_min_score"] and not r.get("factual_errors")
               and not r.get("misleading_title") and r.get("advertiser_friendly", True)
               and not r.get("policy_concerns"))
         review.update(r)

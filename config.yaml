@@ -97,6 +97,7 @@ content:
   # ── virality ──
   min_viral_score: 7                     # LLM viral-potential score (0-10) a topic needs, judged with its trend evidence
   min_hook_score: 8                      # reviewer's hook_strength (0-10) a script needs; weaker hooks are rewritten
+  min_entertainment: 7                   # reviewer's (harsh) entertainment score; flat fact-lists are rewritten
   allow_evergreen: false                 # never fall back to un-trending evergreen topics
   max_drafts: 4                          # script rewrites allowed (feedback from the fact-checker/hook gate)
   selection_rounds: 3                    # if every pick fails the checks, pick again from the remaining trends

@@ -69,8 +69,10 @@ class Strategy:
             if f in fits and f not in used:
                 plan["format"] = f
                 return plan
-        if fits and plan.get("format") not in fits:
-            plan["format"] = self.sample("format", exclude=set(allowed) - set(fits))
+        fresh = [f for f in fits if f not in used]            # don't make the same format twice in one run
+        pool = fresh or fits
+        if pool and (plan.get("format") not in pool):
+            plan["format"] = self.sample("format", exclude=set(allowed) - set(pool))
         return plan
 
     # ── sampling ──────────────────────────────────────────────────────────────
@@ -98,15 +100,17 @@ class Strategy:
 
     def plan(self, n: int) -> list[dict]:
         """Pick n distinct combos. Avoid identical format/voice back-to-back for variety."""
-        plans, used_formats = [], set()
+        plans, used_formats, used_voices = [], set(), set()
         for _ in range(n):
             fmt = self.sample("format", exclude=used_formats if len(used_formats) < len(self.options()["format"]) - 1 else None)
             used_formats.add(fmt)
             plans.append({
                 "format": fmt,
                 "hook_style": self.sample("hook_style"),
-                "voice": self.cfg.get("persona", {}).get("voice") or self.sample("voice"),
+                "voice": self.cfg.get("persona", {}).get("voice") or self.sample(
+                    "voice", exclude=used_voices if len(used_voices) < len(self.options()["voice"]) - 1 else None),
             })
+            used_voices.add(plans[-1]["voice"])
         return plans
 
     # ── learning ──────────────────────────────────────────────────────────────

@@ -95,7 +95,7 @@ def pop(rng: np.random.Generator, dur: float = 0.12) -> np.ndarray:
 
 KINDS = {"whoosh": whoosh, "ding": ding, "riser": riser, "hit": hit, "stamp": stamp, "pop": pop}
 # relative loudness of each effect under the narration (dB); the renderer applies the overall sfx volume on top
-GAIN_DB = {"whoosh": -9, "ding": -8, "riser": -7, "hit": -3, "stamp": -2, "pop": -10}
+GAIN_DB = {"whoosh": -15, "ding": -12, "riser": -5, "hit": -13, "stamp": -9, "pop": -12}   # tuned on a real render
 
 
 def plan_events(timeline: list[dict], number_times: list[float], reveal_at: float | None, stamp_at: float | None,

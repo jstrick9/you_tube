@@ -83,6 +83,7 @@ def _esc(s: str) -> str:
     return s.replace("\\", "").replace("{", "(").replace("}", ")")
 
 
+EMPH_FOR = {0: 2, 1: 4, 2: 0, 3: 2, 4: 1}   # yellow→cyan, green→pink, cyan→yellow, orange→cyan, pink→green
 NUM_RE = re.compile(r"^(\$?)(\d[\d,]*(?:\.\d+)?)(%?)$")
 SCALE_WORDS = {"thousand", "million", "billion", "trillion", "percent"}
 STAMP_GREEN = "&H0040D83A"       # ASS BGR
@@ -336,7 +337,7 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
     for i, v in enumerate(shots):
         frames.append(compose_frame(Path(v["path"]), work / f"frame{i:02d}.jpg", W, H))
 
-    emph_col = THEMES[(theme_idx + 2) % len(THEMES)]["hi"]
+    emph_col = THEMES[EMPH_FOR[theme_idx]]["hi"]      # keyword colour clearly different from the karaoke highlight
     ass = build_ass(segs, hook_text, channel, W, H, theme, "Anton", work / "captions.ass", total, fx=fx,
                     emph_col=emph_col)
     sfx_wav = None
