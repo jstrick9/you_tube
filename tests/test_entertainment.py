@@ -262,3 +262,8 @@ def test_flat_scripts_are_rewritten():
             return o
     ok, review = ScriptWriter(CFG, Flat(), Strat()).check(_script("Cheerful bunch."), SOURCE)
     assert not ok and any("not entertaining enough" in i for i in review["issues"])
+
+
+def test_small_numbers_count_up_only_with_a_scale_word():
+    assert render._number("1.7") is None
+    assert render._number("1.7", scaled=True) == ("", 1.7, 1, "")

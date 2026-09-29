@@ -94,7 +94,7 @@ def _norm_word(w: str) -> str:
     return re.sub(r"[^\w%$']", "", w.lower())
 
 
-def _number(word: str) -> tuple[str, float, int, str] | None:
+def _number(word: str, scaled: bool = False) -> tuple[str, float, int, str] | None:
     """'$1,500' → ('$', 1500.0, decimals, '%'|'') ; years (1000-2100 without comma) and < 10 are not counted up."""
     m = NUM_RE.match(word.strip(".,!?;:\"'()"))
     if not m:
@@ -105,7 +105,7 @@ def _number(word: str) -> tuple[str, float, int, str] | None:
     except ValueError:
         return None
     dec = len(num.split(".")[1]) if "." in num else 0
-    if v < 10 or ("," not in num and not pre and not pct and 1000 <= v <= 2100 and dec == 0):
+    if (v < 10 and not (scaled and v > 0)) or ("," not in num and not pre and not pct and 1000 <= v <= 2100 and dec == 0):
         return None
     return pre, v, dec, pct
 
@@ -130,7 +130,8 @@ def fx_lines(segments: list[dict], fx: dict, theme: dict, emph_col: str, W: int,
         k = len((asides[si] if si < len(asides) else "").split())
         facts = words[:len(words) - k] if k else words
         for wi, w in enumerate(facts):
-            n = _number(w["word"])
+            nxt0 = _norm_word(facts[wi + 1]["word"]) if wi + 1 < len(facts) else ""
+            n = _number(w["word"], scaled=nxt0 in SCALE_WORDS - {"percent"})     # "1.7 billion" counts up too
             if re.search(r"\d", w["word"]) and (not num_times or w["start"] - num_times[-1] > 1.2):
                 num_times.append(w["start"])
             if not (n and kinetic) or w["start"] - last_count < 2.5 or len([x for x in lines if "Count" in x]) >= 36:
