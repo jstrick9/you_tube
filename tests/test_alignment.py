@@ -73,7 +73,7 @@ def patched(monkeypatch, tmp_path):
     monkeypatch.setattr(media, "commons_search", lambda *a, **k: [])
     monkeypatch.setattr(media, "openverse_search", lambda *a, **k: [])
 
-    def usable(c, work):
+    def usable(c, work, *a):
         p = tmp_path / (re.sub(r"\W", "_", c["url"]) + ".jpg")
         c["_img"].save(p)
         return p
@@ -253,7 +253,7 @@ def test_approved_but_unusable_image_triggers_requery(patched, tmp_path, monkeyp
     patched["q-retry"] = [cand("nerve", 7)]
     patched["q-paw"] = [cand("paw", 3)]
     ok_usable = media._usable
-    monkeypatch.setattr(media, "_usable", lambda c, w: None if c["url"].endswith("nerve/9.jpg") else ok_usable(c, w))
+    monkeypatch.setattr(media, "_usable", lambda c, w, *a: None if c["url"].endswith("nerve/9.jpg") else ok_usable(c, w, *a))
     s = segs(("a cat face", "q-cat"), ("nerve endings fire", "q-nerve"), ("a paw", "q-paw"))
     v = media.gather(SRC, s, CFG, tmp_path, llm=FakeLLM(requery={"shows": "nerve", "queries": ["q-retry"]}))
     assert [sh["credit"]["url"] for sh in v["shots"] if sh["seg"] == 1] == ["https://img/nerve/7.jpg"]

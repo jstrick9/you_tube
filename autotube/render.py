@@ -13,7 +13,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from . import sfx
+from . import motion, sfx
 from .common import FONTS_DIR, ffmpeg_bin, font_path
 
 log = logging.getLogger("autotube.render")
@@ -301,6 +301,33 @@ def thumbnail(frame: Path, text: str, out: Path, theme_idx: int) -> Path:
     return out
 
 
+def is_video(v: dict) -> bool:
+    return v.get("kind") == "video" or str(v.get("path", "")).lower().endswith((".mp4", ".webm", ".mov"))
+
+
+def poster_frame(clip: Path, out: Path) -> Path:
+    subprocess.run([ffmpeg_bin(), "-loglevel", "error", "-y", "-ss", "0.5", "-i", str(clip), "-frames:v", "1",
+                    "-q:v", "2", str(out)], check=True, capture_output=True)
+    return out
+
+
+def video_chain(i: int, aspect: float, W: int, H: int, fps: int) -> str:
+    """Same layout as a still: portrait clips fill the screen; landscape clips sit sharp at ~40% height over a
+    blurred, darkened copy of themselves."""
+    if aspect < 0.75:
+        return (f"[{i}:v]fps={fps},setpts=PTS-STARTPTS,scale={W}:{H}:force_original_aspect_ratio=increase,"
+                f"crop={W}:{H},setsar=1")
+    fw, fh = W, int(W / aspect) // 2 * 2
+    if fh > H * 0.62:
+        fh = int(H * 0.62) // 2 * 2
+        fw = int(fh * aspect) // 2 * 2
+    y = int(H * 0.40 - fh / 2)
+    return (f"[{i}:v]fps={fps},setpts=PTS-STARTPTS,setsar=1,split=2[va{i}][vb{i}];"
+            f"[va{i}]scale={W // 4}:{H // 4}:force_original_aspect_ratio=increase,crop={W // 4}:{H // 4},"
+            f"boxblur=10:2,colorchannelmixer=rr=0.45:gg=0.45:bb=0.45,scale={W}:{H},setsar=1[vbg{i}];"
+            f"[vb{i}]scale={fw}:{fh},setsar=1[vfg{i}];[vbg{i}][vfg{i}]overlay=(W-w)/2:{y}")
+
+
 def shot_plan(visuals: list[dict], n_segs: int) -> list[dict]:
     """Normalise visuals to an ordered shot list covering every segment (old format = one per segment)."""
     if visuals and all("seg" in v for v in visuals):
@@ -312,6 +339,75 @@ def shot_plan(visuals: list[dict], n_segs: int) -> list[dict]:
         if i not in have and shots:
             shots.append(dict(shots[i % len(shots)], seg=i))
     return sorted(shots, key=lambda v: v["seg"])
+
+
+def _ff(cmd: list[str], what: str) -> None:
+    res = subprocess.run([ffmpeg_bin(), "-y", "-loglevel", "error"] + cmd, capture_output=True, text=True)
+    if res.returncode != 0:
+        raise RuntimeError(f"ffmpeg failed ({what}):\n" + res.stderr[-2000:])
+
+
+def _kenburns(mo: str, nf: int) -> tuple[str, str, str]:
+    z0, z1 = (1.0, 1.14) if mo != "out" else (1.14, 1.0)
+    z = f"{z0}+({z1 - z0})*on/{nf}"
+    if mo == "left":
+        return z, f"(iw-iw/zoom)*(1-on/{nf})", "(ih-ih/zoom)/2"
+    if mo == "right":
+        return z, f"(iw-iw/zoom)*on/{nf}", "(ih-ih/zoom)/2"
+    if mo == "up":
+        return z, "(iw-iw/zoom)/2", f"(ih-ih/zoom)*(1-on/{nf})"
+    return z, "(iw-iw/zoom)/2", "(ih-ih/zoom)/2"
+
+
+def build_video_track(frames: list[Path], clip_aspect: dict, clip_src: dict, durs: list[float], motions: list[str],
+                      transitions: list[str], total: float, W: int, H: int, fps: int, work: Path) -> Path:
+    """Silent picture track, built piece by piece so memory stays flat however many clips there are.
+
+    1. every shot is rendered on its own at exactly its frame count (+ the crossfade overlap);
+    2. piece i = shot i's solo part + the crossfade into shot i+1 (only two small files open at once);
+    3. pieces are joined with the concat demuxer.
+    Boundaries are quantised to whole frames, so pictures stay locked to the narration timeline."""
+    n = len(frames)
+    NF = int(round(total * fps))
+    offs = [int(round(sum(durs[:i]) * fps)) for i in range(n)] + [NF]
+    X = int(round(XF * fps))
+    enc = ["-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "16", "-pix_fmt", "yuv420p", "-r", str(fps)]
+    cw, ch = int(W * SS), int(H * SS)
+    shot_files = []
+    for i in range(n):
+        nf = max(2, offs[i + 1] - offs[i] + (X if i < n - 1 else 0))
+        out = work / f"shot{i:02d}.mp4"
+        if i in clip_aspect:
+            chain = video_chain(0, clip_aspect[i], W, H, fps)
+            _ff(["-stream_loop", "-1", "-i", str(clip_src[i]), "-filter_complex",
+                 chain + f",format=yuv420p[v]", "-map", "[v]", "-frames:v", str(nf)] + enc + [str(out)], f"shot {i}")
+        else:
+            z, x, y = _kenburns(motions[i % len(motions)], nf)
+            _ff(["-i", str(frames[i]), "-vf", f"scale={cw}:{ch},setsar=1,zoompan=z='{z}':x='{x}':y='{y}':d={nf}:"
+                 f"s={W}x{H}:fps={fps},format=yuv420p", "-frames:v", str(nf)] + enc + [str(out)], f"shot {i}")
+        shot_files.append(out)
+    pieces = []
+    for i in range(n):
+        a = X if i > 0 else 0
+        b = offs[i + 1] - offs[i]
+        out = work / f"piece{i:02d}.mp4"
+        body = f"trim=start_frame={a}:end_frame={max(b, a + 1)},setpts=PTS-STARTPTS,fps={fps},settb=1/{fps}"
+        if i < n - 1:
+            fc = (f"[0:v]split=2[s0][s1];[s0]{body}[bo];"
+                  f"[s1]trim=start_frame={b}:end_frame={b + X},setpts=PTS-STARTPTS,fps={fps},settb=1/{fps}[ta];"
+                  f"[1:v]trim=end_frame={X},setpts=PTS-STARTPTS,fps={fps},settb=1/{fps}[hd];"
+                  f"[ta][hd]xfade=transition={transitions[i]}:duration={X / fps:.4f}:offset=0[tr];"
+                  f"[bo][tr]concat=n=2:v=1:a=0,format=yuv420p[v]")
+            _ff(["-i", str(shot_files[i]), "-i", str(shot_files[i + 1]), "-filter_complex", fc, "-map", "[v]"]
+                + enc + [str(out)], f"piece {i}")
+        else:
+            _ff(["-i", str(shot_files[i]), "-vf", body + ",format=yuv420p"] + enc + [str(out)], f"piece {i}")
+        pieces.append(out)
+    lst = work / "pieces.txt"
+    lst.write_text("".join(f"file '{p.resolve()}'\n" for p in pieces))
+    track = work / "track.mp4"
+    _ff(["-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(track)], "concat")
+    return track
 
 
 # ── main render ───────────────────────────────────────────────────────────────
@@ -334,9 +430,31 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
         per_seg[v["seg"]] = per_seg.get(v["seg"], 0) + 1
     durs = [seg_durs[v["seg"]] / per_seg[v["seg"]] for v in shots]
 
-    frames = []
+    frames, clip_aspect, clip_src = [], {}, {}
+    animate = bool(cfg["video"].get("animate_stills", True)) and motion.available()
+    moves: list[str] = []
     for i, v in enumerate(shots):
-        frames.append(compose_frame(Path(v["path"]), work / f"frame{i:02d}.jpg", W, H))
+        still = Path(v["path"])
+        if is_video(v):                    # moving footage: the poster frame stands in for thumbnails only
+            still = Path(v.get("poster") or poster_frame(Path(v["path"]), work / f"poster{i:02d}.jpg"))
+            with Image.open(still) as im:
+                clip_aspect[i] = im.width / im.height
+            clip_src[i] = Path(v["path"])
+        elif animate:                      # verified still → 2.5D camera move (same pixels, real depth motion)
+            d = durs[i] + (XF if i < len(shots) - 1 else 0) + 0.1
+            mv = rng.choice([m for m in motion.MOVES if not moves or m != moves[-1]])
+            moves.append(mv)
+            key = f"{abs(hash((str(still), round(d, 2), mv))) % 10**10}"
+            clip = work / f"anim_{key}.mp4"
+            try:
+                if not clip.exists():
+                    motion.animate_still(still, clip, d, fps, seed + i, move=mv)
+                with Image.open(still) as im:
+                    clip_aspect[i] = im.width / im.height
+                clip_src[i] = clip
+            except Exception as e:  # noqa: BLE001
+                log.warning("2.5D motion failed for shot %d (%s) — Ken Burns instead", i, str(e)[:120])
+        frames.append(compose_frame(still, work / f"frame{i:02d}.jpg", W, H))
 
     emph_col = THEMES[EMPH_FOR[theme_idx]]["hi"]      # keyword colour clearly different from the karaoke highlight
     ass = build_ass(segs, hook_text, channel, W, H, theme, "Anton", work / "captions.ass", total, fx=fx,
@@ -351,54 +469,25 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
         events = sfx.plan_events(starts, num_times, reveal_at, stamp_at, total)
         sfx_wav = sfx.build_track(events, total, work / "sfx.wav", seed)
 
-    cmd = [ffmpeg_bin(), "-y", "-loglevel", "error", "-stats"]
-    for f in frames:
-        cmd += ["-i", str(f)]
     n = len(frames)
-    cmd += ["-i", str(tts["audio"])]
-    a_idx = n
-    if music_wav:
-        cmd += ["-i", str(music_wav)]
-    m_idx = n + 1
-    s_idx = n + (2 if music_wav else 1)
-    if sfx_wav:
-        cmd += ["-i", str(sfx_wav)]
-
-    fg = []
     motions: list[str] = []
     for _ in range(n):             # never the same camera move twice in a row
         motions.append(rng.choice([m for m in ("in", "out", "left", "right", "up") if not motions or m != motions[-1]]))
-    cw, ch = int(W * SS), int(H * SS)
-    for i in range(n):
-        d = durs[i] + (XF if i < n - 1 else 0)
-        nf = max(2, int(round(d * fps)))
-        mo = motions[i % len(motions)]
-        z0, z1 = (1.0, 1.14) if mo != "out" else (1.14, 1.0)
-        zexpr = f"{z0}+({z1 - z0})*on/{nf}"
-        if mo == "left":
-            x = f"(iw-iw/zoom)*(1-on/{nf})"
-            y = "(ih-ih/zoom)/2"
-        elif mo == "right":
-            x = f"(iw-iw/zoom)*on/{nf}"
-            y = "(ih-ih/zoom)/2"
-        elif mo == "up":
-            x = "(iw-iw/zoom)/2"
-            y = f"(ih-ih/zoom)*(1-on/{nf})"
-        else:
-            x = "(iw-iw/zoom)/2"
-            y = "(ih-ih/zoom)/2"
-        fg.append(f"[{i}:v]scale={cw}:{ch},setsar=1,"
-                  f"zoompan=z='{zexpr}':x='{x}':y='{y}':d={nf}:s={W}x{H}:fps={fps},"
-                  f"format=yuv420p,trim=duration={d:.3f},setpts=PTS-STARTPTS,fps={fps},settb=1/{fps}[v{i}]")
-    # crossfade chain
-    last = "v0"
-    offset = 0.0
     trans = ["fade", "smoothleft", "smoothup", "circleopen", "fadeblack", "slideleft", "zoomin"]
-    for i in range(1, n):
-        offset += durs[i - 1]
-        t = rng.choice(trans)
-        fg.append(f"[{last}][v{i}]xfade=transition={t}:duration={XF}:offset={offset - 0:.3f}[x{i}]")
-        last = f"x{i}"
+    track = build_video_track(frames, clip_aspect, clip_src, durs, motions, [rng.choice(trans) for _ in range(n)],
+                              total, W, H, fps, work)
+
+    cmd = [ffmpeg_bin(), "-y", "-loglevel", "error", "-stats", "-i", str(track)]
+    cmd += ["-i", str(tts["audio"])]
+    a_idx = 1
+    if music_wav:
+        cmd += ["-i", str(music_wav)]
+    m_idx = 2
+    s_idx = 3 if music_wav else 2
+    if sfx_wav:
+        cmd += ["-i", str(sfx_wav)]
+    fg = [f"[0:v]fps={fps},settb=1/{fps},setsar=1[x0]"]
+    last = "x0"
     # progress bar + captions
     fg.append(f"color=c=white@0.85:s={W}x12:r={fps},format=rgba[bar]")
     fg.append(f"[{last}][bar]overlay=x='-W+W*t/{total:.3f}':y=H-12:shortest=1[vb]")
@@ -430,7 +519,7 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
             "-c:v", "libx264", "-preset", "veryfast", "-crf", "21", "-profile:v", "high", "-pix_fmt", "yuv420p",
             "-r", str(fps), "-c:a", "aac", "-b:a", "192k", "-ar", "44100", "-movflags", "+faststart",
             "-t", f"{total:.3f}", str(out_mp4)]
-    log.info("rendering %d scenes, %.1fs …", n, total)
+    log.info("final pass: captions, sound, %d scenes, %.1fs …", n, total)
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         raise RuntimeError("ffmpeg failed:\n" + res.stderr[-3000:])

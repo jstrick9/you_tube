@@ -82,6 +82,13 @@ jobs:
           path: ~/.cache/huggingface
           key: clip-vit-b-32-laion2b
 
+      - name: Cache depth model (living-photo motion)
+        if: steps.need.outputs.needed != '0'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/autotube
+          key: depth-anything-v2-small-q
+
       - name: Cache offline TTS voice (fallback only)
         if: steps.need.outputs.needed != '0'
         uses: actions/cache@v4

@@ -91,7 +91,7 @@ def build_description(script: dict, source: dict, visuals: list[dict], cfg: dict
     if cfg["compliance"].get("ai_disclosure_in_description", True):
         parts += ["", "ℹ️ This video was researched from the cited source and produced with AI-assisted "
                       "scripting and a synthetic narrator voice. Facts are checked against the source before publishing."]
-    parts += ["", "🖼️ Image credits:", media.credits_text(visuals),
+    parts += ["", "🖼️ Image & video credits:", media.credits_text(visuals),
               "🎵 Music: original, procedurally generated for this video.", "",
               f"Follow {cfg['channel'].get('handle') or cfg['channel']['name']} for a surprising fact, with sources, every day!", "", f"{tags} #shorts"]
     return "\n".join(parts)
@@ -190,7 +190,7 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
         from .vision import contact_sheet
         ims = []
         for v in visuals["shots"]:
-            with Image.open(v["path"]) as im:
+            with Image.open(v.get("poster") or v["path"]) as im:
                 im = im.convert("RGB")
                 im.thumbnail((400, 400))
                 ims.append(im)
@@ -206,7 +206,8 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     record = {"meta": meta, "script": script, "review": review, "source": {k: source[k] for k in ("title", "url")},
               "plan": plan, "tts_engine": tts["engine"], "duration": r["duration"],
               "qa": {k: report.get(k) for k in ("passed", "attempt", "issues", "frames", "meta")},
-              "shots": [{"seg": v["seg"], "score": v.get("score"), "judge": v.get("judge"), "shows": v.get("shows"),
+              "shots": [{"seg": v["seg"], "kind": v.get("kind", "image"), "window": v.get("window"),
+                         "score": v.get("score"), "judge": v.get("judge"), "shows": v.get("shows"),
                          "want": v.get("want"), "reused": v.get("reused", False), "image": v["credit"].get("title"),
                          "page": v["credit"].get("page")} for v in visuals["shots"]],
               "timeline": r["timeline"]}

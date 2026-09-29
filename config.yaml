@@ -71,6 +71,7 @@ video:
     - en-US-EmmaNeural
     - en-US-ChristopherNeural
   speech_rate: "+8%"
+  animate_stills: true                   # photos get a 2.5D depth-parallax camera move (autotube/motion.py)
   sound_effects: true                    # procedural whoosh/ding/riser/hit/stamp (autotube/sfx.py), copyright-free
   sfx_volume_db: -12
   kinetic_captions: true                 # keyword colour pop, number count-ups, reveal flash, italic asides
@@ -207,7 +208,13 @@ llm:
   temperature: 0.8
 
 media:
-  sources: [pexels, wikimedia, openverse]   # pexels used only if PEXELS_API_KEY is set
+  # photos: pexels (only with PEXELS_API_KEY), wikimedia, openverse
+  # moving footage: commons_video (Wikimedia Commons videos), nasa_video (NASA library, public domain, keyless),
+  #                 pexels_video (only with PEXELS_API_KEY — portrait stock clips)
+  sources: [commons_video, nasa_video, pexels_video, pexels, wikimedia, openverse]
+  prefer_video: true                     # a verified clip beats an equally good still (motion holds attention)
+  video_bonus: 1.0                       # ranking bonus for clips among APPROVED candidates (never lowers the bar)
+  max_video_mb: 90                       # skip (or use a smaller version of) bigger source files
   min_image_width: 900
   # Every image is LOOKED AT before use (see autotube/vision.py): CLIP pre-ranks candidates, then a
   # vision LLM (Gemini free tier) scores a contact sheet against the exact narration line.
