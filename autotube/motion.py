@@ -106,9 +106,14 @@ def animate_still(img_path: Path, out: Path, dur: float, fps: int = 30, seed: in
     n = max(2, int(round(dur * fps)))
     ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)
     cx, cy = w / 2, h / 2
-    base_zoom = 1.07                                   # hides the borders that parallax would reveal
-    par = 0.022 * strength * w                         # max near-vs-far horizontal offset in px
-    dz = 0.075 * strength
+    # A clearly visible camera move (like a slow gimbal shot) + depth parallax on top, so near things slide
+    # past far things. Zoom margins are sized so reflected borders never enter the frame.
+    drift = move in ("drift_left", "drift_right", "rise")
+    base_zoom = 1.16 if drift else 1.04
+    pan = 0.04 * strength * w                          # global camera travel (each side of centre)
+    par = 0.03 * strength * w                          # extra near-vs-far offset
+    dz = 0.13 * strength                               # global push-in / pull-out
+    dzp = 0.06 * strength                              # extra push for near things
     near = depth - 0.35                                # far background moves a little the other way
 
     cmd = [ffmpeg_bin(), "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w}x{h}",
@@ -121,16 +126,15 @@ def animate_still(img_path: Path, out: Path, dur: float, fps: int = 30, seed: in
             zoom = base_zoom
             sx = sy = 0.0
             if move == "dolly_in":
-                zoom = base_zoom * (1 + dz * t * (0.6 + 0.8 * depth))
+                zoom = base_zoom * (1 + dz * t + dzp * t * depth)
             elif move == "dolly_out":
-                zoom = base_zoom * (1 + dz * (1 - t) * (0.6 + 0.8 * depth))
+                zoom = base_zoom * (1 + dz * (1 - t) + dzp * (1 - t) * depth)
             elif move == "drift_left":
-                sx = par * (t - 0.5) * 2 * near
+                sx = (pan + par * near) * (t - 0.5) * 2
             elif move == "drift_right":
-                sx = -par * (t - 0.5) * 2 * near
-            else:                                      # rise: camera moves up, near things drop faster
-                sy = -par * 0.8 * (t - 0.5) * 2 * near
-                zoom = base_zoom * (1 + dz * 0.4 * t * depth)
+                sx = -(pan + par * near) * (t - 0.5) * 2
+            else:                                      # rise: camera cranes up, near things drop faster
+                sy = -(pan * 0.9 + par * 0.8 * near) * (t - 0.5) * 2
             map_x = (cx + (xs - cx) / zoom + sx).astype(np.float32)
             map_y = (cy + (ys - cy) / zoom + sy).astype(np.float32)
             frame = cv2.remap(rgb, map_x, map_y, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
