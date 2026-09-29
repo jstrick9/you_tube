@@ -244,3 +244,32 @@ def test_only_scheduled_videos_hold_publish_slots():
             for i, (v, st) in enumerate([("a", "scheduled"), ("b", "withdrawn"), ("c", "missing"),
                                           ("d", "rejected"), ("e", "upload_failed: x")])]
     assert pipeline.taken_slots(hist) == {pipeline._slot_key(fut)}
+
+
+def test_approved_but_unusable_image_triggers_requery(patched, tmp_path, monkeypatch):
+    """Regression (run 36506122073): a line whose approved image couldn't be used was dropped without a re-search."""
+    patched["q-cat"] = [cand("cat", 1), cand("cat", 2)]
+    patched["q-nerve"] = [cand("nerve", 9)]            # approved 9/10 … but its download will fail
+    patched["q-retry"] = [cand("nerve", 7)]
+    patched["q-paw"] = [cand("paw", 3)]
+    ok_usable = media._usable
+    monkeypatch.setattr(media, "_usable", lambda c, w: None if c["url"].endswith("nerve/9.jpg") else ok_usable(c, w))
+    s = segs(("a cat face", "q-cat"), ("nerve endings fire", "q-nerve"), ("a paw", "q-paw"))
+    v = media.gather(SRC, s, CFG, tmp_path, llm=FakeLLM(requery={"shows": "nerve", "queries": ["q-retry"]}))
+    assert [sh["credit"]["url"] for sh in v["shots"] if sh["seg"] == 1] == ["https://img/nerve/7.jpg"]
+
+
+def test_black_and_white_photo_is_not_a_document():
+    """Regression: the colour-count rule threw away every B&W photo/engraving after the judge approved it."""
+    import random
+    rnd = random.Random(3)
+    im = Image.new("L", (400, 300))
+    im.putdata([min(255, max(0, int(40 + 170 * (x / 400) + rnd.gauss(0, 25)))) for y in range(300) for x in range(400)])
+    assert not media._looks_like_document(im.convert("RGB"))
+
+
+def test_vision_approved_image_skips_document_heuristic(monkeypatch, tmp_path):
+    seen = {}
+    monkeypatch.setattr(media, "_download", lambda a, d, doc_filter=True: seen.setdefault("f", doc_filter) and None)
+    media._usable({"url": "u", "vscore": 9}, tmp_path)
+    assert seen["f"] is False

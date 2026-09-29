@@ -128,10 +128,13 @@ def _looks_like_document(im: Image.Image) -> bool:
     white = sum(1 for r, g, b in px if r > 225 and g > 225 and b > 225) / len(px)
     flat = sum(1 for r, g, b in px if max(r, g, b) - min(r, g, b) < 18) / len(px)
     colours = len(set((r // 16, g // 16, b // 16) for r, g, b in px))
-    return (white > 0.38 and flat > 0.55) or colours < 40      # text pages / flat clip-art
+    greys = len(set((r + g + b) // 24 for r, g, b in px))       # tonal range, works for B&W photos too
+    # text pages / flat clip-art. NOTE: colour count alone must not decide — black-and-white photos and
+    # engravings have < 40 colour bins but a full tonal range, and they're often exactly the right image.
+    return (white > 0.38 and flat > 0.55) or (colours < 40 and greys < 12)
 
 
-def _download(asset: dict, dest_dir: Path) -> Path | None:
+def _download(asset: dict, dest_dir: Path, doc_filter: bool = True) -> Path | None:
     h = hashlib.md5(asset["url"].encode()).hexdigest()[:12]
     dest = dest_dir / f"img_{h}.jpg"
     if dest.exists():
@@ -148,7 +151,9 @@ def _download(asset: dict, dest_dir: Path) -> Path | None:
                 raise ValueError(f"image too large {im.size}")
             im.draft("RGB", (2400, 2400))
             im = im.convert("RGB")
-            if min(im.size) < 400 or _looks_like_document(im):
+            if min(im.size) < 400 or (doc_filter and _looks_like_document(im)):
+                log.info("      image dropped (%s): %s", "too small" if min(im.size) < 400 else "looks like a document",
+                         asset.get("title", "")[:60])
                 tmp.unlink(missing_ok=True)
                 return None
             # cap size for speed
@@ -157,7 +162,7 @@ def _download(asset: dict, dest_dir: Path) -> Path | None:
         tmp.unlink(missing_ok=True)
         return dest
     except Exception as e:  # noqa: BLE001
-        log.debug("download failed %s: %s", asset["url"][:80], e)
+        log.info("      download failed %s: %s", asset.get("title", asset["url"])[:60], str(e)[:80])
         return None
 
 
@@ -177,7 +182,9 @@ def _candidates_for(queries: list[str], sources: list[str], allowed: list[str], 
 
 
 def _usable(a: dict, work: Path) -> Path | None:
-    p = _download(a, work)
+    # An image a vision model has already approved for the line is not second-guessed by the crude
+    # "document" heuristic (the judge rejects text/scans itself, and final QA re-checks the rendered frame).
+    p = _download(a, work, doc_filter="vscore" not in a)
     if p:
         with Image.open(p) as im:
             if min(im.size) < 480:
@@ -298,35 +305,49 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
         queries = [q for q in (vis.get("queries") or []) if isinstance(q, str) and q.strip()]
         if not queries:
             queries = [f"{subject} {k}" for k in kws] or [subject]
+        want_n = 2 if seg_durs and i < len(seg_durs) and seg_durs[i] > multi_after else 1
+
+        def place(good, want):
+            """Put up to want_n approved, usable, not-yet-shown images on this line; return (got, spares)."""
+            got, spare, dup, bad = 0, [], 0, 0
+            for c in good:
+                if is_used(c):
+                    dup += 1
+                elif got < want_n:
+                    if add_shot(c, i, want):
+                        got += 1
+                    else:
+                        bad += 1
+                else:
+                    spare.append(c)
+            if not got:
+                # every approved match for this line is already on screen elsewhere → repeat the best one,
+                # but never right after the line that already shows it
+                for c in good:
+                    u = is_used(c)
+                    if u and abs(u["seg"] - i) > 1 and add_shot(c, i, want, reused=True):
+                        got = 1
+                        break
+            if good and not got:
+                log.info("    seg %d: %d approved image(s) but none placeable (%d already shown, %d unusable)",
+                         i, len(good), dup, bad)
+            return got, spare
+
         judged = judge_line(canon(_candidates_for(queries, sources, allowed, min_w)) + common, want, seg["text"])
         good = [c for c in judged if c["vscore"] >= min_score]
-        if not good and llm is not None and mcfg.get("requery", True):
+        got, spare = place(good, want)
+        if not got and llm is not None and mcfg.get("requery", True):
             try:
                 want2, q2 = _requery(llm, subject, seg["text"], want, [c.get("vshows", "") for c in judged])
-                log.info("    seg %d: no match for %r → retrying with %r %s", i, want[:50], want2[:50], q2)
+                log.info("    seg %d: no usable match for %r → retrying with %r %s", i, want[:50], want2[:50], q2)
                 judged2 = judge_line(canon(_candidates_for(q2, sources, allowed, min_w)), want2, seg["text"])
-                good = [c for c in judged2 if c["vscore"] >= min_score]
-                want = want2 if good else want
+                good2 = [c for c in judged2 if c["vscore"] >= min_score]
+                got, spare = place(good2, want2)
+                judged = sorted(judged + judged2, key=lambda c: -c["vscore"])
             except vision.VisionUnavailable:
                 raise
             except Exception as e:  # noqa: BLE001
-                log.debug("requery failed: %s", e)
-        want_n = 2 if seg_durs and i < len(seg_durs) and seg_durs[i] > multi_after else 1
-        got = 0
-        spare = []
-        for c in good:
-            if got < want_n and not is_used(c) and add_shot(c, i, want):
-                got += 1
-            elif not is_used(c):
-                spare.append(c)
-        if not got:
-            # every verified match for this line is already on screen elsewhere → repeat the best one,
-            # but never right after the line that already shows it
-            for c in good:
-                u = is_used(c)
-                if u and abs(u["seg"] - i) > 1 and add_shot(c, i, want, reused=True):
-                    got = 1
-                    break
+                log.info("    seg %d: requery failed: %s", i, str(e)[:120])
         if not got:
             best = f"{judged[0]['vscore']:.0f}/10 ({judged[0].get('vshows', '')[:60]})" if judged else "none"
             raise NoVisualMatch(f"line {i + 1} has no image that shows it (best: {best}): {seg['text'][:80]!r}")
