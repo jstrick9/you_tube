@@ -30,9 +30,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 120.3,
+      "hours_live": 120.5,
       "vph": 0.166,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00",
+      "checked_at": "2026-09-29T16:29:03.247875+00:00",
       "a_views": 18,
       "avg_view_pct": 4627.33,
       "avg_view_dur": 1527
@@ -70,9 +70,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 114.8,
-      "vph": 10.614,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00",
+      "hours_live": 115.0,
+      "vph": 10.593,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00",
       "a_views": 1192,
       "avg_view_pct": 81.43,
       "avg_view_dur": 35
@@ -110,9 +110,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 111.8,
-      "vph": 10.577,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00",
+      "hours_live": 112.0,
+      "vph": 10.555,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00",
       "a_views": 1195,
       "avg_view_pct": 41.89,
       "avg_view_dur": 15
@@ -150,9 +150,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 96.3,
-      "vph": 13.288,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00",
+      "hours_live": 96.5,
+      "vph": 13.256,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00",
       "a_views": 1109,
       "avg_view_pct": 56.06,
       "avg_view_dur": 17
@@ -190,9 +190,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 90.8,
-      "vph": 12.694,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00",
+      "hours_live": 91.0,
+      "vph": 12.662,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00",
       "a_views": 1132,
       "avg_view_pct": 59.62,
       "avg_view_dur": 18
@@ -230,9 +230,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 87.8,
-      "vph": 12.888,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00",
+      "hours_live": 88.0,
+      "vph": 12.855,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00",
       "a_views": 1129,
       "avg_view_pct": 30.070000000000004,
       "avg_view_dur": 13
@@ -270,9 +270,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 72.3,
-      "vph": 16.054,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00",
+      "hours_live": 72.5,
+      "vph": 16.003,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00",
       "a_views": 543,
       "avg_view_pct": 42.33,
       "avg_view_dur": 13
@@ -310,9 +310,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 66.8,
-      "vph": 18.081,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00",
+      "hours_live": 67.0,
+      "vph": 18.019,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00",
       "a_views": 858,
       "avg_view_pct": 40.65,
       "avg_view_dur": 15
@@ -350,9 +350,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 63.8,
-      "vph": 9.788,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00",
+      "hours_live": 64.0,
+      "vph": 9.752,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00",
       "a_views": 279,
       "avg_view_pct": 71.46,
       "avg_view_dur": 26
@@ -390,9 +390,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 48.3,
-      "vph": 18.547,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00"
+      "hours_live": 48.5,
+      "vph": 18.46,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00"
     },
     "reward": 0.95
   },
@@ -427,9 +427,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 42.8,
-      "vph": 26.921,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00"
+      "hours_live": 43.0,
+      "vph": 26.777,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00"
     }
   },
   {
@@ -457,15 +457,15 @@
     "video_id": "SBETRh-FF_I",
     "status": "scheduled",
     "metrics": {
-      "views": 206,
+      "views": 285,
       "likes": 2,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 39.8,
-      "vph": 5.182,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00"
+      "hours_live": 40.0,
+      "vph": 7.128,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00"
     }
   },
   {
@@ -493,15 +493,15 @@
     "video_id": "6dO8y_ojGhI",
     "status": "scheduled",
     "metrics": {
-      "views": 102,
-      "likes": 1,
+      "views": 148,
+      "likes": 3,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 24.3,
-      "vph": 4.205,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00"
+      "hours_live": 24.5,
+      "vph": 6.045,
+      "checked_at": "2026-09-29T16:29:03.247875+00:00"
     }
   },
   {
@@ -615,7 +615,101 @@
       "rejection": null,
       "hours_live": 1.0,
       "vph": 1.0,
-      "checked_at": "2026-09-29T16:15:17.027348+00:00"
+      "checked_at": "2026-09-29T16:29:03.247875+00:00"
     }
+  },
+  {
+    "created_at": "2026-09-29T16:56:56.095133+00:00",
+    "run_id": "20260929-1629",
+    "title": "Hungry Stones: When Rivers Reveal Famine Warnings #shorts",
+    "topic": "Hunger stone",
+    "topic_key": "hunger stone",
+    "wiki_title": "Hunger stone",
+    "trend_sources": [
+      "wikipedia"
+    ],
+    "choice": {
+      "category": "history",
+      "format": "ranked_escalation",
+      "hook_style": "number_first",
+      "voice": "en-US-EmmaNeural",
+      "source": "wikipedia"
+    },
+    "viral_score": 8.0,
+    "why_trending": "Wikipedia views surging 1496x normal",
+    "trend_evidence": [
+      "Wikipedia: 111,489 views/day, 1496.5x its normal"
+    ],
+    "review_score": 8,
+    "duration": 38.43802721088436,
+    "tts_engine": "edge-tts",
+    "file": "20260929-1629-01-hunger-stone.mp4",
+    "publish_at": "2026-09-29T21:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "video_id": "FvfnD8B8ioM",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-09-29T16:56:58.990765+00:00",
+    "run_id": "20260929-1629",
+    "title": "The World's Most Expensive Wargame #shorts",
+    "topic": "there's a genus of Arachnids named after Abbadon the Despoiler, one of the major villains from Warhammer 40000",
+    "topic_key": "theres a genus of arachnids named after abbadon the despoiler one of the major villains from warhammer 40000",
+    "wiki_title": "Warhammer 40,000",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "culture",
+      "format": "plot_twist",
+      "hook_style": "number_first",
+      "voice": "en-US-BrianNeural",
+      "source": "reddit"
+    },
+    "viral_score": 9.0,
+    "why_trending": "reddit_todayilearned viral post today about arachnid genus named after Warhammer 40k villain",
+    "trend_evidence": [
+      "TIL there's a genus of Arachnids named after Abbadon the Despoiler, one of the major villains from Warhammer 40000"
+    ],
+    "review_score": 8,
+    "duration": 26.438072562358276,
+    "tts_engine": "edge-tts",
+    "file": "20260929-1629-02-warhammer-40-000.mp4",
+    "publish_at": "2026-09-30T00:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "video_id": "76b5-M7YOn0",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-09-29T16:57:01.746067+00:00",
+    "run_id": "20260929-1629",
+    "title": "The Animal Left Behind on the Moon #shorts",
+    "topic": "This Animal Might Be Living On The Moon",
+    "topic_key": "this animal might be living on the moon",
+    "wiki_title": "Tardigrade",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "choice": {
+      "category": "space",
+      "format": "sounds_fake",
+      "hook_style": "number_first",
+      "voice": "en-US-AvaNeural",
+      "source": "youtube_outliers"
+    },
+    "viral_score": 9.0,
+    "why_trending": "Viral Short now: 1,503,574 views in 21h about an animal left on the moon",
+    "trend_evidence": [
+      "viral Short now: 1,503,574 views in 21h, 0x its channel's subscribers",
+      "This animal might still be living on the Moon after being accidentally left there."
+    ],
+    "review_score": 8,
+    "duration": 37.23804988662131,
+    "tts_engine": "edge-tts",
+    "file": "20260929-1629-03-tardigrade.mp4",
+    "publish_at": "2026-09-30T16:00:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "video_id": "105yFSP7cgQ",
+    "status": "scheduled"
   }
 ]
