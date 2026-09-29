@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 import random
 
-from .common import read_json, write_json
+from .common import now_utc, read_json, write_json
 
 log = logging.getLogger("autotube.strategy")
 
@@ -40,12 +40,38 @@ class Strategy:
         c = self.cfg
         return {
             "category": list(c["channel"]["categories"]),
-            "format": list(c["content"]["formats"]),
+            "format": self.formats_in_season(),
             "hook_style": list(c["content"]["hook_styles"]),
             "voice": list(c["video"]["voices"]),
             "source": ["youtube_outliers", "wikipedia", "google_trends", "reddit", "hackernews", "on_this_day",
                        "youtube_chart", "evergreen"],
         }
+
+    def formats_in_season(self, month: int | None = None) -> list[str]:
+        """Configured formats minus seasonal ones that are out of season (e.g. creepy_true outside October)."""
+        month = month or now_utc().month
+        seasonal = self.cfg["content"].get("seasonal_formats") or {}
+        return [f for f in self.cfg["content"]["formats"]
+                if f not in seasonal or month in [int(m) for m in seasonal[f]]]
+
+    def seasonal_now(self) -> list[str]:
+        seasonal = self.cfg["content"].get("seasonal_formats") or {}
+        return [f for f in self.formats_in_season() if f in seasonal]
+
+    def fit(self, plan: dict, topic: dict, used: set[str] | None = None) -> dict:
+        """Make the plan's format one the topic can honestly support (the topic selector lists them in
+        topic['formats']). In season, a seasonal format (creepy_true in October) wins once per run if it fits."""
+        allowed = self.formats_in_season()
+        fits = [f for f in (topic.get("formats") or []) if f in allowed]
+        plan = dict(plan)
+        used = used if used is not None else set()
+        for f in self.seasonal_now():
+            if f in fits and f not in used:
+                plan["format"] = f
+                return plan
+        if fits and plan.get("format") not in fits:
+            plan["format"] = self.sample("format", exclude=set(allowed) - set(fits))
+        return plan
 
     # ── sampling ──────────────────────────────────────────────────────────────
     def sample(self, dim: str, exclude: set[str] | None = None) -> str:
@@ -79,7 +105,7 @@ class Strategy:
             plans.append({
                 "format": fmt,
                 "hook_style": self.sample("hook_style"),
-                "voice": self.sample("voice"),
+                "voice": self.cfg.get("persona", {}).get("voice") or self.sample("voice"),
             })
         return plans
 

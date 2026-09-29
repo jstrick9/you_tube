@@ -19,7 +19,7 @@ from . import media, music, qa, render, trends
 from .vision import VisionUnavailable
 from .common import OUTPUT_DIR, WORK_DIR, now_utc, read_json, slugify, write_json
 from .llm import LLM
-from .scriptwriter import ScriptWriter
+from .scriptwriter import ScriptWriter, spoken_text
 from .strategy import Strategy
 from .tts import synthesize
 
@@ -80,9 +80,11 @@ def remaining_today(cfg: dict, upload: bool = True) -> int:
 
 def build_description(script: dict, source: dict, visuals: list[dict], cfg: dict, tts_engine: str) -> str:
     tags = " ".join(h if h.startswith("#") else f"#{h}" for h in script.get("hashtags", [])[:3])
+    catch = (cfg.get("persona") or {}).get("catchphrase")
     parts = [
         script.get("description", "").strip(),
         "",
+        *([f"✅ {catch} Every claim in this video is checked against the source below.", ""] if catch else []),
         f"📚 Source: {source['title']} — {source['url']}",
         *[f"📚 Also: {a['title']} — {a['url']}" for a in source.get("also", [])[:4]],
     ]
@@ -93,6 +95,33 @@ def build_description(script: dict, source: dict, visuals: list[dict], cfg: dict
               "🎵 Music: original, procedurally generated for this video.", "",
               f"Follow {cfg['channel'].get('handle') or cfg['channel']['name']} for a surprising fact, with sources, every day!", "", f"{tags} #shorts"]
     return "\n".join(parts)
+
+
+def pause_plan(script: dict, plan: dict, cfg: dict) -> list[float]:
+    """Silence before each line: normal, except a beat before the reveal (longer for the 3-2-1 countdown)."""
+    gaps = [0.0] * len(script["segments"])
+    for i, s in enumerate(script["segments"]):
+        if s.get("reveal") and i > 0:
+            key = "countdown_pause" if plan.get("format") == "guess_reveal" else "reveal_pause"
+            gaps[i] = float(cfg["content"].get(key, 0.55))
+    return gaps
+
+
+def effects_plan(script: dict, plan: dict, source: dict, cfg: dict) -> dict:
+    """Everything the renderer needs for kinetic captions, SFX and the proof stamp."""
+    persona = cfg.get("persona") or {}
+    segs = script["segments"]
+    reveal = next((i for i, s in enumerate(segs) if s.get("reveal")), None)
+    return {
+        "emphasis": [s.get("emphasis") or [] for s in segs],
+        "asides": [s.get("aside") or "" for s in segs],
+        "reveal": reveal,
+        "countdown": plan.get("format") == "guess_reveal" and reveal is not None,
+        "stamp": ({"source": f"Source: Wikipedia · {source['title']}", "seconds": float(persona.get("stamp_seconds", 2.0))}
+                  if persona.get("proof_stamp", True) else None),
+        "kinetic": bool(cfg["video"].get("kinetic_captions", True)),
+        "sfx": bool(cfg["video"].get("sound_effects", True)),
+    }
 
 
 def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int, run_id: str) -> dict | None:
@@ -108,12 +137,14 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     work.mkdir(parents=True, exist_ok=True)
     seed = int(hashlib.md5(f"{run_id}{slug}".encode()).hexdigest()[:8], 16)
 
-    tts = synthesize([s["text"] for s in script["segments"]], plan["voice"], cfg["video"]["speech_rate"], work)
+    lines = [spoken_text(s) for s in script["segments"]]
+    gaps = pause_plan(script, plan, cfg)
+    tts = synthesize(lines, plan["voice"], cfg["video"]["speech_rate"], work, gaps=gaps)
     lo, hi = cfg["video"]["target_seconds"]
     if tts["duration"] > 59.0:      # Shorts must stay < 60 s for safest classification
         log.info("  narration %.1fs too long → speeding up", tts["duration"])
         faster = f"+{int(cfg['video']['speech_rate'].strip('+%')) + int((tts['duration'] / 57 - 1) * 100) + 4}%"
-        tts = synthesize([s["text"] for s in script["segments"]], plan["voice"], faster, work)
+        tts = synthesize(lines, plan["voice"], faster, work, gaps=gaps)
         if tts["duration"] > 59.0:
             log.info("  ✗ still too long (%.1fs), skipping", tts["duration"])
             return None
@@ -134,12 +165,13 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     if "#shorts" not in title.lower() and len(title) <= 90:
         title = f"{title} #shorts"
     subject = source["title"]
+    fx = effects_plan(script, plan, source, cfg)
 
     # render → final QA on the finished file → (repair a failed shot with a verified spare, re-render) → …
     repairs = int(cfg.get("qa", {}).get("max_repairs", 2))
     report: dict = {"passed": False}
     for attempt in range(repairs + 1):
-        r = render.render(tts, visuals["shots"], mus, hook_card, cfg["channel"]["name"], cfg, work, out, seed)
+        r = render.render(tts, visuals["shots"], mus, hook_card, cfg["channel"]["name"], cfg, work, out, seed, fx=fx)
         report = qa.verify(out, r["timeline"], visuals["shots"], tts, script, title, hook_card, subject,
                            writer.llm, cfg)
         report["attempt"] = attempt + 1
@@ -211,7 +243,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     log.info("topic queue: %s", [p["topic"][:40] for p in picks[: n + 4]])
 
     # 2. produce
-    results, used_titles = [], set()
+    results, used_titles, used_formats = [], set(), set()
     pi = 0
     deadline = time.time() + 60 * float(cfg["schedule"].get("max_run_minutes", 120))
     vision_down = False
@@ -237,8 +269,9 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             pi += 1
             tried.add(topic.get("topic_key", ""))
             topic["category"] = topic.get("category") or random.choice(cfg["channel"]["categories"])
+            fitted = strat.fit(plan, topic, used_formats)
             try:
-                res = make_one(cfg, writer, topic, plan, i + 1, run_id)
+                res = make_one(cfg, writer, topic, fitted, i + 1, run_id)
             except VisionUnavailable as e:
                 log.error("  ✗ %s — stopping this run (nothing unverified is published; the next run retries)", e)
                 vision_down = True
@@ -248,6 +281,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
                 res = None
             if res and res["source"]["title"] not in used_titles:
                 used_titles.add(res["source"]["title"])
+                used_formats.add(res["plan"]["format"])
                 results.append(res)
                 break
     log.info("produced %d/%d videos", len(results), n)

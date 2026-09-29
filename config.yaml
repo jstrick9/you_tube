@@ -9,15 +9,16 @@ channel:
   name: "Proof in a Minute"              # shown on-screen (brand tag) and in the description footer
   handle: "@proofinaminute"              # YouTube handle, used in the description call-to-action
   niche: >-
-    Fascinating, verified facts and quick explainers about science, space,
-    history, nature, technology and the stories behind things people are
-    searching for today.
+    Entertaining, true stories and facts that sound fake but are proven — the
+    weirdest, funniest, creepiest and most jaw-dropping real things from
+    history, nature, science, space, technology, food, animals, places and
+    pop culture, told by a witty narrator, every one backed by a cited source.
   language: en
   region: US                             # trend region (Google Trends geo / YouTube chart)
   timezone: America/New_York
   # Topic categories the system can choose from. The analytics loop learns
   # which of these perform best and shifts output toward them automatically.
-  categories: [science, space, history, nature, technology, geography, culture, sports, entertainment]
+  categories: [science, space, history, nature, animals, technology, geography, culture, food, mysteries, sports, entertainment]
   # Evergreen seeds: only used when content.allow_evergreen is true (off by default — every video must ride a
   # live trend signal: a viral Short, a Wikipedia spike, Google Trends, Reddit, HN or a same-day anniversary).
   evergreen_seeds:
@@ -36,6 +37,20 @@ channel:
     - Venus flytrap
     - Saturn's rings
     - Easter Island
+
+# ── Channel identity ── (a recognisable narrator + promise is what separates a channel YouTube keeps monetized
+# from "generic AI facts over stock photos"; see README → Entertainment & identity)
+persona:
+  catchphrase: "Sounds fake. It's proven."
+  character: >-
+    a dry-witted, slightly incredulous narrator who finds real facts more ridiculous than fiction. Talks to ONE
+    viewer like a friend ("okay, this one is unhinged"), reacts with short deadpan asides, is never mean to real
+    people or groups, and never exaggerates the facts themselves — the facts are wild enough.
+  asides: true                     # 1-2 short humorous reactions per script (fact-checked as jokes, never as facts)
+  max_asides: 2
+  proof_stamp: true                # end card: "PROVEN ✓" rubber stamp + the source, with a stamp sound
+  stamp_seconds: 2.0
+  voice: null                      # set one voice (e.g. en-US-AndrewNeural) to lock a signature narrator; null = learned
 
 schedule:
   videos_per_day: 3                      # keep modest: quality > quantity (see README → Compliance)
@@ -56,6 +71,9 @@ video:
     - en-US-EmmaNeural
     - en-US-ChristopherNeural
   speech_rate: "+8%"
+  sound_effects: true                    # procedural whoosh/ding/riser/hit/stamp (autotube/sfx.py), copyright-free
+  sfx_volume_db: -12
+  kinetic_captions: true                 # keyword colour pop, number count-ups, reveal flash, italic asides
   background_music: true                 # procedurally generated, copyright-free ambient bed
   music_volume_db: -26
   loudness_lufs: -14
@@ -63,8 +81,14 @@ video:
 content:
   # Script formats — rotated and learned. Different formats = genuinely
   # different videos, which matters for YouTube's "inauthentic content" policy.
-  formats: [facts3, backstory, myth_vs_fact, timeline, by_the_numbers, what_if]
-  hook_styles: [question, bold_claim, number_first, you_statement]
+  # Entertainment-first formats (each is a genuinely different kind of video). The topic selector says which
+  # formats each topic can honestly support, and the bandit learns which ones our audience watches to the end.
+  formats: [sounds_fake, ranked_escalation, guess_reveal, plot_twist, myth_buster, would_you_survive,
+            dumbest_decision, scale_shock, backstory, what_if, creepy_true]
+  # Formats only used in certain months (1-12). In season, one video per run uses it whenever a topic fits.
+  seasonal_formats:
+    creepy_true: [10]              # October: "creepy but true" (eerie, never gory)
+  hook_styles: [question, bold_claim, number_first, you_statement, disbelief]
   require_grounding: true                # every claim must be supported by fetched source text
   min_grounded_segments: 3
   allow_living_people: false             # skip topics that are biographies of living people
@@ -77,6 +101,8 @@ content:
   max_drafts: 4                          # script rewrites allowed (feedback from the fact-checker/hook gate)
   selection_rounds: 3                    # if every pick fails the checks, pick again from the remaining trends
   loop_ending: true                      # last line flows back into the first line (replays count as watch time)
+  reveal_pause: 0.55                     # beat of silence before the reveal line (riser SFX + flash fill it)
+  countdown_pause: 1.25                  # guess_reveal format: on-screen 3-2-1 before the answer
 
 trends:
   # Proven-viral signal: fact/explainer Shorts that took off in the last N hours (YouTube search, uses the

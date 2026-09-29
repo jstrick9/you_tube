@@ -7,11 +7,13 @@ from __future__ import annotations
 
 import logging
 import random
+import re
 import subprocess
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
+from . import sfx
 from .common import FONTS_DIR, ffmpeg_bin, font_path
 
 log = logging.getLogger("autotube.render")
@@ -81,8 +83,113 @@ def _esc(s: str) -> str:
     return s.replace("\\", "").replace("{", "(").replace("}", ")")
 
 
+NUM_RE = re.compile(r"^(\$?)(\d[\d,]*(?:\.\d+)?)(%?)$")
+SCALE_WORDS = {"thousand", "million", "billion", "trillion", "percent"}
+STAMP_GREEN = "&H0040D83A"       # ASS BGR
+ASIDE_COL = "&H00C8F0FF"         # soft cream for the narrator's asides
+
+
+def _norm_word(w: str) -> str:
+    return re.sub(r"[^\w%$']", "", w.lower())
+
+
+def _number(word: str) -> tuple[str, float, int, str] | None:
+    """'$1,500' → ('$', 1500.0, decimals, '%'|'') ; years (1000-2100 without comma) and < 10 are not counted up."""
+    m = NUM_RE.match(word.strip(".,!?;:\"'()"))
+    if not m:
+        return None
+    pre, num, pct = m.groups()
+    try:
+        v = float(num.replace(",", ""))
+    except ValueError:
+        return None
+    dec = len(num.split(".")[1]) if "." in num else 0
+    if v < 10 or ("," not in num and not pre and not pct and 1000 <= v <= 2100 and dec == 0):
+        return None
+    return pre, v, dec, pct
+
+
+def _fmt_num(v: float, dec: int, commas: bool) -> str:
+    if dec:
+        return f"{v:,.{dec}f}" if commas else f"{v:.{dec}f}"
+    return f"{int(round(v)):,}" if commas else str(int(round(v)))
+
+
+def fx_lines(segments: list[dict], fx: dict, theme: dict, emph_col: str, W: int, H: int, total: float
+             ) -> tuple[list[str], list[float], float | None, float | None]:
+    """Kinetic extras: number count-ups, reveal flash, 3-2-1 countdown, PROVEN stamp.
+    Returns (ASS dialogue lines, times numbers are spoken, reveal time, stamp time)."""
+    lines: list[str] = []
+    num_times: list[float] = []
+    kinetic = fx.get("kinetic", True)
+    asides = fx.get("asides") or []
+    last_count = -9.0
+    for si, seg in enumerate(segments):
+        words = [w for w in seg["words"] if w["word"].strip()]
+        k = len((asides[si] if si < len(asides) else "").split())
+        facts = words[:len(words) - k] if k else words
+        for wi, w in enumerate(facts):
+            n = _number(w["word"])
+            if re.search(r"\d", w["word"]) and (not num_times or w["start"] - num_times[-1] > 1.2):
+                num_times.append(w["start"])
+            if not (n and kinetic) or w["start"] - last_count < 2.5 or len([x for x in lines if "Count" in x]) >= 36:
+                continue
+            last_count = w["start"]
+            pre, v, dec, pct = n
+            nxt = _norm_word(facts[wi + 1]["word"]) if wi + 1 < len(facts) else ""
+            suffix = pct + (" " + nxt.upper() if nxt in SCALE_WORDS else "")
+            commas = "," in w["word"]
+            st, steps, dur = w["start"], 12, 0.55
+            for j in range(steps + 1):
+                val = v * (1 - (1 - j / steps) ** 3)
+                a = st + dur * j / steps
+                b = st + dur * (j + 1) / steps if j < steps else min(total, st + dur + 1.1)
+                pop = "\\t(0,120,\\fscx118\\fscy118)\\t(120,240,\\fscx100\\fscy100)" if j == steps else ""
+                lines.append(f"Dialogue: 3,{_ts(a)},{_ts(b)},Count,,0,0,0,,{{\\pos({W // 2},{int(H * 0.585)})"
+                             f"\\c{emph_col}{pop}}}{pre}{_fmt_num(val, dec, commas)}{_esc(suffix)}")
+    reveal_at = None
+    ri = fx.get("reveal")
+    if ri is not None and 0 < ri < len(segments):
+        reveal_at = segments[ri]["start"]
+        if kinetic:
+            # white flash on the reveal
+            lines.append(f"Dialogue: 4,{_ts(reveal_at)},{_ts(reveal_at + 0.32)},Fx,,0,0,0,,"
+                         f"{{\\an7\\pos(0,0)\\alpha&H78&\\fad(20,240)\\p1}}m 0 0 l {W} 0 l {W} {H} l 0 {H}{{\\p0}}")
+        if fx.get("countdown"):
+            a0 = segments[ri - 1]["end"]
+            span = max(0.6, reveal_at - a0)
+            lines.append(f"Dialogue: 3,{_ts(a0)},{_ts(reveal_at)},Label,,0,0,0,,{{\\pos({W // 2},{int(H * 0.25)})"
+                         f"\\fad(80,0)}}LOCK IN YOUR GUESS")
+            for j, d in enumerate("321"):
+                a = a0 + span * j / 3
+                lines.append(f"Dialogue: 3,{_ts(a)},{_ts(a + span / 3)},Countdown,,0,0,0,,{{\\pos({W // 2},{int(H * 0.42)})"
+                             f"\\c{theme['hi']}\\fscx160\\fscy160\\t(0,140,\\fscx100\\fscy100)}}{d}")
+    stamp_at = None
+    st_cfg = fx.get("stamp")
+    if st_cfg and total > 8:
+        stamp_at = max(total - float(st_cfg.get("seconds", 2.0)), total * 0.6)
+        cx, cy = W // 2, int(H * 0.40)
+        bw, bh, th = 780, 220, 14
+        org = f"\\org({cx},{cy})"
+        slam = "\\fscx190\\fscy190\\alpha&H60&\\t(0,130,\\fscx100\\fscy100\\alpha&H00&)"
+        frame = (f"m 0 0 l {bw} 0 l {bw} {bh} l 0 {bh} l 0 0 "
+                 f"m {th} {th} l {th} {bh - th} l {bw - th} {bh - th} l {bw - th} {th} l {th} {th} ")
+        check = "m 48 118 l 84 84 l 118 118 l 190 44 l 226 80 l 118 188 l 48 118"
+        lines.append(f"Dialogue: 5,{_ts(stamp_at)},{_ts(total)},Stamp,,0,0,0,,{{\\an5\\pos({cx},{cy}){org}\\frz8"
+                     f"{slam}\\p1}}{frame}{check}{{\\p0}}")
+        lines.append(f"Dialogue: 5,{_ts(stamp_at)},{_ts(total)},StampTxt,,0,0,0,,{{\\an5\\pos({cx + 95},{cy + 2}){org}"
+                     f"\\frz8{slam}}}PROVEN")
+        src = _esc(str(st_cfg.get("source", "")))[:60]
+        if src:
+            lines.append(f"Dialogue: 5,{_ts(stamp_at + 0.15)},{_ts(total)},Source,,0,0,0,,{{\\an5\\pos({cx},{cy + 190})"
+                         f"\\fad(120,0)}}{src}")
+    return lines, num_times, reveal_at, stamp_at
+
+
 def build_ass(segments: list[dict], hook_text: str, channel: str, W: int, H: int, theme: dict,
-              font_name: str, out: Path, total: float) -> Path:
+              font_name: str, out: Path, total: float, fx: dict | None = None,
+              emph_col: str = "&H003C8CFF") -> Path:
+    fx = fx or {}
     fs = 112
     head = f"""[Script Info]
 ScriptType: v4.00+
@@ -96,6 +203,13 @@ Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour,
 Style: Cap,{font_name},{fs},&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,1,0,1,7,3,5,60,60,0,1
 Style: Hook,{font_name},96,{theme['boxtxt']},&H00FFFFFF,{theme['box']},{theme['box']},-1,0,0,0,100,100,1,0,3,18,0,8,90,90,210,1
 Style: Brand,{font_name},46,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,0,0,0,0,100,100,2,0,1,3,0,8,40,40,90,1
+Style: Count,{font_name},200,&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,2,0,1,11,4,5,40,40,0,1
+Style: Countdown,{font_name},420,&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,14,6,5,40,40,0,1
+Style: Label,{font_name},78,&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,3,0,1,7,3,5,40,40,0,1
+Style: Fx,{font_name},20,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
+Style: Stamp,{font_name},20,{STAMP_GREEN},{STAMP_GREEN},&H00101010,&H00000000,0,0,0,0,100,100,0,0,1,3,0,5,0,0,0,1
+Style: StampTxt,{font_name},165,{STAMP_GREEN},{STAMP_GREEN},&H00101010,&H00000000,-1,0,0,0,100,100,6,0,1,3,0,5,0,0,0,1
+Style: Source,{font_name},46,&H00FFFFFF,&H00FFFFFF,&H00000000,&HB4000000,0,0,0,0,100,100,1,0,3,14,0,5,60,60,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -108,13 +222,26 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                      f"{{\\fad(0,250)\\t(0,180,\\fscx112\\fscy112)\\t(180,320,\\fscx100\\fscy100)}}{_esc(hook_text.upper())}")
     lines.append(f"Dialogue: 1,{_ts(0)},{_ts(total)},Brand,,0,0,0,,{{\\alpha&H40&}}{_esc(channel)}")
 
+    extra, _, _, _ = fx_lines(segments, fx, theme, emph_col, W, H, total) if fx else ([], [], None, None)
+    lines += extra
+    asides = fx.get("asides") or []
+    emphasis = fx.get("emphasis") or []
+    kinetic = fx.get("kinetic", False)
+
     # karaoke word chunks
-    for seg in segments:
+    for si, seg in enumerate(segments):
         words = [w for w in seg["words"] if w["word"].strip()]
+        k_aside = len((asides[si] if si < len(asides) else "").split())
+        aside_from = len(words) - k_aside if k_aside else len(words) + 1
+        emph = {_norm_word(t) for e in (emphasis[si] if si < len(emphasis) else []) for t in str(e).split()}
+        for wi_, w in enumerate(words):
+            w["_aside"] = wi_ >= aside_from
+            w["_emph"] = kinetic and not w["_aside"] and (_norm_word(w["word"]) in emph or bool(re.search(r"\d", w["word"])))
         chunks, cur = [], []
-        for w in words:
+        for wi_, w in enumerate(words):
             cur.append(w)
-            if len(cur) >= 3 or w["word"][-1:] in ".,!?;:" or len(" ".join(x["word"] for x in cur)) > 15:
+            nxt_aside = words[wi_ + 1].get("_aside") if wi_ + 1 < len(words) else None
+            if (nxt_aside is not None and nxt_aside != w.get("_aside")) or len(cur) >= 3 or w["word"][-1:] in ".,!?;:" or len(" ".join(x["word"] for x in cur)) > 15:
                 chunks.append(cur)
                 cur = []
         if cur:
@@ -126,9 +253,17 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 en = ch[wi + 1]["start"] if wi + 1 < len(ch) else c_end
                 parts = []
                 for wj, w2 in enumerate(ch):
-                    txt = _esc(w2["word"].upper())
+                    aside = kinetic and w2.get("_aside")
+                    txt = _esc(w2["word"].lower() if aside else w2["word"].upper())
+                    base = ASIDE_COL if aside else (emph_col if w2.get("_emph") else "&H00FFFFFF&")
+                    ital = "\\i1" if aside else ""
+                    reset = f"{{\\c{base}\\fscx100\\fscy100\\i0}}" if (aside or w2.get("_emph")) else ""
                     if wj == wi:
-                        parts.append(f"{{\\c{theme['hi']}\\fscx108\\fscy108}}{txt}{{\\c&H00FFFFFF&\\fscx100\\fscy100}}")
+                        big = 124 if w2.get("_emph") else 108
+                        parts.append(f"{{\\c{emph_col if w2.get('_emph') else theme['hi']}{ital}\\fscx{big}\\fscy{big}}}"
+                                     f"{txt}{{\\c&H00FFFFFF&\\fscx100\\fscy100\\i0}}")
+                    elif reset:
+                        parts.append(f"{{\\c{base}{ital}}}{txt}{{\\c&H00FFFFFF&\\i0}}")
                     else:
                         parts.append(txt)
                 pop = "\\t(0,90,\\fscx104\\fscy104)\\t(90,160,\\fscx100\\fscy100)" if wi == 0 else ""
@@ -179,7 +314,7 @@ def shot_plan(visuals: list[dict], n_segs: int) -> list[dict]:
 
 # ── main render ───────────────────────────────────────────────────────────────
 def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: str, channel: str,
-           cfg: dict, work: Path, out_mp4: Path, seed: int) -> dict:
+           cfg: dict, work: Path, out_mp4: Path, seed: int, fx: dict | None = None) -> dict:
     rng = random.Random(seed)
     W, H, fps = cfg["video"]["width"], cfg["video"]["height"], cfg["video"]["fps"]
     theme_idx = rng.randrange(len(THEMES))
@@ -201,7 +336,18 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
     for i, v in enumerate(shots):
         frames.append(compose_frame(Path(v["path"]), work / f"frame{i:02d}.jpg", W, H))
 
-    ass = build_ass(segs, hook_text, channel, W, H, theme, "Anton", work / "captions.ass", total)
+    emph_col = THEMES[(theme_idx + 2) % len(THEMES)]["hi"]
+    ass = build_ass(segs, hook_text, channel, W, H, theme, "Anton", work / "captions.ass", total, fx=fx,
+                    emph_col=emph_col)
+    sfx_wav = None
+    if fx and fx.get("sfx"):
+        _, num_times, reveal_at, stamp_at = fx_lines(segs, fx, theme, emph_col, W, H, total)
+        starts, t = [], 0.0
+        for d in durs:
+            starts.append({"start": t})
+            t += d
+        events = sfx.plan_events(starts, num_times, reveal_at, stamp_at, total)
+        sfx_wav = sfx.build_track(events, total, work / "sfx.wav", seed)
 
     cmd = [ffmpeg_bin(), "-y", "-loglevel", "error", "-stats"]
     for f in frames:
@@ -212,6 +358,9 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
     if music_wav:
         cmd += ["-i", str(music_wav)]
     m_idx = n + 1
+    s_idx = n + (2 if music_wav else 1)
+    if sfx_wav:
+        cmd += ["-i", str(sfx_wav)]
 
     fg = []
     motions: list[str] = []
@@ -261,10 +410,17 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
     if music_wav:
         fg.append(f"[{m_idx}:a]lowpass=f=3200,volume={vol + 12}dB,atrim=duration={total:.3f}[mus]")
         fg.append("[mus][sc]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=400[duck]")
-        fg.append("[nar][duck]amix=inputs=2:duration=first:normalize=0[mix]")
+        fg.append("[nar][duck]amix=inputs=2:duration=first:normalize=0[mix0]")
     else:
         fg.append("[sc]anullsink")
-        fg.append("[nar]anull[mix]")
+        fg.append("[nar]anull[mix0]")
+    if sfx_wav:
+        sv = cfg["video"].get("sfx_volume_db", -12)
+        fg.append(f"[{s_idx}:a]aformat=sample_rates=44100:channel_layouts=stereo,volume={sv + 12}dB,"
+                  f"atrim=duration={total:.3f}[sfx]")
+        fg.append("[mix0][sfx]amix=inputs=2:duration=first:normalize=0[mix]")
+    else:
+        fg.append("[mix0]anull[mix]")
     lufs = cfg["video"].get("loudness_lufs", -14)
     fg.append(f"[mix]loudnorm=I={lufs}:TP=-1.5:LRA=11,atrim=duration={total:.3f}[aout]")
 

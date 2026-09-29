@@ -63,10 +63,10 @@ def test_bandit_learns():
     for dim, opts in s.options().items():
         s.state["arms"][dim] = {o: {"a": 1.0, "b": 1.0, "n": 0} for o in opts}
     for _ in range(40):
-        s.update({"format": "myth_vs_fact"}, 0.9)
-        s.update({"format": "timeline"}, 0.1)
+        s.update({"format": "sounds_fake"}, 0.9)
+        s.update({"format": "scale_shock"}, 0.1)
     picks = [s.sample("format") for _ in range(200)]
-    assert picks.count("myth_vs_fact") > picks.count("timeline") * 3
+    assert picks.count("sounds_fake") > picks.count("scale_shock") * 3
 
 
 if __name__ == "__main__":

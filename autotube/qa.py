@@ -26,6 +26,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 from .common import ffmpeg_bin, font_path
+from .scriptwriter import spoken_text
 from .vision import VisionUnavailable
 
 log = logging.getLogger("autotube.qa")
@@ -48,7 +49,7 @@ def narration_check(tts: dict, script: dict, min_ratio: float = 0.9) -> list[str
     for i, (ts, ss) in enumerate(zip(tts["segments"], segs)):
         spoken = _norm_tokens(" ".join(w["word"] for w in ts["words"]))
         sent = _norm_tokens(ts["text"])
-        written = _norm_tokens(ss["text"])
+        written = _norm_tokens(spoken_text(ss))
         r1 = difflib.SequenceMatcher(None, spoken, sent).ratio() if sent else 0
         r2 = difflib.SequenceMatcher(None, sent, written).ratio() if written else 0
         if r1 < min_ratio:
@@ -112,7 +113,8 @@ def frame_check(mp4: Path, timeline: list[dict], tts: dict, script: dict, title:
         seg = segs[t["seg"]]
         spoken = _spoken_during(seg, t["start"], t["end"]) or seg["text"]
         role = "hook" if t["seg"] == 0 else ("call to action" if t["seg"] == n_lines - 1 else "")
-        items.append({"k": k, "seg": t["seg"], "path": t["path"], "t": round(mid, 2), "line": seg["text"],
+        fact = script["segments"][t["seg"]]["text"] if t["seg"] < len(script["segments"]) else seg["text"]
+        items.append({"k": k, "seg": t["seg"], "path": t["path"], "t": round(mid, 2), "line": fact,
                       "spoken": spoken, "role": role, "img": _frame_at(mp4, mid)})
 
     results, meta = [], {"hook_text_ok": True, "title_ok": True, "notes": []}
@@ -131,7 +133,9 @@ VIDEO TITLE: {title}
 
 The attached sheet shows {len(batch)} frames from the finished vertical video, numbered 1-{len(batch)} (number in the
 yellow box at each frame's bottom-left). Ignore the burned-in captions, the small channel name at the top, the
-progress bar, the hook title box and the blurred background fill — judge the MAIN PHOTO.
+progress bar, the hook title box, big animated numbers, a "PROVEN" stamp / source card, countdown digits, a white
+flash and the blurred background fill — judge the MAIN PHOTO. The narrator sometimes adds a short joke after a line;
+judge the photo against the factual "full line".
 
 {rows}
 

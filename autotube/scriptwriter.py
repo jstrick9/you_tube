@@ -21,12 +21,46 @@ FORMAT_GUIDE = {
     "timeline": "A rapid-fire timeline of 4-5 key moments, each with its year (years must come from the source).",
     "by_the_numbers": "Structure the video around 3-4 striking numbers from the source, explaining what each means in human terms.",
     "what_if": "Pose a vivid 'what would happen if' or 'imagine' framing grounded in real facts from the source, then reveal the real facts.",
+    # ── entertainment-first formats ──
+    "sounds_fake": ("SOUNDS FAKE, BUT IT'S TRUE: open with the single most unbelievable true claim; the narrator can "
+                    "barely believe it either; then prove it with 2-3 specific details from the source (who, when, where, "
+                    "how we know), each crazier than the last. The reveal line is the detail that makes it even wilder."),
+    "ranked_escalation": ("RANKED FROM WEIRD TO INSANE: 3 true facts in escalating order. Start each body line with its "
+                          "rank word, e.g. 'Weird:', 'Weirder:', 'Completely unhinged:'. The last one (the reveal) must "
+                          "be the most jaw-dropping."),
+    "guess_reveal": ("GUESS BEFORE THE REVEAL: the hook challenges the viewer to guess something specific the source "
+                     "answers ('Guess what this was actually used for.' / 'Guess how old this is.'); 1-2 clue lines make "
+                     "them commit to a (probably wrong) guess; the ANSWER line is the reveal — the video shows an "
+                     "on-screen 3-2-1 countdown right before it, so never say a countdown; then one bonus line."),
+    "plot_twist": ("PLOT TWIST: tell it like an ordinary story the viewer thinks they understand, then flip it with a "
+                   "true twist from the source they didn't see coming (the twist line is the reveal)."),
+    "myth_buster": ("MYTHS YOU WERE TAUGHT: open with something most people were taught or assume, then show what is "
+                    "actually true. ONLY use a myth, misconception, legend or popular belief that the SOURCE TEXT itself "
+                    "describes as one — never invent a myth. The correction line is the reveal."),
+    "would_you_survive": ("COULD YOU HANDLE IT: put the viewer inside the real situation in the second person ('You are "
+                          "a sailor in 1850, and...'), escalate the real challenges from the source, then reveal what "
+                          "actually happened or how people coped. Family-friendly: no gore, injuries or death details."),
+    "dumbest_decision": ("THE MOST ABSURD DECISION: a real, documented decision, plan, rule or invention from the source "
+                         "that sounds baffling, told with comic disbelief; give the reasoning at the time (from the "
+                         "source) and the ridiculous result. Laugh at the situation, never at victims or real groups."),
+    "scale_shock": ("SCALE SHOCK: make one true number from the source feel enormous (or tiny) by comparing it with "
+                    "everyday things IN WORDS ('longer than a football field', 'heavier than a car') — never compute or "
+                    "state numbers that are not in the source."),
+    "creepy_true": ("CREEPY BUT TRUE (spooky season): an eerie, goosebump-level true story or fact — strange phenomena, "
+                    "unexplained sounds, abandoned places, unsettling creatures, odd history. Build unease line by line "
+                    "and end on the chilling detail. Spooky, never gory: no violence, injuries, bodies or death details, "
+                    "and never claim the supernatural is real."),
 }
+# formats whose structure centres on one big reveal (gets the riser, flash and a beat of silence)
+REVEAL_FORMATS = {"guess_reveal", "plot_twist", "myth_buster", "sounds_fake", "ranked_escalation", "creepy_true",
+                  "dumbest_decision", "would_you_survive"}
 HOOK_GUIDE = {
     "question": "Open with a specific question a stranger can't answer but instantly wants to (not 'Did you know...?').",
     "bold_claim": "Open with the single most surprising TRUE claim from the source, stated flatly, no preamble.",
     "number_first": "Open with the most striking number from the source and what it means, in the first 3 words.",
     "you_statement": "Open by putting the viewer inside the fact ('Your...', 'You could...'), specific and surprising.",
+    "disbelief": ("State the wildest true detail flatly, then undercut it with a 1-3 word deadpan reaction "
+                  "(e.g. '<wild true fact>. Seriously.') — the fact itself comes first, never a vague 'this sounds fake'."),
 }
 HOOK_RULES = (
     "HOOK RULES (the first line decides if 70%+ of viewers stay): 6-12 words; lead with the most surprising, specific "
@@ -35,15 +69,17 @@ HOOK_RULES = (
     "'Have you ever wondered', greetings, the channel name, the topic name alone.")
 
 SELECT_SYSTEM = (
-    "You are the content strategist for a faceless educational YouTube Shorts channel. "
-    "You choose topics that are trending right now AND can be turned into a genuinely informative, "
-    "factual, family-friendly 45-second video. You reject gossip, tragedies, politics, medical/financial "
+    "You are the content strategist for a faceless YouTube Shorts channel whose promise is 'Sounds fake. It's proven.' "
+    "— wildly entertaining true stories (funny, absurd, creepy, jaw-dropping), every one backed by a source. "
+    "You choose topics that are trending right now AND can be turned into a genuinely entertaining, "
+    "factual, family-friendly 30-second video. You reject gossip, tragedies, politics, medical/financial "
     "advice, living-person biographies, and anything that could mislead. Reply with JSON only."
 )
 
 WRITER_SYSTEM = (
-    "You are an expert short-form scriptwriter for an educational YouTube Shorts channel. "
-    "You write punchy, high-retention scripts that are 100% factually grounded in the SOURCE TEXT provided. "
+    "You are an expert short-form comedy-documentary scriptwriter for a YouTube Shorts channel whose promise is "
+    "'Sounds fake. It's proven.' You write punchy, funny, high-retention scripts that entertain first and teach along the way — "
+    "scripts that are 100% factually grounded in the SOURCE TEXT provided. "
     "Hard rules: (1) Every factual claim, number, date and name must appear in or be directly implied by the SOURCE TEXT. "
     "(2) Never invent quotes, statistics or events. (3) No clickbait that the video doesn't deliver on. "
     "(4) Family-friendly, no profanity, no medical/financial/legal advice. (5) Write for the ear: short sentences, "
@@ -59,6 +95,43 @@ REVIEW_SYSTEM = (
 
 def _clip(s: str, n: int) -> str:
     return s if len(s) <= n else s[:n].rsplit(" ", 1)[0]
+
+
+ASIDE_BAD = re.compile(r"\d|\b(hundred|thousand|million|billion|trillion|percent|dozen)s?\b", re.I)
+
+
+def spoken_text(seg: dict) -> str:
+    """What the narrator actually says for a segment: the factual line plus its optional humorous aside."""
+    aside = (seg.get("aside") or "").strip()
+    return f"{seg['text'].strip()} {aside}".strip() if aside else seg["text"].strip()
+
+
+def tidy(script: dict, fmt: str = "", max_asides: int = 2) -> dict:
+    """Normalise the entertainment fields the writer returns, dropping anything that could smuggle in a claim:
+    asides must be short, number-free, not on the hook and at most `max_asides`; emphasis words must really be in
+    the line; exactly one reveal (defaults to the last body line for reveal-centred formats)."""
+    segs = script.get("segments") or []
+    kept = 0
+    for i, seg in enumerate(segs):
+        a = re.sub(r"\s+", " ", str(seg.get("aside") or "")).strip().strip('"')
+        if a and (i == 0 or kept >= max_asides or len(a.split()) > 10 or ASIDE_BAD.search(a)):
+            a = ""
+        if a and a[-1] not in ".!?":
+            a += "."
+        seg["aside"] = a
+        kept += bool(a)
+        low = seg["text"].lower()
+        emph = seg.get("emphasis") if isinstance(seg.get("emphasis"), list) else []
+        seg["emphasis"] = [e.strip() for e in emph if isinstance(e, str) and e.strip()
+                           and e.strip().lower() in low][:2]
+    reveals = [i for i, seg in enumerate(segs) if seg.get("reveal") is True and i > 0]
+    for seg in segs:
+        seg["reveal"] = False
+    if reveals:
+        segs[reveals[0]]["reveal"] = True
+    elif fmt in REVEAL_FORMATS and len(segs) >= 3:
+        segs[-2]["reveal"] = True
+    return script
 
 
 class ScriptWriter:
@@ -98,7 +171,14 @@ class ScriptWriter:
         weights = {c: round(self.strategy.category_weight(c), 2) for c in cats}
         today = now_utc()
         want = min(len(pool), 3 * n + 4)
-        user = f"""TODAY: {today:%A %B %d, %Y}. (Consider seasonal interest in the coming week, e.g. holidays, events.)
+        in_season = getattr(self.strategy, "formats_in_season", None)
+        formats = in_season() if in_season else list(ccfg.get("formats", []))
+        fmt_list = "\n".join(f"  {f}: {_clip(FORMAT_GUIDE[f], 110)}" for f in formats if f in FORMAT_GUIDE)
+        season = ""
+        if "creepy_true" in (getattr(self.strategy, "seasonal_now", lambda: [])()):
+            season = ("\nSPOOKY SEASON: it is October — eerie-but-true subjects (strange phenomena, abandoned places, "
+                      "unsettling creatures, odd history, unexplained sounds) are extra viral now; favour them, never gore.")
+        user = f"""TODAY: {today:%A %B %d, %Y}. (Consider seasonal interest in the coming week, e.g. holidays, events.){season}
 CHANNEL NICHE: {self.cfg['channel']['niche']}
 CATEGORIES (learned audience preference 0-1 from our own analytics, favor higher): {json.dumps(weights)}
 RECENTLY COVERED (avoid): {', '.join(list(recent)[:40]) or 'none'}
@@ -109,21 +189,26 @@ LIVE TREND CANDIDATES (every one is trending now; evidence shows how strongly):
   google_trends = search spike; reddit_* = top post today; on_this_day = anniversary today/tomorrow
 {listing}
 
-Pick the {want} candidates most likely to make a VIRAL educational YouTube Short for our channel. Score each one's
-viral_score 0-10:
+Pick the {want} candidates most likely to make a VIRAL, genuinely ENTERTAINING (not just "interesting") YouTube Short
+for our channel. Score each one's viral_score 0-10:
   + a scroll-stopping, "wait, WHAT?" true fact or story a total stranger would stop for (surprise, disbelief, awe)
   + broad appeal — needs no prior knowledge; not niche insider news
   + proven demand right now (see evidence) — a viral Short on the same subject is the strongest proof
-  + emotional pull (awe, curiosity, nostalgia, satisfying explanation) without being tragic or divisive
+  + emotional pull — makes people laugh, gasp, cringe, feel creeped out or say "no way" out loud (absurd, funny,
+    eerie, jaw-dropping), or awe/nostalgia — without being tragic or divisive; would people SEND it to a friend?
   + it can be shown with real photos of the actual thing (animals, places, objects, artworks, historic photos)
   - cap at 4: dry news, sports scores, award results, celebrity/relationship gossip, politics, anything a Wikipedia
     article can't support with surprising facts; cap at 2: tragedies, crime victims, living private people
+FORMATS we can make (pick the 2-4 this topic can HONESTLY support from its Wikipedia article — e.g. myth_buster only
+if the article describes a misconception, dumbest_decision only for a documented absurd decision):
+{fmt_list}
 For a viral Short topic, give our OWN angle (never copy the other video) and the English Wikipedia article that
 grounds it (for a trending person or event, prefer the underlying record, place, object or phenomenon unless the
 person is historical; for a TIL/viral post, the underlying subject).
 
 Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<one of categories>",
-"angle": "<one sentence: the single most surprising true hook>", "wiki_query": "<wikipedia article title>",
+"angle": "<one sentence: the single most surprising/funny true hook>", "wiki_query": "<wikipedia article title>",
+"formats": ["<2-4 fitting formats from FORMATS>"],
 "why_trending": "<short, cite the evidence>", "risk": "none|low|high"}}]}} — best first."""
 
         def validate(o):
@@ -147,7 +232,9 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                     dropped.append(f"{c['topic'][:40]} ({vs:.0f})")
                     continue
                 cat = p.get("category") if p.get("category") in cats else random.choice(cats)
+                fits = [f for f in (p.get("formats") or []) if isinstance(f, str) and f in formats]
                 c.update({"category": cat, "angle": p.get("angle", ""), "wiki_query": p.get("wiki_query") or c["topic"],
+                          "formats": fits,
                           "why_trending": p.get("why_trending", ""), "viral_score": vs})
                 # blend: LLM viral potential (50%), measured trend strength (25%), and what our own analytics learned
                 # about this category (12.5%) and this kind of trend source (12.5%)
@@ -180,14 +267,28 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                          "'...and that is why' before a hook that is the reason). No 'follow for more', no goodbye.")
         else:
             loop_rule = "answer the hook's question with the final surprising fact + a natural 'Follow for more.'"
+        persona = self.cfg.get("persona") or {}
+        max_asides = int(persona.get("max_asides", 2)) if persona.get("asides", True) else 0
+        fmt = plan["format"] if plan["format"] in FORMAT_GUIDE else "sounds_fake"
+        reveal_rule = ('  "reveal": true on exactly ONE segment — the line with the biggest surprise/answer/twist (the video adds '
+                       'a beat of silence, a riser and a flash right before it). Never the hook.\n')
+        aside_rule = (
+            f'  "aside" (optional, at most {max_asides} in the whole script, never on the hook): a 2-8 word deadpan\n'
+            '     reaction the narrator says right AFTER that line — e.g. "Which is, frankly, rude.", "Nature, please.",\n'
+            '     "Bold plan. Terrible plan." It is a JOKE/OPINION ONLY: no facts, numbers, names, dates or claims; never\n'
+            '     mean about real people, groups or victims; family-friendly. Only include it if it is actually funny.\n'
+        ) if max_asides else ""
+        persona_line = (f"NARRATOR PERSONA: {persona['character']}\nCHANNEL PROMISE: \"{persona.get('catchphrase', '')}\" "
+                        "— every wild claim is proven by the source (a PROVEN stamp + source card closes each video).\n"
+                        if persona.get("character") else "")
         user = f"""TOPIC: {topic['topic']}
 WHY IT'S TRENDING: {topic.get('why_trending') or ', '.join(topic.get('sources', []))}
 ANGLE: {topic.get('angle') or 'most surprising educational angle'}
-FORMAT: {plan['format']} — {FORMAT_GUIDE[plan['format']]}
+FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
 HOOK STYLE: {plan['hook_style']} — {HOOK_GUIDE[plan['hook_style']]}
 LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
 CHANNEL: {self.cfg['channel']['name']}
-
+{persona_line}
 SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of facts:
 \"\"\"{source['text'][:self.src_chars]}\"\"\"
 
@@ -198,8 +299,14 @@ Write the script as 5-6 segments:
     every line must add something new; no filler, no repetition, escalate toward the most surprising fact);
   - last segment = PAYOFF, 8-16 words: {loop_rule}
 The TOPIC line is just a trend headline — do NOT repeat its claims or numbers unless the SOURCE TEXT states them.
-TOTAL narration MUST be {words_lo}-{words_hi} words. Count them. Too short = rejected.
+ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with
+comic timing and personality (reactions, contrast, "and it gets worse"). The facts stay 100% exact; the humour comes
+from HOW you tell them and from the asides, never from changing what happened.
+TOTAL narration (text + asides) MUST be {words_lo}-{words_hi} words. Count them. Too short = rejected.
 For each segment give:
+  "text": the spoken line (facts),
+{aside_rule}  "emphasis": 1-2 key words copied exactly from "text" that flash on screen in colour (the surprising word/number),
+{reveal_rule}
   "visual": what the viewer SEES while that line is spoken — it must literally depict what the line is about:
      "shows": one concrete, photographable scene of the SPECIFIC thing the line is about — the named person, place,
               object, species, artwork or event itself (e.g. "close-up of a cat's face with long white whiskers",
@@ -214,7 +321,8 @@ For each segment give:
 
 Return JSON:
 {{"title": "<= 60 chars: names the subject + a curiosity gap the video truly answers; no emojis, no clickbait lies",
- "segments": [{{"text": "...", "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "..."}}]}}"""
+ "segments": [{{"text": "...", "aside": "", "emphasis": ["..."], "reveal": false,
+               "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "..."}}]}}"""
 
         def validate(o):
             segs = o.get("segments")
@@ -225,13 +333,14 @@ Return JSON:
             bad = [i + 1 for i, v in enumerate(vis) if not (isinstance(v, dict) and str(v.get("shows", "")).strip()
                                                              and isinstance(v.get("queries"), list) and v["queries"])]
             assert len(bad) <= 1, f"segments {bad} are missing \"visual\": {{\"shows\": ..., \"queries\": [...]}}"
-            words = sum(len(s["text"].split()) for s in segs)
+            words = sum(len(spoken_text(s).split()) for s in segs)
             assert words_lo * 0.75 <= words <= words_hi * 1.3, (
                 f"narration is {words} words but must be {words_lo}-{words_hi} words — "
                 + ("add more concrete facts from the source to the body segments" if words < words_lo
                    else "shorten the body segments"))
 
         script = self.llm.json(WRITER_SYSTEM, user, validate=validate)
+        tidy(script, fmt, max_asides)
         script.update(self.metadata(script, source))
         return script
 
@@ -257,7 +366,8 @@ Write YouTube metadata for this Short. Return JSON:
 
     # ── 3. programmatic + LLM review ─────────────────────────────────────────
     def check(self, script: dict, source: dict) -> tuple[bool, dict]:
-        narration = " ".join(s["text"] for s in script["segments"])
+        # numbers + blocked words are checked on EVERYTHING spoken (asides included); evidence only on facts
+        narration = " ".join(spoken_text(s) for s in script["segments"])
         issues = []
         bad_nums = unsupported_numbers(narration + " " + script.get("title", ""), source["text"])
         if bad_nums:
@@ -284,19 +394,30 @@ Write YouTube metadata for this Short. Return JSON:
         if issues:
             return False, review
 
+        rows = []
+        for s in script["segments"]:
+            rows.append(f"- {s['text']}")
+            if s.get("aside"):
+                rows.append(f"    [ASIDE - joke/opinion, not a factual claim] {s['aside']}")
+        narration_list = "\n".join(rows)
         user = f"""SOURCE TEXT:\n\"\"\"{source['text'][:self.src_chars]}\"\"\"\n
 SCRIPT TITLE: {script['title']}
 SCRIPT DESCRIPTION: {script.get('description', '')}
-SCRIPT NARRATION:
-{chr(10).join(f'- {s["text"]}' for s in script['segments'])}
+SCRIPT NARRATION (lines marked ASIDE are the narrator's jokes, spoken right after the line above them):
+{narration_list}
 
 Evaluate. Return JSON: {{"factual_errors": ["..."], "misleading_title": true|false, "advertiser_friendly": true|false,
-"policy_concerns": ["..."], "value_add": "<what the viewer learns>", "hook_strength": 0-10, "score": 0-10,
-"fixes": ["..."]}}
+"policy_concerns": ["..."], "value_add": "<what the viewer learns>", "hook_strength": 0-10, "entertainment": 0-10,
+"score": 0-10, "fixes": ["..."]}}
 Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; <7 = do not publish.
 Read EVERY sentence literally, word by word: if its literal meaning is false or garbled (e.g. the wrong subject doing
 the action — "rivers carved warnings" when people carved them; a date or place attached to the wrong thing), list
 it in factual_errors even if the gist is right.
+ASIDES are humour, not claims: never list an aside in factual_errors for being a joke, exaggerated opinion or
+sarcasm. Put an aside in policy_concerns ONLY if it states a new specific fact as true, mocks real people, groups,
+victims or a tragedy, or is not family-friendly. A joke must never change what the facts say.
+entertainment: 9-10 = funny/gripping, you'd send it to a friend; 5-6 = accurate but flat. If < 8, add a punchier
+TRUE rewrite idea (comic timing, contrast, a better aside) to "fixes".
 hook_strength: 9-10 = the first line alone would stop a stranger scrolling (specific, surprising, opens a question the
 video answers); 7-8 = decent; <=6 = generic ('Did you know', 'Here are some facts', topic name, slow setup).
 If hook_strength < 9, put a stronger TRUE first line in "fixes"."""

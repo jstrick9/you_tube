@@ -115,8 +115,11 @@ def _piper_one(text: str, out_wav: Path) -> list[dict]:
 
 
 # ── public API ────────────────────────────────────────────────────────────────
-def synthesize(segments: list[str], voice: str, rate: str, work: Path) -> dict:
-    """Return {'audio': Path(wav), 'duration': float, 'segments': [{text,start,end,words:[...]}], 'engine': str}"""
+def synthesize(segments: list[str], voice: str, rate: str, work: Path, gaps: list[float] | None = None) -> dict:
+    """Return {'audio': Path(wav), 'duration': float, 'segments': [{text,start,end,words:[...]}], 'engine': str}
+
+    gaps[i] (optional) = seconds of silence BEFORE segment i (i >= 1); default GAP. A longer beat before the reveal
+    line is where the renderer puts the riser / on-screen countdown ("comedic timing")."""
     work.mkdir(parents=True, exist_ok=True)
     texts = [_clean_for_speech(s) for s in segments]
     engine = "edge-tts"
@@ -158,6 +161,9 @@ def synthesize(segments: list[str], voice: str, rate: str, work: Path) -> dict:
                                        for wd in words]})
             t0 += dur
             if i < len(seg_files) - 1:
-                w.writeframes(silence)
-                t0 += GAP
+                g = GAP
+                if gaps and i + 1 < len(gaps) and gaps[i + 1]:
+                    g = max(GAP, min(1.6, float(gaps[i + 1])))
+                w.writeframes(silence if g == GAP else b"\x00\x00" * int(SR * g))
+                t0 += g
     return {"audio": out, "duration": t0, "segments": seg_meta, "engine": engine}
