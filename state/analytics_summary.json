@@ -1,8 +1,8 @@
 {
-  "updated": "2026-09-29T07:29:34.066862+00:00",
+  "updated": "2026-09-29T15:05:34.962165+00:00",
   "videos_total": 17,
   "videos_7d": 17,
-  "views_7d": 11198,
+  "views_7d": 11321,
   "learned_this_run": 0,
   "strategy": {
     "category": [
@@ -50,6 +50,21 @@
         "arm": "sports",
         "mean": 0.5,
         "n": 0
+      },
+      {
+        "arm": "animals",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "food",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "mysteries",
+        "mean": 0.5,
+        "n": 0
       }
     ],
     "format": [
@@ -79,6 +94,46 @@
         "n": 0
       },
       {
+        "arm": "sounds_fake",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "ranked_escalation",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "guess_reveal",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "plot_twist",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "myth_buster",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "would_you_survive",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "dumbest_decision",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "scale_shock",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
         "arm": "timeline",
         "mean": 0.463,
         "n": 1
@@ -102,6 +157,11 @@
       },
       {
         "arm": "number_first",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
+        "arm": "disbelief",
         "mean": 0.5,
         "n": 0
       }
@@ -192,7 +252,7 @@
     {
       "title": "The Long Development of Ant-Man #shorts",
       "id": "tFm3Zuu2kGA",
-      "views": 1206,
+      "views": 1207,
       "avg_view_pct": 40.65
     },
     {
@@ -228,13 +288,13 @@
     {
       "title": "The Only Governor Of Two Different States #shorts",
       "id": "lUA-2zrFHGc",
-      "views": 892,
+      "views": 895,
       "avg_view_pct": null
     },
     {
       "title": "Why speaking another language changes you #shorts",
       "id": "laRBRQqcE0E",
-      "views": 623,
+      "views": 624,
       "avg_view_pct": 71.46
     }
   ],
