@@ -30,9 +30,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 119.1,
+      "hours_live": 119.3,
       "vph": 0.168,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00",
+      "checked_at": "2026-09-29T15:15:52.303933+00:00",
       "a_views": 18,
       "avg_view_pct": 4627.33,
       "avg_view_dur": 1527
@@ -70,9 +70,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 113.6,
-      "vph": 10.722,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00",
+      "hours_live": 113.8,
+      "vph": 10.706,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00",
       "a_views": 1192,
       "avg_view_pct": 81.43,
       "avg_view_dur": 35
@@ -110,9 +110,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 110.6,
-      "vph": 10.688,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00",
+      "hours_live": 110.8,
+      "vph": 10.671,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00",
       "a_views": 1195,
       "avg_view_pct": 41.89,
       "avg_view_dur": 15
@@ -150,9 +150,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 95.1,
-      "vph": 13.45,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00",
+      "hours_live": 95.3,
+      "vph": 13.426,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00",
       "a_views": 1109,
       "avg_view_pct": 56.06,
       "avg_view_dur": 17
@@ -190,9 +190,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 89.6,
-      "vph": 12.858,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00",
+      "hours_live": 89.8,
+      "vph": 12.834,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00",
       "a_views": 1132,
       "avg_view_pct": 59.62,
       "avg_view_dur": 18
@@ -230,9 +230,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 86.6,
-      "vph": 13.061,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00",
+      "hours_live": 86.8,
+      "vph": 13.035,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00",
       "a_views": 1129,
       "avg_view_pct": 30.070000000000004,
       "avg_view_dur": 13
@@ -270,9 +270,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 71.1,
-      "vph": 16.317,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00",
+      "hours_live": 71.3,
+      "vph": 16.277,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00",
       "a_views": 543,
       "avg_view_pct": 42.33,
       "avg_view_dur": 13
@@ -310,9 +310,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 65.6,
-      "vph": 18.401,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00",
+      "hours_live": 65.8,
+      "vph": 18.353,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00",
       "a_views": 858,
       "avg_view_pct": 40.65,
       "avg_view_dur": 15
@@ -350,9 +350,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 62.6,
-      "vph": 9.969,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00",
+      "hours_live": 62.8,
+      "vph": 9.942,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00",
       "a_views": 279,
       "avg_view_pct": 71.46,
       "avg_view_dur": 26
@@ -390,9 +390,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 47.1,
-      "vph": 19.005,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00"
+      "hours_live": 47.3,
+      "vph": 18.936,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00"
     }
   },
   {
@@ -426,9 +426,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 41.6,
-      "vph": 27.673,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00"
+      "hours_live": 41.8,
+      "vph": 27.559,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00"
     }
   },
   {
@@ -456,15 +456,15 @@
     "video_id": "SBETRh-FF_I",
     "status": "scheduled",
     "metrics": {
-      "views": 218,
+      "views": 224,
       "likes": 2,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 38.6,
-      "vph": 5.649,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00"
+      "hours_live": 38.8,
+      "vph": 5.778,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00"
     }
   },
   {
@@ -498,9 +498,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 23.1,
-      "vph": 3.637,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00"
+      "hours_live": 23.3,
+      "vph": 3.611,
+      "checked_at": "2026-09-29T15:15:52.303933+00:00"
     }
   },
   {
@@ -614,7 +614,7 @@
       "rejection": null,
       "hours_live": 1.0,
       "vph": 0.0,
-      "checked_at": "2026-09-29T15:05:34.962165+00:00"
+      "checked_at": "2026-09-29T15:15:52.303933+00:00"
     }
   }
 ]
