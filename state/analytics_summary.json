@@ -1,30 +1,30 @@
 {
-  "updated": "2026-09-29T15:15:52.303933+00:00",
+  "updated": "2026-09-29T16:15:17.027348+00:00",
   "videos_total": 17,
   "videos_7d": 17,
-  "views_7d": 11327,
-  "learned_this_run": 0,
+  "views_7d": 11328,
+  "learned_this_run": 1,
   "strategy": {
     "category": [
       {
         "arm": "culture",
-        "mean": 0.622,
+        "mean": 0.62,
         "n": 2
       },
       {
+        "arm": "history",
+        "mean": 0.6,
+        "n": 3
+      },
+      {
         "arm": "entertainment",
-        "mean": 0.544,
+        "mean": 0.543,
         "n": 1
       },
       {
         "arm": "science",
         "mean": 0.524,
         "n": 3
-      },
-      {
-        "arm": "history",
-        "mean": 0.504,
-        "n": 2
       },
       {
         "arm": "space",
@@ -69,24 +69,24 @@
     ],
     "format": [
       {
+        "arm": "facts3",
+        "mean": 0.62,
+        "n": 2
+      },
+      {
         "arm": "myth_vs_fact",
-        "mean": 0.622,
+        "mean": 0.62,
         "n": 2
       },
       {
         "arm": "backstory",
-        "mean": 0.544,
+        "mean": 0.543,
         "n": 3
       },
       {
         "arm": "by_the_numbers",
-        "mean": 0.544,
+        "mean": 0.543,
         "n": 2
-      },
-      {
-        "arm": "facts3",
-        "mean": 0.5,
-        "n": 1
       },
       {
         "arm": "what_if",
@@ -135,14 +135,19 @@
       },
       {
         "arm": "timeline",
-        "mean": 0.463,
+        "mean": 0.464,
         "n": 1
       }
     ],
     "hook_style": [
       {
+        "arm": "number_first",
+        "mean": 0.65,
+        "n": 1
+      },
+      {
         "arm": "question",
-        "mean": 0.573,
+        "mean": 0.572,
         "n": 3
       },
       {
@@ -156,11 +161,6 @@
         "n": 3
       },
       {
-        "arm": "number_first",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
         "arm": "disbelief",
         "mean": 0.5,
         "n": 0
@@ -169,23 +169,23 @@
     "voice": [
       {
         "arm": "en-US-AvaNeural",
-        "mean": 0.608,
+        "mean": 0.606,
         "n": 2
       },
       {
+        "arm": "en-US-ChristopherNeural",
+        "mean": 0.58,
+        "n": 5
+      },
+      {
         "arm": "en-US-EmmaNeural",
-        "mean": 0.544,
+        "mean": 0.543,
         "n": 2
       },
       {
         "arm": "en-US-AndrewNeural",
         "mean": 0.526,
         "n": 1
-      },
-      {
-        "arm": "en-US-ChristopherNeural",
-        "mean": 0.513,
-        "n": 4
       },
       {
         "arm": "en-US-BrianNeural",
