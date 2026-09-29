@@ -294,6 +294,9 @@ Evaluate. Return JSON: {{"factual_errors": ["..."], "misleading_title": true|fal
 "policy_concerns": ["..."], "value_add": "<what the viewer learns>", "hook_strength": 0-10, "score": 0-10,
 "fixes": ["..."]}}
 Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; <7 = do not publish.
+Read EVERY sentence literally, word by word: if its literal meaning is false or garbled (e.g. the wrong subject doing
+the action — "rivers carved warnings" when people carved them; a date or place attached to the wrong thing), list
+it in factual_errors even if the gist is right.
 hook_strength: 9-10 = the first line alone would stop a stranger scrolling (specific, surprising, opens a question the
 video answers); 7-8 = decent; <=6 = generic ('Did you know', 'Here are some facts', topic name, slow setup).
 If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
