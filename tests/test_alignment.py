@@ -273,3 +273,10 @@ def test_vision_approved_image_skips_document_heuristic(monkeypatch, tmp_path):
     monkeypatch.setattr(media, "_download", lambda a, d, doc_filter=True: seen.setdefault("f", doc_filter) and None)
     media._usable({"url": "u", "vscore": 9}, tmp_path)
     assert seen["f"] is False
+
+
+def test_sign_off_line_detection():
+    for t in ["Follow for more science facts", "Subscribe for more!", "Like and follow for part two"]:
+        assert media.CTA_RE.search(t)
+    for t in ["Follow the money trail to 1920", "The ship sank in 1912", "Bees like flowers"]:
+        assert not media.CTA_RE.search(t)

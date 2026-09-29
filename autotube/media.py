@@ -192,6 +192,9 @@ def _usable(a: dict, work: Path) -> Path | None:
     return p
 
 
+CTA_RE = re.compile(r"\b(follow (?:for|us|me|along)|subscribe|like (?:and|for)|see you (?:next|tomorrow))\b", re.I)
+
+
 class NoVisualMatch(RuntimeError):
     """A narration line has no image that verifiably shows it → the topic is skipped."""
 
@@ -305,6 +308,10 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
         queries = [q for q in (vis.get("queries") or []) if isinstance(q, str) and q.strip()]
         if not queries:
             queries = [f"{subject} {k}" for k in kws] or [subject]
+        if i == len(segments) - 1 and CTA_RE.search(seg["text"]):
+            # sign-off ("Follow for more …"): show the video's own subject, never an arbitrary picture
+            want = f"a clear, striking photo of {subject} itself"
+            queries = [subject] + queries[:1]
         want_n = 2 if seg_durs and i < len(seg_durs) and seg_durs[i] > multi_after else 1
 
         def place(good, want):

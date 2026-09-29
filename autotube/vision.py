@@ -257,6 +257,9 @@ For EACH image: say what it literally shows, then score 0-10 how well it works a
   8-7  = clearly shows the video's SPECIFIC subject (that exact person, place, object, species, work or event) in a way
          that fits this line
   6-5  = loosely related, or the subject is tiny/unclear
+  5    = MAXIMUM for symbolic/mood imagery (an eye, a coffee cup, a crowd, a sunset, books, a silhouette, hands)
+         standing in for an idea, feeling, statistic or process — unless the line's concrete thing is actually visible.
+         Test: would an ordinary viewer immediately see why THIS picture goes with THESE words? If not, ≤ 5.
   4    = MAXIMUM for a generic stand-in: random people, a generic office/computer/street/crowd standing in for a
          named subject
   2    = MAXIMUM for identifiable people who are not the subject (never pair strangers with facts about someone)

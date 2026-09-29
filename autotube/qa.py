@@ -139,7 +139,9 @@ For each frame: does the main photo clearly show what that narration is about â€
 species, person, object or event being described? For a hook or call-to-action line, a clear photo of the video's
 subject counts as a match.
 FAIL a frame (match=false) if it shows: a different thing that merely shares a name (building, bar, street, sign,
-logo, product, film), a generic stand-in for a named subject, unrelated identifiable people, mostly text/map/diagram,
+logo, product, film), a generic stand-in for a named subject, symbolic/mood imagery (an eye, a coffee cup, a crowd,
+a sunset, books) where an ordinary viewer would not immediately see why the picture goes with the words, unrelated
+identifiable people, mostly text/map/diagram/printed pages,
 something that contradicts or could mislead about what is being said, or if you are unsure.{extra}
 Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "score": 0-10, "issue": ""}}],
  "hook_text_ok": true, "title_ok": true, "notes": ""}}"""
