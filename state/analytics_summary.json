@@ -1,30 +1,30 @@
 {
-  "updated": "2026-09-29T16:29:03.247875+00:00",
-  "videos_total": 17,
-  "videos_7d": 17,
-  "views_7d": 11453,
-  "learned_this_run": 0,
+  "updated": "2026-09-30T07:24:08.233159+00:00",
+  "videos_total": 20,
+  "videos_7d": 20,
+  "views_7d": 12516,
+  "learned_this_run": 2,
   "strategy": {
     "category": [
       {
         "arm": "culture",
-        "mean": 0.62,
+        "mean": 0.616,
         "n": 2
       },
       {
         "arm": "history",
-        "mean": 0.6,
+        "mean": 0.597,
         "n": 3
-      },
-      {
-        "arm": "entertainment",
-        "mean": 0.543,
-        "n": 1
       },
       {
         "arm": "science",
-        "mean": 0.524,
-        "n": 3
+        "mean": 0.553,
+        "n": 4
+      },
+      {
+        "arm": "entertainment",
+        "mean": 0.541,
+        "n": 1
       },
       {
         "arm": "space",
@@ -40,11 +40,6 @@
         "arm": "technology",
         "mean": 0.5,
         "n": 0
-      },
-      {
-        "arm": "geography",
-        "mean": 0.5,
-        "n": 1
       },
       {
         "arm": "sports",
@@ -65,27 +60,32 @@
         "arm": "mysteries",
         "mean": 0.5,
         "n": 0
+      },
+      {
+        "arm": "geography",
+        "mean": 0.439,
+        "n": 2
       }
     ],
     "format": [
       {
         "arm": "facts3",
-        "mean": 0.62,
-        "n": 2
+        "mean": 0.632,
+        "n": 3
       },
       {
         "arm": "myth_vs_fact",
-        "mean": 0.62,
+        "mean": 0.616,
         "n": 2
       },
       {
         "arm": "backstory",
-        "mean": 0.543,
+        "mean": 0.542,
         "n": 3
       },
       {
         "arm": "by_the_numbers",
-        "mean": 0.543,
+        "mean": 0.542,
         "n": 2
       },
       {
@@ -135,29 +135,29 @@
       },
       {
         "arm": "timeline",
-        "mean": 0.464,
-        "n": 1
+        "mean": 0.417,
+        "n": 2
       }
     ],
     "hook_style": [
       {
-        "arm": "number_first",
-        "mean": 0.65,
-        "n": 1
+        "arm": "you_statement",
+        "mean": 0.582,
+        "n": 4
       },
       {
         "arm": "question",
-        "mean": 0.572,
+        "mean": 0.57,
         "n": 3
       },
       {
-        "arm": "you_statement",
-        "mean": 0.56,
-        "n": 3
+        "arm": "number_first",
+        "mean": 0.55,
+        "n": 2
       },
       {
         "arm": "bold_claim",
-        "mean": 0.52,
+        "mean": 0.519,
         "n": 3
       },
       {
@@ -168,29 +168,29 @@
     ],
     "voice": [
       {
-        "arm": "en-US-AvaNeural",
-        "mean": 0.606,
-        "n": 2
-      },
-      {
         "arm": "en-US-ChristopherNeural",
-        "mean": 0.58,
+        "mean": 0.579,
         "n": 5
       },
       {
-        "arm": "en-US-EmmaNeural",
-        "mean": 0.543,
-        "n": 2
-      },
-      {
-        "arm": "en-US-AndrewNeural",
-        "mean": 0.526,
+        "arm": "en-US-BrianNeural",
+        "mean": 0.563,
         "n": 1
       },
       {
-        "arm": "en-US-BrianNeural",
-        "mean": 0.5,
-        "n": 0
+        "arm": "en-US-EmmaNeural",
+        "mean": 0.542,
+        "n": 2
+      },
+      {
+        "arm": "en-US-AvaNeural",
+        "mean": 0.531,
+        "n": 3
+      },
+      {
+        "arm": "en-US-AndrewNeural",
+        "mean": 0.525,
+        "n": 1
       }
     ],
     "source": [
@@ -241,61 +241,61 @@
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
       "views": 1279,
-      "avg_view_pct": 56.06
+      "avg_view_pct": 51.97999999999999
     },
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1218,
-      "avg_view_pct": 81.43
+      "views": 1219,
+      "avg_view_pct": 80.64
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
       "id": "tFm3Zuu2kGA",
       "views": 1207,
-      "avg_view_pct": 40.65
+      "avg_view_pct": 60.83
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
-      "views": 1182,
-      "avg_view_pct": 41.89
+      "views": 1183,
+      "avg_view_pct": 41.72
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
       "id": "OyHMkwqEOKo",
       "views": 1160,
-      "avg_view_pct": 42.33
+      "avg_view_pct": 41.47
+    },
+    {
+      "title": "Which Substance Has the Highest Melting Point? #shorts",
+      "id": "4WkKoRw9r00",
+      "views": 1154,
+      "avg_view_pct": 46.87
     },
     {
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
       "views": 1152,
-      "avg_view_pct": 59.62
-    },
-    {
-      "title": "Which Substance Has the Highest Melting Point? #shorts",
-      "id": "4WkKoRw9r00",
-      "views": 1151,
-      "avg_view_pct": null
+      "avg_view_pct": 59.209999999999994
     },
     {
       "title": "How Your Liver Rebuilds Itself #shorts",
       "id": "oTgoKlCkGE0",
       "views": 1131,
-      "avg_view_pct": 30.070000000000004
+      "avg_view_pct": 30.11
+    },
+    {
+      "title": "How Does Canadian Rain Reach the Gulf of Mexico? #shorts",
+      "id": "6dO8y_ojGhI",
+      "views": 974,
+      "avg_view_pct": null
     },
     {
       "title": "The Only Governor Of Two Different States #shorts",
       "id": "lUA-2zrFHGc",
-      "views": 895,
-      "avg_view_pct": null
-    },
-    {
-      "title": "Why speaking another language changes you #shorts",
-      "id": "laRBRQqcE0E",
-      "views": 624,
-      "avg_view_pct": 71.46
+      "views": 906,
+      "avg_view_pct": 52.98
     }
   ],
   "rejected": []
