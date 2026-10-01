@@ -1,9 +1,9 @@
 {
-  "updated": "2026-09-30T16:28:06.006377+00:00",
-  "videos_total": 20,
-  "videos_7d": 20,
-  "views_7d": 12526,
-  "learned_this_run": 1,
+  "updated": "2026-10-01T07:46:35.944160+00:00",
+  "videos_total": 23,
+  "videos_7d": 22,
+  "views_7d": 12776,
+  "learned_this_run": 0,
   "strategy": {
     "category": [
       {
@@ -134,6 +134,11 @@
         "n": 0
       },
       {
+        "arm": "creepy_true",
+        "mean": 0.5,
+        "n": 0
+      },
+      {
         "arm": "timeline",
         "mean": 0.418,
         "n": 2
@@ -247,36 +252,36 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1219,
-      "avg_view_pct": 80.64
+      "avg_view_pct": 80.46
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
       "id": "tFm3Zuu2kGA",
       "views": 1203,
-      "avg_view_pct": 60.83
+      "avg_view_pct": 59.78
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
       "views": 1183,
-      "avg_view_pct": 41.72
+      "avg_view_pct": 41.66
+    },
+    {
+      "title": "Which Substance Has the Highest Melting Point? #shorts",
+      "id": "4WkKoRw9r00",
+      "views": 1164,
+      "avg_view_pct": 49.69
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
       "id": "OyHMkwqEOKo",
       "views": 1160,
-      "avg_view_pct": 41.47
-    },
-    {
-      "title": "Which Substance Has the Highest Melting Point? #shorts",
-      "id": "4WkKoRw9r00",
-      "views": 1159,
-      "avg_view_pct": 46.87
+      "avg_view_pct": 41.37
     },
     {
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
-      "views": 1152,
+      "views": 1153,
       "avg_view_pct": 59.209999999999994
     },
     {
@@ -288,14 +293,14 @@
     {
       "title": "How Does Canadian Rain Reach the Gulf of Mexico? #shorts",
       "id": "6dO8y_ojGhI",
-      "views": 974,
-      "avg_view_pct": null
+      "views": 973,
+      "avg_view_pct": 68.82
     },
     {
       "title": "The Only Governor Of Two Different States #shorts",
       "id": "lUA-2zrFHGc",
-      "views": 908,
-      "avg_view_pct": 52.98
+      "views": 910,
+      "avg_view_pct": 51.34000000000001
     }
   ],
   "rejected": []
