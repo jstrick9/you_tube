@@ -24,15 +24,15 @@
     "video_id": "q5lleO0lrkI",
     "status": "scheduled",
     "metrics": {
-      "views": 20,
+      "views": 21,
       "likes": 0,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 159.8,
-      "vph": 0.125,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
+      "hours_live": 169.1,
+      "vph": 0.124,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
       "a_views": 20,
       "avg_view_pct": 3474.28,
       "avg_view_dur": 1146
@@ -64,16 +64,16 @@
     "video_id": "vBTIN-iRO9k",
     "status": "scheduled",
     "metrics": {
-      "views": 1219,
+      "views": 1220,
       "likes": 27,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 154.3,
-      "vph": 7.901,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
-      "a_views": 1243,
+      "hours_live": 163.6,
+      "vph": 7.456,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
+      "a_views": 1218,
       "avg_view_pct": 80.46,
       "avg_view_dur": 35
     },
@@ -110,10 +110,10 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 151.3,
-      "vph": 7.82,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
-      "a_views": 1199,
+      "hours_live": 160.6,
+      "vph": 7.365,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
+      "a_views": 1183,
       "avg_view_pct": 41.66,
       "avg_view_dur": 14
     },
@@ -150,10 +150,10 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 135.8,
-      "vph": 9.42,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
-      "a_views": 1317,
+      "hours_live": 145.1,
+      "vph": 8.813,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
+      "a_views": 1279,
       "avg_view_pct": 51.97999999999999,
       "avg_view_dur": 16
     },
@@ -190,10 +190,10 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 130.3,
-      "vph": 8.85,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
-      "a_views": 1156,
+      "hours_live": 139.6,
+      "vph": 8.258,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
+      "a_views": 1152,
       "avg_view_pct": 59.209999999999994,
       "avg_view_dur": 18
     },
@@ -224,16 +224,16 @@
     "video_id": "oTgoKlCkGE0",
     "status": "scheduled",
     "metrics": {
-      "views": 1128,
+      "views": 1127,
       "likes": 13,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 127.3,
-      "vph": 8.863,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
-      "a_views": 1136,
+      "hours_live": 136.6,
+      "vph": 8.249,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
+      "a_views": 1131,
       "avg_view_pct": 30.11,
       "avg_view_dur": 13
     },
@@ -264,15 +264,15 @@
     "video_id": "OyHMkwqEOKo",
     "status": "scheduled",
     "metrics": {
-      "views": 1160,
+      "views": 1159,
       "likes": 13,
       "comments": 1,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 111.8,
-      "vph": 10.378,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
+      "hours_live": 121.1,
+      "vph": 9.569,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
       "a_views": 1161,
       "avg_view_pct": 41.37,
       "avg_view_dur": 13
@@ -310,9 +310,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 106.3,
-      "vph": 11.32,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
+      "hours_live": 115.6,
+      "vph": 10.405,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
       "a_views": 1208,
       "avg_view_pct": 59.78,
       "avg_view_dur": 23
@@ -350,9 +350,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 103.3,
-      "vph": 6.013,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
+      "hours_live": 112.6,
+      "vph": 5.514,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
       "a_views": 624,
       "avg_view_pct": 55.14,
       "avg_view_dur": 20
@@ -384,15 +384,15 @@
     "video_id": "lUA-2zrFHGc",
     "status": "scheduled",
     "metrics": {
-      "views": 910,
+      "views": 911,
       "likes": 11,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 87.8,
-      "vph": 10.367,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
+      "hours_live": 97.1,
+      "vph": 9.38,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
       "a_views": 895,
       "avg_view_pct": 51.34000000000001,
       "avg_view_dur": 15
@@ -424,15 +424,15 @@
     "video_id": "4WkKoRw9r00",
     "status": "scheduled",
     "metrics": {
-      "views": 1164,
+      "views": 1166,
       "likes": 9,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 82.3,
-      "vph": 14.147,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
+      "hours_live": 91.6,
+      "vph": 12.727,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
       "a_views": 1163,
       "avg_view_pct": 49.69,
       "avg_view_dur": 18
@@ -470,9 +470,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 79.3,
-      "vph": 5.777,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
+      "hours_live": 88.6,
+      "vph": 5.168,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
       "a_views": 144,
       "avg_view_pct": 49.86,
       "avg_view_dur": 18
@@ -510,9 +510,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 63.8,
-      "vph": 15.256,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00",
+      "hours_live": 73.1,
+      "vph": 13.307,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00",
       "a_views": 85,
       "avg_view_pct": 68.82,
       "avg_view_dur": 26
@@ -622,16 +622,17 @@
     "video_id": "Tm86-6r3k6I",
     "status": "scheduled",
     "metrics": {
-      "views": 323,
+      "views": 326,
       "likes": 3,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 39.8,
-      "vph": 8.12,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00"
-    }
+      "hours_live": 49.1,
+      "vph": 6.637,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00"
+    },
+    "reward": 0.25
   },
   {
     "created_at": "2026-09-29T16:56:56.095133+00:00",
@@ -764,9 +765,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 10.3,
-      "vph": 0.195,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00"
+      "hours_live": 19.6,
+      "vph": 0.102,
+      "checked_at": "2026-10-01T17:07:06.138793+00:00"
     }
   },
   {
@@ -806,9 +807,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 7.3,
+      "hours_live": 16.6,
       "vph": 0.0,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00"
+      "checked_at": "2026-10-01T17:07:06.138793+00:00"
     }
   },
   {
@@ -845,12 +846,108 @@
       "views": 0,
       "likes": 0,
       "comments": 0,
-      "privacy": "private",
+      "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1.0,
+      "hours_live": 1.1,
       "vph": 0.0,
-      "checked_at": "2026-10-01T07:46:35.944160+00:00"
+      "checked_at": "2026-10-01T17:07:06.138793+00:00"
     }
+  },
+  {
+    "created_at": "2026-10-01T17:15:58.611792+00:00",
+    "run_id": "20261001-1707",
+    "title": "How the Largest Animal Ever Eats Tiny Prey #shorts",
+    "topic": "How Blue Whales Feed",
+    "topic_key": "how blue whales feed",
+    "wiki_title": "Blue whale",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "choice": {
+      "category": "animals",
+      "format": "scale_shock",
+      "hook_style": "question",
+      "voice": "en-US-AndrewNeural",
+      "source": "youtube_outliers"
+    },
+    "viral_score": 9.5,
+    "why_trending": "Viral Short now with 639k views in 42h proving high demand.",
+    "trend_evidence": [
+      "viral Short now: 639,053 views in 42h, 269x its channel's subscribers",
+      "The BLUE WHALE is the largest animal on Earth, yet much of its diet consists of tiny creatures called KRILL. Instead of teeth, it has rows o"
+    ],
+    "review_score": 8,
+    "duration": 23.006054421768706,
+    "tts_engine": "edge-tts",
+    "file": "20261001-1707-01-blue-whale.mp4",
+    "publish_at": "2026-10-01T21:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "video_id": "1ed_FohPwqs",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-10-01T17:16:00.914460+00:00",
+    "run_id": "20261001-1707",
+    "title": "Why you are falling through space right now #shorts",
+    "topic": "You’re Falling Through Space Without Ever Hitting Earth",
+    "topic_key": "youre falling through space without ever hitting earth",
+    "wiki_title": "Orbit",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "choice": {
+      "category": "space",
+      "format": "would_you_survive",
+      "hook_style": "question",
+      "voice": "en-US-BrianNeural",
+      "source": "youtube_outliers"
+    },
+    "viral_score": 9.2,
+    "why_trending": "Viral Short with nearly 800k views demonstrating curiosity in space mechanics.",
+    "trend_evidence": [
+      "viral Short now: 798,491 views in 94h, 28x its channel's subscribers",
+      "An orbit sounds like the opposite of falling, but that's not actually what's happening. A spacecraft in orbit is continuously falling toward"
+    ],
+    "review_score": 8,
+    "duration": 34.730045351473926,
+    "tts_engine": "edge-tts",
+    "file": "20261001-1707-02-orbit.mp4",
+    "publish_at": "2026-10-02T00:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "video_id": "UvqHvc4mOXM",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-10-01T17:16:03.564535+00:00",
+    "run_id": "20261001-1707",
+    "title": "Why Did Aztec Swords Use Volcanic Glass Blades? #shorts",
+    "topic": "Why FEATHER Swords? Aztec",
+    "topic_key": "why feather swords aztec",
+    "wiki_title": "Macuahuitl",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "choice": {
+      "category": "history",
+      "format": "myth_buster",
+      "hook_style": "question",
+      "voice": "en-US-AvaNeural",
+      "source": "youtube_outliers"
+    },
+    "viral_score": 8.8,
+    "why_trending": "Viral Short with 690k views in 50h.",
+    "trend_evidence": [
+      "viral Short now: 690,829 views in 50h, 15x its channel's subscribers",
+      "Why Aztecs fought with swords with feather edges."
+    ],
+    "review_score": 9,
+    "duration": 26.846031746031745,
+    "tts_engine": "edge-tts",
+    "file": "20261001-1707-03-macuahuitl.mp4",
+    "publish_at": "2026-10-02T16:00:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "video_id": "j1f2p7A4P48",
+    "status": "scheduled"
   }
 ]

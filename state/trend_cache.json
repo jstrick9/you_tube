@@ -1,5 +1,5 @@
 {
-  "yt_outliers_date": "2026-09-30",
+  "yt_outliers_date": "2026-10-01",
   "yt_outliers": [
     {
       "topic": "5 самых опасных мостов в мире",
@@ -7,638 +7,638 @@
       "is_fact": true,
       "score": 1.0,
       "context": [
-        "viral Short now: 1,306,588 views in 48h, 226x its channel's subscribers",
+        "viral Short now: 2,326,246 views in 72h, 337x its channel's subscribers",
         ""
       ],
       "evidence": {
-        "views": 1306588,
-        "hours": 47.8,
-        "vph": 27322,
-        "breakout": 225.7
-      }
-    },
-    {
-      "topic": "Как работает этот необычный вездеход Хомяк?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9973,
-      "context": [
-        "viral Short now: 3,036,168 views in 75h, 33x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 3036168,
-        "hours": 75.0,
-        "vph": 40465,
-        "breakout": 32.6
+        "views": 2326246,
+        "hours": 72.5,
+        "vph": 32099,
+        "breakout": 336.6
       }
     },
     {
       "topic": "How Blue Whales Feed",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9946,
+      "score": 0.9971,
       "context": [
-        "viral Short now: 286,083 views in 18h, 125x its channel's subscribers",
+        "viral Short now: 639,053 views in 42h, 269x its channel's subscribers",
         "The BLUE WHALE is the largest animal on Earth, yet much of its diet consists of tiny creatures called KRILL. Instead of teeth, it has rows o"
       ],
       "evidence": {
-        "views": 286083,
-        "hours": 17.7,
-        "vph": 16151,
-        "breakout": 124.9
-      }
-    },
-    {
-      "topic": "How Fast Can We Reach Triton? Light, Space Shuttle, UFO & More!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9919,
-      "context": [
-        "viral Short now: 2,096,590 views in 51h, 25x its channel's subscribers",
-        "Triton is Neptune’s largest moon and one of the most fascinating icy worlds in the outer Solar System! But how long would it take to reach T"
-      ],
-      "evidence": {
-        "views": 2096590,
-        "hours": 50.9,
-        "vph": 41162,
-        "breakout": 25.0
-      }
-    },
-    {
-      "topic": "How An Injury Changes A Deer’s Next Antler",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9892,
-      "context": [
-        "viral Short now: 597,521 views in 63h, 199x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 597521,
-        "hours": 63.0,
-        "vph": 9490,
-        "breakout": 199.2
-      }
-    },
-    {
-      "topic": "What Happens to a Whale’s Body After Death?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9865,
-      "context": [
-        "viral Short now: 296,134 views in 37h, 213x its channel's subscribers",
-        "What Happens to a Whale’s Body After Death? What happens when the largest animal on Earth dies? When a whale’s body sinks to the ocean floor"
-      ],
-      "evidence": {
-        "views": 296134,
-        "hours": 37.1,
-        "vph": 7981,
-        "breakout": 213.0
-      }
-    },
-    {
-      "topic": "Top 5 Amazing Food Facts You Probably Didn’t Know!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9837,
-      "context": [
-        "viral Short now: 772,433 views in 87h, 168x its channel's subscribers",
-        "Discover 5 amazing and interesting food facts in this quick video! From aromatic cardamom and naturally sweet figs to nutrient-rich walnuts "
-      ],
-      "evidence": {
-        "views": 772433,
-        "hours": 86.7,
-        "vph": 8906,
-        "breakout": 167.6
-      }
-    },
-    {
-      "topic": "వరనక ఎనన సరల వరక చయల(9)",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.981,
-      "context": [
-        "viral Short now: 1,203,487 views in 50h, 30x its channel's subscribers",
-        "వరనక ఎనన సరల వరక చయల(9) motivational quotes telugu telugu motivational quotes facts telugu facts tranding songs భరయ భరతల మ కసమ వడయ ఇద https:"
-      ],
-      "evidence": {
-        "views": 1203487,
-        "hours": 49.9,
-        "vph": 24106,
-        "breakout": 30.2
-      }
-    },
-    {
-      "topic": "We have a beautiful cat",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9783,
-      "context": [
-        "viral Short now: 2,869,169 views in 51h, 6x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 2869169,
-        "hours": 51.5,
-        "vph": 55748,
-        "breakout": 5.8
+        "views": 639053,
+        "hours": 42.4,
+        "vph": 15085,
+        "breakout": 268.5
       }
     },
     {
       "topic": "Toby’s Final Goodbye",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9756,
+      "score": 0.9942,
       "context": [
-        "viral Short now: 669,057 views in 41h, 48x its channel's subscribers",
+        "viral Short now: 1,104,209 views in 66h, 79x its channel's subscribers",
         "In his final moments, TOBY looked deeply into his OWNER’S eyes. After a lifetime filled with LOVE, walks, and companionship, he rested in th"
       ],
       "evidence": {
-        "views": 669057,
-        "hours": 41.0,
-        "vph": 16334,
-        "breakout": 48.5
+        "views": 1104209,
+        "hours": 65.6,
+        "vph": 16830,
+        "breakout": 78.9
       }
     },
     {
-      "topic": "Moment Before Aura!?",
+      "topic": "आज पक मझस झगड कर लय",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9729,
+      "score": 0.9912,
       "context": [
-        "viral Short now: 1,241,869 views in 53h, 23x its channel's subscribers",
-        "Welcome to KING FX Editing: Alight Motion Quality: 30 FPS Music is used as part of transformative edits. Fair Use Disclaimer: This channel m"
+        "viral Short now: 1,165,813 views in 85h, 73x its channel's subscribers",
+        "आज पक मझस झगड कर लय"
       ],
       "evidence": {
-        "views": 1241869,
-        "hours": 53.0,
-        "vph": 23445,
-        "breakout": 22.7
+        "views": 1165813,
+        "hours": 84.6,
+        "vph": 13778,
+        "breakout": 72.9
       }
     },
     {
-      "topic": "వనయకడ లడడ వల పటల ఎతక పయయ తలస",
+      "topic": "जगल म य आवज सनई द, त रकन मत!",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9702,
+      "score": 0.9883,
       "context": [
-        "viral Short now: 540,346 views in 81h, 168x its channel's subscribers",
-        ""
+        "viral Short now: 894,640 views in 50h, 44x its channel's subscribers",
+        "Jungle mein agar aapko ye ajeeb awaaz sunai de, to use ignore mat karna! Kuch jaanwar apni awaaz se khatre ka signal de sakte hain. Is video"
       ],
       "evidence": {
-        "views": 540346,
-        "hours": 81.4,
-        "vph": 6642,
-        "breakout": 168.3
+        "views": 894640,
+        "hours": 49.6,
+        "vph": 18033,
+        "breakout": 44.3
+      }
+    },
+    {
+      "topic": "Did you know this about Musa and Khidr?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9854,
+      "context": [
+        "viral Short now: 559,406 views in 76h, 176x its channel's subscribers",
+        "Prophet Musa, Prophet Musa story, Musa AS, Musa Alaihis Salam, Musa Nabi, Musa Nabi story, Musa story, Moses story, Prophet Moses, Moses in "
+      ],
+      "evidence": {
+        "views": 559406,
+        "hours": 75.8,
+        "vph": 7381,
+        "breakout": 176.5
       }
     },
     {
       "topic": "The Crazy Engineering of Ants!",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9675,
+      "score": 0.9825,
       "context": [
-        "viral Short now: 334,601 views in 56h, 196x its channel's subscribers",
+        "viral Short now: 495,316 views in 81h, 240x its channel's subscribers",
         "Important Disclaimer: Some clips used in this video are not owned by us, and we do not claim ownership of them. All credits go to their resp"
       ],
       "evidence": {
-        "views": 334601,
-        "hours": 56.5,
-        "vph": 5924,
-        "breakout": 195.7
+        "views": 495316,
+        "hours": 81.1,
+        "vph": 6105,
+        "breakout": 240.4
+      }
+    },
+    {
+      "topic": "How An Injury Changes A Deer’s Next Antler",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9796,
+      "context": [
+        "viral Short now: 597,190 views in 88h, 199x its channel's subscribers",
+        ""
+      ],
+      "evidence": {
+        "views": 597190,
+        "hours": 87.6,
+        "vph": 6816,
+        "breakout": 199.1
+      }
+    },
+    {
+      "topic": "What Happens to a Whale’s Body After Death?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9766,
+      "context": [
+        "viral Short now: 364,120 views in 62h, 246x its channel's subscribers",
+        "What Happens to a Whale’s Body After Death? What happens when the largest animal on Earth dies? When a whale’s body sinks to the ocean floor"
+      ],
+      "evidence": {
+        "views": 364120,
+        "hours": 61.8,
+        "vph": 5896,
+        "breakout": 246.0
+      }
+    },
+    {
+      "topic": "వరనక ఎనన సరల వరక చయల(9)",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9737,
+      "context": [
+        "viral Short now: 1,393,980 views in 75h, 34x its channel's subscribers",
+        "వరనక ఎనన సరల వరక చయల(9) motivational quotes telugu telugu motivational quotes facts telugu facts tranding songs భరయ భరతల మ కసమ వడయ ఇద https:"
+      ],
+      "evidence": {
+        "views": 1393980,
+        "hours": 74.6,
+        "vph": 18692,
+        "breakout": 33.7
+      }
+    },
+    {
+      "topic": "हरसगर क औषधय गण",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9708,
+      "context": [
+        "viral Short now: 937,681 views in 78h, 65x its channel's subscribers",
+        ""
+      ],
+      "evidence": {
+        "views": 937681,
+        "hours": 77.9,
+        "vph": 12032,
+        "breakout": 64.7
+      }
+    },
+    {
+      "topic": "We have a beautiful cat",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9679,
+      "context": [
+        "viral Short now: 3,263,097 views in 76h, 7x its channel's subscribers",
+        ""
+      ],
+      "evidence": {
+        "views": 3263097,
+        "hours": 76.1,
+        "vph": 42869,
+        "breakout": 6.6
       }
     },
     {
       "topic": "But She Ran To Someone Else",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9647,
+      "score": 0.9649,
       "context": [
-        "viral Short now: 298,831 views in 44h, 146x its channel's subscribers",
+        "viral Short now: 387,879 views in 69h, 183x its channel's subscribers",
         "A couple arrived at daycare to pick up their daughter expecting the usual excited reunion. Instead, the little girl ran straight past them t"
       ],
       "evidence": {
-        "views": 298831,
-        "hours": 44.4,
-        "vph": 6734,
-        "breakout": 145.8
+        "views": 387879,
+        "hours": 69.0,
+        "vph": 5619,
+        "breakout": 183.0
       }
     },
     {
-      "topic": "1 october स पहल य कम कर लन",
+      "topic": "fish intake oxygen",
       "source": "youtube_outliers",
       "is_fact": true,
       "score": 0.962,
       "context": [
-        "viral Short now: 3,380,993 views in 36h, 1x its channel's subscribers",
+        "viral Short now: 216,055 views in 34h, 110x its channel's subscribers",
         ""
       ],
       "evidence": {
-        "views": 3380993,
-        "hours": 35.7,
-        "vph": 94753,
-        "breakout": 0.7
+        "views": 216055,
+        "hours": 33.6,
+        "vph": 6427,
+        "breakout": 109.7
       }
     },
     {
-      "topic": "How They Turned Wood Before Electricity!",
+      "topic": "Mengapa Putri Diana Duduk Sendiri di Taj Mahal",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9593,
+      "score": 0.9591,
       "context": [
-        "viral Short now: 444,841 views in 85h, 195x its channel's subscribers",
-        "Before electric power tools, craftsmen had ingenious ways of turning wood. Instead of an electric motor spinning the workpiece, traditional "
+        "viral Short now: 301,727 views in 17h, 17x its channel's subscribers",
+        "Mengapa Putri Diana duduk sendirian di depan simbol cinta abadi, Taj Mahal? Video legendaris tahun 1992 ini menyimpan cerita mendalam tentan"
       ],
       "evidence": {
-        "views": 444841,
-        "hours": 85.5,
-        "vph": 5205,
-        "breakout": 195.1
-      }
-    },
-    {
-      "topic": "Why FEATHER Swords? Aztec",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9566,
-      "context": [
-        "viral Short now: 574,455 views in 25h, 12x its channel's subscribers",
-        "Why Aztecs fought with swords with feather edges."
-      ],
-      "evidence": {
-        "views": 574455,
-        "hours": 25.5,
-        "vph": 22562,
-        "breakout": 12.2
-      }
-    },
-    {
-      "topic": "इस सल क वयरल गणपत वसरजन",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9539,
-      "context": [
-        "viral Short now: 1,003,223 views in 56h, 17x its channel's subscribers",
-        "इस सल क वयरल गणपत वसरजन"
-      ],
-      "evidence": {
-        "views": 1003223,
-        "hours": 56.1,
-        "vph": 17878,
-        "breakout": 17.0
-      }
-    },
-    {
-      "topic": "what do you know about breakfast in bed?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9512,
-      "context": [
-        "viral Short now: 632,824 views in 75h, 52x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 632824,
-        "hours": 75.5,
-        "vph": 8386,
-        "breakout": 51.9
-      }
-    },
-    {
-      "topic": "10 Weirdest Things About Shaquille O'neal...",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9485,
-      "context": [
-        "viral Short now: 1,625,303 views in 75h, 9x its channel's subscribers",
-        "These are the 10 weirdest facts I came acrodd from NBA basketball legend Shaq!"
-      ],
-      "evidence": {
-        "views": 1625303,
-        "hours": 75.1,
-        "vph": 21649,
-        "breakout": 9.0
-      }
-    },
-    {
-      "topic": "How many of these signs did you know?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9457,
-      "context": [
-        "viral Short now: 630,570 views in 60h, 30x its channel's subscribers",
-        "Think you know what these hand signs mean? From Call and Good Luck to Rock On and Victory, these signs can have different meanings depending"
-      ],
-      "evidence": {
-        "views": 630570,
-        "hours": 59.7,
-        "vph": 10562,
-        "breakout": 30.0
-      }
-    },
-    {
-      "topic": "How Rare You Are",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.943,
-      "context": [
-        "viral Short now: 5,498,839 views in 81h, 0x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 5498839,
-        "hours": 81.0,
-        "vph": 67918,
-        "breakout": 0.2
-      }
-    },
-    {
-      "topic": "Asteroid that wiped out the dinosaurs asteroid extinction",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9403,
-      "context": [
-        "viral Short now: 133,752 views in 34h, 134x its channel's subscribers",
-        "facts shorts astronomy music-raya(slowed) reference -Your Discovery Science All the videos, songs, images, and graphics used in the video be"
-      ],
-      "evidence": {
-        "views": 133752,
-        "hours": 34.0,
-        "vph": 3938,
-        "breakout": 133.8
-      }
-    },
-    {
-      "topic": "You’re Falling Through Space Without Ever Hitting Earth",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9376,
-      "context": [
-        "viral Short now: 690,662 views in 69h, 24x its channel's subscribers",
-        "An orbit sounds like the opposite of falling, but that's not actually what's happening. A spacecraft in orbit is continuously falling toward"
-      ],
-      "evidence": {
-        "views": 690662,
-        "hours": 69.5,
-        "vph": 9943,
-        "breakout": 24.2
-      }
-    },
-    {
-      "topic": "بنات بتعرفوه",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9349,
-      "context": [
-        "viral Short now: 1,384,124 views in 45h, 2x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 1384124,
-        "hours": 45.0,
-        "vph": 30777,
-        "breakout": 2.5
-      }
-    },
-    {
-      "topic": "이달의 소녀를 아시나요?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9322,
-      "context": [
-        "viral Short now: 318,175 views in 87h, 117x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 318175,
-        "hours": 86.7,
-        "vph": 3671,
-        "breakout": 117.4
+        "views": 301727,
+        "hours": 16.5,
+        "vph": 18234,
+        "breakout": 16.9
       }
     },
     {
       "topic": "ఈ గరర 3 రజలగ నళల ఎదక తగలకపయద?",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9295,
+      "score": 0.9562,
       "context": [
-        "viral Short now: 332,097 views in 30h, 16x its channel's subscribers",
+        "viral Short now: 667,862 views in 55h, 32x its channel's subscribers",
         "ఈ చనన గరర మడ రజలగ దహత ఉనన నళల తగలకపయద. అద గమనచన అబబయ తన చతలత నటన అదచ దన దహ తరచడ. చనన సహయ కడ ఒక పరణక ఎత పదద ఆనదనన ఇసతద ఈ వడయ చపసతద."
       ],
       "evidence": {
-        "views": 332097,
-        "hours": 30.0,
-        "vph": 11085,
-        "breakout": 16.4
+        "views": 667862,
+        "hours": 54.6,
+        "vph": 12230,
+        "breakout": 31.7
       }
     },
     {
-      "topic": "বশবর বভনন দশর অদভত সপড বরকর!",
+      "topic": "1 october स पहल य कम कर लन",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9267,
+      "score": 0.9533,
       "context": [
-        "viral Short now: 954,307 views in 84h, 16x its channel's subscribers",
-        "বশবর বভনন দশর অদভত সপড বরকর! কন দশরট সবচয় অবক করছ আপনক?"
+        "viral Short now: 3,921,166 views in 60h, 1x its channel's subscribers",
+        ""
       ],
       "evidence": {
-        "views": 954307,
-        "hours": 84.0,
-        "vph": 11361,
-        "breakout": 15.5
+        "views": 3921166,
+        "hours": 60.3,
+        "vph": 64992,
+        "breakout": 0.8
+      }
+    },
+    {
+      "topic": "Dubakoor Foreign ReturnDo you know someone",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9504,
+      "context": [
+        "viral Short now: 796,946 views in 50h, 16x its channel's subscribers",
+        ""
+      ],
+      "evidence": {
+        "views": 796946,
+        "hours": 50.2,
+        "vph": 15879,
+        "breakout": 16.0
       }
     },
     {
       "topic": "SIGMA PHYSICS TEACHER",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.924,
+      "score": 0.9474,
       "context": [
-        "viral Short now: 712,934 views in 49h, 9x its channel's subscribers",
+        "viral Short now: 1,112,311 views in 73h, 15x its channel's subscribers",
         "SIGMA PHYSICS TEACHER . . Physics teacher explained:- 3d animation sigma physics, physics aura, sigma edit, aura edit, physics edits, scienc"
       ],
       "evidence": {
-        "views": 712934,
-        "hours": 48.5,
-        "vph": 14692,
-        "breakout": 9.4
-      }
-    },
-    {
-      "topic": "Indian 500 vs Pakistan vs USA vs Japan vs Nepal 3D Map Animation",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9213,
-      "context": [
-        "viral Short now: 1,014,765 views in 76h, 10x its channel's subscribers",
-        "500 Indian Rupees ki value different countries mein kitni hai? India , Pakistan , USA , Japan aur Nepal mein 500 se aap kya-kya kharid sakte"
-      ],
-      "evidence": {
-        "views": 1014765,
-        "hours": 75.5,
-        "vph": 13436,
-        "breakout": 10.4
-      }
-    },
-    {
-      "topic": "SABÍAS QUE?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9186,
-      "context": [
-        "viral Short now: 838,918 views in 83h, 17x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 838918,
-        "hours": 83.0,
-        "vph": 10105,
-        "breakout": 17.0
+        "views": 1112311,
+        "hours": 73.2,
+        "vph": 15200,
+        "breakout": 14.6
       }
     },
     {
       "topic": "Do you know Death Note ends differently in the manga?",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9159,
+      "score": 0.9445,
       "context": [
-        "viral Short now: 901,582 views in 48h, 5x its channel's subscribers",
+        "viral Short now: 1,444,724 views in 73h, 8x its channel's subscribers",
         ""
       ],
       "evidence": {
-        "views": 901582,
-        "hours": 48.5,
-        "vph": 18604,
-        "breakout": 5.1
+        "views": 1444724,
+        "hours": 73.1,
+        "vph": 19760,
+        "breakout": 8.1
       }
     },
     {
-      "topic": "He Won Then Collapsed",
+      "topic": "Why FEATHER Swords? Aztec",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9132,
+      "score": 0.9416,
       "context": [
-        "viral Short now: 582,241 views in 92h, 31x its channel's subscribers",
-        "After winning his fourth NBA championship in 1996, Michael Jordan was overcome with emotion. The moment became one of the most memorable sce"
+        "viral Short now: 690,829 views in 50h, 15x its channel's subscribers",
+        "Why Aztecs fought with swords with feather edges."
       ],
       "evidence": {
-        "views": 582241,
-        "hours": 91.7,
-        "vph": 6351,
-        "breakout": 30.6
+        "views": 690829,
+        "hours": 50.1,
+        "vph": 13786,
+        "breakout": 14.7
       }
     },
     {
-      "topic": "This Animal Might Be Living On The Moon",
+      "topic": "How many of these signs did you know?",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9105,
+      "score": 0.9387,
       "context": [
-        "viral Short now: 2,696,831 views in 59h, 0x its channel's subscribers",
-        "This animal might still be living on the Moon after being accidentally left there."
+        "viral Short now: 703,548 views in 84h, 33x its channel's subscribers",
+        "Think you know what these hand signs mean? From Call and Good Luck to Rock On and Victory, these signs can have different meanings depending"
       ],
       "evidence": {
-        "views": 2696831,
-        "hours": 59.0,
-        "vph": 45737,
-        "breakout": 0.1
+        "views": 703548,
+        "hours": 84.4,
+        "vph": 8341,
+        "breakout": 32.6
       }
     },
     {
-      "topic": "Getting Canceled in 1692...",
+      "topic": "You’re Falling Through Space Without Ever Hitting Earth",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9078,
+      "score": 0.9358,
       "context": [
-        "viral Short now: 2,607,362 views in 95h, 1x its channel's subscribers",
-        "The Mud accusation and the Corn accusation were actually real documented accusations from the witch trails by the way..."
+        "viral Short now: 798,491 views in 94h, 28x its channel's subscribers",
+        "An orbit sounds like the opposite of falling, but that's not actually what's happening. A spacecraft in orbit is continuously falling toward"
       ],
       "evidence": {
-        "views": 2607362,
-        "hours": 95.4,
-        "vph": 27339,
-        "breakout": 1.4
+        "views": 798491,
+        "hours": 94.1,
+        "vph": 8485,
+        "breakout": 28.0
       }
     },
     {
-      "topic": "चन क 15 सबस अजबगरब खत",
+      "topic": "CHILDHOOD RELATED 90S KID'S",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.9051,
+      "score": 0.9329,
       "context": [
-        "viral Short now: 1,911,595 views in 94h, 3x its channel's subscribers",
-        "चन क 15 सबस अजबगरब खत Warning This video is made for educational and informational purposes only. We are sharing these facts to provide info"
+        "viral Short now: 733,403 views in 36h, 5x its channel's subscribers",
+        ""
       ],
       "evidence": {
-        "views": 1911595,
-        "hours": 94.4,
-        "vph": 20256,
+        "views": 733403,
+        "hours": 36.1,
+        "vph": 20296,
+        "breakout": 5.2
+      }
+    },
+    {
+      "topic": "Asteroid that wiped out the dinosaurs asteroid extinction",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9299,
+      "context": [
+        "viral Short now: 161,939 views in 59h, 162x its channel's subscribers",
+        "facts shorts astronomy music-raya(slowed) reference -Your Discovery Science All the videos, songs, images, and graphics used in the video be"
+      ],
+      "evidence": {
+        "views": 161939,
+        "hours": 58.6,
+        "vph": 2763,
+        "breakout": 161.9
+      }
+    },
+    {
+      "topic": "They Didn't Use ANY CGI For This?! BTS Buddy Facts",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.927,
+      "context": [
+        "viral Short now: 691,345 views in 72h, 17x its channel's subscribers",
+        "The secret mechanics behind Buddy are mind-blowing! From manually controlling the backpack's face without CGI to the performer's nose consta"
+      ],
+      "evidence": {
+        "views": 691345,
+        "hours": 71.6,
+        "vph": 9654,
+        "breakout": 16.9
+      }
+    },
+    {
+      "topic": "మతన ఆశరమల రజక ఎత Protein ఫడ పడతర తలస?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9241,
+      "context": [
+        "viral Short now: 291,134 views in 16h, 5x its channel's subscribers",
+        "శకహర భజనల శరరనక సరపడ పరటన లభసతద? నచరపత పదధతల ఉపప, నన లకడ అధక పరటన ఎల పదవచచ డకటర మతన సతయనరయణ రజ గర మటలల తలసకడ. మలకల, రగ మలట, మలట-మలలట పలకల, ఆ"
+      ],
+      "evidence": {
+        "views": 291134,
+        "hours": 15.6,
+        "vph": 18645,
+        "breakout": 4.8
+      }
+    },
+    {
+      "topic": "A lot of rats have appeared here",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9212,
+      "context": [
+        "viral Short now: 1,096,488 views in 29h, 1x its channel's subscribers",
+        ""
+      ],
+      "evidence": {
+        "views": 1096488,
+        "hours": 28.8,
+        "vph": 38096,
+        "breakout": 0.7
+      }
+    },
+    {
+      "topic": "بنات بتعرفوه",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9182,
+      "context": [
+        "viral Short now: 1,582,654 views in 70h, 3x its channel's subscribers",
+        ""
+      ],
+      "evidence": {
+        "views": 1582654,
+        "hours": 69.6,
+        "vph": 22732,
         "breakout": 2.9
-      }
-    },
-    {
-      "topic": "INI RASANYA JADI HEWAN PALING INTROVERT DI LAUTAN!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "score": 0.9023,
-      "context": [
-        "viral Short now: 779,135 views in 54h, 5x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 779135,
-        "hours": 54.2,
-        "vph": 14369,
-        "breakout": 5.5
       }
     },
     {
       "topic": "10 Amazing Food & Health Facts!",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.8997,
+      "score": 0.9153,
       "context": [
-        "viral Short now: 703,934 views in 61h, 7x its channel's subscribers",
+        "viral Short now: 956,940 views in 86h, 9x its channel's subscribers",
         "10 Amazing Food & Health Facts! Kya aap jaante hain ki banana, kiwi, mint tea, papaya, beetroot, makhana, soaked raisins, guava, pomegranate"
       ],
       "evidence": {
-        "views": 703934,
-        "hours": 61.1,
-        "vph": 11514,
-        "breakout": 7.0
+        "views": 956940,
+        "hours": 85.8,
+        "vph": 11155,
+        "breakout": 9.4
+      }
+    },
+    {
+      "topic": "This Animal Might Be Living On The Moon",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9124,
+      "context": [
+        "viral Short now: 3,392,837 views in 84h, 0x its channel's subscribers",
+        "This animal might still be living on the Moon after being accidentally left there."
+      ],
+      "evidence": {
+        "views": 3392837,
+        "hours": 83.6,
+        "vph": 40577,
+        "breakout": 0.2
+      }
+    },
+    {
+      "topic": "The Fastest Animals on Earth Have a Shocking Speed Difference",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9095,
+      "context": [
+        "viral Short now: 1,226,741 views in 73h, 4x its channel's subscribers",
+        "An ostrich, horse, Greyhound, and cheetah can reach incredible speeds on land, but the sky changes everything. Eagles are extremely fast, ye"
+      ],
+      "evidence": {
+        "views": 1226741,
+        "hours": 73.1,
+        "vph": 16780,
+        "breakout": 4.1
+      }
+    },
+    {
+      "topic": "He Saved the Water With a Simple Trick!",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9066,
+      "context": [
+        "viral Short now: 825,711 views in 33h, 1x its channel's subscribers",
+        "He Saved the Water With a Simple Trick!"
+      ],
+      "evidence": {
+        "views": 825711,
+        "hours": 32.6,
+        "vph": 25319,
+        "breakout": 1.5
+      }
+    },
+    {
+      "topic": "Muz Kaç Para Biliyor musun",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9037,
+      "context": [
+        "viral Short now: 252,932 views in 68h, 47x its channel's subscribers",
+        "Bu Sahne Küçük Ağa Dizisinden Alınmıştır. Sahne Kendi El Emeğim İle Edit Yapılıp Paylaşılmıştır. Eğer Beğendiyseniz Beğenip Yorum Atmayı Unu"
+      ],
+      "evidence": {
+        "views": 252932,
+        "hours": 68.2,
+        "vph": 3711,
+        "breakout": 46.8
+      }
+    },
+    {
+      "topic": "Coca-Cola Bottle Evolution Since 1899",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.9007,
+      "context": [
+        "viral Short now: 221,312 views in 53h, 35x its channel's subscribers",
+        "Take a look at the evolution of Coca-Cola bottles from 1899 to 1986! See how the bottle designs changed through the years. Which one is your"
+      ],
+      "evidence": {
+        "views": 221312,
+        "hours": 52.6,
+        "vph": 4206,
+        "breakout": 35.5
       }
     },
     {
       "topic": "Do you know which of Iron Man's suits is the most powerful?",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.8969,
+      "score": 0.8978,
       "context": [
-        "viral Short now: 236,096 views in 54h, 37x its channel's subscribers",
+        "viral Short now: 289,953 views in 78h, 44x its channel's subscribers",
         "Number six, the Mark 1 built from scrap in a cave, barely able to fly, but it birthed Iron Man. Number five, the Mark 5 suitcase suit cool, "
       ],
       "evidence": {
-        "views": 236096,
-        "hours": 53.5,
-        "vph": 4410,
-        "breakout": 36.9
+        "views": 289953,
+        "hours": 78.2,
+        "vph": 3708,
+        "breakout": 43.7
       }
     },
     {
-      "topic": "Tag your mom",
+      "topic": "How Newly Discovered Animals Get Their Names",
       "source": "youtube_outliers",
       "is_fact": true,
-      "score": 0.8942,
+      "score": 0.8949,
       "context": [
-        "viral Short now: 1,468,476 views in 63h, 1x its channel's subscribers",
+        "viral Short now: 698,084 views in 81h, 10x its channel's subscribers",
         ""
       ],
       "evidence": {
-        "views": 1468476,
-        "hours": 63.5,
-        "vph": 23137,
-        "breakout": 1.3
+        "views": 698084,
+        "hours": 81.4,
+        "vph": 8580,
+        "breakout": 10.0
+      }
+    },
+    {
+      "topic": "य चज मत खन",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.892,
+      "context": [
+        "viral Short now: 918,174 views in 28h, 0x its channel's subscribers",
+        ""
+      ],
+      "evidence": {
+        "views": 918174,
+        "hours": 28.2,
+        "vph": 32518,
+        "breakout": 0.2
+      }
+    },
+    {
+      "topic": "तम Insan नह हत pt76 Find Your Animal Name Facts Shorts",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.889,
+      "context": [
+        "viral Short now: 958,599 views in 33h, 0x its channel's subscribers",
+        "तम Insan नह हत pt76 Find Your Animal Name Facts Shorts AnimalPersonalityTest GuessYourAnimal AnimalQuiz PersonalityTest SpiritAnimal AnimalP"
+      ],
+      "evidence": {
+        "views": 958599,
+        "hours": 33.0,
+        "vph": 29079,
+        "breakout": 0.3
+      }
+    },
+    {
+      "topic": "HOW Do Helicopter Linemen Work on Live Power Lines?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "score": 0.8861,
+      "context": [
+        "viral Short now: 705,050 views in 63h, 5x its channel's subscribers",
+        "HOW Do Helicopter Linemen Work on Live Power Lines? Working on high-voltage power lines from a helicopter sounds unbelievable! These workers"
+      ],
+      "evidence": {
+        "views": 705050,
+        "hours": 63.2,
+        "vph": 11152,
+        "breakout": 5.2
       }
     }
   ]

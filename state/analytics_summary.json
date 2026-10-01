@@ -1,19 +1,14 @@
 {
-  "updated": "2026-10-01T07:46:35.944160+00:00",
+  "updated": "2026-10-01T17:07:06.138793+00:00",
   "videos_total": 23,
   "videos_7d": 22,
-  "views_7d": 12776,
-  "learned_this_run": 0,
+  "views_7d": 12781,
+  "learned_this_run": 1,
   "strategy": {
     "category": [
       {
-        "arm": "culture",
-        "mean": 0.614,
-        "n": 2
-      },
-      {
         "arm": "history",
-        "mean": 0.596,
+        "mean": 0.595,
         "n": 3
       },
       {
@@ -23,13 +18,18 @@
       },
       {
         "arm": "geography",
-        "mean": 0.552,
+        "mean": 0.551,
         "n": 3
       },
       {
         "arm": "entertainment",
-        "mean": 0.54,
+        "mean": 0.539,
         "n": 1
+      },
+      {
+        "arm": "culture",
+        "mean": 0.532,
+        "n": 3
       },
       {
         "arm": "space",
@@ -70,18 +70,18 @@
     "format": [
       {
         "arm": "facts3",
-        "mean": 0.63,
+        "mean": 0.628,
         "n": 3
       },
       {
-        "arm": "backstory",
-        "mean": 0.62,
-        "n": 4
+        "arm": "myth_vs_fact",
+        "mean": 0.612,
+        "n": 2
       },
       {
-        "arm": "myth_vs_fact",
-        "mean": 0.614,
-        "n": 2
+        "arm": "backstory",
+        "mean": 0.56,
+        "n": 5
       },
       {
         "arm": "by_the_numbers",
@@ -140,29 +140,29 @@
       },
       {
         "arm": "timeline",
-        "mean": 0.418,
+        "mean": 0.419,
         "n": 2
       }
     ],
     "hook_style": [
       {
         "arm": "question",
-        "mean": 0.641,
-        "n": 4
-      },
-      {
-        "arm": "you_statement",
-        "mean": 0.581,
+        "mean": 0.639,
         "n": 4
       },
       {
         "arm": "number_first",
-        "mean": 0.55,
+        "mean": 0.549,
         "n": 2
       },
       {
+        "arm": "you_statement",
+        "mean": 0.527,
+        "n": 5
+      },
+      {
         "arm": "bold_claim",
-        "mean": 0.519,
+        "mean": 0.518,
         "n": 3
       },
       {
@@ -174,17 +174,17 @@
     "voice": [
       {
         "arm": "en-US-AndrewNeural",
-        "mean": 0.639,
+        "mean": 0.637,
         "n": 2
       },
       {
         "arm": "en-US-ChristopherNeural",
-        "mean": 0.578,
+        "mean": 0.577,
         "n": 5
       },
       {
         "arm": "en-US-BrianNeural",
-        "mean": 0.561,
+        "mean": 0.56,
         "n": 1
       },
       {
@@ -194,8 +194,8 @@
       },
       {
         "arm": "en-US-AvaNeural",
-        "mean": 0.531,
-        "n": 3
+        "mean": 0.479,
+        "n": 4
       }
     ],
     "source": [
@@ -251,7 +251,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1219,
+      "views": 1220,
       "avg_view_pct": 80.46
     },
     {
@@ -269,13 +269,13 @@
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
-      "views": 1164,
+      "views": 1166,
       "avg_view_pct": 49.69
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
       "id": "OyHMkwqEOKo",
-      "views": 1160,
+      "views": 1159,
       "avg_view_pct": 41.37
     },
     {
@@ -287,7 +287,7 @@
     {
       "title": "How Your Liver Rebuilds Itself #shorts",
       "id": "oTgoKlCkGE0",
-      "views": 1128,
+      "views": 1127,
       "avg_view_pct": 30.11
     },
     {
@@ -299,7 +299,7 @@
     {
       "title": "The Only Governor Of Two Different States #shorts",
       "id": "lUA-2zrFHGc",
-      "views": 910,
+      "views": 911,
       "avg_view_pct": 51.34000000000001
     }
   ],
