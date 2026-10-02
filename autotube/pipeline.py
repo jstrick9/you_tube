@@ -140,6 +140,10 @@ def build_description(script: dict, source: dict, visuals: list[dict], cfg: dict
     return clean_description("\n".join(parts))
 
 
+MAX_SPEEDUP_PCT = 10        # beyond roughly this the voice starts to sound robotic, which costs
+                            # more retention than the extra seconds do
+
+
 def pause_plan(script: dict, plan: dict, cfg: dict) -> list[float]:
     """Silence before each line: normal, except a beat before the reveal (longer for the 3-2-1 countdown)."""
     gaps = [0.0] * len(script["segments"])
@@ -148,6 +152,66 @@ def pause_plan(script: dict, plan: dict, cfg: dict) -> list[float]:
             key = "countdown_pause" if plan.get("format") == "guess_reveal" else "reveal_pause"
             gaps[i] = float(cfg["content"].get(key, 0.55))
     return gaps
+
+
+
+def shown_duration(tts: dict) -> float:
+    """What the viewer actually sits through: narration plus the silence the renderer appends.
+
+    Checking tts["duration"] alone meant every video ran TAIL seconds longer than the target it
+    had just been measured against.
+    """
+    return tts["duration"] + render.TAIL
+
+
+def fit_length(script: dict, plan: dict, cfg: dict, work, synth) -> tuple[dict | None, list[float]]:
+    """Synthesize the narration and bring it inside the configured band.
+
+    Completion rate is the dominant Shorts ranking input and it falls off fast with length, so the
+    band is held in three escalating steps:
+
+      1. Drop the least load-bearing body line and re-synthesize (never the hook, reveal or payoff).
+      2. If nothing is safe to drop - a 5-segment script protects three of them, so this runs out
+         quickly - add a bounded amount of pace. Previously the only backstop was the 59-second
+         Shorts cliff, which is how 44 and 46 second videos shipped against a 36 second target.
+      3. Past 59s the Short loses its classification, so give up on the topic.
+
+    The speed-up is capped because past roughly ten percent the voice sounds robotic, and that
+    costs more retention than the seconds it saves.
+    """
+    lo, hi = cfg["video"]["target_seconds"]
+    base_rate = cfg["video"]["speech_rate"]
+    gaps = pause_plan(script, plan, cfg)
+    tts = synth([spoken_text(s) for s in script["segments"]], plan["voice"], base_rate, work, gaps=gaps)
+
+    for _ in range(3):
+        if shown_duration(tts) <= hi:
+            break
+        i = weakest_segment(script["segments"])
+        if i is None:
+            break
+        log.info("  narration %.1fs > %.0fs target → dropping body line %d: %r",
+                 shown_duration(tts), float(hi), i + 1, script["segments"][i]["text"][:60])
+        script["segments"].pop(i)
+        gaps = pause_plan(script, plan, cfg)
+        tts = synth([spoken_text(s) for s in script["segments"]], plan["voice"], base_rate, work, gaps=gaps)
+
+    if shown_duration(tts) > hi:
+        need = shown_duration(tts) / max(float(hi) - 0.1, 1.0)
+        bump = min(MAX_SPEEDUP_PCT, int((need - 1) * 100) + 2)
+        if bump > 0:
+            faster = f"+{int(str(base_rate).strip('+%')) + bump}%"
+            log.info("  narration %.1fs > %.0fs and nothing safe to drop → pacing %s",
+                     shown_duration(tts), float(hi), faster)
+            tts = synth([spoken_text(s) for s in script["segments"]], plan["voice"], faster, work, gaps=gaps)
+
+    if shown_duration(tts) > 59.0:          # Shorts must stay < 60 s for safest classification
+        log.info("  ✗ still too long (%.1fs), skipping", shown_duration(tts))
+        return None, gaps
+    if shown_duration(tts) > hi:
+        log.info("  note: %.1fs is over the %.0fs target but within the Shorts limit — keeping",
+                 shown_duration(tts), float(hi))
+    return tts, gaps
 
 
 def effects_plan(script: dict, plan: dict, source: dict, cfg: dict) -> dict:
@@ -180,32 +244,11 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     work.mkdir(parents=True, exist_ok=True)
     seed = int(hashlib.md5(f"{run_id}{slug}".encode()).hexdigest()[:8], 16)
 
-    gaps = pause_plan(script, plan, cfg)
     lo, hi = cfg["video"]["target_seconds"]
-    tts = synthesize([spoken_text(s) for s in script["segments"]], plan["voice"],
-                     cfg["video"]["speech_rate"], work, gaps=gaps)
-    # Completion rate is the dominant Shorts ranking input and it falls off fast with length, so hold the
-    # configured band. Trim by DROPPING the least load-bearing body line (never the hook, reveal or payoff)
-    # and re-synthesizing — speeding the voice up past the configured rate sounds robotic and costs retention too.
-    for _ in range(3):
-        if tts["duration"] <= hi + 2.0:
-            break
-        i = weakest_segment(script["segments"])
-        if i is None:
-            break
-        log.info("  narration %.1fs > %.1fs target → dropping body line %d: %r",
-                 tts["duration"], hi + 2.0, i + 1, script["segments"][i]["text"][:60])
-        script["segments"].pop(i)
-        gaps = pause_plan(script, plan, cfg)
-        tts = synthesize([spoken_text(s) for s in script["segments"]], plan["voice"],
-                         cfg["video"]["speech_rate"], work, gaps=gaps)
-    if tts["duration"] > 59.0:      # Shorts must stay < 60 s for safest classification
-        log.info("  narration %.1fs still too long → speeding up", tts["duration"])
-        faster = f"+{int(cfg['video']['speech_rate'].strip('+%')) + int((tts['duration'] / 57 - 1) * 100) + 4}%"
-        tts = synthesize([spoken_text(s) for s in script["segments"]], plan["voice"], faster, work, gaps=gaps)
-        if tts["duration"] > 59.0:
-            log.info("  ✗ still too long (%.1fs), skipping", tts["duration"])
-            return None
+    tts, gaps = fit_length(script, plan, cfg, work, synthesize)
+    if tts is None:
+        return None
+
     lines = [spoken_text(s) for s in script["segments"]]
 
     tsegs = tts["segments"]
@@ -264,6 +307,7 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     }
     record = {"meta": meta, "script": script, "review": review, "source": {k: source[k] for k in ("title", "url")},
               "plan": plan, "tts_engine": tts["engine"], "duration": r["duration"],
+              "words": sum(len(spoken_text(x).split()) for x in script["segments"]),
               "qa": {k: report.get(k) for k in ("passed", "attempt", "issues", "frames", "meta")},
               "shots": [{"seg": v["seg"], "kind": v.get("kind", "image"), "window": v.get("window"),
                          "score": v.get("score"), "judge": v.get("judge"), "shows": v.get("shows"),
@@ -280,7 +324,8 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     out.with_suffix(".json").write_text(json.dumps(record, indent=2, default=str))
     log.info("  ✓ rendered %s (%.1fs, review=%s)", out.name, r["duration"], review.get("score"))
     return {"file": out, "thumb": thumb, "meta": meta, "script": script, "source": source, "review": review,
-            "topic": topic, "plan": plan, "duration": r["duration"], "tts_engine": tts["engine"], "qa": report}
+            "topic": topic, "plan": plan, "duration": r["duration"], "tts_engine": tts["engine"],
+            "words": sum(len(spoken_text(x).split()) for x in script["segments"]), "qa": report}
 
 
 def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_work: bool = False) -> list[dict]:
@@ -361,7 +406,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             "review_score": res["review"].get("score"),
             "reviewer": res["review"].get("reviewer"),
             "review_independent": res["review"].get("independent"),
-            "duration": res["duration"],
+            "duration": res["duration"], "words": res.get("words"),
             "tts_engine": res["tts_engine"], "file": res["file"].name, "publish_at": slot.isoformat() if slot else None,
             "llm": llm.last_used,
         }

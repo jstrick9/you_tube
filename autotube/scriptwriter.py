@@ -348,7 +348,12 @@ Return JSON:
                                                              and isinstance(v.get("queries"), list) and v["queries"])]
             assert len(bad) <= 1, f"segments {bad} are missing \"visual\": {{\"shows\": ..., \"queries\": [...]}}"
             words = sum(len(spoken_text(s).split()) for s in segs)
-            assert words_lo * 0.75 <= words <= words_hi * 1.3, (
+            # The upper tolerance used to be 1.3x, which accepted 120 words against a 93-word
+            # target. At the measured ~3 words/second that is a 40-second narration before pauses
+            # and trailing silence — the direct cause of the 44s and 46s videos in the history. A
+            # script that long is cheaper to reject here, where the model can simply rewrite it,
+            # than to fix later by deleting a fact it had already built the story around.
+            assert words_lo * 0.75 <= words <= words_hi * 1.08, (
                 f"narration is {words} words but must be {words_lo}-{words_hi} words — "
                 + ("add more concrete facts from the source to the body segments" if words < words_lo
                    else "shorten the body segments"))
