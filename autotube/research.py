@@ -123,11 +123,20 @@ def ground_news(topic: str, search_query: str | None, lang: str = "en",
     brief = news.brief(subject, lang, region, int(rcfg.get("min_outlets", 2)))
     if not brief:
         return None
+    person_angle = ""
     if cfg is not None:
         allowed, reason = safety.check_subject(subject, brief["text"][:1200], cfg, llm)
         if not allowed:
             log.info("skip %r: %s", subject, reason)
             return None
+        # A breaking story about a person is the single riskiest thing a trend scanner can hand us,
+        # and here there is no Wikipedia description to test, so the classifier decides from the
+        # headlines whether a real person is the subject at all.
+        if (cfg.get("content") or {}).get("allow_living_people"):
+            ok, reason, person_angle = safety.check_person(subject, brief["text"][:1200], cfg, llm)
+            if not ok and "not about a person" not in reason.lower():
+                log.info("skip %r: %s", subject, reason)
+                return None
 
     # anchor the background on the first backbone entity that actually has an article
     anchor_title, anchor_text = None, ""
@@ -160,6 +169,7 @@ def ground_news(topic: str, search_query: str | None, lang: str = "en",
         "images": article_images(anchor_title, lang),
         "lead_image": (summ.get("originalimage") or {}).get("source"),
         "news": {"outlets": brief["outlets"], "consensus": brief["consensus"], "anchor": anchor_title},
+        "safe_angle": person_angle,
     }
 
 
@@ -201,9 +211,18 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
         if hit:
             log.info("skip %r: source is about a blocked subject (%s)", title, hit)
             return None
-    if not allow_living and is_living_person(summ):
+    person = is_living_person(summ)
+    if person and not allow_living:
         log.info("skip %r: looks like a living person (%s)", title, summ.get("description"))
         return None
+    safe_angle = ""
+    if person:
+        # Living people are allowed only as public figures discussed in their professional
+        # capacity (autotube/safety.check_person). Fails closed.
+        ok, reason, safe_angle = safety.check_person(title, probe, cfg or {}, llm)
+        if not ok:
+            log.info("skip %r: %s", title, reason)
+            return None
     text = article_text(title, lang)
     also: list[str] = []
     extra_credits: list[dict] = []
@@ -240,6 +259,8 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
                  for a in also] + extra_credits,
         "images": article_images(title, lang),
         "lead_image": (summ.get("originalimage") or {}).get("source"),
+        "person": person,
+        "safe_angle": safe_angle,
     }
 
 

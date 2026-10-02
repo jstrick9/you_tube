@@ -94,7 +94,9 @@ content:
   hook_styles: [question, bold_claim, number_first, you_statement, disbelief]
   require_grounding: true                # every claim must be supported by fetched source text
   min_grounded_segments: 3
-  allow_living_people: false             # skip topics that are biographies of living people
+  # Living people are allowed, but only as PUBLIC FIGURES discussed in their professional
+  # capacity — see safety.person below and autotube/safety.check_person. Fails closed.
+  allow_living_people: true             # skip topics that are biographies of living people
   dedupe_days: 45                        # don't repeat a topic within N days
   min_trend_score: 0.35
   # ── virality ──
@@ -208,6 +210,10 @@ safety:
   # Words that only mean "judge this in context" (the full list lives in autotube/safety.py;
   # anything listed here replaces it).
   sensitive: null
+  person:
+    require_public_figure: true          # a private individual who merely went viral is never a topic
+    allow_minors: false
+    blocked_angles: null                 # null → autotube/safety.PERSON_BLOCKED_ANGLES
 
 research:
   # Grounding corpora beyond Wikipedia (autotube/sources.py). Wikipedia still resolves and anchors

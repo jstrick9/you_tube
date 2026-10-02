@@ -279,6 +279,17 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
             '     "Bold plan. Terrible plan." It is a JOKE/OPINION ONLY: no facts, numbers, names, dates or claims; never\n'
             '     mean about real people, groups or victims; family-friendly. Only include it if it is actually funny.\n'
         ) if max_asides else ""
+        # A living person reached this point only because safety.check_person approved one specific
+        # professional angle. The writer has to be told what that angle is, or the model will drift
+        # back to whatever made the person trend — which is usually the thing we just refused.
+        person_rule = ""
+        if source.get("person"):
+            person_rule = (
+                "REAL LIVING PERSON: stay strictly on their public professional work"
+                + (f" — specifically: {source['safe_angle']}" if source.get("safe_angle") else "")
+                + ". Never mention their health, death, family, relationships, appearance, money, "
+                  "legal matters, accusations, feuds or politics. State nothing you cannot point to "
+                  "in the SOURCE TEXT. No 'allegedly', 'reportedly' or 'sources say'.")
         persona_line = (f"NARRATOR PERSONA: {persona['character']}\nCHANNEL PROMISE: \"{persona.get('catchphrase', '')}\" "
                         "— every wild claim is proven by the source (a PROVEN stamp + source card closes each video).\n"
                         if persona.get("character") else "")
@@ -301,6 +312,7 @@ Write the script as 5-6 segments:
     "and it gets stranger" escalation → the reveal. Use contrast and consequence ("so", "which meant", "except");
   - last segment = PAYOFF, 8-16 words: {loop_rule}
 The TOPIC line is just a trend headline — do NOT repeat its claims or numbers unless the SOURCE TEXT states them.
+{person_rule}
 ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with
 comic timing and personality (reactions, contrast, "and it gets worse"). The facts stay 100% exact; the humour comes
 from HOW you tell them and from the asides, never from changing what happened.
@@ -393,7 +405,8 @@ Write YouTube metadata for this Short. Return JSON:
         # Context-aware (autotube/safety.py): titles stay strict, narration is only hard-blocked on
         # genuinely non-negotiable terms. The LLM reviewer still judges advertiser-friendliness in
         # context, which is the check that actually matches YouTube's guidelines.
-        issues += safety.check_script(script.get("title", ""), narration, self.cfg)
+        issues += safety.check_script(script.get("title", ""), narration, self.cfg,
+                                      about_person=bool(source.get("person")))
 
         review = {"score": 0, "issues": issues, "programmatic_ok": not issues}
         if issues:
