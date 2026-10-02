@@ -21,6 +21,8 @@ log = logging.getLogger("autotube.render")
 XF = 0.30          # crossfade seconds
 TAIL = 0.7         # silence after last word
 SS = 1.5           # supersampling factor for smooth zoompan
+CAPTION_Y = 0.62   # caption baseline as a fraction of H (keeps clear of the Shorts UI chrome)
+HOOK_CARD_SECONDS = 1.6   # hook title card: long enough to read, short enough not to fight the captions
 
 # caption colour themes (ASS colours are &HAABBGGRR) — rotated per video for variety
 THEMES = [
@@ -33,39 +35,88 @@ THEMES = [
 
 
 # ── image prep ────────────────────────────────────────────────────────────────
+# Full-bleed framing. A letterboxed picture floating on a blurred copy of itself is the single
+# clearest "automated channel" tell on Shorts, and it throws away ~60% of the screen. Every shot now
+# COVERS the 9:16 canvas; the crop window is chosen by edge energy so the subject survives the crop.
+MAX_COVER_ASPECT = 2.60     # wider than this (panoramas) would lose too much → fall back to the inset
+COVER_BIAS_Y = 0.42         # when cropping a tall source, keep slightly above centre (faces/subjects sit high)
+
+
+def saliency_offset(im: Image.Image, cw: int, ch: int) -> tuple[int, int]:
+    """Top-left of the cover-crop window, chosen by edge energy (cheap saliency, no extra deps).
+
+    `im` is already resized to at least (cw, ch). Slides the crop window over a tiny edge map and
+    keeps the position with the most detail, so a centre-crop never decapitates the subject.
+    """
+    ex, ey = im.width - cw, im.height - ch
+    if ex <= 0 and ey <= 0:
+        return max(0, ex // 2), max(0, ey // 2)
+    try:
+        SM = 64                                   # work on a ~64px-wide edge map: microseconds, good enough
+        sw = SM
+        sh = max(1, int(im.height * SM / im.width))
+        small = im.convert("L").resize((sw, sh), Image.BILINEAR).filter(ImageFilter.FIND_EDGES)
+        px = small.load()
+        # integral image of edge energy
+        acc = [[0] * (sw + 1) for _ in range(sh + 1)]
+        for y in range(sh):
+            row_sum = 0
+            for x in range(sw):
+                row_sum += px[x, y]
+                acc[y + 1][x + 1] = acc[y][x + 1] + row_sum
+        kx = max(1, round(cw * sw / im.width))
+        ky = max(1, round(ch * sh / im.height))
+        best, bx, by = -1.0, 0, 0
+        for sy in range(0, max(1, sh - ky + 1)):
+            for sx in range(0, max(1, sw - kx + 1)):
+                e = (acc[sy + ky][sx + kx] - acc[sy][sx + kx] - acc[sy + ky][sx] + acc[sy][sx])
+                # mild pull toward the composition sweet spot so flat images don't crop off-centre
+                dx = abs((sx + kx / 2) / sw - 0.5)
+                dy = abs((sy + ky / 2) / sh - COVER_BIAS_Y)
+                e *= (1.0 - 0.18 * dx - 0.18 * dy)
+                if e > best:
+                    best, bx, by = e, sx, sy
+        x = int(round(bx * im.width / sw))
+        y = int(round(by * im.height / sh))
+        return max(0, min(x, max(ex, 0))), max(0, min(y, max(ey, 0)))
+    except Exception as e:  # noqa: BLE001 — never let framing break a render
+        log.debug("saliency crop failed (%s) → centre crop", e)
+        return max(0, ex // 2), max(0, int(ey * COVER_BIAS_Y))
+
+
+def cover(im: Image.Image, cw: int, ch: int) -> Image.Image:
+    """Resize + saliency-crop `im` so it exactly fills (cw, ch) with no bars."""
+    r = max(cw / im.width, ch / im.height)
+    full = im.resize((max(cw, int(im.width * r) + 2), max(ch, int(im.height * r) + 2)), Image.LANCZOS)
+    l, t = saliency_offset(full, cw, ch)
+    return full.crop((l, t, l + cw, t + ch))
+
+
 def compose_frame(src: Path, dst: Path, W: int, H: int) -> Path:
-    """Portrait canvas: blurred, darkened cover-fill background + sharp fitted foreground."""
+    """Portrait canvas, full-bleed: the shot fills the whole 9:16 frame (saliency-aware cover crop).
+
+    Only an extreme panorama falls back to an inset over a blurred bed, and even then the inset is
+    large and the bed is zoomed, so there is no dead letterbox band.
+    """
     cw, ch = int(W * SS), int(H * SS)
     with Image.open(src) as im:
         im = im.convert("RGB")
-        # background: cover
-        r = max(cw / im.width, ch / im.height)
-        bg = im.resize((int(im.width * r) + 2, int(im.height * r) + 2), Image.LANCZOS)
-        l, t = (bg.width - cw) // 2, (bg.height - ch) // 2
-        bg = bg.crop((l, t, l + cw, t + ch)).filter(ImageFilter.GaussianBlur(40))
-        bg = Image.eval(bg, lambda v: int(v * 0.45))
-        # foreground: fit width (portrait images fill more)
         aspect = im.width / im.height
-        if aspect < 0.75:        # already portrait-ish → cover the whole canvas
-            fg, pos = None, None
-            r = max(cw / im.width, ch / im.height)
-            full = im.resize((int(im.width * r) + 2, int(im.height * r) + 2), Image.LANCZOS)
-            l, t = (full.width - cw) // 2, (full.height - ch) // 2
-            bg = full.crop((l, t, l + cw, t + ch))
-        else:
-            fw = cw
-            fh = int(fw / aspect)
-            if fh > ch * 0.62:
-                fh = int(ch * 0.62)
-                fw = int(fh * aspect)
-            fg = im.resize((fw, fh), Image.LANCZOS)
-            pos = ((cw - fw) // 2, int(ch * 0.40 - fh / 2))
-            # soft shadow
-            sh = Image.new("RGBA", (fw + 80, fh + 80), (0, 0, 0, 0))
-            ImageDraw.Draw(sh).rectangle((40, 40, fw + 40, fh + 40), fill=(0, 0, 0, 170))
-            sh = sh.filter(ImageFilter.GaussianBlur(25))
-            bg.paste(sh, (pos[0] - 40, pos[1] - 25), sh)
-            bg.paste(fg, pos)
+        if aspect <= MAX_COVER_ASPECT:
+            cover(im, cw, ch).save(dst, "JPEG", quality=92)
+            return dst
+        # panorama: showing it whole IS the point — inset it big over a zoomed, blurred bed
+        bg = cover(im, cw, ch).filter(ImageFilter.GaussianBlur(40))
+        bg = Image.eval(bg, lambda v: int(v * 0.40))
+        fw = cw
+        fh = max(2, int(fw / aspect))
+        fg = im.resize((fw, fh), Image.LANCZOS)
+        pos = ((cw - fw) // 2, int(ch * 0.44 - fh / 2))
+        sh = Image.new("RGBA", (fw + 80, fh + 80), (0, 0, 0, 0))
+        ImageDraw.Draw(sh).rectangle((40, 40, fw + 40, fh + 40), fill=(0, 0, 0, 170))
+        sh = sh.filter(ImageFilter.GaussianBlur(25))
+        bg.paste(sh, (pos[0] - 40, pos[1] - 25), sh)
+        bg.paste(fg, pos)
         bg.save(dst, "JPEG", quality=92)
     return dst
 
@@ -147,7 +198,7 @@ def fx_lines(segments: list[dict], fx: dict, theme: dict, emph_col: str, W: int,
                 a = st + dur * j / steps
                 b = st + dur * (j + 1) / steps if j < steps else min(total, st + dur + 1.1)
                 pop = "\\t(0,120,\\fscx118\\fscy118)\\t(120,240,\\fscx100\\fscy100)" if j == steps else ""
-                lines.append(f"Dialogue: 3,{_ts(a)},{_ts(b)},Count,,0,0,0,,{{\\pos({W // 2},{int(H * 0.585)})"
+                lines.append(f"Dialogue: 3,{_ts(a)},{_ts(b)},Count,,0,0,0,,{{\\pos({W // 2},{int(H * 0.30)})"
                              f"\\c{emph_col}{pop}}}{pre}{_fmt_num(val, dec, commas)}{_esc(suffix)}")
     reveal_at = None
     ri = fx.get("reveal")
@@ -202,7 +253,7 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Cap,{font_name},{fs},&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,1,0,1,7,3,5,60,60,0,1
+Style: Cap,{font_name},{fs},&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,1,0,1,7,3,5,150,150,0,1
 Style: Hook,{font_name},96,{theme['boxtxt']},&H00FFFFFF,{theme['box']},{theme['box']},-1,0,0,0,100,100,1,0,3,18,0,8,90,90,210,1
 Style: Brand,{font_name},46,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,0,0,0,0,100,100,2,0,1,3,0,8,40,40,90,1
 Style: Count,{font_name},200,&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,2,0,1,11,4,5,40,40,0,1
@@ -217,10 +268,10 @@ Style: Source,{font_name},46,&H00FFFFFF,&H00FFFFFF,&H00000000,&HB4000000,0,0,0,0
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     lines = []
-    cy = int(H * 0.72)
+    cy = int(H * CAPTION_Y)   # Shorts UI overlays the bottom ~18% and the right ~15%
     # hook title card (first ~2.8 s) with pop-in
     if hook_text:
-        lines.append(f"Dialogue: 2,{_ts(0)},{_ts(min(2.9, total))},Hook,,0,0,0,,"
+        lines.append(f"Dialogue: 2,{_ts(0)},{_ts(min(HOOK_CARD_SECONDS, total))},Hook,,0,0,0,,"
                      f"{{\\fad(0,250)\\t(0,180,\\fscx112\\fscy112)\\t(180,320,\\fscx100\\fscy100)}}{_esc(hook_text.upper())}")
     lines.append(f"Dialogue: 1,{_ts(0)},{_ts(total)},Brand,,0,0,0,,{{\\alpha&H40&}}{_esc(channel)}")
 
@@ -243,7 +294,11 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         for wi_, w in enumerate(words):
             cur.append(w)
             nxt_aside = words[wi_ + 1].get("_aside") if wi_ + 1 < len(words) else None
-            if (nxt_aside is not None and nxt_aside != w.get("_aside")) or len(cur) >= 3 or w["word"][-1:] in ".,!?;:" or len(" ".join(x["word"] for x in cur)) > 15:
+            txt_len = len(" ".join(x["word"] for x in cur))
+            hard_stop = w["word"][-1:] in ".!?"          # only sentence ends break a card; commas read badly
+            if ((nxt_aside is not None and nxt_aside != w.get("_aside"))
+                    or len(cur) >= 4 or (len(cur) >= 2 and txt_len >= 18)
+                    or (hard_stop and len(cur) >= 2) or txt_len > 24):
                 chunks.append(cur)
                 cur = []
         if cur:
@@ -312,19 +367,19 @@ def poster_frame(clip: Path, out: Path) -> Path:
 
 
 def video_chain(i: int, aspect: float, W: int, H: int, fps: int) -> str:
-    """Same layout as a still: portrait clips fill the screen; landscape clips sit sharp at ~40% height over a
-    blurred, darkened copy of themselves."""
-    if aspect < 0.75:
+    """Same framing rule as a still: the clip fills the whole 9:16 frame (cover crop, biased slightly high).
+
+    Only an extreme panorama keeps the inset-over-blurred-bed layout.
+    """
+    if aspect <= MAX_COVER_ASPECT:
+        # crop toward the upper third of a tall source: subjects/horizons almost never sit dead centre
         return (f"[{i}:v]fps={fps},setpts=PTS-STARTPTS,scale={W}:{H}:force_original_aspect_ratio=increase,"
-                f"crop={W}:{H},setsar=1")
-    fw, fh = W, int(W / aspect) // 2 * 2
-    if fh > H * 0.62:
-        fh = int(H * 0.62) // 2 * 2
-        fw = int(fh * aspect) // 2 * 2
-    y = int(H * 0.40 - fh / 2)
+                f"crop={W}:{H}:(iw-{W})/2:(ih-{H})*{COVER_BIAS_Y:.2f},setsar=1")
+    fw, fh = W, max(2, int(W / aspect) // 2 * 2)
+    y = int(H * 0.44 - fh / 2)
     return (f"[{i}:v]fps={fps},setpts=PTS-STARTPTS,setsar=1,split=2[va{i}][vb{i}];"
             f"[va{i}]scale={W // 4}:{H // 4}:force_original_aspect_ratio=increase,crop={W // 4}:{H // 4},"
-            f"boxblur=10:2,colorchannelmixer=rr=0.45:gg=0.45:bb=0.45,scale={W}:{H},setsar=1[vbg{i}];"
+            f"boxblur=10:2,colorchannelmixer=rr=0.40:gg=0.40:bb=0.40,scale={W}:{H},setsar=1[vbg{i}];"
             f"[vb{i}]scale={fw}:{fh},setsar=1[vfg{i}];[vbg{i}][vfg{i}]overlay=(W-w)/2:{y}")
 
 

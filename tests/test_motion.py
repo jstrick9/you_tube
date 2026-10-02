@@ -127,10 +127,37 @@ def test_video_track_is_frame_exact_with_clips_and_stills(tmp_path):
 
 
 def test_video_chain_layouts():
-    land = render.video_chain(0, 16 / 9, 1080, 1920, 30)
-    assert "overlay" in land and "boxblur" in land and "scale=1080:606" in land
-    port = render.video_chain(0, 9 / 16, 1080, 1920, 30)
-    assert "overlay" not in port and "crop=1080:1920" in port
+    # full-bleed: ordinary landscape AND portrait clips both cover the whole 9:16 frame — no letterbox
+    for aspect in (16 / 9, 4 / 3, 1.0, 9 / 16):
+        ch = render.video_chain(0, aspect, 1080, 1920, 30)
+        assert "overlay" not in ch and "boxblur" not in ch, aspect
+        assert "crop=1080:1920" in ch, aspect
+    # only an extreme panorama keeps the inset-over-blurred-bed layout
+    pano = render.video_chain(0, 4.0, 1080, 1920, 30)
+    assert "overlay" in pano and "boxblur" in pano
+
+
+def test_compose_frame_is_full_bleed(tmp_path):
+    from PIL import Image
+    src = tmp_path / "wide.jpg"
+    Image.new("RGB", (1600, 900), (20, 120, 200)).save(src)
+    out = render.compose_frame(src, tmp_path / "out.jpg", 1080, 1920)
+    with Image.open(out) as im:
+        assert im.size == (int(1080 * render.SS), int(1920 * render.SS))
+        # every pixel comes from the photo: no blurred/darkened bars top or bottom
+        top = im.crop((0, 0, im.width, 40)).convert("L").resize((1, 1)).getpixel((0, 0))
+        mid = im.crop((0, im.height // 2 - 20, im.width, im.height // 2 + 20)).convert("L").resize((1, 1)).getpixel((0, 0))
+        assert abs(top - mid) < 12
+
+
+def test_saliency_offset_finds_the_subject(tmp_path):
+    from PIL import Image, ImageDraw
+    im = Image.new("RGB", (1200, 600), (10, 10, 10))
+    d = ImageDraw.Draw(im)
+    for x in range(60, 300, 12):                      # dense detail on the LEFT
+        d.line((x, 80, x, 520), fill=(255, 255, 255), width=4)
+    x, _ = render.saliency_offset(im, 600, 600)
+    assert x < 300, f"crop window should follow the detail, got x={x}"
 
 
 def test_is_video():

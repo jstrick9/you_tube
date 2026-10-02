@@ -74,3 +74,26 @@ if __name__ == "__main__":
         if name.startswith("test_"):
             fn()
             print("✓", name)
+
+
+# ── duration discipline + description sanitising ──────────────────────────────
+def test_weakest_segment_protects_hook_reveal_and_payoff():
+    from autotube.pipeline import weakest_segment
+    segs = [
+        {"text": "Hook line here", "evidence": ""},
+        {"text": "A filler line with no figures at all", "evidence": "short"},
+        {"text": "In 1823 some 40000 of them arrived", "evidence": "a much longer evidence quote here"},
+        {"text": "The twist nobody saw coming", "evidence": "evidence", "reveal": True},
+        {"text": "Payoff loops back", "evidence": ""},
+    ]
+    i = weakest_segment(segs)
+    assert i == 1, f"should drop the number-free filler body line, got {i}"
+    assert weakest_segment(segs[:4]) is None, "never trim a script that is already minimal"
+
+
+def test_clean_description_strips_what_youtube_rejects():
+    from autotube.pipeline import clean_description
+    out = clean_description("Great <b>fact</b>\x07 about\n\n\n\nbirds   today")
+    assert "<" not in out and ">" not in out and "\x07" not in out
+    assert "\n\n\n" not in out and "  " not in out
+    assert clean_description("x" * 6000).__len__() <= 4900

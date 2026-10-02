@@ -10,6 +10,7 @@ import hashlib
 import json
 import logging
 import random
+import re
 import shutil
 import time
 from datetime import datetime, timedelta
@@ -78,6 +79,48 @@ def remaining_today(cfg: dict, upload: bool = True) -> int:
     return max(0, int(cfg["schedule"]["videos_per_day"]) - done)
 
 
+def weakest_segment(segments: list[dict]) -> int | None:
+    """Index of the body line we can lose with the least damage, or None if there's nothing safe to drop.
+
+    Protected: the hook (0), the payoff/loop (last), and the reveal. Among the rest we drop the line that
+    carries the least new information — no number, no aside, shortest evidence quote, fewest words.
+    """
+    n = len(segments)
+    if n <= 4:
+        return None
+    best, best_key = None, None
+    for i in range(1, n - 1):
+        s = segments[i]
+        if s.get("reveal"):
+            continue
+        key = (
+            bool(re.search(r"\d", s.get("text", ""))),        # keep lines with numbers
+            bool((s.get("aside") or "").strip()),             # keep lines carrying a joke
+            len((s.get("evidence") or "").split()),           # keep the best-sourced lines
+            len(s.get("text", "").split()),                   # keep the densest lines
+        )
+        if best_key is None or key < best_key:
+            best, best_key = i, key
+    return best
+
+
+_DESC_BAD = re.compile(r"[<>\x00-\x08\x0b\x0c\x0e-\x1f]")
+
+
+def clean_description(text: str, limit: int = 4900) -> str:
+    """YouTube rejects descriptions containing angle brackets or control characters with a 400.
+
+    LLM-written descriptions and Commons credit strings both leak them, which cost us an upload on
+    2026-09-30 ("The request metadata specifies an invalid video description").
+    """
+    text = _DESC_BAD.sub(" ", text or "")
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text).strip()
+    if len(text) > limit:                       # cut on a line boundary so credits never end mid-URL
+        text = text[:limit].rsplit("\n", 1)[0].rstrip()
+    return text
+
+
 def build_description(script: dict, source: dict, visuals: list[dict], cfg: dict, tts_engine: str) -> str:
     tags = " ".join(h if h.startswith("#") else f"#{h}" for h in script.get("hashtags", [])[:3])
     catch = (cfg.get("persona") or {}).get("catchphrase")
@@ -94,7 +137,7 @@ def build_description(script: dict, source: dict, visuals: list[dict], cfg: dict
     parts += ["", "🖼️ Image & video credits:", media.credits_text(visuals),
               "🎵 Music: original, procedurally generated for this video.", "",
               f"Follow {cfg['channel'].get('handle') or cfg['channel']['name']} for a surprising fact, with sources, every day!", "", f"{tags} #shorts"]
-    return "\n".join(parts)
+    return clean_description("\n".join(parts))
 
 
 def pause_plan(script: dict, plan: dict, cfg: dict) -> list[float]:
@@ -137,17 +180,33 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     work.mkdir(parents=True, exist_ok=True)
     seed = int(hashlib.md5(f"{run_id}{slug}".encode()).hexdigest()[:8], 16)
 
-    lines = [spoken_text(s) for s in script["segments"]]
     gaps = pause_plan(script, plan, cfg)
-    tts = synthesize(lines, plan["voice"], cfg["video"]["speech_rate"], work, gaps=gaps)
     lo, hi = cfg["video"]["target_seconds"]
+    tts = synthesize([spoken_text(s) for s in script["segments"]], plan["voice"],
+                     cfg["video"]["speech_rate"], work, gaps=gaps)
+    # Completion rate is the dominant Shorts ranking input and it falls off fast with length, so hold the
+    # configured band. Trim by DROPPING the least load-bearing body line (never the hook, reveal or payoff)
+    # and re-synthesizing — speeding the voice up past the configured rate sounds robotic and costs retention too.
+    for _ in range(3):
+        if tts["duration"] <= hi + 2.0:
+            break
+        i = weakest_segment(script["segments"])
+        if i is None:
+            break
+        log.info("  narration %.1fs > %.1fs target → dropping body line %d: %r",
+                 tts["duration"], hi + 2.0, i + 1, script["segments"][i]["text"][:60])
+        script["segments"].pop(i)
+        gaps = pause_plan(script, plan, cfg)
+        tts = synthesize([spoken_text(s) for s in script["segments"]], plan["voice"],
+                         cfg["video"]["speech_rate"], work, gaps=gaps)
     if tts["duration"] > 59.0:      # Shorts must stay < 60 s for safest classification
-        log.info("  narration %.1fs too long → speeding up", tts["duration"])
+        log.info("  narration %.1fs still too long → speeding up", tts["duration"])
         faster = f"+{int(cfg['video']['speech_rate'].strip('+%')) + int((tts['duration'] / 57 - 1) * 100) + 4}%"
-        tts = synthesize(lines, plan["voice"], faster, work, gaps=gaps)
+        tts = synthesize([spoken_text(s) for s in script["segments"]], plan["voice"], faster, work, gaps=gaps)
         if tts["duration"] > 59.0:
             log.info("  ✗ still too long (%.1fs), skipping", tts["duration"])
             return None
+    lines = [spoken_text(s) for s in script["segments"]]
 
     tsegs = tts["segments"]
     starts = [x["start"] for x in tsegs] + [tts["duration"]]
