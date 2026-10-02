@@ -152,6 +152,86 @@ def _parse_ts(ts: str):
     return datetime.fromisoformat(ts.replace("Z", "+00:00"))
 
 
+# ── lanes & format DNA ────────────────────────────────────────────────────────
+HOOK_PATTERNS = [
+    ("question",      r"^\s*(why|how|what|who|when|where|which|can|did|do|does|is|are|was|could|should)\b|\?"),
+    ("number_first",  r"^\s*(?:top\s+)?\d|^\s*\d+\s|\b\d+\s+(things|facts|reasons|ways|times)\b"),
+    ("disbelief",     r"\b(actually|no one|nobody|never|wait|insane|crazy|wild|unbelievable|won'?t believe|shocking|turns out)\b"),
+    ("you_statement", r"\b(you|your|you'?re|yourself)\b"),
+]
+
+
+def hook_pattern(title: str) -> str:
+    """Classify a title into one of the channel's hook_styles.
+
+    Deliberately ordered: a title can satisfy several patterns, and the earlier ones are the more
+    specific claim about its shape. Anything unmatched is a plain assertion — a bold_claim.
+    """
+    t = (title or "").strip().lower()
+    for name, pat in HOOK_PATTERNS:
+        if re.search(pat, t):
+            return name
+    return "bold_claim"
+
+
+def lane_queries(cfg: dict) -> list[tuple[str, str]]:
+    """(lane, query) pairs for this run, capped by quota and rotated day by day.
+
+    When the configured lanes hold more queries than max_queries_per_run allows, taking the first N
+    every day would mean the last lanes are never searched. Rotating the start offset by day-of-year
+    gives every query its turn across a week while keeping each individual run inside quota.
+    """
+    t = cfg.get("trends", {}) or {}
+    lanes = t.get("lanes") or {}
+    pairs: list[tuple[str, str]] = []
+    if lanes:
+        # interleave lanes so a cap still samples every lane rather than exhausting the first
+        per_lane = [[(name, q) for q in (spec.get("queries") or [])] for name, spec in lanes.items()]
+        for i in range(max((len(x) for x in per_lane), default=0)):
+            for lane in per_lane:
+                if i < len(lane):
+                    pairs.append(lane[i])
+    else:
+        pairs = [("", q) for q in (t.get("youtube_outlier_queries") or [])]
+    cap = int(t.get("max_queries_per_run", 0) or len(pairs))
+    if 0 < cap < len(pairs):
+        off = now_utc().timetuple().tm_yday % len(pairs)
+        pairs = [pairs[(off + i) % len(pairs)] for i in range(cap)]
+    return pairs
+
+
+def lane_of(cfg: dict, category: str) -> str:
+    for name, spec in (cfg.get("trends", {}).get("lanes") or {}).items():
+        if category in (spec.get("categories") or []):
+            return name
+    return ""
+
+
+def format_pulse(rows: list[dict]) -> dict:
+    """Which hook shapes are actually winning on YouTube right now.
+
+    The reward loop can only learn from our own uploads, which is a handful of videos a week — far
+    too slow to notice that, say, number-first hooks are hot this month. These rows are other
+    people's viral Shorts, so they are a live read on format demand that costs us nothing and
+    arrives thousands of videos at a time. Weighted by views per hour rather than by video count,
+    so one breakout counts for more than ten mild performers.
+    """
+    tally: dict[str, dict] = {}
+    for r in rows:
+        pat = hook_pattern(r.get("topic", ""))
+        d = tally.setdefault(pat, {"videos": 0, "vph": 0.0})
+        d["videos"] += 1
+        d["vph"] += float(r.get("vph") or 0)
+    total = sum(d["vph"] for d in tally.values()) or 1.0
+    return {
+        "updated": now_utc().isoformat(timespec="seconds"),
+        "sample": len(rows),
+        "hook_style": {k: round(v["vph"] / total, 4) for k, v in sorted(
+            tally.items(), key=lambda kv: -kv[1]["vph"])},
+        "videos": {k: v["videos"] for k, v in tally.items()},
+    }
+
+
 def youtube_outliers(cfg: dict) -> list[dict]:
     """Fact/explainer Shorts that are going viral RIGHT NOW (proven demand for the topic).
 
@@ -161,8 +241,8 @@ def youtube_outliers(cfg: dict) -> list[dict]:
     Only the TOPIC is used — our video is an original, sourced take, never a copy.
     """
     t = cfg.get("trends", {})
-    queries = t.get("youtube_outlier_queries") or []
-    if not queries or not _yt_oauth_ready():
+    pairs = lane_queries(cfg)
+    if not pairs or not _yt_oauth_ready():
         return []
     from .common import write_json
     today = now_utc().date().isoformat()
@@ -178,14 +258,14 @@ def youtube_outliers(cfg: dict) -> list[dict]:
     try:
         from . import youtube
         yt = youtube.service()
-        found: dict[str, str] = {}
-        for q in queries:
+        found: dict[str, tuple[str, str]] = {}        # videoId -> (query, lane)
+        for lane, q in pairs:
             try:
                 r = yt.search().list(part="id", q=q, type="video", videoDuration="short", order="viewCount",
                                      publishedAfter=since.strftime("%Y-%m-%dT%H:%M:%SZ"), regionCode=region,
                                      relevanceLanguage=lang, safeSearch="strict", maxResults=25).execute()
                 for it in r.get("items", []):
-                    found.setdefault(it["id"]["videoId"], q)
+                    found.setdefault(it["id"]["videoId"], (q, lane))
             except Exception as e:  # noqa: BLE001
                 log.warning("youtube outlier search %r failed: %s", q, str(e)[:120])
         ids = list(found)
@@ -213,22 +293,35 @@ def youtube_outliers(cfg: dict) -> list[dict]:
             if len(topic) < 8:
                 continue
             rows.append({"topic": topic, "vph": vph, "ratio": ratio, "views": views, "hours": hours, "subs": s_count,
-                         "desc": _clean_title(sn.get("description", ""))[:140], "query": found.get(v["id"], "")})
+                         "desc": _clean_title(sn.get("description", ""))[:140],
+                         "query": found.get(v["id"], ("", ""))[0], "lane": found.get(v["id"], ("", ""))[1],
+                         "hook": hook_pattern(topic)})
         # rank: speed (views/hour) and breakout (views vs. channel size) both matter
         rows.sort(key=lambda r: -(math.log10(r["vph"] + 1) + 0.6 * math.log10(r["ratio"] + 1)))
         n = len(rows)
         for i, r in enumerate(rows[:40]):
             out.append({
                 "topic": r["topic"], "source": "youtube_outliers", "is_fact": True,
+                "lane": r["lane"], "hook": r["hook"],
                 "score": round(min(1.0, 0.55 + 0.45 * _norm_rank(i, n)), 4),
                 "context": [f"viral Short now: {r['views']:,} views in {r['hours']:.0f}h"
                             + (f", {r['ratio']:.0f}x its channel's subscribers" if r["subs"] else ""), r["desc"]],
                 "evidence": {"views": r["views"], "hours": round(r["hours"], 1), "vph": round(r["vph"]),
                              "breakout": round(r["ratio"], 1)},
             })
-        log.info("youtube outliers: %d viral Shorts from %d searches", len(out), len(queries))
+        by_lane: dict[str, int] = {}
+        for o in out:
+            by_lane[o.get("lane") or "-"] = by_lane.get(o.get("lane") or "-", 0) + 1
+        log.info("youtube outliers: %d viral Shorts from %d searches across %d lanes (%s)",
+                 len(out), len(pairs), len(by_lane),
+                 ", ".join(f"{k}:{v}" for k, v in sorted(by_lane.items())))
         cache.update({"yt_outliers_date": today, "yt_outliers": out})
         write_json("trend_cache.json", cache)
+        if t.get("format_pulse", True) and rows:
+            pulse = format_pulse(rows)
+            write_json("format_pulse.json", pulse)
+            log.info("format pulse (%d viral Shorts): %s", pulse["sample"],
+                     ", ".join(f"{k} {v:.0%}" for k, v in pulse["hook_style"].items()))
     except Exception as e:  # noqa: BLE001
         log.warning("youtube outliers failed: %s", str(e)[:200])
     return out

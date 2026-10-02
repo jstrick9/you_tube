@@ -93,6 +93,22 @@ class Strategy:
     def observations(self, dim: str) -> int:
         return sum(v.get("n", 0) for v in self.state["arms"].get(dim, {}).values())
 
+    def pulse_weights(self, dim: str, keys: list[str]) -> list[float] | None:
+        """Live external demand for `dim`, from other people's viral Shorts (trends.format_pulse).
+
+        Our own reward loop sees a handful of videos a week, so it cannot notice in time that a
+        particular hook shape is hot this month. The outlier scanner reads thousands of viral Shorts
+        a day, which is a far faster signal — but it is other channels' evidence, not ours, so it
+        only ever biases a choice we were otherwise making blind. Blended with a uniform floor so
+        no option is ever starved to zero.
+        """
+        share = (read_json("format_pulse.json", {}) or {}).get(dim) or {}
+        if not share or not keys:
+            return None
+        alpha, floor = 0.7, 1.0 / len(keys)
+        w = [(1 - alpha) * floor + alpha * float(share.get(k, 0.0)) for k in keys]
+        return w if sum(w) > 0 else None
+
     def sample(self, dim: str, exclude: set[str] | None = None) -> str:
         opts = self.options()[dim]
         arms = {k: v for k, v in self.state["arms"][dim].items()
@@ -103,7 +119,9 @@ class Strategy:
         # random rather than by a posterior built from noise. Thompson sampling on 3 observations is
         # not exploration, it is superstition.
         if dim in self.frozen or self.observations(dim) < self.min_obs or random.random() < self.explore:
-            return random.choice(list(arms))
+            keys = list(arms)
+            w = self.pulse_weights(dim, keys)
+            return random.choices(keys, weights=w, k=1)[0] if w else random.choice(keys)
         draws = {k: random.betavariate(max(v["a"], 0.05), max(v["b"], 0.05)) for k, v in arms.items()}
         return max(draws, key=draws.get)
 
