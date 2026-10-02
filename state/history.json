@@ -24,15 +24,15 @@
     "video_id": "q5lleO0lrkI",
     "status": "scheduled",
     "metrics": {
-      "views": 21,
+      "views": 22,
       "likes": 0,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 183.5,
+      "hours_live": 192.3,
       "vph": 0.114,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 20,
       "avg_view_pct": 3474.28,
       "avg_view_dur": 1146
@@ -70,9 +70,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 178.0,
-      "vph": 6.86,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 186.8,
+      "vph": 6.536,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 1219,
       "avg_view_pct": 80.33,
       "avg_view_dur": 35
@@ -110,9 +110,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 175.0,
-      "vph": 6.76,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 183.8,
+      "vph": 6.436,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 1184,
       "avg_view_pct": 41.66,
       "avg_view_dur": 14
@@ -150,9 +150,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 159.5,
-      "vph": 8.019,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 168.3,
+      "vph": 7.599,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 1279,
       "avg_view_pct": 51.97999999999999,
       "avg_view_dur": 16
@@ -190,9 +190,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 154.0,
-      "vph": 7.5,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 162.8,
+      "vph": 7.094,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 1152,
       "avg_view_pct": 59.209999999999994,
       "avg_view_dur": 18
@@ -230,9 +230,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 151.0,
-      "vph": 7.464,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 159.8,
+      "vph": 7.052,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 1131,
       "avg_view_pct": 30.11,
       "avg_view_dur": 13
@@ -270,9 +270,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 135.5,
-      "vph": 8.561,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 144.3,
+      "vph": 8.038,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 1162,
       "avg_view_pct": 41.37,
       "avg_view_dur": 13
@@ -310,9 +310,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 130.0,
-      "vph": 9.262,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 138.8,
+      "vph": 8.673,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 1209,
       "avg_view_pct": 59.699999999999996,
       "avg_view_dur": 23
@@ -350,9 +350,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 127.0,
-      "vph": 4.89,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 135.8,
+      "vph": 4.572,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 625,
       "avg_view_pct": 55.14,
       "avg_view_dur": 20
@@ -384,15 +384,15 @@
     "video_id": "lUA-2zrFHGc",
     "status": "scheduled",
     "metrics": {
-      "views": 911,
+      "views": 914,
       "likes": 11,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 111.5,
-      "vph": 8.17,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 120.3,
+      "vph": 7.596,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 908,
       "avg_view_pct": 51.81,
       "avg_view_dur": 15
@@ -424,15 +424,15 @@
     "video_id": "4WkKoRw9r00",
     "status": "scheduled",
     "metrics": {
-      "views": 1166,
+      "views": 1174,
       "likes": 9,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 106.0,
-      "vph": 11.0,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 114.8,
+      "vph": 10.225,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 1184,
       "avg_view_pct": 49.81,
       "avg_view_dur": 18
@@ -464,15 +464,15 @@
     "video_id": "SBETRh-FF_I",
     "status": "scheduled",
     "metrics": {
-      "views": 459,
+      "views": 460,
       "likes": 5,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 103.0,
-      "vph": 4.456,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 111.8,
+      "vph": 4.114,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 453,
       "avg_view_pct": 47.87,
       "avg_view_dur": 18
@@ -510,9 +510,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 87.5,
-      "vph": 11.12,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 96.3,
+      "vph": 10.102,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 972,
       "avg_view_pct": 45.53,
       "avg_view_dur": 17
@@ -628,9 +628,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 63.5,
-      "vph": 5.102,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00",
+      "hours_live": 72.3,
+      "vph": 4.48,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00",
       "a_views": 62,
       "avg_view_pct": 47.48,
       "avg_view_dur": 16
@@ -768,9 +768,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 34.0,
-      "vph": 0.088,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00"
+      "hours_live": 42.8,
+      "vph": 0.07,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00"
     }
   },
   {
@@ -810,9 +810,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 31.0,
-      "vph": 0.032,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00"
+      "hours_live": 39.8,
+      "vph": 0.025,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00"
     }
   },
   {
@@ -852,9 +852,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 15.5,
-      "vph": 0.065,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00"
+      "hours_live": 24.3,
+      "vph": 0.041,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00"
     }
   },
   {
@@ -889,15 +889,15 @@
     "video_id": "1ed_FohPwqs",
     "status": "scheduled",
     "metrics": {
-      "views": 957,
+      "views": 962,
       "likes": 26,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 10.0,
-      "vph": 95.695,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00"
+      "hours_live": 18.8,
+      "vph": 51.115,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00"
     }
   },
   {
@@ -932,15 +932,15 @@
     "video_id": "UvqHvc4mOXM",
     "status": "scheduled",
     "metrics": {
-      "views": 762,
-      "likes": 31,
+      "views": 1133,
+      "likes": 34,
       "comments": 1,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 7.0,
-      "vph": 108.849,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00"
+      "hours_live": 15.8,
+      "vph": 71.617,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00"
     }
   },
   {
@@ -975,15 +975,108 @@
     "video_id": "j1f2p7A4P48",
     "status": "scheduled",
     "metrics": {
-      "views": 0,
-      "likes": 0,
+      "views": 11,
+      "likes": 1,
       "comments": 0,
-      "privacy": "private",
+      "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
       "hours_live": 1.0,
-      "vph": 0.0,
-      "checked_at": "2026-10-02T07:30:01.800492+00:00"
+      "vph": 11.0,
+      "checked_at": "2026-10-02T16:19:13.028373+00:00"
     }
+  },
+  {
+    "created_at": "2026-10-02T16:53:14.114059+00:00",
+    "run_id": "20261002-1619",
+    "title": "Why half of Earth's heat is radioactive decay #shorts",
+    "topic": "half of Earth’s internal heat does not come from the residual heat left over from the planet's formation, but from the continuous radioactive decay of isotopes like Uranium, Thorium, and Potassium in the crust and mantle.",
+    "topic_key": "half of earths internal heat does not come from the residual heat left over from the planets formation but from the continuous radioactive decay of isotopes like uranium thorium and potassium in the crust and mantle",
+    "wiki_title": "Earth's internal heat budget",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "science",
+      "format": "scale_shock",
+      "hook_style": "question",
+      "voice": "en-US-AndrewNeural",
+      "source": "reddit"
+    },
+    "viral_score": 9.4,
+    "why_trending": "reddit_todayilearned top post today",
+    "trend_evidence": [
+      "TIL half of Earth’s internal heat does not come from the residual heat left over from the planet's formation, but from the continuous radioactive decay of isotopes like Uranium, Thorium, and Potassium in the crust and mantle."
+    ],
+    "review_score": 8,
+    "duration": 32.24600907029479,
+    "tts_engine": "edge-tts",
+    "file": "20261002-1619-01-earth-s-internal-heat-budget.mp4",
+    "publish_at": "2026-10-02T21:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "video_id": "A_pMdr1HGgE",
+    "status": "scheduled"
+  },
+  {
+    "created_at": "2026-10-02T16:53:16.857245+00:00",
+    "run_id": "20261002-1619",
+    "title": "Why Alchemists Called This Acid 'Spirits of Salt' #shorts",
+    "topic": "a 1904 cookbook included a recipe for \"raw beef soup\" that was basically raw beef, hydrochloric acid, and water, chilled on ice for 12 hours and drunk cold. The target audience: invalids in need of nourishment.",
+    "topic_key": "a 1904 cookbook included a recipe for raw beef soup that was basically raw beef hydrochloric acid and water chilled on ice for 12 hours and drunk cold the target audience invalids in need of nourishment",
+    "wiki_title": "Hydrochloric acid",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "choice": {
+      "category": "food",
+      "format": "creepy_true",
+      "hook_style": "question",
+      "voice": "en-US-ChristopherNeural",
+      "source": "reddit"
+    },
+    "viral_score": 9.2,
+    "why_trending": "reddit_todayilearned top post today",
+    "trend_evidence": [
+      "TIL a 1904 cookbook included a recipe for \"raw beef soup\" that was basically raw beef, hydrochloric acid, and water, chilled on ice for 12 hours and drunk cold. The target audience: invalids in need of nourishment."
+    ],
+    "review_score": 8,
+    "duration": 31.14206349206349,
+    "tts_engine": "edge-tts",
+    "file": "20261002-1619-02-hydrochloric-acid.mp4",
+    "publish_at": "2026-10-03T00:30:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "status": "upload_failed: <HttpError 400 when requesting None returned \"The request metadata specifies an invalid video description.\". Details: \"[{'message': 'The request metadata specifies an invalid video description.', 'dom"
+  },
+  {
+    "created_at": "2026-10-02T16:53:17.029702+00:00",
+    "run_id": "20261002-1619",
+    "title": "How Helicopter Linemen Work on Live Power Lines #shorts",
+    "topic": "HOW Do Helicopter Linemen Work on Live Power Lines?",
+    "topic_key": "how do helicopter linemen work on live power lines",
+    "wiki_title": "Lineworker",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "choice": {
+      "category": "technology",
+      "format": "sounds_fake",
+      "hook_style": "you_statement",
+      "voice": "en-US-AvaNeural",
+      "source": "youtube_outliers"
+    },
+    "viral_score": 8.5,
+    "why_trending": "Viral Short now: 851,520 views in 86h, 6x its channel's subscribers",
+    "trend_evidence": [
+      "viral Short now: 851,520 views in 86h, 6x its channel's subscribers",
+      "HOW Do Helicopter Linemen Work on Live Power Lines? Working on high-voltage power lines from a helicopter sounds unbelievable! These workers"
+    ],
+    "review_score": 9,
+    "duration": 28.958049886621314,
+    "tts_engine": "edge-tts",
+    "file": "20261002-1619-03-lineworker.mp4",
+    "publish_at": "2026-10-03T16:00:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "video_id": "Mh57dHFzYa0",
+    "status": "scheduled"
   }
 ]

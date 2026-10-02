@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-02T07:30:01.800492+00:00",
+  "updated": "2026-10-02T16:19:13.028373+00:00",
   "videos_total": 26,
   "videos_7d": 22,
-  "views_7d": 10824,
+  "views_7d": 11223,
   "learned_this_run": 0,
   "strategy": {
     "category": [
@@ -269,7 +269,7 @@
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
-      "views": 1166,
+      "views": 1174,
       "avg_view_pct": 49.81
     },
     {
@@ -285,6 +285,12 @@
       "avg_view_pct": 59.209999999999994
     },
     {
+      "title": "Why you are falling through space right now #shorts",
+      "id": "UvqHvc4mOXM",
+      "views": 1133,
+      "avg_view_pct": null
+    },
+    {
       "title": "How Your Liver Rebuilds Itself #shorts",
       "id": "oTgoKlCkGE0",
       "views": 1127,
@@ -295,12 +301,6 @@
       "id": "6dO8y_ojGhI",
       "views": 973,
       "avg_view_pct": 45.53
-    },
-    {
-      "title": "How the Largest Animal Ever Eats Tiny Prey #shorts",
-      "id": "1ed_FohPwqs",
-      "views": 957,
-      "avg_view_pct": null
     }
   ],
   "rejected": []
