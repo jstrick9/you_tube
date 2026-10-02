@@ -50,7 +50,9 @@ persona:
   max_asides: 2
   proof_stamp: true                # end card: "PROVEN ✓" rubber stamp + the source, with a stamp sound
   stamp_seconds: 2.0
-  voice: null                      # set one voice (e.g. en-US-AndrewNeural) to lock a signature narrator; null = learned
+  # A recognisable channel needs ONE narrator. Rotating 5 voices also split the bandit's evidence 5 ways
+  # for no benefit. Pinned to our best performer so far (Andrew, posterior mean 0.637 over 2 videos).
+  voice: en-US-AndrewNeural        # null = learned by the bandit (not recommended below ~500 videos)
 
 schedule:
   videos_per_day: 3                      # keep modest: quality > quantity (see README → Compliance)
@@ -247,8 +249,34 @@ upload:
 analytics:
   enabled: true
   evaluate_after_hours: 48                # judge a video's performance after N hours
-  retention_weight: 0.4                   # reward = 0.6*views-rank + 0.4*retention-rank
   exploration: 0.15                       # extra random exploration on top of Thompson sampling
+
+  # ── reward ──
+  # Weighted toward RETENTION, not views. Views/hour is downstream of how much traffic the algorithm
+  # chose to send; retention is the upstream signal we control and the one that decides whether a Short
+  # escapes its seed audience at all.
+  w_retention: 0.65
+  w_reach: 0.25
+  w_engagement: 0.10
+  # Absolute targets. A video scoring exactly the target gets 1.0 on that component. These are what the
+  # reward is measured against until the channel has enough SPREAD for percentile ranking to mean
+  # something — with every video landing in a narrow band, ranking noise is not a learning signal.
+  target_avg_view_pct: 75.0               # 2026 Shorts: ~70%+ viewed-not-swiped is the escape threshold
+  target_completion: 0.55                 # share of viewers still there at the end (drives replays)
+  target_hook_retention: 0.80             # share still there at 15% elapsed — the hook's verdict
+  target_vph: 40.0                        # views/hour; raise this as the channel grows
+  target_engagement: 0.06                 # (likes + 3*comments) / views
+  rank_min_videos: 40                     # below this many matured videos, score absolutely
+  rank_min_spread: 0.35                   # ...and below this coefficient of variation, keep scoring absolutely
+  min_views_to_learn: 50                  # a video with fewer views is noise, not evidence — don't learn from it
+
+  # ── what the bandit spends its evidence on ──
+  # Frozen dimensions rotate for variety but are not learned. With thousands of possible cells and a few
+  # videos a day, spreading evidence across every dimension means none of them ever separates; freezing
+  # voice and hook_style makes category and format converge several times faster. Unfreeze once the
+  # channel is doing real volume.
+  frozen_dimensions: [voice, hook_style, source]
+  min_observations: 8                     # a dimension is sampled at random until it has this much evidence
 
 notify:
   # Optional free push notifications via ntfy.sh (no account) or a Discord webhook.

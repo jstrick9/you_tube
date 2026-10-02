@@ -15,19 +15,33 @@ from __future__ import annotations
 import logging
 import random
 
+from datetime import datetime
+
 from .common import now_utc, read_json, write_json
 
 log = logging.getLogger("autotube.strategy")
 
 DIMENSIONS = ("category", "format", "hook_style", "voice", "source")
-DECAY = 0.97          # applied on every update → recent results matter more
-PRIOR = (1.0, 1.0)    # Beta(1,1)
+HALF_LIFE_DAYS = 45.0   # evidence decays with TIME, not with upload count (see Strategy.age)
+PRIOR = (1.0, 1.0)      # Beta(1,1)
 
 
 class Strategy:
+    # class-level defaults so tests (and any caller) can build a bare Strategy via __new__
+    frozen: set[str] = set()
+    min_obs: int = 0
+    explore: float = 0.15
+
     def __init__(self, cfg: dict):
         self.cfg = cfg
-        self.explore = float(cfg.get("analytics", {}).get("exploration", 0.15))
+        acfg = cfg.get("analytics", {}) or {}
+        self.explore = float(acfg.get("exploration", 0.15))
+        # Dimensions we deliberately do NOT learn. With 15 formats x 5 hooks x 5 voices x 12 categories
+        # there are thousands of cells and only a few videos a day; spreading the evidence across all of
+        # them means no dimension ever separates. Frozen dimensions rotate deterministically for variety
+        # and spend zero statistical power, so category and format converge several times faster.
+        self.frozen = set(acfg.get("frozen_dimensions") or [])
+        self.min_obs = int(acfg.get("min_observations", 8))
         self.state = read_json("strategy.json", {"arms": {}, "updates": 0})
         arms = self.state.setdefault("arms", {})
         options = self.options()
@@ -76,12 +90,19 @@ class Strategy:
         return plan
 
     # ── sampling ──────────────────────────────────────────────────────────────
+    def observations(self, dim: str) -> int:
+        return sum(v.get("n", 0) for v in self.state["arms"].get(dim, {}).values())
+
     def sample(self, dim: str, exclude: set[str] | None = None) -> str:
+        opts = self.options()[dim]
         arms = {k: v for k, v in self.state["arms"][dim].items()
-                if k in self.options()[dim] and k not in (exclude or set())}
+                if k in opts and k not in (exclude or set())}
         if not arms:
-            arms = self.state["arms"][dim]
-        if random.random() < self.explore:
+            arms = {k: v for k, v in self.state["arms"][dim].items() if k in opts} or self.state["arms"][dim]
+        # A frozen dimension, or one with too little evidence to tell its arms apart, is chosen at
+        # random rather than by a posterior built from noise. Thompson sampling on 3 observations is
+        # not exploration, it is superstition.
+        if dim in self.frozen or self.observations(dim) < self.min_obs or random.random() < self.explore:
             return random.choice(list(arms))
         draws = {k: random.betavariate(max(v["a"], 0.05), max(v["b"], 0.05)) for k, v in arms.items()}
         return max(draws, key=draws.get)
@@ -114,15 +135,39 @@ class Strategy:
         return plans
 
     # ── learning ──────────────────────────────────────────────────────────────
+    def age(self, now=None) -> None:
+        """Forget with the calendar, not with the upload counter.
+
+        The old code multiplied every arm by 0.97 on EVERY update. At 3 videos/day that is 0.97^90 by
+        the end of a month — early evidence had evaporated long before enough of it accumulated to
+        separate 15 formats. Decay is now a 45-day half-life applied once per analytics pass, so the
+        model still adapts when tastes shift but can actually accumulate evidence in the meantime.
+        """
+        now = now or now_utc()
+        last = self.state.get("aged_at")
+        self.state["aged_at"] = now.isoformat()
+        if not last:
+            return
+        try:
+            days = (now - datetime.fromisoformat(last)).total_seconds() / 86400.0
+        except (TypeError, ValueError):
+            return
+        if days <= 0:
+            return
+        factor = 0.5 ** (days / HALF_LIFE_DAYS)
+        for arms in self.state["arms"].values():
+            for v in arms.values():
+                v["a"] = PRIOR[0] + (v["a"] - PRIOR[0]) * factor
+                v["b"] = PRIOR[1] + (v["b"] - PRIOR[1]) * factor
+
     def update(self, choice: dict, reward: float) -> None:
         reward = max(0.0, min(1.0, reward))
         for dim in DIMENSIONS:
+            if dim in self.frozen:
+                continue                 # not learned → don't pretend we measured it
             arm = choice.get(dim)
             if not arm or arm not in self.state["arms"].get(dim, {}):
                 continue
-            for v in self.state["arms"][dim].values():   # forgetting
-                v["a"] = PRIOR[0] + (v["a"] - PRIOR[0]) * DECAY
-                v["b"] = PRIOR[1] + (v["b"] - PRIOR[1]) * DECAY
             a = self.state["arms"][dim][arm]
             a["a"] += reward
             a["b"] += 1.0 - reward
@@ -135,7 +180,10 @@ class Strategy:
     def report(self) -> dict:
         out = {}
         for dim, arms in self.state["arms"].items():
-            out[dim] = sorted(
+            n = sum(v.get("n", 0) for v in arms.values())
+            status = ("frozen" if dim in self.frozen
+                      else "learning" if n >= self.min_obs else f"exploring ({n}/{self.min_obs})")
+            out[dim] = {"status": status, "observations": n, "arms": sorted(
                 [{"arm": k, "mean": round(v["a"] / (v["a"] + v["b"]), 3), "n": v["n"]} for k, v in arms.items()],
-                key=lambda x: -x["mean"])
+                key=lambda x: -x["mean"])}
         return out

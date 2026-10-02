@@ -248,8 +248,19 @@ def test_fit_avoids_repeating_a_format_in_one_run(monkeypatch):
     assert s.fit({"format": "scale_shock"}, {"formats": ["scale_shock"]}, {"scale_shock"})["format"] == "scale_shock"
 
 
-def test_plan_varies_voices():
+def test_pinned_persona_voice_is_the_signature_narrator():
+    """A recognisable channel has ONE narrator, and rotating voices also split the bandit's evidence
+    five ways for no benefit. When persona.voice is set, every plan uses it."""
     s = _strategy()
+    plans = s.plan(3)
+    pinned = s.cfg.get("persona", {}).get("voice")
+    assert pinned, "config should pin a signature narrator"
+    assert {p["voice"] for p in plans} == {pinned}
+
+
+def test_plan_varies_voices_when_none_is_pinned():
+    s = _strategy()
+    s.cfg = {**s.cfg, "persona": {**s.cfg.get("persona", {}), "voice": None}}
     plans = s.plan(3)
     assert len({p["voice"] for p in plans}) == 3
 

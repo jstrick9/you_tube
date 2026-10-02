@@ -134,3 +134,71 @@ def retention(ids: list[str], start: str, end: str) -> dict[str, dict]:
     except Exception as e:  # noqa: BLE001
         log.warning("analytics API unavailable: %s", str(e)[:200])
         return {}
+
+
+def retention_curves(ids: list[str], start: str, end: str) -> dict[str, dict]:
+    """Per-video RETENTION CURVE: audienceWatchRatio across elapsedVideoTimeRatio.
+
+    `averageViewPercentage` says *that* people left; the curve says *where*. That is the difference
+    between "this video underperformed" and "we lose 40% of viewers during the hook" — the former is
+    unactionable, the latter tells the bandit and the scriptwriter exactly what to change.
+
+    The elapsedVideoTimeRatio dimension only accepts ONE video per query, so this costs one Analytics
+    call per video. The Analytics API has its own quota (separate from the Data API's 10,000 units),
+    and callers pass only videos that don't already have a curve, so a normal day is a handful of calls.
+
+    Returns per video: {curve, hook_retention, completion, swipe_point, curve_points}.
+    """
+    if not ids:
+        return {}
+    out: dict[str, dict] = {}
+    try:
+        ya = service("youtubeAnalytics", "v2")
+    except Exception as e:  # noqa: BLE001
+        log.warning("analytics API unavailable for curves: %s", str(e)[:160])
+        return {}
+    for vid in ids:
+        try:
+            r = ya.reports().query(ids="channel==MINE", startDate=start, endDate=end,
+                                   metrics="audienceWatchRatio", dimensions="elapsedVideoTimeRatio",
+                                   filters=f"video=={vid}", sort="elapsedVideoTimeRatio").execute()
+            rows = [(float(a), float(b)) for a, b in r.get("rows", []) if b is not None]
+            if len(rows) < 5:
+                continue
+            out[vid] = summarize_curve(rows)
+        except Exception as e:  # noqa: BLE001
+            log.debug("retention curve for %s unavailable: %s", vid, str(e)[:120])
+    if out:
+        log.info("retention curves: %d videos", len(out))
+    return out
+
+
+def summarize_curve(rows: list[tuple[float, float]]) -> dict:
+    """Condense a retention curve into the few numbers that are actually actionable.
+
+    hook_retention — share still watching at 15% elapsed (the hook's verdict).
+    completion     — share still watching at the very end (drives replays and reach on Shorts).
+    swipe_point    — where the curve first falls below half the audience; the biggest leak.
+    """
+    rows = sorted(rows)
+
+    def at(x: float) -> float:
+        prev = rows[0]
+        for t, v in rows:
+            if t >= x:
+                if t == prev[0]:
+                    return v
+                f = (x - prev[0]) / (t - prev[0])
+                return prev[1] + f * (v - prev[1])
+            prev = (t, v)
+        return rows[-1][1]
+
+    swipe = next((t for t, v in rows if v < 0.5), None)
+    return {
+        "hook_retention": round(at(0.15), 4),
+        "completion": round(rows[-1][1], 4),
+        "swipe_point": round(swipe, 4) if swipe is not None else None,
+        "curve_points": len(rows),
+        # 11-point resample: small enough to commit to the repo every night, detailed enough to plot
+        "curve": [round(at(i / 10), 4) for i in range(11)],
+    }
