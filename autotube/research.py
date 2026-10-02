@@ -10,7 +10,7 @@ import logging
 import re
 from urllib.parse import quote
 
-from . import safety, sources
+from . import news, safety, sources
 from .common import get_json
 from .trends import is_living_person, wiki_summary
 
@@ -100,6 +100,69 @@ def article_images(title: str, lang: str = "en", limit: int = 25) -> list[str]:
         return []
 
 
+
+def ground_news(topic: str, search_query: str | None, lang: str = "en",
+                cfg: dict | None = None, llm=None) -> dict | None:
+    """Ground a trend that has no Wikipedia article in the open news record.
+
+    Two rules keep this from becoming a rumour mill. First, a story must be carried by at least
+    `research.min_outlets` INDEPENDENT publishers before it can be used at all, so one outlet's
+    scoop — or one wire story syndicated five times — is not treated as established fact. Second,
+    only headlines are taken: reproducing publishers' article bodies would be both a copyright
+    problem and precisely the reused content that costs monetization.
+
+    Headlines alone cannot carry a 60-second script, so the explainer half is anchored on a related
+    encyclopedic subject (Sora 2 → OpenAI). If no such backbone resolves, the topic is dropped
+    rather than written from headlines alone.
+    """
+    rcfg = ((cfg or {}).get("research") or {})
+    if not rcfg.get("news_fallback", True):
+        return None
+    subject = (search_query or topic or "").strip()
+    region = ((cfg or {}).get("channel") or {}).get("region", "US")
+    brief = news.brief(subject, lang, region, int(rcfg.get("min_outlets", 2)))
+    if not brief:
+        return None
+    if cfg is not None:
+        allowed, reason = safety.check_subject(subject, brief["text"][:1200], cfg, llm)
+        if not allowed:
+            log.info("skip %r: %s", subject, reason)
+            return None
+
+    # anchor the background on the first backbone entity that actually has an article
+    anchor_title, anchor_text = None, ""
+    for cand in brief["backbone"]:
+        t = search_title(cand, lang)
+        if not t or re.match(r"^(List|Lists|Timeline|Index|Outline|Glossary) of ", t):
+            continue
+        body = article_text(t, lang)
+        if len(body) >= 1500:
+            anchor_title, anchor_text = t, body
+            break
+    if not anchor_title:
+        log.info("skip %r: %d outlets agree it is happening, but no encyclopedic backbone to "
+                 "explain it from", subject, brief["n_outlets"])
+        return None
+
+    log.info("news-grounded %r: %d independent outlets, background from %r",
+             subject, brief["n_outlets"], anchor_title)
+    text = brief["text"] + "\n\n" + f"Background on {anchor_title}:\n" + anchor_text
+    summ = wiki_summary(anchor_title, lang) or {}
+    return {
+        "title": topic,
+        "url": brief["also"][0]["url"] if brief["also"] else "",
+        "description": f"trending news topic, corroborated by {brief['n_outlets']} outlets",
+        "summary": "; ".join(brief["consensus"][:6]),
+        "text": text,
+        "also": brief["also"] + [{"title": anchor_title,
+                                  "url": f"https://{lang}.wikipedia.org/wiki/{quote(anchor_title.replace(' ', '_'))}",
+                                  "publisher": "Wikipedia"}],
+        "images": article_images(anchor_title, lang),
+        "lead_image": (summ.get("originalimage") or {}).get("source"),
+        "news": {"outlets": brief["outlets"], "consensus": brief["consensus"], "anchor": anchor_title},
+    }
+
+
 def ground(topic: str, search_query: str | None, lang: str = "en", allow_living: bool = False,
            blocked: list[str] | None = None, cfg: dict | None = None, llm=None) -> dict | None:
     """Return {'title','url','summary','text','images'} or None if unusable.
@@ -114,7 +177,9 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
             if title:
                 break
     if not title:
-        return None
+        # No encyclopedia article. Most things that genuinely trend are like this — a launch, a
+        # controversy, a meme — and discarding them all is what kept the channel off live trends.
+        return ground_news(topic, search_query, lang, cfg, llm)
     if re.match(r"^(List|Lists|Timeline|Index|Outline|Glossary) of ", title):
         log.info("skip %r: list-style article (thin narrative)", title)
         return None

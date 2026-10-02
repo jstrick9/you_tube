@@ -220,7 +220,9 @@ research:
   #              exactly what scale_shock and by_the_numbers need, and often absent from article prose
   extra_sources: [wikidata, nasa, arxiv, pubmed]
   enrich_below_chars: 7000      # only enrich when the Wikipedia article is thinner than this
-  enrich_max_chars: 4000        # cap on added text, so the writer prompt stays focused
+  enrich_max_chars: 4000
+  news_fallback: true                    # trends with no Wikipedia article: ground in the news record
+  min_outlets: 2                         # independent publishers required before a story may be used        # cap on added text, so the writer prompt stays focused
 
 llm:
   # Providers are tried in order; any provider without a key is skipped.
