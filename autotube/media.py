@@ -112,19 +112,82 @@ def openverse_search(query: str, min_w: int, limit: int = 10) -> list[dict]:
     return out
 
 
+# ── 9:16 fitness ──────────────────────────────────────────────────────────────
+FRAME_W, FRAME_H = 1080, 1920
+FRAME_AR = FRAME_W / FRAME_H          # 0.5625
+
+
+def crop_px(w: int | None, h: int | None) -> int:
+    """Real horizontal pixels that survive a 9:16 cover-crop of a w x h asset.
+
+    Since every shot became full-bleed, this - not raw width - is the number that decides whether a
+    frame looks sharp. Cover-cropping a landscape asset throws the sides away and then upscales
+    what is left to 1080 wide, so a 1920x1080 clip contributes only 1080*(9/16) = 608 real pixels
+    and gets blown up 1.8x; a 1280x720 one contributes 405 and is blown up 2.7x. A raw width floor
+    cannot see any of that, which is why a "1920px" asset could still render as mush.
+    """
+    try:
+        w, h = int(w or 0), int(h or 0)
+    except (TypeError, ValueError):
+        return 0
+    if w <= 0 or h <= 0:
+        return 0
+    return int(min(w, h * FRAME_AR))
+
+
+def crop_quality(w: int | None, h: int | None) -> float:
+    """crop_px as a fraction of the 1080 the frame needs. >=1.0 means no upscaling."""
+    return crop_px(w, h) / FRAME_W
+
+
+def shape_bonus(a: dict, weight: float = 1.0) -> float:
+    """Ranking nudge toward assets that fill a 9:16 frame without being upscaled.
+
+    Deliberately a bonus and not a filter. Hard-filtering to portrait shrinks the candidate pool so
+    far that the vision judge starts approving weak matches, and a sharp picture of the wrong thing
+    is worse than a slightly soft picture of the right one. Relevance still leads; this only breaks
+    ties between candidates the judge already approved.
+    """
+    q = crop_quality(a.get("w"), a.get("h"))
+    if q <= 0:
+        return 0.0                      # unknown dimensions: no opinion either way
+    if q >= 1.0:
+        return weight                   # fills the frame at native resolution or better
+    return weight * max(-1.0, (q - 1.0) * 1.5)   # soft penalty, scaled by how much upscaling it forces
+
+
 def pexels_search(query: str, limit: int = 8) -> list[dict]:
+    """Pexels photos, asking for portrait first but NOT restricting to it.
+
+    This used to pass orientation=portrait as a hard filter, which made sense when the renderer
+    letterboxed and a landscape photo was unusable. Now that every shot is cover-cropped full-bleed,
+    that filter only starves the pool: Pexels' portrait subset is small, so a narrow subject
+    returned almost nothing and the vision judge was left choosing among weak matches. Both
+    orientations are fetched and shape_bonus() prefers the ones that fill 9:16 natively.
+    """
     key = os.environ.get("PEXELS_API_KEY")
     if not key:
         return []
-    try:
-        data = get_json("https://api.pexels.com/v1/search", params={
-            "query": query, "per_page": limit, "orientation": "portrait"}, headers={"Authorization": key})
-    except Exception as e:  # noqa: BLE001
-        log.debug("pexels failed: %s", e)
-        return []
-    return [{"url": p["src"]["large2x"], "thumb": p["src"].get("medium"), "page": p["url"], "title": p.get("alt") or query,
-             "license": "Pexels License", "author": p.get("photographer", "Pexels"), "source": "Pexels",
-             "w": p["width"], "h": p["height"]} for p in data.get("photos", [])]
+    out, seen = [], set()
+    for orientation in ("portrait", None):
+        params = {"query": query, "per_page": limit}
+        if orientation:
+            params["orientation"] = orientation
+        try:
+            data = get_json("https://api.pexels.com/v1/search", params=params,
+                            headers={"Authorization": key})
+        except Exception as e:  # noqa: BLE001
+            log.debug("pexels failed: %s", e)
+            continue
+        for p in data.get("photos", []):
+            if p["src"]["large2x"] in seen:
+                continue
+            seen.add(p["src"]["large2x"])
+            out.append({"url": p["src"]["large2x"], "thumb": p["src"].get("medium"), "page": p["url"],
+                        "title": p.get("alt") or query, "license": "Pexels License",
+                        "author": p.get("photographer", "Pexels"), "source": "Pexels",
+                        "w": p["width"], "h": p["height"]})
+    return out
 
 
 # ── moving footage ────────────────────────────────────────────────────────────
@@ -205,29 +268,53 @@ def nasa_video_search(query: str, limit: int = 5) -> list[dict]:
 
 
 def pexels_video_search(query: str, limit: int = 5) -> list[dict]:
+    """Pexels clips, fetched in both orientations and chosen by post-crop sharpness."""
     key = os.environ.get("PEXELS_API_KEY")
     if not key:
         return []
-    try:
-        data = get_json("https://api.pexels.com/videos/search", params={"query": query, "per_page": limit},
-                        headers={"Authorization": key})
-    except Exception as e:  # noqa: BLE001
-        log.debug("pexels video failed: %s", e)
-        return []
-    out = []
-    for v in data.get("videos", []):
-        files = [f for f in v.get("video_files", []) if f.get("link") and (f.get("height") or 0) >= 720]
-        if not files or not (VIDEO_MIN_S <= float(v.get("duration") or 0) <= VIDEO_MAX_S):
+    out, seen = [], set()
+    for orientation in ("portrait", None):
+        params = {"query": query, "per_page": limit}
+        if orientation:
+            params["orientation"] = orientation
+        try:
+            data = get_json("https://api.pexels.com/videos/search", params=params,
+                            headers={"Authorization": key})
+        except Exception as e:  # noqa: BLE001
+            log.debug("pexels video failed: %s", e)
             continue
-        f = sorted(files, key=lambda f: f.get("width", 0) * f.get("height", 0))[0]
-        pics = v.get("video_pictures") or []
-        thumb = pics[len(pics) // 2]["picture"] if pics else v.get("image")
-        out.append({"kind": "video", "url": f["link"], "thumb": thumb, "page": v.get("url"),
-                    "title": (v.get("url") or query).rstrip("/").rsplit("/", 1)[-1][:70] + " (video)",
-                    "license": "Pexels License", "author": (v.get("user") or {}).get("name", "Pexels"),
-                    "source": "Pexels", "duration": float(v.get("duration") or 0), "w": f.get("width"),
-                    "h": f.get("height")})
+        for v in data.get("videos", []):
+            if v.get("id") in seen:
+                continue
+            files = [f for f in v.get("video_files", []) if f.get("link") and (f.get("height") or 0) >= 720]
+            if not files or not (VIDEO_MIN_S <= float(v.get("duration") or 0) <= VIDEO_MAX_S):
+                continue
+            f = _best_video_file(files)
+            seen.add(v.get("id"))
+            pics = v.get("video_pictures") or []
+            thumb = pics[len(pics) // 2]["picture"] if pics else v.get("image")
+            out.append({"kind": "video", "url": f["link"], "thumb": thumb, "page": v.get("url"),
+                        "title": (v.get("url") or query).rstrip("/").rsplit("/", 1)[-1][:70] + " (video)",
+                        "license": "Pexels License", "author": (v.get("user") or {}).get("name", "Pexels"),
+                        "source": "Pexels", "duration": float(v.get("duration") or 0), "w": f.get("width"),
+                        "h": f.get("height")})
     return out
+
+
+def _best_video_file(files: list[dict]) -> dict:
+    """Cheapest rendition that still fills a 9:16 frame at native resolution.
+
+    The old rule was "smallest file at or above 720p", which is the wrong axis entirely now that
+    clips are cover-cropped: a 1280x720 landscape rendition keeps only 405 of the 1080 pixels the
+    frame needs and gets upscaled 2.7x, so the bandwidth it saved bought a visibly soft shot. We
+    now pick the smallest rendition whose POST-CROP width clears 1080, and fall back to the
+    sharpest available when nothing does.
+    """
+    by_size = sorted(files, key=lambda f: (f.get("width") or 0) * (f.get("height") or 0))
+    good = [f for f in by_size if crop_px(f.get("width"), f.get("height")) >= FRAME_W]
+    if good:
+        return good[0]
+    return max(by_size, key=lambda f: crop_px(f.get("width"), f.get("height")))
 
 
 def _probe_duration(path: Path) -> float:
@@ -505,6 +592,7 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
     min_score = float(mcfg.get("min_match_score", 7))
     multi_after = float(mcfg.get("multi_shot_seconds", 4.5))
     video_bonus = float(mcfg.get("video_bonus", 1.0)) if mcfg.get("prefer_video", True) else 0.0
+    shape_w = float(mcfg.get("shape_bonus", 1.0))
     max_mb = float(mcfg.get("max_video_mb", 90))
     need_by_seg: dict[int, float] = {}
     work.mkdir(parents=True, exist_ok=True)
@@ -548,9 +636,18 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
         return sorted(judged, key=lambda c: -c["vscore"])
 
     def rank(judged):
-        """Approved candidates, best first; real moving footage gets a bonus over an equally good still."""
+        """Approved candidates, best first.
+
+        Three things decide the order: how well the vision judge thinks the asset shows the line,
+        whether it is real moving footage, and whether it survives the 9:16 cover-crop without
+        being upscaled. Relevance leads - shape only separates candidates the judge already
+        approved, because a sharp picture of the wrong thing is worse than a soft picture of the
+        right one.
+        """
         good = [c for c in judged if c["vscore"] >= min_score]
-        return sorted(good, key=lambda c: -(c["vscore"] + (video_bonus if c.get("kind") == "video" else 0)))
+        return sorted(good, key=lambda c: -(c["vscore"]
+                                            + (video_bonus if c.get("kind") == "video" else 0)
+                                            + shape_bonus(c, shape_w)))
 
     used: list[dict] = []          # {"url","hash","emb","title","seg"}
     shots: list[dict] = []
@@ -574,7 +671,8 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
                   ("vscore", "vshows", "vjudge", "clip", "clip_cos", "thumb", "variants", "t_ref", "window")}
         shots.append({"path": p, "credit": credit, "seg": i, "score": c["vscore"], "shows": c.get("vshows", ""),
                       "judge": c.get("vjudge", ""), "want": want, "reused": reused,
-                      "kind": c.get("kind", "image"), "poster": c.get("_poster"), "window": c.get("window")})
+                      "kind": c.get("kind", "image"), "poster": c.get("_poster"), "window": c.get("window"),
+                      "crop_q": round(crop_quality(c.get("w"), c.get("h")), 2)})
         log.info("    seg %d ← %.1f/10 [%s]%s %s  (%s)", i, c["vscore"], c.get("vjudge"), " (repeat)" if reused else "",
                  c.get("vshows", "")[:70], c["title"][:45])
         return True
@@ -646,6 +744,15 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
         raise NoVisualMatch(f"only {distinct} distinct verified images for {subject!r} (need {need})")
     shots.sort(key=lambda s: (s["seg"], s.get("reused", False)))
     n_vid = sum(1 for s in shots if s.get("kind") == "video")
+    # How many shots actually fill the 9:16 frame at native resolution. Since every shot became
+    # full-bleed this is the number that decides whether the video looks sharp or upscaled, and it
+    # is invisible in any other metric — log it so the next tuning pass has evidence, not a hunch.
+    qs = [s["crop_q"] for s in shots if s.get("crop_q")]
+    if qs:
+        native = sum(1 for q in qs if q >= 1.0)
+        log.info("  framing: %d/%d shots fill 9:16 natively (median crop quality %.2f%s)",
+                 native, len(qs), sorted(qs)[len(qs) // 2],
+                 "" if native == len(qs) else f", worst {min(qs):.2f} = {1 / max(min(qs), 0.01):.1f}x upscale")
     log.info("  visuals: %d shots (%d video clips), %d distinct, every line verified, %d vision calls", len(shots),
              n_vid, distinct, judge.calls)
     return {"shots": shots, "alts": alts, "calls": judge.calls, "need": need_by_seg, "max_mb": max_mb}

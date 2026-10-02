@@ -259,7 +259,11 @@ media:
   #                 pexels_video (only with PEXELS_API_KEY — portrait stock clips)
   sources: [commons_video, nasa_video, pexels_video, pexels, wikimedia, openverse]
   prefer_video: true                     # a verified clip beats an equally good still (motion holds attention)
-  video_bonus: 1.0                       # ranking bonus for clips among APPROVED candidates (never lowers the bar)
+  video_bonus: 1.0
+  # Ranking nudge toward assets that fill a 9:16 frame without upscaling (see media.shape_bonus).
+  # A bonus rather than a filter: hard-filtering to portrait starves the pool and the vision judge
+  # starts approving weak matches. 0 disables it.
+  shape_bonus: 1.0                       # ranking bonus for clips among APPROVED candidates (never lowers the bar)
   max_video_mb: 90                       # skip (or use a smaller version of) bigger source files
   min_image_width: 900
   # Every image is LOOKED AT before use (see autotube/vision.py): CLIP pre-ranks candidates, then a
