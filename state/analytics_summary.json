@@ -1,251 +1,271 @@
 {
-  "updated": "2026-10-02T16:19:13.028373+00:00",
-  "videos_total": 26,
-  "videos_7d": 22,
-  "views_7d": 11223,
+  "updated": "2026-10-02T21:28:21.128293+00:00",
+  "videos_total": 28,
+  "videos_7d": 21,
+  "views_7d": 7969,
   "learned_this_run": 0,
   "strategy": {
-    "category": [
-      {
-        "arm": "history",
-        "mean": 0.595,
-        "n": 3
-      },
-      {
-        "arm": "science",
-        "mean": 0.552,
-        "n": 4
-      },
-      {
-        "arm": "geography",
-        "mean": 0.551,
-        "n": 3
-      },
-      {
-        "arm": "entertainment",
-        "mean": 0.539,
-        "n": 1
-      },
-      {
-        "arm": "culture",
-        "mean": 0.532,
-        "n": 3
-      },
-      {
-        "arm": "space",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "nature",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "technology",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "sports",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "animals",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "food",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "mysteries",
-        "mean": 0.5,
-        "n": 0
-      }
-    ],
-    "format": [
-      {
-        "arm": "facts3",
-        "mean": 0.628,
-        "n": 3
-      },
-      {
-        "arm": "myth_vs_fact",
-        "mean": 0.612,
-        "n": 2
-      },
-      {
-        "arm": "backstory",
-        "mean": 0.56,
-        "n": 5
-      },
-      {
-        "arm": "by_the_numbers",
-        "mean": 0.541,
-        "n": 2
-      },
-      {
-        "arm": "what_if",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "sounds_fake",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "ranked_escalation",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "guess_reveal",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "plot_twist",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "myth_buster",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "would_you_survive",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "dumbest_decision",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "scale_shock",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "creepy_true",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "timeline",
-        "mean": 0.419,
-        "n": 2
-      }
-    ],
-    "hook_style": [
-      {
-        "arm": "question",
-        "mean": 0.639,
-        "n": 4
-      },
-      {
-        "arm": "number_first",
-        "mean": 0.549,
-        "n": 2
-      },
-      {
-        "arm": "you_statement",
-        "mean": 0.527,
-        "n": 5
-      },
-      {
-        "arm": "bold_claim",
-        "mean": 0.518,
-        "n": 3
-      },
-      {
-        "arm": "disbelief",
-        "mean": 0.5,
-        "n": 0
-      }
-    ],
-    "voice": [
-      {
-        "arm": "en-US-AndrewNeural",
-        "mean": 0.637,
-        "n": 2
-      },
-      {
-        "arm": "en-US-ChristopherNeural",
-        "mean": 0.577,
-        "n": 5
-      },
-      {
-        "arm": "en-US-BrianNeural",
-        "mean": 0.56,
-        "n": 1
-      },
-      {
-        "arm": "en-US-EmmaNeural",
-        "mean": 0.541,
-        "n": 2
-      },
-      {
-        "arm": "en-US-AvaNeural",
-        "mean": 0.479,
-        "n": 4
-      }
-    ],
-    "source": [
-      {
-        "arm": "youtube_outliers",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "wikipedia",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "google_trends",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "reddit",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "hackernews",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "on_this_day",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "youtube_chart",
-        "mean": 0.5,
-        "n": 0
-      },
-      {
-        "arm": "evergreen",
-        "mean": 0.5,
-        "n": 0
-      }
-    ]
+    "category": {
+      "status": "learning",
+      "observations": 13,
+      "arms": [
+        {
+          "arm": "history",
+          "mean": 0.565,
+          "n": 3
+        },
+        {
+          "arm": "entertainment",
+          "mean": 0.529,
+          "n": 1
+        },
+        {
+          "arm": "space",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "nature",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "technology",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "sports",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "animals",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "food",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "mysteries",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "geography",
+          "mean": 0.487,
+          "n": 2
+        },
+        {
+          "arm": "science",
+          "mean": 0.482,
+          "n": 4
+        },
+        {
+          "arm": "culture",
+          "mean": 0.462,
+          "n": 3
+        }
+      ]
+    },
+    "format": {
+      "status": "learning",
+      "observations": 13,
+      "arms": [
+        {
+          "arm": "by_the_numbers",
+          "mean": 0.528,
+          "n": 2
+        },
+        {
+          "arm": "backstory",
+          "mean": 0.512,
+          "n": 5
+        },
+        {
+          "arm": "facts3",
+          "mean": 0.506,
+          "n": 2
+        },
+        {
+          "arm": "what_if",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "sounds_fake",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "ranked_escalation",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "guess_reveal",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "plot_twist",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "myth_buster",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "would_you_survive",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "dumbest_decision",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "scale_shock",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "creepy_true",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "timeline",
+          "mean": 0.496,
+          "n": 2
+        },
+        {
+          "arm": "myth_vs_fact",
+          "mean": 0.464,
+          "n": 2
+        }
+      ]
+    },
+    "hook_style": {
+      "status": "frozen",
+      "observations": 0,
+      "arms": [
+        {
+          "arm": "question",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "bold_claim",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "number_first",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "you_statement",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "disbelief",
+          "mean": 0.5,
+          "n": 0
+        }
+      ]
+    },
+    "voice": {
+      "status": "frozen",
+      "observations": 0,
+      "arms": [
+        {
+          "arm": "en-US-AndrewNeural",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "en-US-AvaNeural",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "en-US-BrianNeural",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "en-US-EmmaNeural",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "en-US-ChristopherNeural",
+          "mean": 0.5,
+          "n": 0
+        }
+      ]
+    },
+    "source": {
+      "status": "frozen",
+      "observations": 0,
+      "arms": [
+        {
+          "arm": "youtube_outliers",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "wikipedia",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "google_trends",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "reddit",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "hackernews",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "on_this_day",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "youtube_chart",
+          "mean": 0.5,
+          "n": 0
+        },
+        {
+          "arm": "evergreen",
+          "mean": 0.5,
+          "n": 0
+        }
+      ]
+    }
   },
   "top_videos": [
     {
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
-      "views": 1279,
+      "views": 1280,
       "avg_view_pct": 51.97999999999999
     },
     {
@@ -269,8 +289,14 @@
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
-      "views": 1174,
-      "avg_view_pct": 49.81
+      "views": 1175,
+      "avg_view_pct": 49.79
+    },
+    {
+      "title": "Why you are falling through space right now #shorts",
+      "id": "UvqHvc4mOXM",
+      "views": 1164,
+      "avg_view_pct": null
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
@@ -285,12 +311,6 @@
       "avg_view_pct": 59.209999999999994
     },
     {
-      "title": "Why you are falling through space right now #shorts",
-      "id": "UvqHvc4mOXM",
-      "views": 1133,
-      "avg_view_pct": null
-    },
-    {
       "title": "How Your Liver Rebuilds Itself #shorts",
       "id": "oTgoKlCkGE0",
       "views": 1127,
@@ -300,8 +320,34 @@
       "title": "How Does Canadian Rain Reach the Gulf of Mexico? #shorts",
       "id": "6dO8y_ojGhI",
       "views": 973,
-      "avg_view_pct": 45.53
+      "avg_view_pct": 45.59
     }
   ],
-  "rejected": []
+  "rejected": [],
+  "retention": {
+    "videos": 12,
+    "where": "ending",
+    "verdict": "ENDING is the leak: 16% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
+    "avg_curve": [
+      1.171,
+      1.123,
+      0.715,
+      0.55,
+      0.453,
+      0.4,
+      0.358,
+      0.33,
+      0.306,
+      0.282,
+      0.195
+    ],
+    "median_hook_retention": 0.96,
+    "median_completion": 0.159,
+    "median_swipe_point": 0.36,
+    "worst_drop": {
+      "size": 0.408,
+      "from_pct": 10,
+      "to_pct": 20
+    }
+  }
 }
