@@ -1,0 +1,45 @@
+# Runs on every push and pull request. Nothing else in CI ran the test suite, so a broken commit
+# only showed up when the nightly job failed to publish — hours later, with no video to show for it.
+name: AutoTube tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"        # must match the version requirements.txt was resolved for
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install (hash-verified)
+        run: |
+          pip install -q -r requirements.txt
+          pip install -q -r requirements-dev.txt
+
+      - name: Tests
+        run: python -m pytest -q
+
+      # A lockfile only protects you while it still corresponds to the inputs. If someone edits
+      # requirements.in and forgets to recompile, the pins silently stop meaning anything.
+      - name: Lockfile is in sync with requirements.in
+        run: |
+          pipx run uv pip compile requirements.in --python-version 3.12 \
+            --generate-hashes --quiet -o /tmp/check.txt
+          if ! diff -q <(grep -v '^#' requirements.txt) <(grep -v '^#' /tmp/check.txt) > /dev/null; then
+            echo "::error::requirements.txt is out of date. Run:"
+            echo "  uv pip compile requirements.in --python-version 3.12 --generate-hashes -o requirements.txt"
+            diff <(grep -v '^#' requirements.txt) <(grep -v '^#' /tmp/check.txt) | head -40
+            exit 1
+          fi
+          echo "lockfile in sync"

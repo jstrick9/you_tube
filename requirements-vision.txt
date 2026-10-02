@@ -1,0 +1,17 @@
+# Optional visual-relevance check (CLIP). Installed separately in the daily workflow because the
+# CPU torch wheels live on PyTorch's own index, not PyPI.
+#
+# Pinned without hashes: these wheels carry a local version label (+cpu) served from a non-PyPI
+# index, and hash-pinning across both indexes is brittle enough to be a worse risk than it removes.
+# Exact versions still give us the reproducibility that matters.
+#
+# Unlike requirements.txt these three were NOT installed and exercised at pin time (the torch CPU
+# wheel did not fit in the build sandbox). They are safe to pin anyway because vision is an
+# optional path: pipeline.py already carries a vision_down flag and completes the run without it.
+# open_clip 3.x keeps both APIs vision.py uses (create_model_and_transforms, get_tokenizer).
+#
+# Install with:
+#   pip install -r requirements-vision.txt --extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1+cpu
+torchvision==0.29.1+cpu
+open_clip_torch==3.3.0

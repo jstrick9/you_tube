@@ -54,6 +54,7 @@ jobs:
           cache: pip
           cache-dependency-path: |
             requirements.txt
+            requirements-vision.txt
             .github/workflows/daily.yml
 
       # Scheduled backup/catch-up runs: find out first whether anything is still needed today, so a run
@@ -62,7 +63,7 @@ jobs:
         id: need
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            pip install -q pyyaml && python scripts/needed_today.py
+            pip install -q pyyaml==6.0.3 && python scripts/needed_today.py   # pinned; full install stays below
           else
             echo "needed=manual" >> "$GITHUB_OUTPUT"
           fi
@@ -73,8 +74,7 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core > /dev/null
           pip install -q -r requirements.txt
           # CLIP (CPU-only torch) — local image↔text matching used to verify every visual
-          pip install -q torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          pip install -q open_clip_torch
+          pip install -q -r requirements-vision.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Cache CLIP model weights
         if: steps.need.outputs.needed != '0'
