@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-01T17:07:06.138793+00:00",
-  "videos_total": 23,
+  "updated": "2026-10-02T07:30:01.800492+00:00",
+  "videos_total": 26,
   "videos_7d": 22,
-  "views_7d": 12781,
-  "learned_this_run": 1,
+  "views_7d": 10824,
+  "learned_this_run": 0,
   "strategy": {
     "category": [
       {
@@ -251,14 +251,14 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1220,
-      "avg_view_pct": 80.46
+      "views": 1221,
+      "avg_view_pct": 80.33
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
       "id": "tFm3Zuu2kGA",
-      "views": 1203,
-      "avg_view_pct": 59.78
+      "views": 1204,
+      "avg_view_pct": 59.699999999999996
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
@@ -270,18 +270,18 @@
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
       "views": 1166,
-      "avg_view_pct": 49.69
+      "avg_view_pct": 49.81
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
       "id": "OyHMkwqEOKo",
-      "views": 1159,
+      "views": 1160,
       "avg_view_pct": 41.37
     },
     {
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
-      "views": 1153,
+      "views": 1155,
       "avg_view_pct": 59.209999999999994
     },
     {
@@ -294,13 +294,13 @@
       "title": "How Does Canadian Rain Reach the Gulf of Mexico? #shorts",
       "id": "6dO8y_ojGhI",
       "views": 973,
-      "avg_view_pct": 68.82
+      "avg_view_pct": 45.53
     },
     {
-      "title": "The Only Governor Of Two Different States #shorts",
-      "id": "lUA-2zrFHGc",
-      "views": 911,
-      "avg_view_pct": 51.34000000000001
+      "title": "How the Largest Animal Ever Eats Tiny Prey #shorts",
+      "id": "1ed_FohPwqs",
+      "views": 957,
+      "avg_view_pct": null
     }
   ],
   "rejected": []
