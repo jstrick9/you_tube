@@ -392,15 +392,25 @@ def collect(cfg: dict) -> list[dict]:
         else:
             merged[key] = {**r, "sources": [r["source"]], "topic_key": key}
 
-    out = []
+    # Safety triage (autotube/safety.py). At the candidate stage we only drop HARD-blocked subjects;
+    # merely sensitive words ("war", "crash", "trial", "flood") are kept and judged later, in context,
+    # once we have the actual Wikipedia article to judge. Dropping them here is what starved the funnel.
+    from . import safety
+    out, hard, flagged = [], 0, 0
     for c in merged.values():
-        b = _blocked(" ".join([c["topic"]] + [str(x) for x in c.get("context") or []]), blocked)
-        if b:
-            c["rejected"] = f"blocked:{b}"
+        text = " ".join([c["topic"]] + [str(x) for x in c.get("context") or []])
+        verdict, term = safety.screen(text, cfg)
+        if verdict == "block":
+            c["rejected"] = f"blocked:{term}"
+            hard += 1
             continue
+        if verdict == "review":
+            c["sensitive"] = term            # judged in context at grounding time
+            flagged += 1
         out.append(c)
     out.sort(key=lambda x: -x["score"])
-    log.info("%d candidates after merge + safety filter", len(out))
+    log.info("%d candidates after merge + safety triage (%d hard-blocked, %d kept for context review)",
+             len(out), hard, flagged)
     return out
 
 

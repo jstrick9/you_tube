@@ -28,10 +28,20 @@ def test_json_repair_truncated():
 
 
 def test_blocklist():
-    bl = CFG["compliance"]["blocked_topics"]
-    assert _blocked("Mass shooting in city", bl) == "shooting"
-    assert _blocked("Whooping crane migration", bl) is None
-    assert _blocked("Warsaw zoo", bl) is None                         # word boundary: 'war' ≠ 'warsaw'
+    """Topic screening is now tiered (autotube/safety.py), not a flat keyword list.
+
+    Deliberate change: "mass shooting" is still rejected outright, but a merely *sensitive* word is
+    kept for context review instead of deleting the topic. Word-boundary matching is unchanged, so
+    'Warsaw' is still not 'war'.
+    """
+    from autotube import safety
+    assert safety.screen("Mass shooting in city", CFG)[0] == "block"
+    assert safety.screen("Whooping crane migration", CFG) == ("ok", None)
+    assert safety.screen("Warsaw zoo", CFG) == ("ok", None)           # word boundary: 'war' ≠ 'warsaw'
+    assert safety.screen("Thirty Years' War", CFG)[0] == "review"     # kept, judged in context
+    # the legacy helper still behaves for any caller passing an explicit list
+    assert _blocked("Mass shooting in city", ["shooting"]) == "shooting"
+    assert _blocked("Warsaw zoo", ["war"]) is None
 
 
 def test_living_person():

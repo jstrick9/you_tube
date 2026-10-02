@@ -104,7 +104,7 @@ def test_weak_hook_is_rejected_and_rewritten():
     assert not ok and any("hook too weak" in i for i in review["issues"])
 
 
-def test_war_mention_ok_in_narration_but_not_title():
+def test_titles_are_screened_for_shock_bait_not_vocabulary():
     class Rev:
         lite = False
 
@@ -121,4 +121,7 @@ def test_war_mention_ok_in_narration_but_not_title():
            {"text": "Each line records a season nobody wanted to repeat"},
            {"text": "so when you can read it, the warning has already arrived"}]
     assert w.check({"title": "The stone that warns you", "segments": seg}, src)[0]
-    assert not w.check({"title": "The war stone", "segments": seg}, src)[0]
+    # Deliberate change: "war" in a title is no longer banned — "The Shortest War In History" is a
+    # perfectly good educational title. Titles are screened for shock-bait instead.
+    assert w.check({"title": "The war stone", "segments": seg}, src)[0]
+    assert not w.check({"title": "The murder stone", "segments": seg}, src)[0]

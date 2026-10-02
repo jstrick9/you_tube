@@ -96,8 +96,15 @@ def test_numbers_in_asides_are_still_fact_checked():
 
 
 def test_blocked_words_in_asides_are_caught():
-    ok, review = ScriptWriter(CFG, ReviewLLM(), Strat()).check(_script("Killer vibes."), SOURCE)
-    assert not ok and any("blocked" in i for i in review["issues"])
+    """Asides go through the same screen as narration.
+
+    Deliberate change: only genuinely non-negotiable terms are hard-blocked in speech now. A merely
+    sensitive word ("killer vibes") is left to the LLM reviewer to judge in context, which is what
+    YouTube's advertiser-friendly guidelines actually turn on.
+    """
+    w = ScriptWriter(CFG, ReviewLLM(), Strat())
+    ok, review = w.check(_script("Pure torture."), SOURCE)
+    assert not ok and any("never allowed" in i for i in review["issues"])
 
 
 def _strategy():

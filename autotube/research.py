@@ -10,6 +10,7 @@ import logging
 import re
 from urllib.parse import quote
 
+from . import safety, sources
 from .common import get_json
 from .trends import is_living_person, wiki_summary
 
@@ -100,8 +101,12 @@ def article_images(title: str, lang: str = "en", limit: int = 25) -> list[str]:
 
 
 def ground(topic: str, search_query: str | None, lang: str = "en", allow_living: bool = False,
-           blocked: list[str] | None = None) -> dict | None:
-    """Return {'title','url','summary','text','images'} or None if unusable."""
+           blocked: list[str] | None = None, cfg: dict | None = None, llm=None) -> dict | None:
+    """Return {'title','url','summary','text','images'} or None if unusable.
+
+    Wikipedia resolves and anchors the subject; `research.extra_sources` then widens what we can
+    verify against (see autotube/sources.py). Safety screening is context-aware (autotube/safety.py).
+    """
     title = None
     for q in [search_query, topic]:
         if q:
@@ -117,9 +122,17 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
     if summ.get("type") == "disambiguation":
         log.info("skip %r: disambiguation page", title)
         return None
-    if blocked:
-        probe = f" {title} {summ.get('description', '')} {(summ.get('extract') or '')[:400]} ".lower()
-        hit = next((b for b in blocked if re.search(r"\b" + re.escape(b.lower()) + r"\b", probe)), None)
+    probe = f"{summ.get('description', '')} {(summ.get('extract') or '')[:600]}"
+    if cfg is not None:
+        # Context-aware: a word like "war", "crash" or "trial" sends the subject to a classifier
+        # instead of deleting it. Only genuinely non-negotiable subjects are rejected outright.
+        allowed, reason = safety.check_subject(title, probe, cfg, llm)
+        if not allowed:
+            log.info("skip %r: %s", title, reason)
+            return None
+    elif blocked:                                   # legacy keyword path (callers without cfg)
+        hit = next((b for b in blocked if re.search(r"\b" + re.escape(b.lower()) + r"\b",
+                                                   f" {title} {probe} ".lower())), None)
         if hit:
             log.info("skip %r: source is about a blocked subject (%s)", title, hit)
             return None
@@ -128,6 +141,21 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
         return None
     text = article_text(title, lang)
     also: list[str] = []
+    extra_credits: list[dict] = []
+    rcfg = ((cfg or {}).get("research") or {})
+    enabled = list(rcfg.get("extra_sources") or [])
+    if enabled:
+        # Always reach past Wikipedia, not only when the article is thin. A long article is exactly
+        # the case where a NASA caption or a peer-reviewed abstract adds something Wikipedia lacks —
+        # a primary source and hard, unit-bearing numbers — and citing more than one publisher is
+        # itself part of not looking mass-produced. Long articles just get a smaller budget.
+        full = int(rcfg.get("enrich_max_chars", 4000))
+        budget = full if len(text) < int(rcfg.get("enrich_below_chars", 7000)) else max(1200, full // 3)
+        block, extra_credits = sources.enrich(title, enabled, budget)
+        if block:
+            log.info("  %r → +%d chars from %s", title, len(block),
+                     ", ".join(sorted({c["publisher"] for c in extra_credits})))
+            text = text + "\n" + block
     if len(text) < 3000:
         # short article (common for viral oddities like "Hunger stone"): add what other articles say about it
         extra, also = mentions(title, lang)
@@ -143,7 +171,8 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
         "description": summ.get("description", ""),
         "summary": summ.get("extract", ""),
         "text": text,
-        "also": [{"title": a, "url": f"https://{lang}.wikipedia.org/wiki/{quote(a.replace(' ', '_'))}"} for a in also],
+        "also": [{"title": a, "url": f"https://{lang}.wikipedia.org/wiki/{quote(a.replace(' ', '_'))}"}
+                 for a in also] + extra_credits,
         "images": article_images(title, lang),
         "lead_image": (summ.get("originalimage") or {}).get("source"),
     }

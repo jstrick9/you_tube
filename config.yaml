@@ -131,71 +131,77 @@ compliance:
   # even though they stay blocked as a video's TOPIC — YouTube's advertiser-friendly guidelines allow educational,
   # non-graphic references. The title may still never contain them.
   script_mention_ok: [war]
-  blocked_topics:                        # never produce videos about these
-    - death
-    - dies
-    - dead
-    - killed
-    - killing
-    - killer
-    - serial killer
-    - massacre
-    - crime
-    - criminal
-    - convicted
-    - executed
-    - execution
-    - kidnapping
-    - assault
-    - abuse
-    - rape
-    - xxx
-    - sex
-    - courtesan
-    - gore
-    - shooting
-    - murder
-    - suicide
-    - overdose
-    - war
-    - attack
-    - terror
-    - hostage
-    - crash
-    - election
-    - candidate
-    - vote
-    - poll
-    - abortion
-    - vaccine
-    - cancer
-    - cure
-    - diet pill
-    - crypto
-    - stock tip
-    - lottery
-    - casino
-    - betting
-    - odds
-    - porn
-    - onlyfans
-    - nude
-    - leak
-    - lawsuit
-    - arrested
-    - charged
-    - trial
-    - scandal
-    - obituary
-    - funeral
-    - hurricane
-    - earthquake
-    - wildfire
-    - flood
-    - tornado
+  # Topic safety is context-aware — see autotube/safety.py and the `safety:` block below.
+  # The old flat 57-word blocklist rejected `war`, `crash`, `leak`, `trial`, `cure`, `odds`, `flood`,
+  # `earthquake` and more, which deleted huge amounts of safe, high-performing territory (volcanoes,
+  # deep-sea, aviation engineering, archaeology, the history of medicine). YouTube's advertiser-
+  # friendly guidelines are about context and graphicness, not vocabulary.
+  blocked_topics: []                    # legacy key, kept empty for backward compatibility
   require_llm_review: true              # fail closed: never publish a script the fact-checker could not review
   require_independent_review: false     # true = also refuse to publish if the reviewer had to be the writer's model
   quality_gate_min_score: 7              # LLM reviewer score (0-10) required to publish
+
+safety:
+  # Tiered screening (autotube/safety.py). Only tier 3 ever costs an LLM call, and it is the rare case.
+  #   hard_blocked  → rejected instantly, never reviewed
+  #   sensitive     → kept as a candidate, then judged IN CONTEXT once we have the real article:
+  #                   "an engineering crash test" and "a fatal crash" are not the same video
+  #   title_blocked → never allowed in a title, however educational the video is
+  # If the classifier is unreachable, a sensitive subject is rejected — the same behaviour as the old
+  # keyword list, so this is never less safe than what it replaces.
+  context_review: true
+  hard_blocked:
+    - rape
+    - incest
+    - child abuse
+    - porn
+    - pornography
+    - onlyfans
+    - nude
+    - gore
+    - beheading
+    - mutilation
+    - torture
+    - suicide
+    - self-harm
+    - overdose
+    - serial killer
+    - massacre
+    - genocide
+    - terror attack
+    - mass shooting
+    - school shooting
+    - xxx
+    - brothel
+  title_blocked:
+    - murder
+    - killer
+    - massacre
+    - execution
+    - suicide
+    - rape
+    - porn
+    - nude
+    - gore
+    - corpse
+    - tragedy
+    - victims
+  # Words that only mean "judge this in context" (the full list lives in autotube/safety.py;
+  # anything listed here replaces it).
+  sensitive: null
+
+research:
+  # Grounding corpora beyond Wikipedia (autotube/sources.py). Wikipedia still resolves and anchors
+  # every topic; these widen what we can VERIFY against, which is what lifts the virality ceiling
+  # without loosening a single fact-check. All keyless, all free, all quotable prose, all fail-soft.
+  #   nasa     — NASA Image & Video Library (public domain, descriptive captions)
+  #   arxiv    — paper abstracts (physics, astronomy, CS, biology)
+  #   pubmed   — Europe PMC abstracts (medicine, life sciences)
+  #   wikidata — quantitative facts (height, mass, population, inception) rendered as sentences;
+  #              exactly what scale_shock and by_the_numbers need, and often absent from article prose
+  extra_sources: [wikidata, nasa, arxiv, pubmed]
+  enrich_below_chars: 7000      # only enrich when the Wikipedia article is thinner than this
+  enrich_max_chars: 4000        # cap on added text, so the writer prompt stays focused
 
 llm:
   # Providers are tried in order; any provider without a key is skipped.

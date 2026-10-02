@@ -6,7 +6,7 @@ import logging
 import random
 import re
 
-from . import gates
+from . import gates, safety
 from .common import now_utc
 from .llm import LLM, LLMError
 from .research import ground, unsupported_numbers
@@ -390,12 +390,10 @@ Write YouTube metadata for this Short. Return JSON:
                     grounded += 1
         if self.cfg["content"]["require_grounding"] and grounded < self.cfg["content"]["min_grounded_segments"]:
             issues.append(f"only {grounded} segments have verifiable evidence")
-        mention_ok = set(self.cfg["compliance"].get("script_mention_ok", []))
-        blocked = [b for b in self.cfg["compliance"]["blocked_topics"]
-                   if re.search(rf"\b{re.escape(b)}\b", script["title"].lower())
-                   or (b not in mention_ok and re.search(rf"\b{re.escape(b)}\b", narration.lower()))]
-        if blocked:
-            issues.append(f"blocked terms in script: {blocked}")
+        # Context-aware (autotube/safety.py): titles stay strict, narration is only hard-blocked on
+        # genuinely non-negotiable terms. The LLM reviewer still judges advertiser-friendliness in
+        # context, which is the check that actually matches YouTube's guidelines.
+        issues += safety.check_script(script.get("title", ""), narration, self.cfg)
 
         review = {"score": 0, "issues": issues, "programmatic_ok": not issues}
         if issues:
@@ -486,7 +484,8 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
         """Ground → write → check (rewrite with feedback). Returns (script, source, review) or None."""
         source = ground(topic["topic"], topic.get("wiki_query"), self.lang,
                         allow_living=self.cfg["content"]["allow_living_people"],
-                        blocked=self.cfg["compliance"]["blocked_topics"])
+                        blocked=self.cfg["compliance"].get("blocked_topics"),
+                        cfg=self.cfg, llm=self.llm)
         if not source:
             return None
         topic["wiki_title"] = source["title"]
