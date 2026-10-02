@@ -207,10 +207,34 @@ class LLM:
         return self.json(system, user, temperature=0.1, validate=validate, images=images, order=order,
                          models_of=self._vision_models, attempts_per_model=1)
 
+    def _review_models(self, pname: str) -> list[str]:
+        """Models used for fact-checking/review. Falls back to the normal list for that provider."""
+        return self.cfg.get(f"{pname}_review_models", self.cfg.get(f"{pname}_models", []))
+
+    def review_json(self, system: str, user: str, avoid: str | None = None, **kw) -> Any:
+        """Review on an INDEPENDENT model: a writer grading its own draft tends to agree with itself.
+
+        Tries `llm.review_providers` (a deliberately different order from the writer's) and skips the
+        exact provider:model that produced the draft. If that leaves nothing reachable, it falls back
+        to the normal order rather than failing — an imperfect review beats no review, and the caller
+        is told via `last_used` whether the reviewer was actually independent.
+        """
+        order = [p for p in self.cfg.get("review_providers", []) if p in PROVIDERS] or list(self.order)
+        try:
+            return self.json(system, user, order=order, models_of=self._review_models, avoid=avoid, **kw)
+        except LLMError:
+            if not avoid:
+                raise
+            log.info("no independent reviewer reachable — falling back to the full provider list")
+            return self.json(system, user, **kw)
+
     def json(self, system: str, user: str, temperature: float | None = None,
              validate=None, attempts_per_model: int = 2, images: list[bytes] | None = None,
-             order: list[str] | None = None, models_of=None) -> Any:
-        """Return parsed JSON. `validate(obj)` may raise to force a retry/failover."""
+             order: list[str] | None = None, models_of=None, avoid: str | None = None) -> Any:
+        """Return parsed JSON. `validate(obj)` may raise to force a retry/failover.
+
+        `avoid` is a provider:model tag to skip (used to keep the reviewer independent of the writer).
+        """
         temp = self.temperature if temperature is None else temperature
         errors = []
         for pname in (order or self.order):
@@ -218,7 +242,7 @@ class LLM:
             models = models_of(pname) if models_of else self.cfg.get(models_key, [])
             for model in models:
                 tag = f"{pname}:{model}" + (":vision" if images else "")
-                if tag in self._dead:
+                if tag in self._dead or (avoid and tag == avoid):
                     continue
                 feedback = ""
                 for attempt in range(attempts_per_model):

@@ -94,7 +94,13 @@ def test_weak_hook_is_rejected_and_rewritten():
     cfg_c = dict(CFG["content"], require_grounding=False)
     w.cfg = {**CFG, "content": cfg_c}
     src = {"title": "X", "text": "Bees make honey. " * 50}
-    ok, review = w.check({"title": "Honey", "segments": [{"text": "Did you know bees make honey?"}] * 5}, src)
+    # gate-clean script: the ONLY thing wrong with it is the reviewer's hook_strength of 6
+    segs = [{"text": "Bees visit two million flowers to make one jar of honey"},
+            {"text": "A single worker bee makes a twelfth of a teaspoon in her life"},
+            {"text": "The hive beats its wings to dry the nectar into honey"},
+            {"text": "Sealed in wax, it never spoils"},
+            {"text": "so the jar in your cupboard could outlive you"}]
+    ok, review = w.check({"title": "Honey", "segments": segs}, src)
     assert not ok and any("hook too weak" in i for i in review["issues"])
 
 
@@ -109,6 +115,10 @@ def test_war_mention_ok_in_narration_but_not_title():
     w.llm, w.src_chars = Rev(), 4000
     w.cfg = {**CFG, "content": dict(CFG["content"], require_grounding=False)}
     src = {"title": "Hunger stone", "text": "stones during the Thirty Years War " * 40}
-    seg = [{"text": "Carved during the Thirty Years War, it still warns us."}] * 5
+    seg = [{"text": "Carved during the Thirty Years War, this stone still warns us"},
+           {"text": "It only appears when the river drops to a record low"},
+           {"text": "The oldest marking on it is older than anyone alive"},
+           {"text": "Each line records a season nobody wanted to repeat"},
+           {"text": "so when you can read it, the warning has already arrived"}]
     assert w.check({"title": "The stone that warns you", "segments": seg}, src)[0]
     assert not w.check({"title": "The war stone", "segments": seg}, src)[0]

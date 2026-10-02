@@ -230,7 +230,12 @@ def test_script_fact_check_outage_fails_closed(monkeypatch):
     sw.cfg, sw.llm, sw.src_chars = cfg, DownLLM(), 4000
     src = {"title": "Honey", "text": "Honey is a sweet substance made by bees. " * 20}
     ev = "Honey is a sweet substance made by bees."
-    script = {"title": "Honey facts", "segments": [{"text": "Bees make honey.", "evidence": ev}] * 4}
+    # gate-clean script: the only reason it must fail is that the fact-checker is unreachable
+    script = {"title": "Honey facts", "segments": [
+        {"text": "Bees visit two million flowers to fill a single jar", "evidence": ev},
+        {"text": "A worker bee makes a twelfth of a teaspoon in her life", "evidence": ev},
+        {"text": "The hive fans its wings to dry the nectar down", "evidence": ev},
+        {"text": "so the jar in your cupboard will never spoil", "evidence": ev}]}
     monkeypatch.setitem(cfg["content"], "require_grounding", False)
     ok, review = sw.check(script, src)
     assert ok is False and review.get("unavailable")

@@ -6,6 +6,7 @@ import logging
 import random
 import re
 
+from . import gates
 from .common import now_utc
 from .llm import LLM, LLMError
 from .research import ground, unsupported_numbers
@@ -341,6 +342,7 @@ Return JSON:
                    else "shorten the body segments"))
 
         script = self.llm.json(WRITER_SYSTEM, user, validate=validate)
+        script["_writer_model"] = self.llm.last_used          # so the reviewer can be a different one
         tidy(script, fmt, max_asides)
         script.update(self.metadata(script, source))
         return script
@@ -370,6 +372,10 @@ Write YouTube metadata for this Short. Return JSON:
         # numbers + blocked words are checked on EVERYTHING spoken (asides included); evidence only on facts
         narration = " ".join(spoken_text(s) for s in script["segments"])
         issues = []
+        # Deterministic gates first: banned openers, CTA closers, clickbait titles, stage directions,
+        # emoji/hashtags/URLs in speech, verbatim repeats. These are free, reliable and run before a
+        # single review token is spent — see autotube/gates.py for why they don't belong to the LLM.
+        issues += gates.run_all(script, spoken_text, self.cfg)
         bad_nums = unsupported_numbers(narration + " " + script.get("title", ""), source["text"])
         if bad_nums:
             issues.append(f"numbers not found in source: {bad_nums}")
@@ -425,8 +431,24 @@ hook_strength: 9-10 = the first line alone would stop a stranger scrolling (spec
 video answers); 7-8 = decent; <=6 = generic ('Did you know', 'Here are some facts', topic name, slow setup).
 If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
         try:
-            r = self.llm.json(REVIEW_SYSTEM, user, temperature=0.2,
-                              validate=lambda o: float(o["score"]))
+            # A writer grading its own homework agrees with itself. Review runs on a different
+            # provider/model wherever one is reachable (llm.review_providers), and never on the exact
+            # model that produced this draft.
+            review_fn = getattr(self.llm, "review_json", None)
+            if review_fn is not None:
+                r = review_fn(REVIEW_SYSTEM, user, avoid=script.get("_writer_model"),
+                              temperature=0.2, validate=lambda o: float(o["score"]))
+            else:                                     # minimal LLM-like object (tests, custom routers)
+                r = self.llm.json(REVIEW_SYSTEM, user, temperature=0.2, validate=lambda o: float(o["score"]))
+            review["reviewer"] = getattr(self.llm, "last_used", "")
+            review["independent"] = bool(review["reviewer"]) and review["reviewer"] != script.get("_writer_model")
+            if review["reviewer"] and not review["independent"]:
+                log.info("  review ran on the same model as the writer (%s) — no independent reviewer reachable",
+                         review["reviewer"])
+                if self.cfg["compliance"].get("require_independent_review", False):
+                    review["issues"].append("no independent reviewer available — not publishing")
+                    review["unavailable"] = True
+                    return False, review
         except LLMError as e:
             log.warning("review LLM unavailable: %s", e)
             if self.cfg["compliance"].get("require_llm_review", True):

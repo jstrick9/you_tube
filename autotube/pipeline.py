@@ -358,7 +358,10 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
                        "source": trends.primary_source(res["topic"].get("sources", []))},
             "viral_score": res["topic"].get("viral_score"), "why_trending": res["topic"].get("why_trending"),
             "trend_evidence": (res["topic"].get("context") or [])[:2],
-            "review_score": res["review"].get("score"), "duration": res["duration"],
+            "review_score": res["review"].get("score"),
+            "reviewer": res["review"].get("reviewer"),
+            "review_independent": res["review"].get("independent"),
+            "duration": res["duration"],
             "tts_engine": res["tts_engine"], "file": res["file"].name, "publish_at": slot.isoformat() if slot else None,
             "llm": llm.last_used,
         }

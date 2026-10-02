@@ -101,6 +101,8 @@ content:
   min_viral_score: 7                     # LLM viral-potential score (0-10) a topic needs, judged with its trend evidence
   min_hook_score: 8                      # reviewer's hook_strength (0-10) a script needs; weaker hooks are rewritten
   min_entertainment: 7                   # reviewer's (harsh) entertainment score; flat fact-lists are rewritten
+  hook_words_min: 6                      # deterministic gate (autotube/gates.py) — not left to the LLM
+  hook_words_max: 12
   allow_evergreen: false                 # never fall back to un-trending evergreen topics
   max_drafts: 4                          # script rewrites allowed (feedback from the fact-checker/hook gate)
   selection_rounds: 3                    # if every pick fails the checks, pick again from the remaining trends
@@ -192,6 +194,7 @@ compliance:
     - flood
     - tornado
   require_llm_review: true              # fail closed: never publish a script the fact-checker could not review
+  require_independent_review: false     # true = also refuse to publish if the reviewer had to be the writer's model
   quality_gate_min_score: 7              # LLM reviewer score (0-10) required to publish
 
 llm:
@@ -202,6 +205,14 @@ llm:
   groq_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b, openai/gpt-oss-20b]   # verified on Groq Sep 2026
   openrouter_models: ["meta-llama/llama-3.3-70b-instruct:free", "deepseek/deepseek-chat-v3-0324:free"]
   pollinations_models: [openai-fast, openai]
+  # Fact-checking/review runs on a DIFFERENT model from the one that wrote the draft (a writer grading
+  # its own homework agrees with itself). Deliberately the reverse order of `providers`, so when both
+  # Gemini and Groq are keyed the writer and the reviewer are different families. If none is reachable
+  # the review falls back to the normal order and the run is flagged as non-independent.
+  review_providers: [groq, openrouter, gemini]
+  groq_review_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b]
+  openrouter_review_models: ["meta-llama/llama-3.3-70b-instruct:free", "deepseek/deepseek-chat-v3-0324:free"]
+  gemini_review_models: [gemini-flash-latest, gemini-flash-lite-latest]
   # image-checking models (keyless Pollinations can't see images, so it's never used for this)
   vision_providers: [gemini, groq, openrouter]
   gemini_vision_models: [gemini-flash-lite-latest, gemini-flash-latest]   # gemini-2.5-* now return 404
