@@ -303,3 +303,26 @@ def test_preflight_gate_imports_without_the_heavy_dependencies():
     )
     r = subprocess.run([sys.executable, "-c", probe], capture_output=True, text=True)
     assert r.returncode == 0, f"shared rule pulled in a heavy import: {r.stderr[-400:]}"
+
+
+def test_new_free_providers_are_wired_end_to_end():
+    """A provider is only real if the key reaches it AND doctor can check its models.
+
+    The pipeline produced nothing on 3 Oct because both text providers were rate
+    limited at once. These three are permanent free tiers needing no credit card; they
+    exist to make that single point of failure a three-deep one.
+    """
+    import autotube.llm as L
+
+    for p in ("cerebras", "mistral", "cloudflare"):
+        assert p in L.PROVIDERS, f"{p} missing from the provider registry"
+        assert p in L.KEYED_PROVIDERS, f"{p} missing from the keyed map (would be invisible)"
+        assert p in CFG["llm"]["providers"], f"{p} configured but never used for writing"
+        assert CFG["llm"].get(f"{p}_models"), f"{p} has no models configured"
+
+    # Guessed model ids have cost this repo three production runs, so doctor must be
+    # able to check these against the live catalogue rather than us trusting the string.
+    src = (ROOT / "autotube" / "llm.py").read_text()
+    for p in ("cerebras", "mistral", "cloudflare"):
+        assert f'"{p}"' in src.split("def available_models")[1].split("def audit_models")[0], \
+            f"available_models() cannot verify {p} ids"

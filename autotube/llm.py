@@ -232,10 +232,48 @@ def _pollinations(model, system, user, temperature):
                                                            "seed": random.randint(1, 10**9)})  # seed defeats response cache
 
 
+def _cerebras(model, system, user, temperature, images=None):
+    key = os.environ.get("CEREBRAS_API_KEY")
+    if not key:
+        raise LLMError("no CEREBRAS_API_KEY")
+    return _openai_compatible("https://api.cerebras.ai/v1/chat/completions", key, model, system, user,
+                              temperature, images=images)
+
+
+def _mistral(model, system, user, temperature, images=None):
+    key = os.environ.get("MISTRAL_API_KEY")
+    if not key:
+        raise LLMError("no MISTRAL_API_KEY")
+    return _openai_compatible("https://api.mistral.ai/v1/chat/completions", key, model, system, user,
+                              temperature, images=images)
+
+
+def _cloudflare(model, system, user, temperature, images=None):
+    """Workers AI. 10,000 neurons/day free, no card, and it hard-blocks instead of billing."""
+    key = os.environ.get("CLOUDFLARE_API_TOKEN")
+    acct = os.environ.get("CLOUDFLARE_ACCOUNT_ID")
+    if not (key and acct):
+        raise LLMError("no CLOUDFLARE_API_TOKEN")
+    return _openai_compatible(f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/v1/chat/completions",
+                              key, model, system, user, temperature, images=images)
+
+
+# Which env var gates each provider. Kept in one place because it was previously
+# duplicated inline in two methods, and a provider added to one but not the other is
+# invisible until something silently never gets tried.
+KEYED_PROVIDERS = {
+    "gemini": "GEMINI_API_KEY", "groq": "GROQ_API_KEY", "openrouter": "OPENROUTER_API_KEY",
+    "cerebras": "CEREBRAS_API_KEY", "mistral": "MISTRAL_API_KEY",
+    "cloudflare": "CLOUDFLARE_API_TOKEN",
+}
+
 PROVIDERS = {
     "gemini": (_gemini, "gemini_models"),
     "groq": (_groq, "groq_models"),
     "openrouter": (_openrouter, "openrouter_models"),
+    "cerebras": (_cerebras, "cerebras_models"),
+    "mistral": (_mistral, "mistral_models"),
+    "cloudflare": (_cloudflare, "cloudflare_models"),
     "pollinations": (_pollinations, "pollinations_models"),
 }
 
@@ -247,12 +285,12 @@ class LLM:
         self.temperature = float(self.cfg.get("temperature", 0.8))
         self._dead: set[str] = set()   # provider/model combos that hard-failed this run
         self.last_used = ""
-        keyed = {"gemini": "GEMINI_API_KEY", "groq": "GROQ_API_KEY", "openrouter": "OPENROUTER_API_KEY"}
+        keyed = KEYED_PROVIDERS
         # "lite" = only the keyless fallback is available → callers send smaller prompts
         self.lite = not any(os.environ.get(keyed[p]) for p in self.order if p in keyed)
 
     def vision_available(self) -> bool:
-        keyed = {"gemini": "GEMINI_API_KEY", "groq": "GROQ_API_KEY", "openrouter": "OPENROUTER_API_KEY"}
+        keyed = KEYED_PROVIDERS
         return any(os.environ.get(keyed.get(p, "-")) and self._vision_models(p)
                    for p in self.cfg.get("vision_providers", ["gemini", "groq", "openrouter"]))
 
@@ -439,6 +477,25 @@ def available_models(provider: str) -> list[str]:
         if provider == "openrouter":
             d = get_json("https://openrouter.ai/api/v1/models")
             return sorted(m["id"] for m in d.get("data", []))
+        # The OpenAI-compatible providers all expose /models the same way.
+        simple = {
+            "cerebras": ("https://api.cerebras.ai/v1/models", "CEREBRAS_API_KEY"),
+            "mistral": ("https://api.mistral.ai/v1/models", "MISTRAL_API_KEY"),
+        }
+        if provider in simple:
+            url, env = simple[provider]
+            key = os.environ.get(env)
+            if not key:
+                return []
+            d = get_json(url, headers={"Authorization": f"Bearer {key}"})
+            return sorted(m["id"] for m in d.get("data", []))
+        if provider == "cloudflare":
+            key, acct = os.environ.get("CLOUDFLARE_API_TOKEN"), os.environ.get("CLOUDFLARE_ACCOUNT_ID")
+            if not (key and acct):
+                return []
+            d = get_json(f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/v1/models",
+                         headers={"Authorization": f"Bearer {key}"})
+            return sorted(m["id"] for m in d.get("data", []))
     except Exception:  # noqa: BLE001 - diagnostics must never break the caller
         return []
     return []
@@ -448,7 +505,7 @@ def audit_models(cfg: dict) -> dict:
     """Check every configured model id against what the provider actually offers."""
     llm = cfg.get("llm", {})
     report: dict = {}
-    for provider in ("gemini", "groq", "openrouter"):
+    for provider in ("gemini", "groq", "openrouter", "cerebras", "mistral", "cloudflare"):
         catalogue = available_models(provider)
         if not catalogue:
             report[provider] = {"catalogue": None}

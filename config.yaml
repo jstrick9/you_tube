@@ -308,7 +308,7 @@ research:
 llm:
   # Providers are tried in order; any provider without a key is skipped.
   # All have free tiers. Pollinations needs no key at all (last-resort fallback).
-  providers: [groq, gemini, pollinations]
+  providers: [groq, gemini, cerebras, mistral, cloudflare, pollinations]
   # Groq writes first, deliberately. Gemini is the ONLY vision-capable provider here
   # (Groq serves no vision model and there is no OpenRouter key), and image verification
   # is a hard gate - if it cannot run, the video is correctly thrown away. Letting Gemini
@@ -323,12 +323,22 @@ llm:
   # silently fell back to Gemini - the same model that wrote the script, so the run
   # produced zero independent reviews.
   groq_models: [openai/gpt-oss-120b, openai/gpt-oss-20b, qwen/qwen3.8-27b]
+  # Added 3 Oct 2026 to end a day of total rate-limit lockout on gemini+groq. All three
+  # are permanent free tiers that need no credit card. Model ids below are a best guess
+  # and MUST be confirmed with `python -m autotube doctor`, which checks them against
+  # each provider's live catalogue - guessed ids have cost this repo three runs already.
+  cerebras_models: [llama-3.3-70b, gpt-oss-120b, qwen-3-32b]
+  cerebras_review_models: [gpt-oss-120b, llama-3.3-70b]
+  mistral_models: [mistral-small-latest, open-mistral-nemo]
+  mistral_review_models: [mistral-small-latest]
+  cloudflare_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "@cf/meta/llama-3.1-8b-instruct"]
+  cloudflare_review_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast"]
   pollinations_models: [openai-fast, openai]
   # Fact-checking/review runs on a DIFFERENT model from the one that wrote the draft (a writer grading
   # its own homework agrees with itself). Deliberately the reverse order of `providers`, so when both
   # Gemini and Groq are keyed the writer and the reviewer are different families. If none is reachable
   # the review falls back to the normal order and the run is flagged as non-independent.
-  review_providers: [groq, gemini]
+  review_providers: [cerebras, groq, mistral, gemini, cloudflare]
   groq_review_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b, openai/gpt-oss-20b]
   gemini_review_models: [gemini-flash-latest, gemini-flash-lite-latest]
   # image-checking models (keyless Pollinations can't see images, so it's never used for this)
