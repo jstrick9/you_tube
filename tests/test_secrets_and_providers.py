@@ -147,3 +147,16 @@ def test_every_configured_model_id_is_syntactically_a_real_candidate():
             assert m in groq_real, (
                 f"{key}: {m!r} is not in Groq's catalogue. Run `autotube doctor` — it "
                 f"lists the live model ids. Do not guess at model names.")
+
+
+def test_length_instruction_rejects_both_ends_not_just_short():
+    """The budget instruction used to say only "Too short = rejected".
+
+    That is a one-sided push, and the model duly overshot: 58, 68 and 76 words against a
+    52-word ceiling in a single live run, which became the largest single cause of
+    abandoned scripts once the quality gates stopped being the bottleneck.
+    """
+    src = (ROOT / "autotube" / "scriptwriter.py").read_text()
+    assert "Too short = rejected." not in src, "one-sided length instruction is back"
+    assert "words per segment" in src, "per-segment budget is easier to hit than a total"
+    assert "too short AND too long" in src.lower() or "Both ends are rejected" in src

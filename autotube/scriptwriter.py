@@ -294,6 +294,11 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
     def write(self, topic: dict, plan: dict, source: dict) -> dict:
         lo, hi = self.cfg["video"]["target_seconds"]
         words_lo, words_hi = int(lo * 2.6), int(hi * 2.6)
+        # A global word count is something a model estimates badly; a per-segment budget is
+        # something it can actually hold in mind while writing the line. Overshoot was the
+        # single largest cause of abandoned scripts once the quality gates stopped being the
+        # bottleneck - 58, 68 and 76 words against a 52-word ceiling in one run.
+        per_seg = max(1, round((words_lo + words_hi) / 2 / 5.5))
         ev_len = "5-9" if self.llm.lite else "8-15"
         if self.cfg["content"].get("loop_ending", True):
             loop_rule = ("answer the hook's open question with the final surprising fact, and end on words that flow "
@@ -370,7 +375,9 @@ The TOPIC line is just a trend headline — do NOT repeat its claims or numbers 
 {person_rule}{series_rule}ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with
 comic timing and personality (reactions, contrast, "and it gets worse"). The facts stay 100% exact; the humour comes
 from HOW you tell them and from the asides, never from changing what happened.
-TOTAL narration (text + asides) MUST be {words_lo}-{words_hi} words. Count them. Too short = rejected.
+TOTAL narration (text + asides) MUST be {words_lo}-{words_hi} words — that is about {per_seg} words per segment,
+which is ONE short spoken sentence each, not two. Both ends are rejected: too short AND too long.
+The ceiling is the hard one. Write the whole thing, then count, then cut until it fits before you answer.
 For each segment give:
   "text": the spoken line (facts),
 {aside_rule}  "emphasis": 1-2 key words copied exactly from "text" that flash on screen in colour (the surprising word/number),
