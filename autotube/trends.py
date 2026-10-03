@@ -175,29 +175,43 @@ def hook_pattern(title: str) -> str:
 
 
 def lane_queries(cfg: dict) -> list[tuple[str, str]]:
-    """(lane, query) pairs for this run, capped by quota and rotated day by day.
+    """(lane, query) pairs for this run: every lane represented, rotating within each lane.
 
-    When the configured lanes hold more queries than max_queries_per_run allows, taking the first N
-    every day would mean the last lanes are never searched. Rotating the start offset by day-of-year
-    gives every query its turn across a week while keeping each individual run inside quota.
+    Two guarantees that a single flat list cannot give at once. Every lane is searched on every
+    run, because a lane that goes unsearched looks exactly like a lane with nothing trending in it
+    and would quietly stop feeding the channel. And every query still gets its turn over a few
+    days, because the cap usually allows fewer queries than the lanes hold.
+
+    Rotating a flattened list satisfies only the second: the day's window can land entirely inside
+    two lanes and skip the rest.
     """
     t = cfg.get("trends", {}) or {}
     lanes = t.get("lanes") or {}
-    pairs: list[tuple[str, str]] = []
-    if lanes:
-        # interleave lanes so a cap still samples every lane rather than exhausting the first
-        per_lane = [[(name, q) for q in (spec.get("queries") or [])] for name, spec in lanes.items()]
-        for i in range(max((len(x) for x in per_lane), default=0)):
-            for lane in per_lane:
-                if i < len(lane):
-                    pairs.append(lane[i])
-    else:
+    if not lanes:
         pairs = [("", q) for q in (t.get("youtube_outlier_queries") or [])]
-    cap = int(t.get("max_queries_per_run", 0) or len(pairs))
-    if 0 < cap < len(pairs):
-        off = now_utc().timetuple().tm_yday % len(pairs)
-        pairs = [pairs[(off + i) % len(pairs)] for i in range(cap)]
-    return pairs
+        cap = int(t.get("max_queries_per_run", 0) or len(pairs))
+        return pairs[:cap] if cap else pairs
+
+    names = [n for n, spec in lanes.items() if (spec.get("queries") or [])]
+    if not names:
+        return []
+    total = sum(len(lanes[n]["queries"]) for n in names)
+    cap = int(t.get("max_queries_per_run", 0) or total)
+    cap = max(len(names), min(cap, total))        # never starve a lane entirely
+
+    day = now_utc().timetuple().tm_yday
+    # round-robin the budget across lanes, so a cap smaller than the query count still touches each
+    take = {n: 0 for n in names}
+    for i in range(cap):
+        n = names[i % len(names)]
+        if take[n] < len(lanes[n]["queries"]):
+            take[n] += 1
+    out: list[tuple[str, str]] = []
+    for n in names:
+        qs = lanes[n]["queries"]
+        off = day % len(qs)
+        out += [(n, qs[(off + i) % len(qs)]) for i in range(take[n])]
+    return out
 
 
 def lane_of(cfg: dict, category: str) -> str:

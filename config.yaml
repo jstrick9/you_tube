@@ -62,7 +62,11 @@ schedule:
 
 video:
   kind: short                            # 1080x1920 vertical YouTube Short
-  target_seconds: [24, 36]               # 2026 data: ~20-35 s Shorts get the highest completion/replay rates
+  # Tightened from [24, 36]. Completion rate is the dominant Shorts ranking input, it falls off
+  # with length, and it is this channel's weakest metric. The script structure rules in
+  # scriptwriter.py (segment count, body and payoff word ranges) are sized to this band and
+  # tests/test_length.py asserts they stay consistent — change them together.
+  target_seconds: [22, 30]               # 2026 data: ~20-35 s Shorts get the highest completion/replay rates
   fps: 30
   width: 1080
   height: 1920

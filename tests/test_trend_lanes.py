@@ -23,17 +23,42 @@ def test_every_lane_is_searched_even_when_the_quota_cap_bites():
     assert lanes == {"a", "b", "c"}, f"a capped run skipped a lane: {lanes}"
 
 
-def test_cap_is_respected_and_rotates_over_days():
+def test_cap_is_respected_and_rotates_over_days(monkeypatch):
+    import datetime as _dt
+
     cfg = {"trends": {"lanes": {"a": {"queries": [f"q{i}" for i in range(10)]}},
                       "max_queries_per_run": 3}}
-    picked = trends.lane_queries(cfg)
-    assert len(picked) == 3
-    # over a year of offsets every query must get searched at least once
+    assert len(trends.lane_queries(cfg)) == 3
+    # every query must actually get searched as the days roll over
     seen = set()
     for day in range(1, 366):
-        off = day % 10
-        seen |= {f"q{(off + i) % 10}" for i in range(3)}
+        monkeypatch.setattr(trends, "now_utc",
+                            lambda d=day: _dt.datetime(2026, 1, 1) + _dt.timedelta(days=d - 1))
+        seen |= {q for _, q in trends.lane_queries(cfg)}
     assert seen == {f"q{i}" for i in range(10)}
+
+
+def test_every_lane_is_searched_on_every_day_of_the_year(monkeypatch):
+    """Rotation must not be able to skip a lane. A lane that goes unsearched is indistinguishable
+    from a lane with nothing trending, and would quietly stop feeding the channel."""
+    import datetime as _dt
+
+    cfg = {"trends": {"lanes": {
+        "a": {"queries": ["a1", "a2", "a3", "a4"]},
+        "b": {"queries": ["b1", "b2", "b3"]},
+        "c": {"queries": ["c1", "c2"]},
+    }, "max_queries_per_run": 4}}
+    for day in range(1, 366):
+        monkeypatch.setattr(trends, "now_utc",
+                            lambda d=day: _dt.datetime(2026, 1, 1) + _dt.timedelta(days=d - 1))
+        lanes = {lane for lane, _ in trends.lane_queries(cfg)}
+        assert lanes == {"a", "b", "c"}, f"day {day} skipped a lane: {lanes}"
+
+
+def test_cap_below_lane_count_still_touches_every_lane():
+    cfg = {"trends": {"lanes": {k: {"queries": [k + "1", k + "2"]} for k in "abcde"},
+                      "max_queries_per_run": 2}}
+    assert len({lane for lane, _ in trends.lane_queries(cfg)}) == 5
 
 
 def test_no_cap_returns_everything_and_empty_config_is_safe():

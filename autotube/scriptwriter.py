@@ -307,10 +307,10 @@ SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of fact
 {HOOK_RULES}
 Write the script as 5-6 segments:
   - segment 1 = HOOK (see rules), spoken in under 3 seconds;
-  - segments 2..N-1 = BODY, each 14-22 words (1-2 sentences, one concrete fact with a specific detail each —
+  - segments 2..N-1 = BODY, each 12-14 words (1-2 sentences, one concrete fact with a specific detail each —
     every line must add something new; no filler, no repetition). The body is a mini STORY, not a list: setup →
     "and it gets stranger" escalation → the reveal. Use contrast and consequence ("so", "which meant", "except");
-  - last segment = PAYOFF, 8-16 words: {loop_rule}
+  - last segment = PAYOFF, 8-13 words: {loop_rule}
 The TOPIC line is just a trend headline — do NOT repeat its claims or numbers unless the SOURCE TEXT states them.
 {person_rule}
 ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with

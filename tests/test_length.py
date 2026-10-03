@@ -108,3 +108,45 @@ def test_reveal_pause_counts_toward_the_budget():
     s = script_of(3)
     _, gaps = fit_length(s, PLAN, CFG, Path("/tmp"), synth_factory())
     assert sum(gaps) > 0, "the reveal beat is real time and must be budgeted"
+
+
+# ── the band and the prompt must agree ────────────────────────────────────────
+def test_script_structure_fits_the_configured_band():
+    """The prompt's own rules must be satisfiable inside the word budget the band implies.
+
+    These are two numbers in two different files and nothing connected them: at [22, 30] the old
+    "5-6 segments, body 14-22 words" produced 72-112 words against a 78-word target, so most drafts
+    would be rejected and burn retries before the topic was abandoned. Tightening the band without
+    resizing the structure silently breaks generation, so assert they agree.
+    """
+    import re
+    from autotube.common import load_config
+
+    cfg = load_config()
+    lo_s, hi_s = cfg["video"]["target_seconds"]
+    words_lo, words_hi = int(lo_s * 2.6), int(hi_s * 2.6)
+    accept_lo, accept_hi = words_lo * 0.75, words_hi * 1.08
+
+    src = Path(__file__).resolve().parent.parent / "autotube" / "scriptwriter.py"
+    text = src.read_text()
+    n_lo, n_hi = map(int, re.search(r"Write the script as (\d)-(\d) segments", text).groups())
+    b_lo, b_hi = map(int, re.search(r"BODY, each (\d+)-(\d+) words", text).groups())
+    p_lo, p_hi = map(int, re.search(r"PAYOFF, (\d+)-(\d+) words", text).groups())
+    hook_hi = int(cfg["content"]["hook_words_max"])
+
+    for n in range(n_lo, n_hi + 1):
+        body = n - 2
+        shortest = cfg["content"]["hook_words_min"] + body * b_lo + p_lo
+        longest = hook_hi + body * b_hi + p_hi
+        assert longest <= accept_hi, (
+            f"{n}-segment script can reach {longest} words but the validator rejects over "
+            f"{accept_hi:.0f} — the band and the prompt structure disagree")
+        assert shortest >= accept_lo, (
+            f"{n}-segment script can be as short as {shortest} words but the validator rejects "
+            f"under {accept_lo:.0f}")
+
+
+def test_band_is_within_shorts_limits():
+    from autotube.common import load_config
+    lo_s, hi_s = load_config()["video"]["target_seconds"]
+    assert 15 <= lo_s < hi_s <= 50, "a Short must stay well under the 60s classification cliff"
