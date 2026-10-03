@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-03T14:05:17.988398+00:00",
+  "updated": "2026-10-03T18:51:01.145562+00:00",
   "videos_total": 29,
-  "videos_7d": 22,
-  "views_7d": 9912,
+  "videos_7d": 19,
+  "views_7d": 7313,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -301,13 +301,13 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1298,
+      "views": 1324,
       "avg_view_pct": null
     },
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
-      "views": 1287,
+      "views": 1310,
       "avg_view_pct": null
     },
     {
@@ -396,7 +396,7 @@
   },
   "subscribers": {
     "net_90d": 7,
-    "views_90d": 17064,
+    "views_90d": 17204,
     "per_1k_views": 0.41,
     "videos": 23,
     "days_to_500": 6428.6,
