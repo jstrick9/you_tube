@@ -1,4 +1,4 @@
-"""Proof in a Minute: channel art generator (profile picture, banner, watermark, preview mockup)."""
+"""Archive 13: channel art generator (profile picture, banner, watermark, preview mockup)."""
 import math, random
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
@@ -169,8 +169,8 @@ pv.paste(band, (40, 120))
 av = Image.open(f"{OUT}/profile-picture-800.png").resize((160, 160), Image.LANCZOS)
 mask = Image.new("L", (160, 160), 0); ImageDraw.Draw(mask).ellipse([0, 0, 159, 159], fill=255)
 pv.paste(av, (40, 435), mask)
-pd.text((225, 450), "Proof in a Minute", font=fB, fill=(15, 15, 15))
-pd.text((226, 505), "@proofinaminute · Surprising facts. Real sources. 60 seconds.", font=fS, fill=(96, 96, 96))
+pd.text((225, 450), "Archive 13", font=fB, fill=(15, 15, 15))
+pd.text((226, 505), "@archive13 · Every file is real. That's the problem.", font=fS, fill=(96, 96, 96))
 pd.rounded_rectangle([226, 545, 386, 590], radius=22, fill=(15, 15, 15)); pd.text((252, 553), "Subscribe", font=font(MBLACK, 22), fill="white")
 # mobile: safe area only
 pd.text((40, 640), "Mobile (safe area only)", font=fS, fill=(90, 90, 90))
@@ -179,8 +179,8 @@ pv.paste(mob, (40, 674))
 av2 = Image.open(f"{OUT}/profile-picture-800.png").resize((110, 110), Image.LANCZOS)
 m2 = Image.new("L", (110, 110), 0); ImageDraw.Draw(m2).ellipse([0, 0, 109, 109], fill=255)
 pv.paste(av2, (40, 950), m2)
-pd.text((170, 965), "Proof in a Minute", font=font(MBLACK, 30), fill=(15, 15, 15))
-pd.text((171, 1008), "@proofinaminute", font=fS, fill=(96, 96, 96))
+pd.text((170, 965), "Archive 13", font=font(MBLACK, 30), fill=(15, 15, 15))
+pd.text((171, 1008), "@archive13", font=fS, fill=(96, 96, 96))
 # small sizes
 pd.text((1010, 640), "Profile picture at real sizes", font=fS, fill=(90, 90, 90))
 x = 1010

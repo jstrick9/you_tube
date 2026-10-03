@@ -126,7 +126,7 @@ def judge(subject: str, context: str, term: str, llm, cfg: dict) -> tuple[bool, 
 CONTEXT: {context[:1200]}
 FLAGGED WORD: "{term}"
 
-We want to make a 30-second, factual, family-friendly educational Short about this subject.
+We want to make a 15-20 second, factual, family-friendly educational Short about this subject.
 Can it be done in an advertiser-friendly, non-graphic, respectful way?
 
 Say yes for: non-graphic historical or scientific references (e.g. an engineering crash test, a
@@ -176,7 +176,8 @@ PERSON_BLOCKED_ANGLES = [
 
 # A factual channel must never repeat a claim it cannot stand behind. These phrases are how an
 # automated script launders a rumour into an assertion, so they are banned outright rather than
-# judged — "Sounds fake. It's proven." is the whole premise.
+# judged — "Every file is real. That's the problem." is the whole premise: the channel may present a thing as
+# unexplained, but never as merely alleged. Unresolved is not the same as unsourced.
 SPECULATION = [
     "allegedly", "reportedly", "rumour has it", "rumor has it", "sources say", "insiders say",
     "it is claimed", "it's claimed", "apparently", "supposedly", "some say", "people are saying",

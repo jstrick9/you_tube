@@ -201,7 +201,7 @@ def test_pause_plan_gives_the_reveal_a_beat():
 def test_kinetic_captions(tmp_path):
     _, fx = _fx()
     tts = _tts()
-    out = render.build_ass(tts["segments"], "IF YOU SEE ME, WEEP", "Proof in a Minute", 1080, 1920, render.THEMES[0],
+    out = render.build_ass(tts["segments"], "IF YOU SEE ME, WEEP", "Archive 13", 1080, 1920, render.THEMES[0],
                            "Anton", tmp_path / "c.ass", tts["duration"] + 0.7, fx=fx)
     a = out.read_text()
     assert ",Count,," in a and "1,500" in a                   # number count-up ends on the exact number
@@ -241,7 +241,7 @@ def test_narration_check_includes_asides():
 
 def test_description_has_the_brand_promise():
     d = build_description({"description": "About hunger stones.", "hashtags": ["#history"]}, SOURCE, [], CFG, "edge")
-    assert "Sounds fake. It's proven." in d and "Source: Hunger stone" in d
+    assert "Every file is real. That's the problem." in d and "Source: Hunger stone" in d
 
 
 def test_fit_avoids_repeating_a_format_in_one_run(monkeypatch):

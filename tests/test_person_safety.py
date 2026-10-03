@@ -97,7 +97,7 @@ def test_person_config_defaults_survive_yaml_nulls():
 
 # ── script level ──────────────────────────────────────────────────────────────
 def test_speculation_is_banned_on_every_topic():
-    """A channel whose premise is 'Sounds fake. It's proven.' may never say 'allegedly'."""
+    """A channel whose premise is "every file is real" may never say 'allegedly'."""
     for phrase in ["She reportedly recorded it in secret.", "The eruption allegedly began at dawn.",
                    "Sources say the launch slipped.", "Fans think it is a hint."]:
         assert safety.check_script("A Title", phrase, CFG), phrase

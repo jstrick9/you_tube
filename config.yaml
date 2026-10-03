@@ -6,13 +6,13 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 channel:
-  name: "Proof in a Minute"              # shown on-screen (brand tag) and in the description footer
-  handle: "@proofinaminute"              # YouTube handle, used in the description call-to-action
+  name: "Archive 13"                      # shown on-screen (brand tag) and in the description footer
+  handle: "@archive13"                       # YouTube handle, used in the description call-to-action
   niche: >-
-    Entertaining, true stories and facts that sound fake but are proven — the
-    weirdest, funniest, creepiest and most jaw-dropping real things from
-    history, nature, science, space, technology, food, animals, places and
-    pop culture, told by a witty narrator, every one backed by a cited source.
+    A numbered archive of real things that should not be possible — unsolved
+    disappearances, declassified records, deep-ocean and deep-space discoveries and
+    the parts of history nobody managed to explain. Two running series, CASE and
+    FIELD, every episode sourced and cited, narrated with dry disbelief.
   language: en
   region: US                             # trend region (Google Trends geo / YouTube chart)
   timezone: America/New_York
@@ -43,7 +43,10 @@ channel:
 # ── Channel identity ── (a recognisable narrator + promise is what separates a channel YouTube keeps monetized
 # from "generic AI facts over stock photos"; see README → Entertainment & identity)
 persona:
-  catchphrase: "Sounds fake. It's proven."
+  # "Every file is real" carries the same load the old "it's proven" did - it is the
+  # stated reason the speculation ban in safety.py exists. What changed is the second
+  # half: the channel now promises unresolved, not debunked.
+  catchphrase: "Every file is real. That's the problem."
   character: >-
     a dry-witted, slightly incredulous narrator who finds real facts more ridiculous than fiction. Talks to ONE
     viewer like a friend ("okay, this one is unhinged"), reacts with short deadpan asides, is never mean to real
