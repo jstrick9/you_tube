@@ -328,3 +328,57 @@ class LLM:
                 f"candidates={tried or '[none configured]'} "
                 f"already-retired={skipped or '[]'} avoiding={avoid or '-'}")
         raise LLMError("All LLM providers failed:\n  " + "\n  ".join(errors[-12:]))
+
+
+# ── model catalogue ──────────────────────────────────────────────────────────
+def available_models(provider: str) -> list[str]:
+    """Model ids a provider will actually accept right now, or [] if unknown.
+
+    Three separate outages in this repo have been a configured model id that simply
+    does not exist - "verified on Groq Sep 2026" models returning 404 a month later,
+    and then replacements that were themselves wrong. A model name is not something
+    worth guessing at: every provider publishes the list.
+    """
+    import os
+
+    from .common import get_json
+    try:
+        if provider == "groq":
+            key = os.environ.get("GROQ_API_KEY")
+            if not key:
+                return []
+            d = get_json("https://api.groq.com/openai/v1/models",
+                         headers={"Authorization": f"Bearer {key}"})
+            return sorted(m["id"] for m in d.get("data", []))
+        if provider == "gemini":
+            key = os.environ.get("GEMINI_API_KEY")
+            if not key:
+                return []
+            d = get_json("https://generativelanguage.googleapis.com/v1beta/models",
+                         params={"key": key, "pageSize": 200})
+            return sorted(m["name"].removeprefix("models/") for m in d.get("models", []))
+        if provider == "openrouter":
+            d = get_json("https://openrouter.ai/api/v1/models")
+            return sorted(m["id"] for m in d.get("data", []))
+    except Exception:  # noqa: BLE001 - diagnostics must never break the caller
+        return []
+    return []
+
+
+def audit_models(cfg: dict) -> dict:
+    """Check every configured model id against what the provider actually offers."""
+    llm = cfg.get("llm", {})
+    report: dict = {}
+    for provider in ("gemini", "groq", "openrouter"):
+        catalogue = available_models(provider)
+        if not catalogue:
+            report[provider] = {"catalogue": None}
+            continue
+        rows = {}
+        for suffix in ("_models", "_review_models", "_vision_models"):
+            for m in llm.get(f"{provider}{suffix}", []) or []:
+                rows[m] = m in catalogue
+        report[provider] = {"catalogue": len(catalogue), "configured": rows,
+                            "missing": sorted(k for k, v in rows.items() if not v),
+                            "sample": catalogue[:40]}
+    return report

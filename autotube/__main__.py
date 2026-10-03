@@ -37,6 +37,7 @@ def notify(cfg: dict, title: str, msg: str, ok: bool = True) -> None:
 
 
 def cmd_doctor(cfg: dict) -> int:
+    ok = True
     from .common import ffmpeg_bin
     from .llm import LLM
     print("ffmpeg:", ffmpeg_bin())
@@ -48,7 +49,22 @@ def cmd_doctor(cfg: dict) -> int:
         print("LLM:", r)
     except Exception as e:  # noqa: BLE001
         print("LLM FAILED:", e)
-    ok = True
+    # Validate configured model ids against each provider's live catalogue. Three
+    # separate failures here have been a model name that does not exist, and each one
+    # cost a full production run to find because the fallback chain hid it.
+    from .llm import audit_models
+    print("\nmodels:")
+    for prov, r in audit_models(cfg).items():
+        if r["catalogue"] is None:
+            print(f"  {prov:11s} (no key or catalogue unreachable — skipped)")
+            continue
+        for m, present in r["configured"].items():
+            print(f"  {prov:11s} {'OK  ' if present else 'GONE'} {m}")
+        if r["missing"]:
+            ok = False
+            print(f"  {prov:11s} !! {len(r['missing'])} configured model(s) do not exist: {r['missing']}")
+            print(f"  {prov:11s} -> available: {', '.join(r['sample'][:14])}")
+
     if os.environ.get("YT_REFRESH_TOKEN"):
         try:
             from .common import http
