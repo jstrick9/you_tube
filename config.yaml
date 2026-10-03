@@ -380,7 +380,7 @@ media:
   # photos: pexels (only with PEXELS_API_KEY), wikimedia, openverse
   # moving footage: commons_video (Wikimedia Commons videos), nasa_video (NASA library, public domain, keyless),
   #                 pexels_video (only with PEXELS_API_KEY — portrait stock clips)
-  sources: [commons_video, nasa_video, pexels_video, pexels, wikimedia, openverse]
+  sources: [commons_video, nasa_video, archive_video, pexels_video, pexels, wikimedia, openverse]
   prefer_video: true                     # a verified clip beats an equally good still (motion holds attention)
   video_bonus: 1.0
   # Ranking nudge toward assets that fill a 9:16 frame without upscaling (see media.shape_bonus).

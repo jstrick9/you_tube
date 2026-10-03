@@ -267,6 +267,92 @@ def nasa_video_search(query: str, limit: int = 5) -> list[dict]:
     return out
 
 
+# Collections whose contents are public domain as a matter of the collection's own
+# policy. archive.org also hosts plenty of in-copyright material, so an unfiltered
+# search there would be a licensing problem, not a free footage win. Every result is
+# additionally required to carry a public-domain or CC licence field below.
+ARCHIVE_PD_COLLECTIONS = ("prelinger", "publicmovies", "government_films", "newsandpublicaffairs")
+
+
+def archive_video_search(query: str, limit: int = 5) -> list[dict]:
+    """Internet Archive public-domain film (keyless).
+
+    Real archival motion footage, which is the one visual upgrade that strengthens
+    rather than undermines the channel's own claim that every file is real. The
+    Prelinger collection alone holds ~10,000 public-domain films.
+
+    Two deliberate restrictions. The search is confined to collections that are public
+    domain by policy, and each item must *also* declare a public-domain or Creative
+    Commons licence - archive.org is a host, not a rights clearinghouse, and an
+    unfiltered query there would pull in copyrighted uploads. Footage is typically
+    640x480 and 4:3, so it is reported honestly here and treated as insert b-roll
+    rather than full-frame by the renderer's existing shape scoring.
+    """
+    coll = " OR ".join(f"collection:{c}" for c in ARCHIVE_PD_COLLECTIONS)
+    q = f'({query}) AND mediatype:movies AND ({coll})'
+    try:
+        data = get_json("https://archive.org/advancedsearch.php",
+                        params={"q": q, "fl[]": ["identifier", "title", "licenseurl"],
+                                "rows": limit, "page": 1, "output": "json"})
+    except Exception as e:  # noqa: BLE001
+        log.debug("archive search failed: %s", e)
+        return []
+    out = []
+    for doc in ((data.get("response") or {}).get("docs") or [])[:limit]:
+        ident = doc.get("identifier")
+        if not ident:
+            continue
+        lic = (doc.get("licenseurl") or "").lower()
+        try:
+            meta = get_json(f"https://archive.org/metadata/{quote(ident)}")
+        except Exception as e:  # noqa: BLE001
+            log.debug("archive metadata failed for %s: %s", ident, e)
+            continue
+        md = meta.get("metadata") or {}
+        lic = lic or str(md.get("licenseurl") or "").lower()
+        # Belt and braces: the collection is PD by policy, but refuse anything whose own
+        # licence field contradicts that or carries a non-commercial restriction.
+        if lic and not ("publicdomain" in lic or "creativecommons" in lic or "cc0" in lic):
+            continue
+        # Splitting the URL on "/" missed by-nc entirely, because the restriction lives
+        # inside the licence code rather than as its own path segment. Match it as a
+        # token instead. ND is refused for the same practical reason as NC: this
+        # pipeline crops, trims and overlays, which makes every use a derivative work.
+        if re.search(r"(^|[-/])n[cd]([-/]|$)", lic):
+            log.debug("archive: refusing %s, licence forbids commercial or derivative use", ident)
+            continue
+        # Relevance guard. archive.org's keyword ranking over this corpus is weak - a
+        # search for "deep sea ocean" happily returns "COLORADO PLATEAU" - and every
+        # candidate that reaches the vision gate spends the scarcest quota we have.
+        # Requiring a real query word in the title or description is crude, but it is
+        # free and it keeps obvious mismatches from costing a vision call.
+        hay = f"{md.get('title') or ''} {md.get('description') or ''}".lower()
+        terms = [w for w in re.findall(r"[a-z]{4,}", query.lower())]
+        if terms and not any(w in hay for w in terms):
+            log.debug("archive: dropping %s, no query term in title/description", ident)
+            continue
+        vids = [f for f in (meta.get("files") or [])
+                if str(f.get("name", "")).lower().endswith(".mp4") and int(f.get("size") or 0) > 0]
+        if not vids:
+            continue
+        vids.sort(key=lambda f: int(f.get("size") or 0), reverse=True)
+        best = vids[0]
+        base = f"https://archive.org/download/{quote(ident)}/"
+        try:
+            w, h = int(best.get("width") or 640), int(best.get("height") or 480)
+        except (TypeError, ValueError):
+            w, h = 640, 480
+        out.append({"kind": "video", "url": base + quote(best["name"]),
+                    "variants": [base + quote(f["name"]) for f in vids[:3]],
+                    "thumb": f"https://archive.org/services/img/{quote(ident)}",
+                    "page": f"https://archive.org/details/{quote(ident)}",
+                    "title": (str(md.get("title") or ident))[:80] + " (archive film)",
+                    "license": "Public domain (Internet Archive)",
+                    "author": str(md.get("creator") or "Internet Archive"),
+                    "source": "Internet Archive", "w": w, "h": h})
+    return out
+
+
 def pexels_video_search(query: str, limit: int = 5) -> list[dict]:
     """Pexels clips, fetched in both orientations and chosen by post-crop sharpness."""
     key = os.environ.get("PEXELS_API_KEY")
@@ -514,6 +600,8 @@ def _candidates_for(queries: list[str], sources: list[str], allowed: list[str], 
             jobs.append((commons_video_search, (q, allowed, 5)))
         if qi < 1 and "nasa_video" in sources:
             jobs.append((nasa_video_search, (q, 4)))
+        if qi < 2 and "archive_video" in sources:
+            jobs.append((archive_video_search, (q, 4)))
         if qi < 2 and "pexels_video" in sources and os.environ.get("PEXELS_API_KEY"):
             jobs.append((pexels_video_search, (q, 4)))
         if "pexels" in sources and os.environ.get("PEXELS_API_KEY"):

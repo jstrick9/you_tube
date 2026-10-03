@@ -400,3 +400,76 @@ def test_doctor_reports_every_provider_key_it_depends_on():
     import autotube.llm as L
     for env in L.KEYED_PROVIDERS.values():
         assert env in src or "KEYED_PROVIDERS" in src
+
+
+# ── Internet Archive public-domain footage ──────────────────────────────────
+def _fake_archive(monkeypatch, docs, meta):
+    import autotube.media as M
+
+    def fake_get_json(url, params=None, headers=None, **kw):
+        if "advancedsearch" in url:
+            return {"response": {"docs": docs}}
+        return meta
+    monkeypatch.setattr(M, "get_json", fake_get_json)
+    return M
+
+
+def test_archive_refuses_items_that_are_not_public_domain(monkeypatch):
+    """archive.org is a host, not a rights clearinghouse.
+
+    An unfiltered search there is a licensing problem, not a free-footage win, so a
+    declared licence that is not PD/CC must be rejected even inside a PD collection.
+    """
+    M = _fake_archive(monkeypatch,
+                      [{"identifier": "x", "title": "nuclear test", "licenseurl": "http://example.com/all-rights"}],
+                      {"metadata": {"title": "nuclear test"},
+                       "files": [{"name": "a.mp4", "size": "999", "width": "640", "height": "480"}]})
+    assert M.archive_video_search("nuclear test", 3) == []
+
+
+def test_archive_rejects_noncommercial_licences(monkeypatch):
+    """A monetised channel cannot use NC material."""
+    M = _fake_archive(monkeypatch,
+                      [{"identifier": "x", "title": "nuclear test",
+                        "licenseurl": "http://creativecommons.org/licenses/by-nc/4.0/"}],
+                      {"metadata": {"title": "nuclear test"},
+                       "files": [{"name": "a.mp4", "size": "999"}]})
+    assert M.archive_video_search("nuclear test", 3) == []
+
+
+def test_archive_drops_irrelevant_hits_before_they_cost_a_vision_call(monkeypatch):
+    """Vision is the scarcest quota and the hard gate; noise there is expensive.
+
+    archive.org's keyword ranking is weak enough to answer "deep sea ocean" with
+    "COLORADO PLATEAU", so an item sharing no query word with its own title or
+    description is dropped for free rather than screened for a vision call.
+    """
+    M = _fake_archive(monkeypatch,
+                      [{"identifier": "x", "title": "Colorado Plateau",
+                        "licenseurl": "http://creativecommons.org/licenses/publicdomain/"}],
+                      {"metadata": {"title": "Colorado Plateau", "description": "a film about canyons"},
+                       "files": [{"name": "a.mp4", "size": "999"}]})
+    assert M.archive_video_search("submarine", 3) == [], "irrelevant item should be dropped"
+    assert len(M.archive_video_search("canyons", 3)) == 1, "a real term match should pass"
+
+
+def test_archive_asset_matches_the_shape_other_video_sources_use(monkeypatch):
+    M = _fake_archive(monkeypatch,
+                      [{"identifier": "dugout", "title": "Project Dugout",
+                        "licenseurl": "http://creativecommons.org/licenses/publicdomain/"}],
+                      {"metadata": {"title": "Project Dugout", "creator": "AEC"},
+                       "files": [{"name": "big.mp4", "size": "900", "width": "640", "height": "480"},
+                                 {"name": "small.mp4", "size": "100"}]})
+    a = M.archive_video_search("dugout", 3)[0]
+    for k in ("kind", "url", "thumb", "page", "title", "license", "author", "source", "w", "h", "variants"):
+        assert k in a, f"asset missing {k} — would break the common video path"
+    assert a["kind"] == "video"
+    assert a["url"].endswith("big.mp4"), "should prefer the largest derivative"
+    assert "publicdomain" in a["license"].lower() or "public domain" in a["license"].lower()
+
+
+def test_archive_is_actually_wired_into_the_source_list():
+    import autotube.media as M
+    assert "archive_video" in CFG["media"]["sources"]
+    src = (ROOT / "autotube" / "media.py").read_text()
+    assert "archive_video_search" in src.split("def _candidates_for")[1], "registered but never dispatched"
