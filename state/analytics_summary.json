@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-03T18:51:01.145562+00:00",
+  "updated": "2026-10-03T20:02:18.990144+00:00",
   "videos_total": 29,
   "videos_7d": 19,
-  "views_7d": 7313,
+  "views_7d": 7456,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -147,7 +147,7 @@
         },
         {
           "arm": "myth_vs_fact",
-          "mean": 0.464,
+          "mean": 0.465,
           "n": 2
         }
       ]
@@ -301,14 +301,14 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1324,
+      "views": 1337,
       "avg_view_pct": null
     },
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
-      "views": 1310,
-      "avg_view_pct": null
+      "views": 1326,
+      "avg_view_pct": 62.5
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -320,13 +320,13 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1223,
-      "avg_view_pct": 80.33
+      "avg_view_pct": 80.2
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
       "id": "tFm3Zuu2kGA",
       "views": 1204,
-      "avg_view_pct": 59.699999999999996
+      "avg_view_pct": 59.75
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
@@ -338,7 +338,7 @@
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
       "views": 1176,
-      "avg_view_pct": 49.79
+      "avg_view_pct": 50.03999999999999
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
@@ -395,12 +395,12 @@
     "verdict": "NO video clears the 70% completion gate (median 16%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
   },
   "subscribers": {
-    "net_90d": 7,
-    "views_90d": 17204,
-    "per_1k_views": 0.41,
+    "net_90d": 13,
+    "views_90d": 17349,
+    "per_1k_views": 0.75,
     "videos": 23,
-    "days_to_500": 6428.6,
-    "days_to_1000": 12857.1
+    "days_to_500": 3461.5,
+    "days_to_1000": 6923.1
   },
   "originality": {
     "episodes_examined": 0,
