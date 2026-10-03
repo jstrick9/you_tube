@@ -307,6 +307,13 @@ analytics:
   enabled: true
   evaluate_after_hours: 48                # judge a video's performance after N hours
   exploration: 0.15                       # extra random exploration on top of Thompson sampling
+  # How many of the most recent uploads get their stats re-fetched each pass. This is the real
+  # limit on what the channel can learn from: YouTube's API terms require stored statistics to be
+  # re-verified every 30 days, so any video outside this window has its metrics dropped and leaves
+  # the reward pool. Raising it costs one stats call per 50 videos. history_keep must stay >= this,
+  # or videos would be forgotten before they are ever measured.
+  refresh_videos: 300
+  history_keep: 2000                      # entries kept in state/history.json (also the topic-repeat memory)
 
   # ── reward ──
   # Weighted toward RETENTION, not views. Views/hour is downstream of how much traffic the algorithm

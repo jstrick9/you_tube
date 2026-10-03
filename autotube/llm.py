@@ -21,6 +21,22 @@ from .common import http
 log = logging.getLogger("autotube.llm")
 
 
+def _retry_after(msg: str, default: float) -> float:
+    """Honour a Retry-After the provider actually told us, when it is sane.
+
+    Guessing 6 seconds against a provider asking for 2 wastes the run's time budget; guessing 6
+    against one asking for 60 just fails again. Capped so a hostile or broken header cannot stall
+    the whole run.
+    """
+    m = re.search(r'retry[-_ ]?after["\s:]+(\d+(?:\.\d+)?)', msg, re.I)
+    if m:
+        try:
+            return max(1.0, min(45.0, float(m.group(1))))
+        except ValueError:
+            pass
+    return default
+
+
 class LLMError(RuntimeError):
     pass
 
@@ -246,6 +262,7 @@ class LLM:
                     continue
                 feedback = ""
                 for attempt in range(attempts_per_model):
+                    last_try = attempt == attempts_per_model - 1
                     try:
                         prompt = user + (f"\n\nIMPORTANT — your previous answer was rejected: {feedback}. Fix this."
                                          if feedback else "")
@@ -265,15 +282,20 @@ class LLM:
                         if "HTTP 404" in msg or "HTTP 400" in msg or "HTTP 401" in msg or "HTTP 403" in msg:
                             self._dead.add(tag)
                             break
-                        if "HTTP 429" in msg or "HTTP 402" in msg:
-                            time.sleep(6 + 6 * attempt)
-                        elif re.search(r"HTTP 50[0234]", msg):      # overloaded / transient
-                            time.sleep(8 + 8 * attempt)
-                        else:
-                            time.sleep(1.5)
+                        # Only back off if we are going to try this model again. Sleeping on the
+                        # final attempt just delayed the failover: 12s per rate-limited model,
+                        # across every model of every provider, out of a 120-minute run budget.
+                        if not last_try:
+                            if "HTTP 429" in msg or "HTTP 402" in msg:
+                                time.sleep(_retry_after(msg, 6 + 6 * attempt))
+                            elif re.search(r"HTTP 50[0234]", msg):      # overloaded / transient
+                                time.sleep(8 + 8 * attempt)
+                            else:
+                                time.sleep(1.5)
                     except Exception as e:  # validation or network
                         errors.append(f"{tag}: {type(e).__name__}: {str(e)[:160]}")
                         if isinstance(e, AssertionError):
                             feedback = str(e)
-                        time.sleep(1)
+                        if not last_try:
+                            time.sleep(1)
         raise LLMError("All LLM providers failed:\n  " + "\n  ".join(errors[-12:]))

@@ -266,9 +266,9 @@ def effects_plan(script: dict, plan: dict, source: dict, cfg: dict) -> dict:
     }
 
 
-def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int, run_id: str) -> dict | None:
-    log.info("▶ [%d] topic=%r format=%s hook=%s voice=%s", idx, topic["topic"], plan["format"],
-             plan["hook_style"], plan["voice"])
+def produce_assets(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict,
+                   idx: int, run_id: str) -> dict | None:
+    """Script → narration → visuals → music. Everything needed to render, or None to skip the topic."""
     produced = writer.produce(topic, plan)
     if not produced:
         log.info("  ✗ could not produce a verified script for %r", topic["topic"])
@@ -279,12 +279,9 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     work.mkdir(parents=True, exist_ok=True)
     seed = int(hashlib.md5(f"{run_id}{slug}".encode()).hexdigest()[:8], 16)
 
-    lo, hi = cfg["video"]["target_seconds"]
-    tts, gaps = fit_length(script, plan, cfg, work, synthesize)
+    tts, _gaps = fit_length(script, plan, cfg, work, synthesize)
     if tts is None:
         return None
-
-    lines = [spoken_text(s) for s in script["segments"]]
 
     tsegs = tts["segments"]
     starts = [x["start"] for x in tsegs] + [tts["duration"]]
@@ -294,23 +291,32 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     except media.NoVisualMatch as e:
         log.info("  ✗ visuals: %s — skipping topic", e)
         return None
+
     mus = music.generate(tts["duration"] + 1, work / "music.wav", seed) if cfg["video"]["background_music"] else None
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    out = OUTPUT_DIR / f"{run_id}-{idx:02d}-{slug}.mp4"
-    hook_card = script.get("thumbnail_text") or ""
     title = script["title"].strip()
     if "#shorts" not in title.lower() and len(title) <= 90:
         title = f"{title} #shorts"
-    subject = source["title"]
-    fx = effects_plan(script, plan, source, cfg)
+    return {"script": script, "source": source, "review": review, "plan": plan, "topic": topic,
+            "work": work, "seed": seed, "tts": tts, "visuals": visuals, "music": mus,
+            "out": OUTPUT_DIR / f"{run_id}-{idx:02d}-{slug}.mp4",
+            "hook_card": script.get("thumbnail_text") or "", "title": title,
+            "subject": source["title"], "fx": effects_plan(script, plan, source, cfg)}
 
-    # render → final QA on the finished file → (repair a failed shot with a verified spare, re-render) → …
-    repairs = int(cfg.get("qa", {}).get("max_repairs", 2))
+
+def render_with_qa(a: dict, cfg: dict, writer: ScriptWriter) -> tuple[dict, dict]:
+    """Render, verify the finished MP4 against the narration, repair a bad shot, repeat."""
+    # Clamped at zero so the loop always runs at least once: `r` is bound inside it and used
+    # afterwards, so a negative max_repairs in config would not disable repairs — it would raise
+    # NameError after a perfectly successful render.
+    repairs = max(0, int(cfg.get("qa", {}).get("max_repairs", 2)))
     report: dict = {"passed": False}
+    r: dict = {}
     for attempt in range(repairs + 1):
-        r = render.render(tts, visuals["shots"], mus, hook_card, cfg["channel"]["name"], cfg, work, out, seed, fx=fx)
-        report = qa.verify(out, r["timeline"], visuals["shots"], tts, script, title, hook_card, subject,
-                           writer.llm, cfg)
+        r = render.render(a["tts"], a["visuals"]["shots"], a["music"], a["hook_card"],
+                          cfg["channel"]["name"], cfg, a["work"], a["out"], a["seed"], fx=a["fx"])
+        report = qa.verify(a["out"], r["timeline"], a["visuals"]["shots"], a["tts"], a["script"],
+                           a["title"], a["hook_card"], a["subject"], writer.llm, cfg)
         report["attempt"] = attempt + 1
         if report["passed"]:
             log.info("  ✓ final QA passed: %d frames checked against the narration", len(report["frames"]))
@@ -318,10 +324,13 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
         log.info("  ✗ final QA attempt %d: %s", attempt + 1, "; ".join(report["issues"])[:500])
         if not report["failed"] or len(report["failed"]) < len(report["issues"]):
             break                    # a non-image problem (narration/title/hook) can't be fixed by swapping photos
-        if not all(media.use_alternative(visuals, seg, path, work / "img") for seg, path in report["failed"]):
+        if not all(media.use_alternative(a["visuals"], seg, path, a["work"] / "img")
+                   for seg, path in report["failed"]):
             break
+    return r, report
 
-    thumb = render.thumbnail(r["first_frame"], hook_card or source["title"], out.with_suffix(".jpg"), r["theme"])
+
+def _shots_sheet(visuals: dict, out) -> None:
     try:   # contact sheet of the shots actually used (kept with the run artifact)
         from PIL import Image
         from .vision import contact_sheet
@@ -335,19 +344,29 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     except Exception as e:  # noqa: BLE001
         log.debug("shots sheet failed: %s", e)
 
+
+def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
+    """Thumbnail, metadata and the run artifact. None if final QA failed — never hand that upstream."""
+    script, source, visuals, out = a["script"], a["source"], a["visuals"], a["out"]
+    thumb = render.thumbnail(r["first_frame"], a["hook_card"] or source["title"],
+                             out.with_suffix(".jpg"), r["theme"])
+    _shots_sheet(visuals, out)
+    words = sum(len(spoken_text(x).split()) for x in script["segments"])
     meta = {
-        "title": title,
-        "description": build_description(script, source, visuals["shots"], cfg, tts["engine"]),
+        "title": a["title"],
+        "description": build_description(script, source, visuals["shots"], cfg, a["tts"]["engine"]),
         "tags": list(dict.fromkeys([t.strip("#") for t in script.get("tags", [])] + ["shorts", "facts"]))[:25],
     }
-    record = {"meta": meta, "script": script, "review": review, "source": {k: source[k] for k in ("title", "url")},
-              "plan": plan, "tts_engine": tts["engine"], "duration": r["duration"],
-              "archetype": r.get("archetype"), "words": sum(len(spoken_text(x).split()) for x in script["segments"]),
+    record = {"meta": meta, "script": script, "review": a["review"],
+              "source": {k: source[k] for k in ("title", "url")},
+              "plan": a["plan"], "tts_engine": a["tts"]["engine"], "duration": r["duration"],
+              "archetype": r.get("archetype"), "words": words,
               "qa": {k: report.get(k) for k in ("passed", "attempt", "issues", "frames", "meta")},
               "shots": [{"seg": v["seg"], "kind": v.get("kind", "image"), "window": v.get("window"),
                          "score": v.get("score"), "judge": v.get("judge"), "shows": v.get("shows"),
-                         "want": v.get("want"), "reused": v.get("reused", False), "image": v["credit"].get("title"),
-                         "page": v["credit"].get("page")} for v in visuals["shots"]],
+                         "want": v.get("want"), "reused": v.get("reused", False),
+                         "image": v["credit"].get("title"), "page": v["credit"].get("page")}
+                        for v in visuals["shots"]],
               "timeline": r["timeline"]}
     if not report["passed"]:
         # keep the evidence in the run artifact, clearly marked, and never hand it to the uploader
@@ -357,10 +376,21 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
         log.info("  ✗ NOT publishing %r — final QA failed", source["title"])
         return None
     out.with_suffix(".json").write_text(json.dumps(record, indent=2, default=str))
-    log.info("  ✓ rendered %s (%.1fs, review=%s)", out.name, r["duration"], review.get("score"))
-    return {"file": out, "thumb": thumb, "meta": meta, "script": script, "source": source, "review": review,
-            "topic": topic, "plan": plan, "duration": r["duration"], "archetype": r.get("archetype"), "tts_engine": tts["engine"],
-            "words": sum(len(spoken_text(x).split()) for x in script["segments"]), "qa": report}
+    log.info("  ✓ rendered %s (%.1fs, review=%s)", out.name, r["duration"], a["review"].get("score"))
+    return {"file": out, "thumb": thumb, "meta": meta, "script": script, "source": source,
+            "review": a["review"], "topic": a["topic"], "plan": a["plan"], "duration": r["duration"],
+            "archetype": r.get("archetype"), "tts_engine": a["tts"]["engine"], "words": words,
+            "qa": report}
+
+
+def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int, run_id: str) -> dict | None:
+    log.info("▶ [%d] topic=%r format=%s hook=%s voice=%s", idx, topic["topic"], plan["format"],
+             plan["hook_style"], plan["voice"])
+    assets = produce_assets(cfg, writer, topic, plan, idx, run_id)
+    if not assets:
+        return None
+    r, report = render_with_qa(assets, cfg, writer)
+    return package(assets, r, report, cfg)
 
 
 def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_work: bool = False) -> list[dict]:
@@ -462,7 +492,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
         if do_upload:            # dry runs never touch history (no topic dedupe / slot booking side effects)
             hist.append(entry)
     if do_upload:
-        write_json("history.json", hist[-2000:])
+        write_json("history.json", hist[-int(cfg.get("analytics", {}).get("history_keep", 2000)):])
     if not keep_work:
         shutil.rmtree(WORK_DIR / run_id, ignore_errors=True)
     return results

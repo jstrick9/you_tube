@@ -193,7 +193,7 @@ def run(cfg: dict) -> dict:
     if not uploaded:
         log.info("no uploaded videos yet — nothing to learn")
         return {"evaluated": 0}
-    ids = [h["video_id"] for h in uploaded][-300:]
+    ids = [h["video_id"] for h in uploaded][-int(cfg["analytics"].get("refresh_videos", 300)):]
     stats = youtube.video_stats(ids)
     start = min(datetime.fromisoformat(h["created_at"]) for h in uploaded).date().isoformat()
     today = now_utc().date().isoformat()
@@ -281,7 +281,7 @@ def run(cfg: dict) -> dict:
     diag = retention_diagnosis(pool_src, acfg)
     if diag.get("verdict"):
         log.info("retention: %s", diag["verdict"])
-    write_json("history.json", hist)
+    write_json("history.json", hist[-int(cfg["analytics"].get("history_keep", 2000)):])
 
     # rolling summary for the dashboard
     last7 = [h for h in uploaded if datetime.fromisoformat(h["created_at"]) > now - timedelta(days=7)]
