@@ -354,7 +354,7 @@ llm:
   cerebras_review_models: [gpt-oss-120b, llama-3.3-70b]
   mistral_models: [mistral-small-latest, ministral-8b-latest]
   mistral_review_models: [mistral-small-latest]
-  cloudflare_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "@cf/meta/llama-3.1-8b-instruct"]
+  cloudflare_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "@cf/deepseek-ai/deepseek-v4-flash-0731"]
   cloudflare_review_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast"]
   # Vision is the hard gate - if no vision model answers, the video is discarded - and
   # until now Gemini was the only provider that could serve it. That single point of
