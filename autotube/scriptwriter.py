@@ -480,8 +480,12 @@ SCRIPT NARRATION (lines marked ASIDE are the narrator's jokes, spoken right afte
 
 Evaluate. Return JSON: {{"factual_errors": ["..."], "misleading_title": true|false, "advertiser_friendly": true|false,
 "policy_concerns": ["..."], "value_add": "<what the viewer learns>", "hook_strength": 0-10, "entertainment": 0-10,
-"score": 0-10, "fixes": ["..."]}}
+"score": 0-10, "loops": true|false, "fixes": ["..."]}}
 Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; <7 = do not publish.
+"loops": does the LAST line flow naturally back into the FIRST when the Short replays? Judge it by meaning,
+not by shared words - "so the ice keeps bleeding" loops cleanly into "a waterfall that runs blood red".
+A replay counts as a view and pushes average view percentage past 100%, which is one of the strongest
+satisfaction signals Shorts has. If it does not loop, say so in "fixes" and give the re-worded last line.
 Read EVERY sentence literally, word by word: if its literal meaning is false or garbled (e.g. the wrong subject doing
 the action — "rivers carved warnings" when people carved them; a date or place attached to the wrong thing), list
 it in factual_errors even if the gist is right.
@@ -541,6 +545,17 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
         if ent < min_ent:
             review["issues"].append(f"not entertaining enough ({ent:.0f}/10, need {min_ent:.0f}) — tell it as a story "
                                     "with tension and a payoff, add comic contrast or a sharper aside; facts unchanged")
+        # The loop is judged semantically by the reviewer, because a lexical check rejects good loops
+        # (see the note in gates.py). Enforced only when require_loop is on, and it defaults off: it
+        # is a new criterion, and turning it into a hard gate before we know its false-positive rate
+        # would start abandoning topics for a reason nobody is watching yet. The verdict is recorded
+        # either way, so the rate can be read off history before anyone flips the switch.
+        loops = r.get("loops")
+        review["loops"] = loops
+        if loops is False and self.cfg["content"].get("require_loop", False):
+            review["issues"].append("the last line does not flow back into the first, so the Short will not "
+                                    "loop — re-word the payoff to pick up the hook; a replay counts as a view")
+
         ok = (ent >= min_ent and hook >= min_hook and score >= self.cfg["compliance"]["quality_gate_min_score"] and not r.get("factual_errors")
               and not r.get("misleading_title") and r.get("advertiser_friendly", True)
               and not r.get("policy_concerns"))

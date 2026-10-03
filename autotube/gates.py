@@ -136,6 +136,15 @@ def check_closer(last: str, loop: bool = True) -> list[str]:
     return issues
 
 
+# A deterministic loop check was tried here and removed. Lexical overlap between the payoff and the
+# hook looked like a cheap proxy for "does this Short loop", but it rejects good loops: for
+# "Antarctica has a waterfall that runs blood red" / "so the ice keeps bleeding, and nobody can stop
+# it" there is no shared token, yet the loop is clean - "bleeding" answers "blood red" semantically.
+# No stemming or stop-word tuning fixes that class of miss, and a false positive here burns a
+# generation retry and can abandon the topic. Whether a payoff loops is a semantic judgement, so it
+# belongs to the LLM reviewer's rubric (see scriptwriter REVIEW_RUBRIC), not to a regex.
+
+
 def check_title(title: str, max_len: int = 100) -> list[str]:
     issues = []
     title = (title or "").strip()

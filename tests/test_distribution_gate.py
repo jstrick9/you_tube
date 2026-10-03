@@ -82,3 +82,29 @@ def test_gate_threshold_is_configurable():
     vids = mk(0.5, 0.6, 0.8)
     assert distribution_gate(vids, {"completion_gate": 0.70})["passing"] == 1
     assert distribution_gate(vids, {"completion_gate": 0.55})["passing"] == 2
+
+
+# ── loop verdict (judged by the reviewer, not by a regex) ────────────────────
+def test_loop_is_judged_semantically_not_lexically():
+    """A deterministic version was tried and removed: it rejected clean loops.
+
+    "so the ice keeps bleeding" loops perfectly into "a waterfall that runs blood red" and shares
+    not one token with it. The note in gates.py records why; this test stops anyone re-adding it.
+    """
+    from autotube import gates
+    src = Path(gates.__file__).read_text()
+    assert "def check_loop" not in src, \
+        "a lexical loop gate is back; it rejects semantically clean loops and burns generation retries"
+    assert "semantic judgement" in src, "the reasoning note was removed"
+
+
+def test_reviewer_is_asked_for_a_loop_verdict():
+    from autotube import scriptwriter
+    src = Path(scriptwriter.__file__).read_text()
+    assert '"loops": true|false' in src
+    assert "require_loop" in src
+
+
+def test_loop_is_recorded_but_not_enforced_by_default():
+    """A brand-new criterion must not start abandoning topics before its error rate is known."""
+    assert cfg()["content"].get("require_loop") is False

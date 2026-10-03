@@ -134,6 +134,9 @@ content:
   allow_evergreen: false                 # never fall back to un-trending evergreen topics
   max_drafts: 4                          # script rewrites allowed (feedback from the fact-checker/hook gate)
   selection_rounds: 3                    # if every pick fails the checks, pick again from the remaining trends
+  # Reviewer judges whether the payoff loops back into the hook (semantic, not lexical).
+  # Recorded on every script; off as a hard gate until its false-positive rate is known.
+  require_loop: false
   loop_ending: true                      # last line flows back into the first line (replays count as watch time)
   reveal_pause: 0.55                     # beat of silence before the reveal line (riser SFX + flash fill it)
   countdown_pause: 1.25                  # guess_reveal format: on-screen 3-2-1 before the answer
