@@ -327,6 +327,7 @@ analytics:
   enabled: true
   evaluate_after_hours: 48                # judge a video's performance after N hours
   exploration: 0.15                       # extra random exploration on top of Thompson sampling
+  cold_start_min: 3        # sample any arm with fewer than this many observations before trusting posteriors
   # How many of the most recent uploads get their stats re-fetched each pass. This is the real
   # limit on what the channel can learn from: YouTube's API terms require stored statistics to be
   # re-verified every 30 days, so any video outside this window has its metrics dropped and leaves

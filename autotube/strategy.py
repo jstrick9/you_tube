@@ -31,11 +31,13 @@ class Strategy:
     frozen: set[str] = set()
     min_obs: int = 0
     explore: float = 0.15
+    cold_start_min: int = 0        # arms below this many observations are sampled before any posterior is trusted
 
     def __init__(self, cfg: dict):
         self.cfg = cfg
         acfg = cfg.get("analytics", {}) or {}
         self.explore = float(acfg.get("exploration", 0.15))
+        self.cold_start_min = int(acfg.get("cold_start_min", 3))
         # Dimensions we deliberately do NOT learn. With 15 formats x 5 hooks x 5 voices x 12 categories
         # there are thousands of cells and only a few videos a day; spreading the evidence across all of
         # them means no dimension ever separates. Frozen dimensions rotate deterministically for variety
@@ -119,6 +121,20 @@ class Strategy:
         # A frozen dimension, or one with too little evidence to tell its arms apart, is chosen at
         # random rather than by a posterior built from noise. Thompson sampling on 3 observations is
         # not exploration, it is superstition.
+        # Cold start. An arm with no observations cannot be compared to anything, and random
+        # selection measures it only eventually - with 11 formats and ~2 videos a day, "eventually"
+        # is months, during which the bandit is choosing confidently between the handful of arms it
+        # happens to have tried. Our own state showed this: every observation sat on format names
+        # that had since been replaced in config, so nine of eleven live formats had never run once
+        # and the posterior ordering was entirely noise. Untested arms go first, least-tested first,
+        # until each clears cold_start_min. This is the cheapest evidence the system will ever buy.
+        cold = [k for k, v in arms.items() if v.get("n", 0) < self.cold_start_min]
+        if cold and dim not in self.frozen:
+            # Weighted, not strictly least-first: always picking the single least-tested arm makes
+            # the schedule deterministic and therefore a predictable template, which is the exact
+            # pattern the repetition heuristics look for. The least-tested arm is merely likeliest.
+            w = [float(self.cold_start_min - arms[k].get("n", 0)) for k in cold]
+            return random.choices(cold, weights=w, k=1)[0]
         if dim in self.frozen or self.observations(dim) < self.min_obs or random.random() < self.explore:
             keys = list(arms)
             w = self.pulse_weights(dim, keys)

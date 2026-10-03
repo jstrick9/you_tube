@@ -142,3 +142,67 @@ def test_sampling_is_random_until_there_is_evidence(monkeypatch):
     s.state["arms"]["category"]["history"].update({"a": 9.0, "b": 1.0, "n": 1})   # 1 lucky video
     picks = {s.sample("category") for _ in range(60)}
     assert picks == {"history", "science"}, "must not chase a posterior built on one observation"
+
+
+# --- Cold start -------------------------------------------------------------
+# Live state showed every observation sitting on format names that had since been
+# replaced in config, leaving nine of eleven live formats with n=0 and a posterior
+# ordering that was pure noise. Untested arms must be measured before trusted.
+
+def _fresh(monkeypatch, **over):
+    monkeypatch.setattr("autotube.strategy.read_json", lambda *a, **k: {"arms": {}, "updates": 0})
+    return Strategy(_cfg(**over))
+
+
+def test_untested_arms_are_sampled_before_any_posterior_is_trusted(monkeypatch):
+    s = _fresh(monkeypatch, min_observations=0, cold_start_min=3)
+    # history looks spectacular on a single video; science has never run at all.
+    s.state["arms"]["category"]["history"].update({"a": 99.0, "b": 1.0, "n": 1})
+    picks = [s.sample("category") for _ in range(300)]
+    assert picks.count("science") > 0, "an arm with no evidence must still get measured"
+    assert picks.count("science") > picks.count("history"), \
+        "the least-tested arm should be the likeliest, not merely possible"
+
+
+def test_cold_start_stops_once_every_arm_has_evidence(monkeypatch):
+    s = _fresh(monkeypatch, min_observations=0, cold_start_min=3)
+    for arm in ("history", "science"):
+        s.state["arms"]["category"][arm]["n"] = 3
+    s.state["arms"]["category"]["history"].update({"a": 99.0, "b": 1.0})
+    picks = [s.sample("category") for _ in range(200)]
+    assert picks.count("history") > 190, "past cold start the posterior must take over"
+
+
+def test_cold_start_is_not_deterministic(monkeypatch):
+    """Always picking the single least-tested arm would make the schedule a fixed
+    rotation - a predictable template is what the repetition heuristics look for."""
+    s = _fresh(monkeypatch, min_observations=0, cold_start_min=3)
+    s.state["arms"]["category"]["history"]["n"] = 2   # 1 short of the floor
+    s.state["arms"]["category"]["science"]["n"] = 0
+    picks = {s.sample("category") for _ in range(200)}
+    assert picks == {"history", "science"}, "both under-tested arms must remain reachable"
+
+
+def test_cold_start_respects_frozen_dimensions(monkeypatch):
+    s = _fresh(monkeypatch, min_observations=0, cold_start_min=3)
+    assert "voice" in s.frozen
+    assert {s.sample("voice") for _ in range(100)} <= {"v1", "v2"}
+
+
+def test_cold_start_can_be_disabled(monkeypatch):
+    s = _fresh(monkeypatch, min_observations=0, cold_start_min=0)
+    s.state["arms"]["category"]["history"].update({"a": 99.0, "b": 1.0, "n": 1})
+    picks = [s.sample("category") for _ in range(200)]
+    assert picks.count("history") > 150, "cold_start_min=0 must restore pure Thompson behaviour"
+
+
+def test_every_live_format_is_measured_within_a_reasonable_run(monkeypatch):
+    """The practical claim: cold start converts 'eventually' into 'within days'."""
+    s = _fresh(monkeypatch, min_observations=0, cold_start_min=3)
+    seen = {}
+    for _ in range(40):
+        f = s.sample("format")
+        seen[f] = seen.get(f, 0) + 1
+        s.state["arms"]["format"][f]["n"] = seen[f]
+    assert set(seen) == {"facts3", "backstory"}
+    assert all(v >= 3 for v in seen.values()), "every format should clear the floor"
