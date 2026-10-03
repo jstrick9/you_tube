@@ -473,3 +473,35 @@ def test_archive_is_actually_wired_into_the_source_list():
     assert "archive_video" in CFG["media"]["sources"]
     src = (ROOT / "autotube" / "media.py").read_text()
     assert "archive_video_search" in src.split("def _candidates_for")[1], "registered but never dispatched"
+
+
+def test_cloudflare_accepts_the_common_misspelling(monkeypatch):
+    """The secrets were created as CLOUDFARE_*; the code read CLOUDFLARE_*.
+
+    The provider then looked configured, reported nothing, and silently never ran —
+    the failure mode that has cost this repo more time than any other. Accepting both
+    spellings is one line.
+    """
+    import autotube.llm as L
+
+    for v in ("CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID",
+              "CLOUDFARE_API_TOKEN", "CLOUDFARE_ACCOUNT_ID"):
+        monkeypatch.delenv(v, raising=False)
+    assert L.cloudflare_creds() == (None, None)
+
+    monkeypatch.setenv("CLOUDFARE_API_TOKEN", "t")
+    monkeypatch.setenv("CLOUDFARE_ACCOUNT_ID", "a")
+    assert L.cloudflare_creds() == ("t", "a"), "misspelled secrets must still work"
+    assert L._provider_key("cloudflare") == "t"
+
+    # A token without an account id is not usable, and must not count as configured.
+    monkeypatch.delenv("CLOUDFARE_ACCOUNT_ID")
+    assert L._provider_key("cloudflare") is None
+
+
+def test_both_spellings_reach_the_workflows():
+    for wf in ("daily.yml", "check.yml"):
+        s = (WF / wf).read_text()
+        for v in ("CLOUDFLARE_API_TOKEN", "CLOUDFARE_API_TOKEN",
+                  "CLOUDFLARE_ACCOUNT_ID", "CLOUDFARE_ACCOUNT_ID"):
+            assert v in s, f"{wf} does not pass {v}"

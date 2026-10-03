@@ -248,10 +248,22 @@ def _mistral(model, system, user, temperature, images=None):
                               temperature, images=images)
 
 
+def cloudflare_creds() -> tuple[str | None, str | None]:
+    """Token and account id, accepting the common "Cloudfare" misspelling.
+
+    Both spellings are honoured on purpose. The secrets were created as CLOUDFARE_*,
+    the code read CLOUDFLARE_*, and the result was a provider that looked configured,
+    reported nothing, and silently never ran - the exact failure mode that has cost
+    this repo the most time. Accepting both is one line; a silent mismatch is a day.
+    """
+    key = os.environ.get("CLOUDFLARE_API_TOKEN") or os.environ.get("CLOUDFARE_API_TOKEN")
+    acct = os.environ.get("CLOUDFLARE_ACCOUNT_ID") or os.environ.get("CLOUDFARE_ACCOUNT_ID")
+    return key, acct
+
+
 def _cloudflare(model, system, user, temperature, images=None):
     """Workers AI. 10,000 neurons/day free, no card, and it hard-blocks instead of billing."""
-    key = os.environ.get("CLOUDFLARE_API_TOKEN")
-    acct = os.environ.get("CLOUDFLARE_ACCOUNT_ID")
+    key, acct = cloudflare_creds()
     if not (key and acct):
         raise LLMError("no CLOUDFLARE_API_TOKEN")
     return _openai_compatible(f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/v1/chat/completions",
@@ -261,6 +273,15 @@ def _cloudflare(model, system, user, temperature, images=None):
 # Which env var gates each provider. Kept in one place because it was previously
 # duplicated inline in two methods, and a provider added to one but not the other is
 # invisible until something silently never gets tried.
+def _provider_key(pname: str) -> str | None:
+    """Is this provider actually usable? Cloudflare needs two values, not one."""
+    if pname == "cloudflare":
+        key, acct = cloudflare_creds()
+        return key if (key and acct) else None
+    env = KEYED_PROVIDERS.get(pname)
+    return os.environ.get(env) if env else None
+
+
 KEYED_PROVIDERS = {
     "gemini": "GEMINI_API_KEY", "groq": "GROQ_API_KEY", "openrouter": "OPENROUTER_API_KEY",
     "cerebras": "CEREBRAS_API_KEY", "mistral": "MISTRAL_API_KEY",
@@ -287,11 +308,11 @@ class LLM:
         self.last_used = ""
         keyed = KEYED_PROVIDERS
         # "lite" = only the keyless fallback is available → callers send smaller prompts
-        self.lite = not any(os.environ.get(keyed[p]) for p in self.order if p in keyed)
+        self.lite = not any(_provider_key(p) for p in self.order if p in keyed)
 
     def vision_available(self) -> bool:
         keyed = KEYED_PROVIDERS
-        return any(os.environ.get(keyed.get(p, "-")) and self._vision_models(p)
+        return any(_provider_key(p) and self._vision_models(p)
                    for p in self.cfg.get("vision_providers", ["gemini", "groq", "openrouter"]))
 
     def _vision_models(self, pname: str) -> list[str]:
@@ -490,7 +511,7 @@ def available_models(provider: str) -> list[str]:
             d = get_json(url, headers={"Authorization": f"Bearer {key}"})
             return sorted(m["id"] for m in d.get("data", []))
         if provider == "cloudflare":
-            key, acct = os.environ.get("CLOUDFLARE_API_TOKEN"), os.environ.get("CLOUDFLARE_ACCOUNT_ID")
+            key, acct = cloudflare_creds()
             if not (key and acct):
                 return []
             d = get_json(f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/v1/models",
