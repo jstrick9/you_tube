@@ -80,6 +80,29 @@ def cmd_doctor(cfg: dict) -> int:
             print(f"  {prov:11s} !! {len(r['missing'])} configured model(s) do not exist: {r['missing']}")
             print(f"  {prov:11s} -> available: {', '.join(r['sample'][:14])}")
 
+    # Vision is a hard gate: if nothing answers, finished scripts are discarded. Prove
+    # it with a real call rather than trusting the catalogue.
+    from .llm import probe_vision, vision_candidates
+    print("\nvision (live probe):")
+    vp = cfg["llm"].get("vision_providers", [])
+    for prov in vp:
+        models = cfg["llm"].get(f"{prov}_vision_models") or (
+            cfg["llm"].get("gemini_models", []) if prov == "gemini" else [])
+        if not models:
+            print(f"  {prov:11s} (no vision models configured)")
+            continue
+        for mdl in models[:2]:
+            good, detail = probe_vision(cfg, prov, mdl)
+            print(f"  {prov:11s} {'WORKS' if good else 'FAILS'} {mdl}")
+            if not good:
+                ok = False
+                print(f"              -> {detail}")
+    print("\nother vision-capable models in the catalogues you have keys for:")
+    for prov in ("gemini", "groq", "mistral", "cloudflare", "cerebras", "openrouter"):
+        cands = vision_candidates(prov)
+        if cands:
+            print(f"  {prov:11s} {', '.join(cands[:8])}")
+
     if os.environ.get("YT_REFRESH_TOKEN"):
         try:
             from .common import http

@@ -531,6 +531,47 @@ def available_models(provider: str) -> list[str]:
     return []
 
 
+VISION_HINTS = ("vision", "llava", "pixtral", "-vl", "scout", "maverick", "image-to-text", "gemini")
+
+
+def vision_candidates(provider: str) -> list[str]:
+    """Models in a provider's live catalogue that look vision-capable.
+
+    A hint list rather than a guarantee - providers do not label this consistently -
+    but it turns "what else could serve vision?" from a research question into one
+    doctor run against the keys actually held.
+    """
+    return [m for m in available_models(provider) if any(h in m.lower() for h in VISION_HINTS)]
+
+
+def probe_vision(cfg: dict, provider: str, model: str) -> tuple[bool, str]:
+    """Actually call a vision model with a tiny image. Listed is not the same as callable.
+
+    gemini-2.5-flash is in Google's catalogue and 404s; Cloudflare lists Meta's vision
+    model and returns 403 on it. Both looked fine to a catalogue check. The only way to
+    know a vision model works is to send it an image.
+    """
+    import base64
+    import io
+
+    from .common import http
+    try:
+        from PIL import Image
+        buf = io.BytesIO()
+        Image.new("RGB", (64, 64), (200, 30, 30)).save(buf, format="JPEG")
+        img = buf.getvalue()
+    except Exception as e:  # noqa: BLE001
+        return False, f"could not build probe image: {e}"
+    fn = PROVIDERS[provider][0]
+    try:
+        out = fn(model, "Reply with JSON only.",
+                 'What colour dominates this image? Answer {"colour": "..."}',
+                 0.0, images=[img])
+        return True, (out or "")[:60].replace("\n", " ")
+    except Exception as e:  # noqa: BLE001
+        return False, str(e)[:140]
+
+
 def audit_models(cfg: dict) -> dict:
     """Check every configured model id against what the provider actually offers."""
     llm = cfg.get("llm", {})
