@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-03T08:55:45.715542+00:00",
+  "updated": "2026-10-03T09:08:46.303349+00:00",
   "videos_total": 29,
   "videos_7d": 22,
-  "views_7d": 9812,
+  "views_7d": 9814,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -396,7 +396,7 @@
   },
   "subscribers": {
     "net_90d": 7,
-    "views_90d": 16962,
+    "views_90d": 16964,
     "per_1k_views": 0.41,
     "videos": 23,
     "days_to_500": 6428.6,
