@@ -349,7 +349,12 @@ class LLM:
                         # run. Five models each sleeping the 45s cap and retrying, across
                         # every topic, is how one run reached 51 minutes without producing
                         # anything. Believe the provider and stop asking.
-                        if "HTTP 429" in msg and advertised_retry(msg) > 60:
+                        #
+                        # 120s, not 60: sleeps are capped at 45s but there are several
+                        # attempts, so a window of a minute or two genuinely can be ridden
+                        # out. At 60 a model with 64s left was retired, costing an
+                        # independent reviewer it would have supplied moments later.
+                        if "HTTP 429" in msg and advertised_retry(msg) > 120:
                             log.warning("retiring %s for this run: rate limited for another "
                                         "%.0fs, longer than the run can wait", tag,
                                         advertised_retry(msg))

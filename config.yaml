@@ -315,7 +315,7 @@ llm:
   # also do every script burned its free-tier quota on text and then 429'd the vision
   # call, losing the whole run. Text has three providers to fall back on; vision has one,
   # so the scarce capability gets the quota.
-  gemini_models: [gemini-flash-lite-latest, gemini-flash-latest, gemini-2.5-flash-lite, gemini-2.5-flash]
+  gemini_models: [gemini-flash-lite-latest, gemini-flash-latest, gemini-3.1-flash-lite, gemini-3-flash-preview]
   # Live run 2026-10-03 (workflow_dispatch 37109430187) showed ALL THREE previous Groq
   # models failing: both gpt-oss models are reasoning models and reject Groq's
   # json_object mode with HTTP 400 "Failed to validate JSON", and qwen/qwen3.8-27b

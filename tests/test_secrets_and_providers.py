@@ -223,8 +223,16 @@ def test_a_long_quota_window_retires_the_model_instead_of_sleeping():
     assert advertised_retry("HTTP 429 (retry after 1ms): {}") == 0.001, "ms must not read as seconds"
     assert advertised_retry("HTTP 429: no header") == 0.0
 
+    import re as _re
     src = (ROOT / "autotube" / "llm.py").read_text()
-    assert "advertised_retry(msg) > 60" in src, "long quota windows must retire the model"
+    m = _re.search(r"advertised_retry\(msg\)\s*>\s*(\d+)", src)
+    assert m, "long quota windows must retire the model rather than pace retries"
+    # Sleeps are capped at 45s across a few attempts, so a window of a minute or two is
+    # genuinely waitable and should not retire a model; anything past a few minutes is not.
+    threshold = int(m.group(1))
+    assert 90 <= threshold <= 300, (
+        f"retirement threshold {threshold}s: below ~90s it discards models that would "
+        f"have come back within the backoff ladder, above ~300s it stalls the run")
 
 
 def test_top_up_cadence_stays_within_free_tier_budget():
