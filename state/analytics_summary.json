@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-03T08:33:13.545038+00:00",
+  "updated": "2026-10-03T08:49:45.388868+00:00",
   "videos_total": 29,
   "videos_7d": 22,
-  "views_7d": 9774,
+  "views_7d": 9778,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -307,13 +307,13 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1246,
+      "views": 1249,
       "avg_view_pct": null
     },
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
-      "views": 1237,
+      "views": 1236,
       "avg_view_pct": null
     },
     {
@@ -337,7 +337,7 @@
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
-      "views": 1175,
+      "views": 1176,
       "avg_view_pct": 49.79
     },
     {
@@ -396,7 +396,7 @@
   },
   "subscribers": {
     "net_90d": 7,
-    "views_90d": 16924,
+    "views_90d": 16928,
     "per_1k_views": 0.41,
     "videos": 23,
     "days_to_500": 6428.6,
