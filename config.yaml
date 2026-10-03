@@ -117,6 +117,24 @@ content:
   # giving nobody a reason to leave one - they were closed, complete and correct. Each device is one
   # concrete way to leave the viewer with something to say. Learned as a bandit dimension so the
   # channel finds out which actually works rather than guessing.
+  # ── Anti-bulk-production defences ──
+  # The named demonetization pattern for faceless channels is "generic TTS narration
+  # over stock footage with AI-written scripts, no commentary or insight", and the
+  # repetition rule under it treats 5+ videos with under 20% script variation as bulk
+  # production - demonetized as a batch, retroactively, channel-wide. Format may repeat;
+  # substance may not. Both numbers below are calibrated, not guessed: on real 4-segment
+  # scripts a deliberate rewrite of the same episode scores 0.31 phrase overlap while a
+  # genuinely different episode in the same series scores 0.00, so 0.25 sits in a very
+  # wide empty gap. Set to 1.0 to disable.
+  max_script_similarity: 0.25
+  similarity_window: 25       # how many recent episodes a new draft is compared against
+  # A count, not a percentage: a ratio floor makes the requirement depend on how wordy
+  # the rest of the script is, and a script landing exactly on a float threshold gets
+  # rejected by rounding. One aside is the whole ask - deliberately not a quota, because
+  # a rejected draft burns a retry and can lose the topic entirely. The ratio is still
+  # measured and stored per video as telemetry. 0 disables.
+  min_asides: 1
+
   # ── Recurring series ──
   # A standalone fact video earns a view and gives no reason to subscribe; "CASE #047"
   # says there are forty-six behind it and a forty-eighth coming. That is the whole

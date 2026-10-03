@@ -18,6 +18,7 @@ from zoneinfo import ZoneInfo
 
 from . import media, music, qa, render, trends
 from . import series as series_mod
+from . import originality
 from .vision import VisionUnavailable
 from .common import OUTPUT_DIR, WORK_DIR, now_utc, read_json, slugify, write_json
 from .llm import LLM
@@ -481,6 +482,10 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             "reviewer": res["review"].get("reviewer"),
             "review_independent": res["review"].get("independent"),
             "series": res.get("series"), "episode": res.get("episode"),
+            # Phrase sketch of what was actually said, so the next run can refuse to
+            # publish a near-duplicate. Fixed width, so history cannot grow without bound.
+            "sketch": originality.sketch(originality.narration_of(res["script"])),
+            "commentary_ratio": round(originality.commentary_ratio(res["script"]), 3),
             "duration": res["duration"], "words": res.get("words"), "archetype": res.get("archetype"),
             "tts_engine": res["tts_engine"], "file": res["file"].name, "publish_at": slot.isoformat() if slot else None,
             "llm": llm.last_used,

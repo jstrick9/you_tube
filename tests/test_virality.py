@@ -95,9 +95,10 @@ def test_weak_hook_is_rejected_and_rewritten():
     w.cfg = {**CFG, "content": cfg_c}
     src = {"title": "X", "text": "Bees make honey. " * 50}
     # gate-clean script: the ONLY thing wrong with it is the reviewer's hook_strength of 6
+    # One aside: content.min_commentary_ratio rejects narration with no narrator voice.
     segs = [{"text": "Bees visit two million flowers to make one jar of honey"},
             {"text": "A single worker bee makes a twelfth of a teaspoon in her life"},
-            {"text": "The hive beats its wings to dry the nectar into honey"},
+            {"text": "The hive beats its wings to dry the nectar into honey", "aside": "Busy little things."},
             {"text": "Sealed in wax, it never spoils"},
             {"text": "so the jar in your cupboard could outlive you"}]
     ok, review = w.check({"title": "Honey", "segments": segs}, src)
@@ -117,7 +118,8 @@ def test_titles_are_screened_for_shock_bait_not_vocabulary():
     src = {"title": "Hunger stone", "text": "stones during the Thirty Years War " * 40}
     seg = [{"text": "Carved during the Thirty Years War, this stone still warns us"},
            {"text": "It only appears when the river drops to a record low"},
-           {"text": "The oldest marking on it is older than anyone alive"},
+           {"text": "The oldest marking on it is older than anyone alive",
+            "aside": "Cheerful bunch."},   # min_commentary_ratio: narration needs a voice
            {"text": "Each line records a season nobody wanted to repeat"},
            {"text": "so when you can read it, the warning has already arrived"}]
     assert w.check({"title": "The stone that warns you", "segments": seg}, src)[0]

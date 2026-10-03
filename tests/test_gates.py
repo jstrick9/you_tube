@@ -194,7 +194,7 @@ def test_scriptwriter_flags_a_non_independent_review():
     src = {"title": "Bees", "text": "Bees make honey from nectar. " * 30}
     script = {"title": "Honey", "_writer_model": "gemini:g-1", "segments": [
         {"text": "Bees visit two million flowers to fill a single jar"},
-        {"text": "A worker bee makes a twelfth of a teaspoon in her life"},
+        {"text": "A worker bee makes a twelfth of a teaspoon in her life", "aside": "Busy little things."},
         {"text": "The hive fans its wings to dry the nectar down"},
         {"text": "so the jar in your cupboard will never spoil"}]}
     ok, review = w.check(script, src)

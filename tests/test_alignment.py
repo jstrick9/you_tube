@@ -234,7 +234,10 @@ def test_script_fact_check_outage_fails_closed(monkeypatch):
     script = {"title": "Honey facts", "segments": [
         {"text": "Bees visit two million flowers to fill a single jar", "evidence": ev},
         {"text": "A worker bee makes a twelfth of a teaspoon in her life", "evidence": ev},
-        {"text": "The hive fans its wings to dry the nectar down", "evidence": ev},
+        # aside on a BODY line, never the hook: asides count toward hook length, and
+        # content.min_asides requires the narration to have a voice of its own
+        {"text": "The hive fans its wings to dry the nectar down", "evidence": ev,
+         "aside": "Busy little things."},
         {"text": "so the jar in your cupboard will never spoil", "evidence": ev}]}
     monkeypatch.setitem(cfg["content"], "require_grounding", False)
     ok, review = sw.check(script, src)

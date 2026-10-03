@@ -6,8 +6,8 @@ import logging
 import random
 import re
 
-from . import gates, safety
-from .common import now_utc
+from . import gates, originality, safety
+from .common import now_utc, read_json
 from .llm import LLM, LLMError
 from .research import ground, unsupported_numbers
 from .strategy import Strategy
@@ -174,6 +174,7 @@ class ScriptWriter:
         self.strategy = strategy
         self.lang = cfg["channel"].get("language", "en")
         self.src_chars = 2600 if llm.lite else 7000
+        self._history: list[dict] | None = None      # lazily read, see check()
 
     # ── 1. topic selection ───────────────────────────────────────────────────
     def select_topics(self, candidates: list[dict], n: int, recent: set[str],
@@ -306,10 +307,12 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
         reveal_rule = ('  "reveal": true on exactly ONE segment — the line with the biggest surprise/answer/twist (the video adds '
                        'a beat of silence, a riser and a flash right before it). Never the hook; usually the last BODY line.\n')
         aside_rule = (
-            f'  "aside" (optional, at most {max_asides} in the whole script, never on the hook): a 2-8 word deadpan\n'
+            f'  "aside" (REQUIRED: at least 1, at most {max_asides} in the whole script, never on the hook): a 2-8 word deadpan\n'
             '     reaction the narrator says right AFTER that line — e.g. "Which is, frankly, rude.", "Nature, please.",\n'
             '     "Bold plan. Terrible plan." It is a JOKE/OPINION ONLY: no facts, numbers, names, dates or claims; never\n'
-            '     mean about real people, groups or victims; family-friendly. Only include it if it is actually funny.\n'
+            '     mean about real people, groups or victims; family-friendly. A script with no aside anywhere is\n'
+            '     rejected: narration that only recites sourced facts has no voice of its own, and a channel of\n'
+            '     those reads as bulk-produced rather than as a show. Make it actually funny.\n'
         ) if max_asides else ""
         # A living person reached this point only because safety.check_person approved one specific
         # professional angle. The writer has to be told what that angle is, or the model will drift
@@ -437,6 +440,17 @@ Write YouTube metadata for this Short. Return JSON:
         # emoji/hashtags/URLs in speech, verbatim repeats. These are free, reliable and run before a
         # single review token is spent — see autotube/gates.py for why they don't belong to the LLM.
         issues += gates.run_all(script, spoken_text, self.cfg)
+        # Repetition and absence-of-voice are the two things that get a faceless channel
+        # demonetized in bulk, and both are only visible by comparing this draft against
+        # what already shipped - so they cannot live in gates.py, which sees one script.
+        # History is cached per writer: check() runs once per retry and the file is small,
+        # but re-reading it inside a retry loop is pointless IO.
+        # getattr rather than self._history: ScriptWriter is constructed without __init__
+        # in several tests and by the retry path, and an originality check is not worth
+        # an AttributeError in the middle of script validation.
+        if getattr(self, "_history", None) is None:
+            self._history = read_json("history.json", [])
+        issues += originality.check(script, self.cfg, self._history)
         bad_nums = unsupported_numbers(narration + " " + script.get("title", ""), source["text"])
         if bad_nums:
             issues.append(f"numbers not found in source: {bad_nums}")
