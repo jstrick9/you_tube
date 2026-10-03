@@ -361,11 +361,12 @@ llm:
   # failure ended two of the last three full runs with a 429 after the script had
   # already been written and verified. Cloudflare's free tier carries vision models, so
   # one key removes the dependency. Ids are a guess; `doctor` checks them.
-  # llava first: the Meta vision model is in the catalogue and doctor reports it OK, but
-  # calling it returns 403 while the same token serves Cloudflare text fine - so it is
-  # per-model access, not token scope, which usually means a licence that has to be
-  # accepted in the dashboard. llava carries no such gate.
-  cloudflare_vision_models: ["@cf/llava-hf/llava-1.5-7b-hf", "@cf/meta/llama-3.2-11b-vision-instruct"]
+  # Ordered by what the live probe actually did, not by what the catalogue lists.
+  # llama-4-scout is genuinely multimodal and ungated. llava-1.5 authenticates but
+  # returns empty content for a JSON instruction - it is too weak to follow the format
+  # the vision gate needs. llama-3.2-vision 403s on a token that serves Cloudflare text
+  # fine, so it is per-model access needing a licence accepted in the dashboard.
+  cloudflare_vision_models: ["@cf/meta/llama-4-scout-17b-16e-instruct", "@cf/llava-hf/llava-1.5-7b-hf", "@cf/meta/llama-3.2-11b-vision-instruct"]
   pollinations_models: [openai-fast, openai]
   # Fact-checking/review runs on a DIFFERENT model from the one that wrote the draft (a writer grading
   # its own homework agrees with itself). Deliberately the reverse order of `providers`, so when both
