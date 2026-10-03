@@ -255,6 +255,99 @@ def fx_lines(segments: list[dict], fx: dict, theme: dict, emph_col: str, W: int,
     return lines, num_times, reveal_at, stamp_at
 
 
+HOOK_FS = 96
+HOOK_MAX_LINES = 2        # a 3-4 line hook card grows down into the Count/Label zone at 0.25-0.30 H
+
+
+def _hook_lines(text: str, fs: int = HOOK_FS, usable: int = 900) -> int:
+    """Lines the hook card will wrap to. Condensed display faces average ~0.47 em per glyph."""
+    cpl = max(8, int(usable / (fs * 0.47)))
+    n, cur = 1, 0
+    for w in text.split():
+        if cur and cur + 1 + len(w) > cpl:
+            n, cur = n + 1, len(w)
+        else:
+            cur += (1 if cur else 0) + len(w)
+    return n
+
+
+def fit_hook(text: str, max_lines: int = HOOK_MAX_LINES) -> str:
+    """Trim the hook card to `max_lines`, on a word boundary.
+
+    The card is top-anchored and grows downwards, so a long hook silently overlaps the big number
+    counter and the "LOCK IN YOUR GUESS" label, both of which can fire inside the card's first
+    1.6 s. Trimming is the right trade: the hook card is a glance-and-read title, not the script.
+    """
+    words = text.split()
+    if not words:
+        return ""
+    trimmed = False
+    while len(words) > 1 and _hook_lines(" ".join(words)) > max_lines:
+        words.pop()
+        trimmed = True
+    if trimmed:   # never end a trimmed card on "FROM THE"
+        while len(words) > 1 and _norm_word(words[-1]) in DANGLERS:
+            words.pop()
+    return " ".join(words).rstrip(",;:-") or words[0]
+
+
+# Words that must not be left dangling at the end of a caption card. A chunk ending on "FOR" or
+# "THE" reads as a dropped sentence: the eye finishes the card and the thought is not there yet.
+DANGLERS = {"a", "an", "the", "and", "or", "but", "of", "to", "in", "on", "at", "for", "from",
+            "with", "by", "as", "is", "was", "are", "were", "that", "this", "it", "its", "into",
+            "over", "under", "than", "then", "so", "if", "when", "while", "because", "about"}
+CHUNK_MAX_WORDS = 4
+CHUNK_MAX_CHARS = 24
+
+
+def _chunk_words(words: list[dict], max_words: int = CHUNK_MAX_WORDS,
+                 max_chars: int = CHUNK_MAX_CHARS) -> list[list[dict]]:
+    """Group timed words into caption cards of 2-4 words.
+
+    Greedy filling alone produces two bad cards. It strands a single word at the end of a segment -
+    usually the payoff, flashed alone for a fraction of a second - and it breaks after function
+    words, so a card ends on "FOR" and the sentence appears to stop mid-thought. Both are fixed by
+    a rebalancing pass rather than by changing the fill, because the fill is what keeps cards
+    readable at speaking pace.
+    """
+    def chars(ch):
+        return len(" ".join(x["word"] for x in ch))
+
+    chunks, cur = [], []
+    for wi_, w in enumerate(words):
+        cur.append(w)
+        nxt_aside = words[wi_ + 1].get("_aside") if wi_ + 1 < len(words) else None
+        txt_len = chars(cur)
+        hard_stop = w["word"][-1:] in ".!?"          # only sentence ends break a card; commas read badly
+        if ((nxt_aside is not None and nxt_aside != w.get("_aside"))
+                or len(cur) >= max_words or (len(cur) >= 2 and txt_len >= 18)
+                or (hard_stop and len(cur) >= 2) or txt_len > max_chars):
+            chunks.append(cur)
+            cur = []
+    if cur:
+        chunks.append(cur)
+
+    # ── push a dangling function word onto the card that completes the thought ──
+    for i in range(len(chunks) - 1):
+        a, b = chunks[i], chunks[i + 1]
+        if len(a) < 2 or a[-1].get("_aside") != b[0].get("_aside"):
+            continue
+        # a few characters of overflow is cheaper than a card that ends on "for"
+        if _norm_word(a[-1]["word"]) in DANGLERS and len(b) < max_words and chars(b) + len(a[-1]["word"]) + 1 <= max_chars + 4:
+            b.insert(0, a.pop())
+
+    # ── never leave a single word alone on the last card of a segment ──
+    if len(chunks) >= 2 and len(chunks[-1]) == 1:
+        prev, last = chunks[-2], chunks[-1]
+        if prev[-1].get("_aside") == last[0].get("_aside"):
+            if len(prev) + 1 <= max_words and chars(prev) + chars(last) + 1 <= max_chars + 6:
+                prev.extend(last)            # short enough to read as one card
+                chunks.pop()
+            elif len(prev) >= 3:
+                last.insert(0, prev.pop())   # otherwise split 4+1 into 3+2
+    return [c for c in chunks if c]
+
+
 def build_ass(segments: list[dict], hook_text: str, channel: str, W: int, H: int, theme: dict,
               font_name: str, out: Path, total: float, fx: dict | None = None, arch: dict | None = None,
               emph_col: str = "&H003C8CFF") -> Path:
@@ -286,13 +379,22 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     lines = []
     cy = int(H * float(arch.get("caption_y", CAPTION_Y)))   # Shorts UI overlays the bottom ~18% and right ~15%
-    # hook title card (first ~2.8 s) with pop-in
-    if hook_text:
-        lines.append(f"Dialogue: 2,{_ts(0)},{_ts(min(float(arch.get('hook_seconds', HOOK_CARD_SECONDS)), total))},Hook,,0,0,0,,"
-                     f"{{\\fad(0,250)\\t(0,180,\\fscx112\\fscy112)\\t(180,320,\\fscx100\\fscy100)}}{_esc(hook_text.upper())}")
-    lines.append(f"Dialogue: 1,{_ts(0)},{_ts(total)},Brand,,0,0,0,,{{\\alpha&H40&}}{_esc(channel)}")
 
-    extra, _, _, _ = fx_lines(segments, fx, theme, emph_col, W, H, total) if fx else ([], [], None, None)
+    extra, num_times, reveal_at, _ = fx_lines(segments, fx, theme, emph_col, W, H, total) if fx else ([], [], None, None)
+
+    # hook title card, with pop-in. Both the card and the number counter are anchored near the top,
+    # so the card has to be gone before the first counter or countdown label appears.
+    if hook_text:
+        hook_end = min(float(arch.get("hook_seconds", HOOK_CARD_SECONDS)), total)
+        top_fx = [t for t in list(num_times or []) if t is not None]
+        if fx.get("countdown") and reveal_at is not None:
+            top_fx.append(reveal_at)
+        if top_fx:
+            hook_end = min(hook_end, max(0.5, min(top_fx) - 0.15))
+        lines.append(f"Dialogue: 2,{_ts(0)},{_ts(hook_end)},Hook,,0,0,0,,"
+                     f"{{\\fad(0,250)\\t(0,180,\\fscx112\\fscy112)\\t(180,320,\\fscx100\\fscy100)}}"
+                     f"{_esc(fit_hook(hook_text.upper()))}")
+    lines.append(f"Dialogue: 1,{_ts(0)},{_ts(total)},Brand,,0,0,0,,{{\\alpha&H40&}}{_esc(channel)}")
     lines += extra
     asides = fx.get("asides") or []
     emphasis = fx.get("emphasis") or []
@@ -307,19 +409,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         for wi_, w in enumerate(words):
             w["_aside"] = wi_ >= aside_from
             w["_emph"] = kinetic and not w["_aside"] and (_norm_word(w["word"]) in emph or bool(re.search(r"\d", w["word"])))
-        chunks, cur = [], []
-        for wi_, w in enumerate(words):
-            cur.append(w)
-            nxt_aside = words[wi_ + 1].get("_aside") if wi_ + 1 < len(words) else None
-            txt_len = len(" ".join(x["word"] for x in cur))
-            hard_stop = w["word"][-1:] in ".!?"          # only sentence ends break a card; commas read badly
-            if ((nxt_aside is not None and nxt_aside != w.get("_aside"))
-                    or len(cur) >= 4 or (len(cur) >= 2 and txt_len >= 18)
-                    or (hard_stop and len(cur) >= 2) or txt_len > 24):
-                chunks.append(cur)
-                cur = []
-        if cur:
-            chunks.append(cur)
+        chunks = _chunk_words(words)
         for ci, ch in enumerate(chunks):
             c_end = chunks[ci + 1][0]["start"] if ci + 1 < len(chunks) else seg["end"] + 0.12
             for wi, w in enumerate(ch):
