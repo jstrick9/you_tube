@@ -207,3 +207,21 @@ def test_provider_errors_keep_enough_body_to_act_on():
     src = (ROOT / "autotube" / "llm.py").read_text()
     assert "r.text[:200]" not in src, "429 bodies truncated before the useful part"
     assert src.count("retry after") >= 2, "both error paths should surface retry-after"
+
+
+def test_a_long_quota_window_retires_the_model_instead_of_sleeping():
+    """Groq answered "retry after 1100" and the run kept sleeping 45s and asking again.
+
+    Five models each backing off the cap, across every topic, took one run to 51 minutes
+    with nothing produced. A quota window measured in minutes cannot be waited out
+    inside a run, so the provider's own advice should end the attempt, not pace it.
+    """
+    from autotube.llm import advertised_retry
+
+    assert advertised_retry("HTTP 429 (retry after 1100): {}") == 1100.0
+    assert advertised_retry("HTTP 429 (retry after 30): {}") == 30.0
+    assert advertised_retry("HTTP 429 (retry after 1ms): {}") == 0.001, "ms must not read as seconds"
+    assert advertised_retry("HTTP 429: no header") == 0.0
+
+    src = (ROOT / "autotube" / "llm.py").read_text()
+    assert "advertised_retry(msg) > 60" in src, "long quota windows must retire the model"

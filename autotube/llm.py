@@ -37,6 +37,24 @@ def _retry_after(msg: str, default: float) -> float:
     return default
 
 
+def advertised_retry(msg: str) -> float:
+    """The provider's Retry-After as actually stated, uncapped. 0 if it said nothing.
+
+    _retry_after clamps to 45s so a bad header cannot stall a run, which is right for
+    deciding how long to sleep but wrong for deciding whether to wait at all. A model
+    that says "retry after 1100" is telling us it is gone for the next twenty minutes;
+    sleeping 45 seconds and asking again just burns the run's time budget.
+    """
+    m = re.search(r'retry[-_ ]?after[\"\s:]+(\d+(?:\.\d+)?)\s*(ms)?', msg, re.I)
+    if not m:
+        return 0.0
+    try:
+        secs = float(m.group(1))
+    except ValueError:
+        return 0.0
+    return secs / 1000.0 if m.group(2) else secs
+
+
 class LLMError(RuntimeError):
     pass
 
@@ -327,6 +345,16 @@ class LLM:
                         # Only back off if we are going to try this model again. Sleeping on the
                         # final attempt just delayed the failover: 12s per rate-limited model,
                         # across every model of every provider, out of a 120-minute run budget.
+                        # A quota window measured in minutes cannot be waited out inside a
+                        # run. Five models each sleeping the 45s cap and retrying, across
+                        # every topic, is how one run reached 51 minutes without producing
+                        # anything. Believe the provider and stop asking.
+                        if "HTTP 429" in msg and advertised_retry(msg) > 60:
+                            log.warning("retiring %s for this run: rate limited for another "
+                                        "%.0fs, longer than the run can wait", tag,
+                                        advertised_retry(msg))
+                            self._dead.add(tag)
+                            break
                         if not last_try:
                             if "HTTP 429" in msg or "HTTP 402" in msg:
                                 time.sleep(_retry_after(msg, 6 + 6 * attempt))
