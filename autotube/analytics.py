@@ -158,6 +158,39 @@ def _median(v: list[float]) -> float | None:
     return v[n // 2] if n % 2 else (v[n // 2 - 1] + v[n // 2]) / 2
 
 
+def distribution_gate(matured: list[dict], acfg: dict) -> dict:
+    """Are we clearing the bar that decides whether YouTube distributes a Short at all?
+
+    Shorts are seeded to a small test audience and the system decides almost immediately. The
+    documented thresholds: ~70% completion earns materially wider distribution, and under ~60%
+    viewed-vs-swiped-away distribution is pulled. Everything else in this file measures how well a
+    video did *given* its distribution; this measures whether it was ever going to get any.
+
+    It is reported separately and deliberately un-normalised, because a channel can look fine on
+    percentile-ranked reward while every single video sits under the gate - which is exactly what
+    ours did: median completion 15.9%, zero of twelve videos above 70%.
+    """
+    gate = float(acfg.get("completion_gate", 0.70))
+    comp = [h["metrics"]["completion"] for h in matured
+            if h.get("metrics", {}).get("completion") is not None]
+    if not comp:
+        return {"n": 0, "verdict": "no completion data yet"}
+    passing = [c for c in comp if c >= gate]
+    med = _median(comp) or 0.0
+    rate = len(passing) / len(comp)
+    if rate >= 0.5:
+        verdict = f"{len(passing)}/{len(comp)} videos clear the {gate:.0%} completion gate - distribution is healthy"
+    elif passing:
+        verdict = (f"only {len(passing)}/{len(comp)} videos clear the {gate:.0%} completion gate "
+                   f"(median {med:.0%}) - most uploads are being throttled before they reach anyone")
+    else:
+        verdict = (f"NO video clears the {gate:.0%} completion gate (median {med:.0%}). Distribution is "
+                   f"being pulled on effectively every upload; topic and reward tuning cannot fix this - "
+                   f"the videos are too long for the retention they hold")
+    return {"n": len(comp), "gate": gate, "passing": len(passing),
+            "pass_rate": round(rate, 3), "median_completion": round(med, 4), "verdict": verdict}
+
+
 def retention_diagnosis(matured: list[dict], acfg: dict) -> dict:
     """Turn the channel's retention curves into one actionable sentence.
 
@@ -302,6 +335,11 @@ def run(cfg: dict) -> dict:
     diag = retention_diagnosis(pool_src, acfg)
     if diag.get("verdict"):
         log.info("retention: %s", diag["verdict"])
+    # Separate from retention shape: are we clearing the distribution gate at all?
+    gate = distribution_gate(matured, acfg)
+    if gate.get("verdict"):
+        log.warning("distribution: %s", gate["verdict"]) if not gate.get("passing") else \
+            log.info("distribution: %s", gate["verdict"])
     write_json("history.json", hist[-int(cfg["analytics"].get("history_keep", 2000)):])
 
     # rolling summary for the dashboard
@@ -316,6 +354,7 @@ def run(cfg: dict) -> dict:
             key=lambda x: -x["views"])[:10],
         "rejected": [h["video_id"] for h in uploaded if h.get("status") == "rejected"],
         "retention": diag,
+        "distribution": gate,
     }
     write_json("analytics_summary.json", summary)
     log.info("analytics: %d videos tracked, %d newly learned", len(uploaded), learned)

@@ -60,6 +60,17 @@ REVEAL_FORMATS = {"guess_reveal", "plot_twist", "myth_buster", "sounds_fake", "r
 # algorithm has to a "worth replying to" signal, and the scripts were earning none of them -
 # they were closed, complete and correct, which is exactly what nobody replies to. Learned as a
 # bandit dimension, so the channel discovers which of these works instead of assuming.
+def grounding_floor(n_segments: int, ccfg: dict) -> int:
+    """How many segments must carry verifiable evidence, for a script of this length."""
+    import math
+    ratio = float(ccfg.get("min_grounded_ratio", 0.5))
+    floor = int(ccfg.get("min_grounded_floor", 2))
+    cap = int(ccfg.get("min_grounded_segments", 3))
+    # clamped to n_segments: the floor must never demand more grounded segments than exist, or a
+    # short script becomes unsatisfiable and every draft is rejected until the topic is abandoned
+    return min(max(1, n_segments), max(floor, min(cap, math.ceil(ratio * max(1, n_segments)))))
+
+
 COMMENT_GUIDE = {
     "none": "",
     "poll": "Finish by making the viewer pick between two concrete options from the story itself "
@@ -331,16 +342,16 @@ SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of fact
 \"\"\"{source['text'][:self.src_chars]}\"\"\"
 
 {HOOK_RULES}
-Write the script as 5-6 segments. Each beat has a DIFFERENT job — do not write interchangeable body lines:
+Write the script as 4-5 segments. Each beat has a DIFFERENT job — do not write interchangeable body lines:
   - segment 1 = HOOK (see rules), spoken in under 3 seconds;
-  - segment 2 = THE TURN, 12-14 words. This single line decides whether the video is watched, and it is the
+  - segment 2 = THE TURN, 9-11 words. This single line decides whether the video is watched, and it is the
     one most often written wrong. It must make the hook BIGGER — a second surprise, or the consequence of the
     first ("which meant...", "except..."). It must NOT be setup, background, a definition, a birth date, a
     founding year, an origin story or any sentence beginning "In 1923..." / "Born in..." / "X is a Y that...".
     The viewer already decided the premise was interesting; explaining it to them is why they leave;
-  - segments 3..N-1 = ESCALATION, each 12-14 words, one concrete new fact each, every line raising the stakes
+  - segments 3..N-1 = ESCALATION, each 9-11 words, one concrete new fact each, every line raising the stakes
     above the line before it. Use contrast and consequence ("so", "which meant", "except"). No filler, no repetition;
-  - last segment = PAYOFF, 8-13 words: {loop_rule}
+  - last segment = PAYOFF, 6-9 words: {loop_rule}
 Leave ONE question deliberately open from the hook until the payoff — the viewer should be unable to stop
 watching without learning the answer. Never answer it in segment 2.
 The TOPIC line is just a trend headline — do NOT repeat its claims or numbers unless the SOURCE TEXT states them.
@@ -437,8 +448,14 @@ Write YouTube metadata for this Short. Return JSON:
                 hits = sum(w in src_low for w in words)
                 if ev[:45] in src_low or (words and hits / len(words) >= 0.8):
                     grounded += 1
-        if self.cfg["content"]["require_grounding"] and grounded < self.cfg["content"]["min_grounded_segments"]:
-            issues.append(f"only {grounded} segments have verifiable evidence")
+        # Scaled to the script's length, not a flat count. A flat 3 was written when scripts were 5-6
+        # segments; at the 15-20s band they are 4-5, so the same number silently became 3-of-4 - a 25%
+        # tightening nobody asked for, and one that would have shown up as unexplained topic abandonment
+        # rather than as a failing test. The ratio keeps 5- and 6-segment behaviour identical.
+        need = grounding_floor(len(script["segments"]), self.cfg["content"])
+        if self.cfg["content"]["require_grounding"] and grounded < need:
+            issues.append(f"only {grounded} of {len(script['segments'])} segments have verifiable "
+                          f"evidence (need {need})")
         # Context-aware (autotube/safety.py): titles stay strict, narration is only hard-blocked on
         # genuinely non-negotiable terms. The LLM reviewer still judges advertiser-friendliness in
         # context, which is the check that actually matches YouTube's guidelines.

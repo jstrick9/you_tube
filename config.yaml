@@ -71,7 +71,13 @@ video:
   # with length, and it is this channel's weakest metric. The script structure rules in
   # scriptwriter.py (segment count, body and payoff word ranges) are sized to this band and
   # tests/test_length.py asserts they stay consistent — change them together.
-  target_seconds: [22, 30]               # 2026 data: ~20-35 s Shorts get the highest completion/replay rates
+  # 15-20s, deliberately. Shorts distribution is gated on completion rate (~70% is the threshold for
+  # expanded distribution; under 60% viewed-vs-swiped-away the algorithm pulls distribution entirely),
+  # and the channel's median completion was 15.9% with 27 of 30 videos sitting in the 25-40s bracket
+  # that the 2026 research identifies as the dead zone. The performing brackets are 15-20s for
+  # single-concept content and 45-58s for story; 15-25s is also the loop sweet spot. We make
+  # single-concept videos, so: 15-20. See docs/MONETIZATION.md.
+  target_seconds: [15, 20]
   fps: 30
   width: 1080
   height: 1920
@@ -108,7 +114,12 @@ content:
   # channel finds out which actually works rather than guessing.
   comment_devices: [none, poll, hot_take, unanswered_question, challenge, correction_bait]
   require_grounding: true                # every claim must be supported by fetched source text
-  min_grounded_segments: 3
+  # Grounding requirement scales with script length (see scriptwriter.grounding_floor). A flat count
+  # was written for 5-6 segment scripts; at 15-20s they are 4-5 segments, where a flat 3 would have
+  # quietly become 3-of-4. 5- and 6-segment scripts are unaffected.
+  min_grounded_segments: 3                # cap
+  min_grounded_ratio: 0.5
+  min_grounded_floor: 2
   # Living people are allowed, but only as PUBLIC FIGURES discussed in their professional
   # capacity — see safety.person below and autotube/safety.check_person. Fails closed.
   allow_living_people: true             # skip topics that are biographies of living people
@@ -333,6 +344,10 @@ analytics:
   # arm that occasionally breaks out beats one that is reliably average. Growth is a power law; the
   # optimiser has to be pointed at the tail or it will keep selecting for the middle.
   w_breakout: 0.15
+  # Shorts distribution gate: ~70% completion earns wider distribution, under ~60% viewed-vs-swiped-away
+  # it is pulled. Reported separately in analytics_summary.json because reward can look fine while every
+  # video sits under the gate. See docs/MONETIZATION.md.
+  completion_gate: 0.70
   breakout_multiple: 5.0                  # views/hour, as a multiple of target_vph, that counts as a full breakout
   # Absolute targets. A video scoring exactly the target gets 1.0 on that component. These are what the
   # reward is measured against until the channel has enough SPREAD for percentile ranking to mean
