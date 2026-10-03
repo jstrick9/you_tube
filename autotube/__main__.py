@@ -60,6 +60,10 @@ def cmd_doctor(cfg: dict) -> int:
             continue
         for m, present in r["configured"].items():
             print(f"  {prov:11s} {'OK  ' if present else 'GONE'} {m}")
+        # Always show the catalogue, not only on failure. A model can be listed and still
+        # be uncallable - gemini-2.5-flash answers "no longer available to new users" -
+        # so the reachable alternatives need to be visible when choosing a replacement.
+        print(f"  {prov:11s} .. {r['catalogue']} available: {', '.join(r['sample'][:24])}")
         if r["missing"]:
             ok = False
             print(f"  {prov:11s} !! {len(r['missing'])} configured model(s) do not exist: {r['missing']}")
