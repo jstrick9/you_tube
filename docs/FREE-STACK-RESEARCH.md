@@ -143,3 +143,83 @@ Recording these so they are not re-proposed later.
 A note on scope: this reverses the earlier "Shorts only" decision. Everything above
 improves Shorts on its own, and long-form becomes a config change rather than a new
 pipeline — which is roughly what `docs/LONGFORM.md` already assumed.
+
+---
+
+## 7. Second pass — searching GitHub itself
+
+The first pass leaned on write-ups and surveyed *local* models, which is how it reached
+"no GPU, therefore no generation". That skipped an axis: **free hosted inference**,
+where someone else owns the GPU. Searching GitHub directly found two living indexes,
+both updated the day of this research:
+
+- `open-free-llm-api/awesome-freellm-apis` — 3,600★, MIT — 134+ free APIs, 40+ providers
+- `12britz/awesome-free-models` — 2,378★ — free models and APIs by modality
+
+### 7a. Cloudflare Workers AI — the strongest single finding
+
+| | |
+|---|---|
+| Free allowance | **10,000 neurons/day**, resets 00:00 UTC |
+| Credit card | **No** |
+| Overrun behaviour | **Hard block, no surprise billing** |
+| Images | FLUX.1 Schnell ≈43 neurons → **~230 images/day at 1024×1024** |
+| Format | base64 JPEG from a plain REST call, no SDK |
+| Also included | Llama 3.1 8B (text), **Whisper** (STT), embeddings — same allowance |
+
+Corroborated by three independent sources. Crucially it is **not watermarked**, which is
+what disqualified both keyless options:
+
+- **Pollinations** — watermarked despite `nologo=true` [verified], 576×1024, poor adherence.
+- **Kavel** — its own README states keyless output is *"1K with a watermark"*. Closed.
+
+Every *keyless* image API watermarks. Unwatermarked free generation requires an account,
+and Cloudflare is the one that asks for no card. One of the sources found above
+independently documents hitting the same Gemini wall I did — their pipeline broke when
+Google's free image tier disappeared, and they migrated to Cloudflare.
+
+**But the brand caveat from §5 still stands, and it is the deciding factor.** A
+generated image of a historical event is a *fabrication presented as evidence*, which is
+the opposite of *"Every file is real."* So the recommendation is narrow: Cloudflare FLUX
+is suitable for **non-depictive** use only — abstract backgrounds, texture, transitions,
+thumbnails — and must never stand in for archival material behind a factual claim. The
+vision gate should keep treating "does this image show what the line says" as the test.
+
+### 7b. Quota relief — the thing actually blocking output today
+
+More valuable than any renderer change. Permanent free tiers requiring **no credit card**:
+
+| Provider | Free models | Note |
+|---|---|---|
+| Cloudflare Workers AI | 40 | 10k neurons/day, also images + Whisper |
+| LLM7.io | 20 | no signup friction |
+| Mistral AI | 15 | |
+| Cohere | 12 | |
+| Hugging Face | 9 | |
+| Cerebras | 6 | very fast inference |
+
+The pipeline currently has exactly two working text providers and spent all of 3 Oct
+rate-limited on both. Adding two or three of these to `llm.providers` would do more for
+output than anything else in this document — and the provider plumbing, failover and
+`_dead` retirement logic already exist, so it is close to a config change.
+
+### 7c. CPU-capable TTS beyond Kokoro
+
+Both new since the first pass, both built for CPU:
+
+- **NeuTTS** (neuphonic) — 6.3K★ — 120M Nano, **GGUF quantised for CPU**, instant cloning
+- **MOSS-TTS Nano** (OpenMOSS) — 4.1K★ — 100M CPU variant of an 8B family
+
+These matter because they are small enough for a 4-vCPU runner, where Chatterbox and
+Qwen3-TTS are not.
+
+### 7d. Revised priority
+
+The second pass changes the order. Fixing supply of *compute* now outranks improving
+*output*, because the pipeline currently ships nothing:
+
+1. **Add 2–3 no-credit-card LLM providers** (§7b) — unblocks production
+2. **Internet Archive b-roll** (§3) — biggest on-brand quality gain
+3. **Raise the 150-min cap** — free minutes going unused
+4. **Cloudflare Whisper or faster-whisper** — caption alignment
+5. **Cloudflare FLUX, non-depictive only** — backgrounds and thumbnails, never evidence
