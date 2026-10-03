@@ -18,7 +18,9 @@ channel:
   timezone: America/New_York
   # Topic categories the system can choose from. The analytics loop learns
   # which of these perform best and shifts output toward them automatically.
-  categories: [science, space, history, nature, animals, technology, geography, culture, food, mysteries, sports, entertainment]
+  # Trimmed to exactly the two lanes. A category the lanes never serve is an arm the
+  # bandit must still spend videos measuring, for a topic that is then off-theme.
+  categories: [history, mysteries, culture, science, space, nature, animals, geography]
   # Evergreen seeds: only used when content.allow_evergreen is true (off by default — every video must ride a
   # live trend signal: a viral Short, a Wikipedia spike, Google Trends, Reddit, HN or a same-day anniversary).
   evergreen_seeds:
@@ -112,6 +114,22 @@ content:
   # giving nobody a reason to leave one - they were closed, complete and correct. Each device is one
   # concrete way to leave the viewer with something to say. Learned as a bandit dimension so the
   # channel finds out which actually works rather than guessing.
+  # ── Recurring series ──
+  # A standalone fact video earns a view and gives no reason to subscribe; "CASE #047"
+  # says there are forty-six behind it and a forty-eighth coming. That is the whole
+  # mechanism by which a scroll becomes a follow, and subscribers - not views - are
+  # what the Partner Programme gates on separately. Set to {} to publish unbranded.
+  # Numbering is derived from history, never from a stored counter, so it cannot drift.
+  series:
+    unsolved:
+      tag: "CASE"
+      categories: [history, mysteries, culture]
+      remit: "a real unsolved or barely-explained event from the human record"
+    field:
+      tag: "FIELD"
+      categories: [science, space, nature, animals, geography]
+      remit: "a real thing in the natural world that should not be possible"
+
   comment_devices: [none, poll, hot_take, unanswered_question, challenge, correction_bait]
   require_grounding: true                # every claim must be supported by fetched source text
   # Grounding requirement scales with script length (see scriptwriter.grounding_floor). A flat count
@@ -147,19 +165,19 @@ trends:
   # Four lanes. Each is a recognisable kind of video with its own queries, so the channel still reads
   # as a deliberate publication rather than a grab-bag — which is what YouTube's holistic channel
   # review rewards — while covering roughly four times the trend surface of the old single lane.
+  # Two lanes, not four. Four lanes is four audiences, each of whom sees roughly one
+  # relevant video in four - which is a good way to be watched and a bad way to be
+  # followed, and subscribers are the binding constraint on monetization. Both
+  # survivors share one promise: the real world is stranger and darker than the
+  # record admits. Dropping tech_ai and pop_culture also sheds the two lanes with the
+  # highest living-people and AI-policy exposure.
   lanes:
-    science_nature:
-      queries: ["science facts", "space facts", "animal facts", "ocean facts"]
-      categories: [science, space, nature, animals, geography]
-    tech_ai:
-      queries: ["ai explained", "tech facts", "new technology", "how it works"]
-      categories: [technology, science]
-    pop_culture:
-      queries: ["why is everyone talking about", "internet trend explained", "viral explained"]
-      categories: [culture, entertainment, food, sports]
     history_mystery:
-      queries: ["history facts", "unsolved mystery", "did you know history"]
+      queries: ["unsolved mystery", "history facts", "disappeared without a trace", "declassified", "did you know history"]
       categories: [history, mysteries, culture]
+    science_nature:
+      queries: ["science facts", "space facts", "animal facts", "ocean facts", "deep sea discovery"]
+      categories: [science, space, nature, animals, geography]
   # Each search.list costs 100 quota units, so 14 queries is ~1,400 of the 10,000/day ceiling.
   max_queries_per_run: 14
   youtube_outlier_queries: []            # legacy flat list; the lanes above supersede it

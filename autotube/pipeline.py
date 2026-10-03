@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from . import media, music, qa, render, trends
+from . import series as series_mod
 from .vision import VisionUnavailable
 from .common import OUTPUT_DIR, WORK_DIR, now_utc, read_json, slugify, write_json
 from .llm import LLM
@@ -295,12 +296,19 @@ def produce_assets(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict,
     mus = music.generate(tts["duration"] + 1, work / "music.wav", seed) if cfg["video"]["background_music"] else None
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     title = script["title"].strip()
+    # Series label first, #shorts last: decorate_title measures against the 100-char
+    # limit, and appending the tag afterwards would silently blow past it.
+    s_key = series_mod.assign(topic.get("category"), cfg)
+    s_num = series_mod.episode_number(s_key, read_json("history.json", [])) if s_key else 0
+    if s_key:
+        title = series_mod.decorate_title(title, s_key, s_num, cfg, limit=90)
     if "#shorts" not in title.lower() and len(title) <= 90:
         title = f"{title} #shorts"
     return {"script": script, "source": source, "review": review, "plan": plan, "topic": topic,
             "work": work, "seed": seed, "tts": tts, "visuals": visuals, "music": mus,
             "out": OUTPUT_DIR / f"{run_id}-{idx:02d}-{slug}.mp4",
             "hook_card": script.get("thumbnail_text") or "", "title": title,
+            "series": s_key, "episode": s_num,
             "subject": source["title"], "fx": effects_plan(script, plan, source, cfg)}
 
 
@@ -413,6 +421,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     log.info("topic queue: %s", [p["topic"][:40] for p in picks[: n + 4]])
 
     # 2. produce
+    series_mod.reset()          # episode numbers are per-run unique, see series._ISSUED
     results, used_titles, used_formats = [], set(), set()
     pi = 0
     deadline = time.time() + 60 * float(cfg["schedule"].get("max_run_minutes", 120))
@@ -471,6 +480,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             "review_score": res["review"].get("score"),
             "reviewer": res["review"].get("reviewer"),
             "review_independent": res["review"].get("independent"),
+            "series": res.get("series"), "episode": res.get("episode"),
             "duration": res["duration"], "words": res.get("words"), "archetype": res.get("archetype"),
             "tts_engine": res["tts_engine"], "file": res["file"].name, "publish_at": slot.isoformat() if slot else None,
             "llm": llm.last_used,
