@@ -41,8 +41,17 @@ def cmd_doctor(cfg: dict) -> int:
     from .common import ffmpeg_bin
     from .llm import LLM
     print("ffmpeg:", ffmpeg_bin())
-    for k in ("GEMINI_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY", "PEXELS_API_KEY", "YOUTUBE_API_KEY",
-              "YT_CLIENT_ID", "YT_CLIENT_SECRET", "YT_REFRESH_TOKEN", "NTFY_TOPIC", "DISCORD_WEBHOOK_URL"):
+    # Derived, not hardcoded. This list used to be literal and silently fell behind when
+    # providers were added: Mistral's key was present and working while doctor's own
+    # report did not mention it, which is how a working provider looks identical to a
+    # missing one. Anything the router can key off now appears here automatically.
+    from .llm import KEYED_PROVIDERS
+    keys = sorted(set(KEYED_PROVIDERS.values()) | {
+        "CLOUDFLARE_ACCOUNT_ID",      # Cloudflare needs the account id as well as the token
+        "PEXELS_API_KEY", "YOUTUBE_API_KEY",
+        "YT_CLIENT_ID", "YT_CLIENT_SECRET", "YT_REFRESH_TOKEN",
+        "NTFY_TOPIC", "DISCORD_WEBHOOK_URL"})
+    for k in keys:
         print(f"  {k:22s} {'set' if os.environ.get(k) else '-'}")
     try:
         r = LLM(cfg).json("Reply with JSON only.", 'Return {"ok": true}', temperature=0)

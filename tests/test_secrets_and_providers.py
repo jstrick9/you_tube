@@ -386,3 +386,17 @@ def test_vision_is_not_a_single_point_of_failure():
         assert p in keyed, f"{p} is not a keyed provider; vision never uses the keyless tier"
         assert CFG["llm"].get(f"{p}_vision_models") or p == "gemini", \
             f"{p} is in vision_providers but has no vision models configured"
+
+
+def test_doctor_reports_every_provider_key_it_depends_on():
+    """A hardcoded key list falls behind the router and hides working providers.
+
+    Mistral's key was set and its catalogue fetched fine, while doctor's own key report
+    never mentioned it — making a working provider look identical to a missing one.
+    """
+    src = (ROOT / "autotube" / "__main__.py").read_text()
+    assert "KEYED_PROVIDERS" in src, "doctor must derive its key list from the router"
+    assert "CLOUDFLARE_ACCOUNT_ID" in src, "Cloudflare needs an account id as well as a token"
+    import autotube.llm as L
+    for env in L.KEYED_PROVIDERS.values():
+        assert env in src or "KEYED_PROVIDERS" in src

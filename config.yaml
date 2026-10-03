@@ -352,7 +352,7 @@ llm:
   # each provider's live catalogue - guessed ids have cost this repo three runs already.
   cerebras_models: [llama-3.3-70b, gpt-oss-120b, qwen-3-32b]
   cerebras_review_models: [gpt-oss-120b, llama-3.3-70b]
-  mistral_models: [mistral-small-latest, open-mistral-nemo]
+  mistral_models: [mistral-small-latest, ministral-8b-latest]
   mistral_review_models: [mistral-small-latest]
   cloudflare_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "@cf/meta/llama-3.1-8b-instruct"]
   cloudflare_review_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast"]
