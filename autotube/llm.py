@@ -261,6 +261,15 @@ def cloudflare_creds() -> tuple[str | None, str | None]:
     return key, acct
 
 
+def _nvidia(model, system, user, temperature, images=None):
+    """NVIDIA NIM. Free tier, no card, OpenAI-compatible, and it serves vision models."""
+    key = os.environ.get("NVIDIA_API_KEY")
+    if not key:
+        raise LLMError("no NVIDIA_API_KEY")
+    return _openai_compatible("https://integrate.api.nvidia.com/v1/chat/completions", key, model, system,
+                              user, temperature, images=images)
+
+
 def _cloudflare(model, system, user, temperature, images=None):
     """Workers AI. 10,000 neurons/day free, no card, and it hard-blocks instead of billing."""
     key, acct = cloudflare_creds()
@@ -285,7 +294,7 @@ def _provider_key(pname: str) -> str | None:
 KEYED_PROVIDERS = {
     "gemini": "GEMINI_API_KEY", "groq": "GROQ_API_KEY", "openrouter": "OPENROUTER_API_KEY",
     "cerebras": "CEREBRAS_API_KEY", "mistral": "MISTRAL_API_KEY",
-    "cloudflare": "CLOUDFLARE_API_TOKEN",
+    "cloudflare": "CLOUDFLARE_API_TOKEN", "nvidia": "NVIDIA_API_KEY",
 }
 
 PROVIDERS = {
@@ -295,6 +304,7 @@ PROVIDERS = {
     "cerebras": (_cerebras, "cerebras_models"),
     "mistral": (_mistral, "mistral_models"),
     "cloudflare": (_cloudflare, "cloudflare_models"),
+    "nvidia": (_nvidia, "nvidia_models"),
     "pollinations": (_pollinations, "pollinations_models"),
 }
 
@@ -502,6 +512,7 @@ def available_models(provider: str) -> list[str]:
         simple = {
             "cerebras": ("https://api.cerebras.ai/v1/models", "CEREBRAS_API_KEY"),
             "mistral": ("https://api.mistral.ai/v1/models", "MISTRAL_API_KEY"),
+            "nvidia": ("https://integrate.api.nvidia.com/v1/models", "NVIDIA_API_KEY"),
         }
         if provider in simple:
             url, env = simple[provider]
@@ -576,7 +587,7 @@ def audit_models(cfg: dict) -> dict:
     """Check every configured model id against what the provider actually offers."""
     llm = cfg.get("llm", {})
     report: dict = {}
-    for provider in ("gemini", "groq", "openrouter", "cerebras", "mistral", "cloudflare"):
+    for provider in ("gemini", "groq", "openrouter", "cerebras", "mistral", "cloudflare", "nvidia"):
         catalogue = available_models(provider)
         if not catalogue:
             report[provider] = {"catalogue": None}

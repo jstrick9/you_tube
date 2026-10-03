@@ -353,6 +353,55 @@ def archive_video_search(query: str, limit: int = 5) -> list[dict]:
     return out
 
 
+def pixazo_image(query: str, limit: int = 1) -> list[dict]:
+    """Generate an image via Pixazo's free tier (Flux Schnell), 1024x1024, unwatermarked.
+
+    Deliberately last in the source order, and deliberately labelled.
+
+    This channel's claim is "Every file is real", and a generated picture of a real
+    event is a fabrication standing where evidence should be. So this exists for the
+    case where no archive holds a usable shot and the alternative is abandoning the
+    video: abstract texture, mood, a scene nobody is asserting is a photograph. The
+    asset records itself as AI-generated so the provenance dossier stays truthful about
+    which frames were synthetic - that record is the thing a monetisation appeal rests
+    on, and quietly mixing generated frames into it would destroy its value.
+
+    It stays behind the vision gate like every other source: if it does not show what
+    the line says, it is rejected.
+    """
+    key = os.environ.get("PIXAZO_API_KEY")
+    if not key:
+        return []
+    try:
+        r = http().post("https://gateway.pixazo.ai/flux/text-to-image",
+                        headers={"Content-Type": "application/json", "Ocp-Apim-Subscription-Key": key},
+                        json={"prompt": query}, timeout=90)
+        if r.status_code != 200:
+            log.debug("pixazo HTTP %s: %s", r.status_code, r.text[:200])
+            return []
+        data = r.json()
+    except Exception as e:  # noqa: BLE001
+        log.debug("pixazo failed: %s", e)
+        return []
+    url = None
+    if isinstance(data, dict):
+        for k in ("url", "image_url", "output", "image"):
+            v = data.get(k)
+            if isinstance(v, str) and v.startswith("http"):
+                url = v
+                break
+            if isinstance(v, list) and v and isinstance(v[0], str) and v[0].startswith("http"):
+                url = v[0]
+                break
+    if not url:
+        log.debug("pixazo: no image url in response keys=%s", list(data)[:8] if isinstance(data, dict) else "?")
+        return []
+    return [{"kind": "image", "url": url, "thumb": url, "page": "https://pixazo.ai",
+             "title": f"AI-generated: {query[:60]}",
+             "license": "AI-generated (Pixazo/Flux Schnell)", "author": "AI-generated",
+             "source": "Pixazo (AI-generated)", "synthetic": True, "w": 1024, "h": 1024}]
+
+
 def pexels_video_search(query: str, limit: int = 5) -> list[dict]:
     """Pexels clips, fetched in both orientations and chosen by post-crop sharpness."""
     key = os.environ.get("PEXELS_API_KEY")
@@ -610,6 +659,10 @@ def _candidates_for(queries: list[str], sources: list[str], allowed: list[str], 
             jobs.append((commons_search, (q, allowed, min_w, 10)))
         if "openverse" in sources and qi < 2:
             jobs.append((openverse_search, (q, min_w, 8)))
+        # Last resort only: generated imagery is a fabrication where evidence should be,
+        # so it is reached for when the archives have produced nothing usable.
+        if qi < 1 and "pixazo" in sources and os.environ.get("PIXAZO_API_KEY"):
+            jobs.append((pixazo_image, (q, 1)))
     with ThreadPoolExecutor(4) as ex:
         results = list(ex.map(lambda j: j[0](*j[1]), jobs))
     return [a for r in results for a in r]

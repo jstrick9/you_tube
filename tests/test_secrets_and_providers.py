@@ -4,6 +4,7 @@ Two failure modes here are invisible until a live run and expensive when they la
 a secret that exists but is never passed into the job, and a "reviewer" that turns out
 to be the same model that wrote the script.
 """
+import os
 import re
 import sys
 from pathlib import Path
@@ -381,7 +382,10 @@ def test_vision_is_not_a_single_point_of_failure():
     """
     vis = CFG["llm"]["vision_providers"]
     assert len(vis) >= 2, f"vision has only {vis} — one rate limit discards finished work"
-    keyed = {"gemini", "groq", "openrouter", "cerebras", "mistral", "cloudflare"}
+    # Derived, not literal. A hardcoded set here is the same bug this suite exists to
+    # catch: it silently falls behind the router every time a provider is added.
+    import autotube.llm as L
+    keyed = set(L.KEYED_PROVIDERS)
     for p in vis:
         assert p in keyed, f"{p} is not a keyed provider; vision never uses the keyless tier"
         assert CFG["llm"].get(f"{p}_vision_models") or p == "gemini", \
@@ -505,3 +509,31 @@ def test_both_spellings_reach_the_workflows():
         for v in ("CLOUDFLARE_API_TOKEN", "CLOUDFARE_API_TOKEN",
                   "CLOUDFLARE_ACCOUNT_ID", "CLOUDFARE_ACCOUNT_ID"):
             assert v in s, f"{wf} does not pass {v}"
+
+
+def test_generated_imagery_is_labelled_and_last():
+    """"Every file is real" is the channel's claim and the appeal's evidence.
+
+    Generated frames are allowed as a last resort, but they must never be silently
+    mixed into a provenance record whose whole value is being truthful about what the
+    footage is.
+    """
+    import autotube.media as M
+    src = (ROOT / "autotube" / "media.py").read_text()
+
+    body = src.split("def pixazo_image")[1].split("\ndef ")[0]
+    assert '"synthetic": True' in body, "generated assets must flag themselves"
+    assert "AI-generated" in body, "licence/author must say so plainly"
+
+    dispatch = src.split("def _candidates_for")[1].split("\ndef ")[0]
+    i_px = dispatch.index("pixazo_image")
+    for real in ("commons_search", "archive_video_search", "openverse_search"):
+        assert dispatch.index(real) < i_px, f"{real} must be tried before generated imagery"
+
+    assert M.pixazo_image("x") == [] or os.environ.get("PIXAZO_API_KEY"), \
+        "must no-op without a key"
+
+
+def test_pixazo_is_configured_last_in_the_source_order():
+    srcs = CFG["media"]["sources"]
+    assert srcs[-1] == "pixazo", f"generated imagery should be the final fallback, got {srcs}"

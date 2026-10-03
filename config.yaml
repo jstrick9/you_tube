@@ -331,7 +331,7 @@ research:
 llm:
   # Providers are tried in order; any provider without a key is skipped.
   # All have free tiers. Pollinations needs no key at all (last-resort fallback).
-  providers: [groq, gemini, cerebras, mistral, cloudflare, pollinations]
+  providers: [groq, gemini, cerebras, mistral, cloudflare, nvidia, pollinations]
   # Groq writes first, deliberately. Gemini is the ONLY vision-capable provider here
   # (Groq serves no vision model and there is no OpenRouter key), and image verification
   # is a hard gate - if it cannot run, the video is correctly thrown away. Letting Gemini
@@ -367,16 +367,21 @@ llm:
   # the vision gate needs. llama-3.2-vision 403s on a token that serves Cloudflare text
   # fine, so it is per-model access needing a licence accepted in the dashboard.
   cloudflare_vision_models: ["@cf/meta/llama-4-scout-17b-16e-instruct", "@cf/meta/llama-3.2-11b-vision-instruct"]
+  # NVIDIA NIM: free tier, no card, 130+ models including vision. Ids are a guess that
+  # `doctor` will confirm or replace - four providers have now shipped a wrong model id.
+  nvidia_models: [meta/llama-3.3-70b-instruct, qwen/qwen2.5-7b-instruct]
+  nvidia_review_models: [meta/llama-3.3-70b-instruct]
+  nvidia_vision_models: [meta/llama-3.2-90b-vision-instruct, microsoft/phi-3.5-vision-instruct]
   pollinations_models: [openai-fast, openai]
   # Fact-checking/review runs on a DIFFERENT model from the one that wrote the draft (a writer grading
   # its own homework agrees with itself). Deliberately the reverse order of `providers`, so when both
   # Gemini and Groq are keyed the writer and the reviewer are different families. If none is reachable
   # the review falls back to the normal order and the run is flagged as non-independent.
-  review_providers: [cerebras, groq, mistral, gemini, cloudflare]
+  review_providers: [cerebras, groq, mistral, nvidia, gemini, cloudflare]
   groq_review_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b, openai/gpt-oss-20b]
   gemini_review_models: [gemini-flash-latest, gemini-flash-lite-latest]
   # image-checking models (keyless Pollinations can't see images, so it's never used for this)
-  vision_providers: [gemini, cloudflare]
+  vision_providers: [cloudflare, gemini, nvidia]
   gemini_vision_models: [gemini-flash-lite-latest, gemini-flash-latest]   # gemini-2.5-* now return 404
   groq_vision_models: []
   temperature: 0.8
@@ -385,7 +390,7 @@ media:
   # photos: pexels (only with PEXELS_API_KEY), wikimedia, openverse
   # moving footage: commons_video (Wikimedia Commons videos), nasa_video (NASA library, public domain, keyless),
   #                 pexels_video (only with PEXELS_API_KEY — portrait stock clips)
-  sources: [commons_video, nasa_video, archive_video, pexels_video, pexels, wikimedia, openverse]
+  sources: [commons_video, nasa_video, archive_video, pexels_video, pexels, wikimedia, openverse, pixazo]
   prefer_video: true                     # a verified clip beats an equally good still (motion holds attention)
   video_bonus: 1.0
   # Ranking nudge toward assets that fill a 9:16 frame without upscaling (see media.shape_bonus).
