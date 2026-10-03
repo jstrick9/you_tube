@@ -14,6 +14,8 @@ from zoneinfo import ZoneInfo
 import yaml
 
 root = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(root))
+from autotube.target import daily_target  # noqa: E402  (after sys.path is set)
 cfg = yaml.safe_load((root / "config.yaml").read_text())
 tz = ZoneInfo(cfg["channel"].get("timezone", "UTC"))
 today = datetime.now(timezone.utc).astimezone(tz).date()
@@ -24,7 +26,7 @@ hist_path = root / "state" / "history.json"
 hist = json.loads(hist_path.read_text()) if hist_path.exists() else []
 done = sum(1 for h in hist if h.get("status") in ok and h.get("created_at")
            and datetime.fromisoformat(h["created_at"]).astimezone(tz).date() == today)
-needed = max(0, int(cfg["schedule"]["videos_per_day"]) - done)
+needed = max(0, daily_target(cfg) - done)
 print(f"{today}: {done} done, {needed} still needed")
 if os.environ.get("GITHUB_OUTPUT"):
     with open(os.environ["GITHUB_OUTPUT"], "a") as f:

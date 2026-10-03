@@ -20,6 +20,7 @@ from . import media, music, qa, render, trends
 from . import series as series_mod
 from . import originality, provenance
 from .vision import VisionUnavailable
+from .target import daily_target
 from .common import OUTPUT_DIR, WORK_DIR, now_utc, read_json, slugify, write_json
 from .llm import LLM
 from .scriptwriter import ScriptWriter, spoken_text
@@ -62,25 +63,6 @@ def slot_jitter(day, idx: int, spread: int) -> int:
         return 0
     h = hashlib.md5(f"{day.isoformat()}:{idx}".encode()).hexdigest()
     return int(h[:8], 16) % (2 * spread + 1) - spread
-
-
-def daily_target(cfg: dict) -> int:
-    """How many videos today. Accepts a fixed int or a [lo, hi] range in videos_per_day.
-
-    A fixed count forever is the same fingerprint problem as a fixed clock time. Varying it is
-    free, but it must be stable for the whole day or the 2-hourly top-up runs would disagree with
-    each other about whether the day is finished, so it is derived from the date.
-    """
-    v = cfg["schedule"]["videos_per_day"]
-    if isinstance(v, (list, tuple)):
-        lo, hi = int(v[0]), int(v[-1])
-        if hi <= lo:
-            return max(0, lo)
-        tz = ZoneInfo(cfg["channel"].get("timezone", "UTC"))
-        day = now_utc().astimezone(tz).date()
-        h = hashlib.md5(f"count:{day.isoformat()}".encode()).hexdigest()
-        return lo + int(h[:8], 16) % (hi - lo + 1)
-    return max(0, int(v))
 
 
 def publish_slots(cfg: dict, n: int, taken: set[str] | None = None) -> list[datetime | None]:

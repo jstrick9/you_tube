@@ -254,3 +254,52 @@ def test_top_up_cadence_stays_within_free_tier_budget():
     # Still enough slots to survive GitHub silently dropping a scheduled run.
     lo, hi = (int(x) for x in topups[0].split()[1].split("/")[0].split("-"))
     assert len(range(lo, hi + 1, step)) >= 3, "need several independent chances per day"
+
+
+# ── scheduled top-up pre-flight ─────────────────────────────────────────────
+def test_preflight_gate_handles_a_videos_per_day_range():
+    """Every scheduled top-up run died in 18 seconds before this.
+
+    videos_per_day became a [lo, hi] range, but the pre-flight copy of the rule still
+    called int() on it. Top-ups are the mechanism that covers GitHub silently dropping
+    a cron, so the safety net had been down since the two changes met.
+    """
+    import subprocess
+
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "needed_today.py")],
+                       capture_output=True, text=True, cwd=ROOT)
+    assert r.returncode == 0, f"pre-flight gate crashed: {r.stderr[-400:]}"
+    assert "still needed" in r.stdout
+
+
+def test_the_daily_target_rule_exists_only_once():
+    """The crash was duplication, not arithmetic — so pin that there is one copy."""
+    from autotube.target import daily_target
+
+    pipeline_src = (ROOT / "autotube" / "pipeline.py").read_text()
+    assert "def daily_target" not in pipeline_src, "pipeline must import the shared rule"
+    script_src = (ROOT / "scripts" / "needed_today.py").read_text()
+    assert "videos_per_day" not in script_src, "the pre-flight gate must not re-derive it"
+
+    # Both forms, and a range must be stable within a day or top-ups disagree with
+    # each other about whether the day is already finished.
+    cfg = {"schedule": {"videos_per_day": [1, 3]}, "channel": {}}
+    assert daily_target(cfg) == daily_target(cfg)
+    assert 1 <= daily_target(cfg) <= 3
+    assert daily_target({"schedule": {"videos_per_day": 2}, "channel": {}}) == 2
+    assert daily_target({"schedule": {"videos_per_day": [2, 2]}, "channel": {}}) == 2
+
+
+def test_preflight_gate_imports_without_the_heavy_dependencies():
+    """It runs before the full install, with only PyYAML present."""
+    import subprocess
+
+    probe = (
+        "import sys;\n"
+        "sys.modules.update({m: None for m in ('requests','PIL','numpy','feedparser')});\n"
+        f"sys.path.insert(0, {str(ROOT)!r});\n"
+        "from autotube.target import daily_target;\n"
+        "print(daily_target({'schedule': {'videos_per_day': [1, 3]}, 'channel': {}}))\n"
+    )
+    r = subprocess.run([sys.executable, "-c", probe], capture_output=True, text=True)
+    assert r.returncode == 0, f"shared rule pulled in a heavy import: {r.stderr[-400:]}"

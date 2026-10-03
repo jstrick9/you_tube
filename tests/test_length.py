@@ -179,7 +179,8 @@ def test_slot_jitter_stays_within_the_configured_spread_and_actually_moves():
 
 def test_daily_target_varies_but_is_stable_within_a_day(monkeypatch):
     import datetime as dt
-    import autotube.pipeline as pl
+    import autotube.pipeline as pl  # noqa: F401  (daily_target now lives in target)
+    import autotube.target as pl
 
     cfg = {"schedule": {"videos_per_day": [1, 3]}, "channel": {"timezone": "UTC"}}
     seen = set()
