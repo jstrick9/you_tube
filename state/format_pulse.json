@@ -1,0 +1,18 @@
+{
+  "updated": "2026-10-03T08:22:55+00:00",
+  "sample": 121,
+  "hook_style": {
+    "bold_claim": 0.5054,
+    "question": 0.4432,
+    "you_statement": 0.0368,
+    "disbelief": 0.013,
+    "number_first": 0.0016
+  },
+  "videos": {
+    "bold_claim": 69,
+    "question": 39,
+    "you_statement": 5,
+    "disbelief": 7,
+    "number_first": 1
+  }
+}

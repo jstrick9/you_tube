@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-03T07:04:50.288491+00:00",
+  "updated": "2026-10-03T08:22:50.550644+00:00",
   "videos_total": 29,
   "videos_7d": 22,
-  "views_7d": 9638,
+  "views_7d": 9686,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -307,7 +307,7 @@
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
-      "views": 1232,
+      "views": 1264,
       "avg_view_pct": null
     },
     {
@@ -385,5 +385,26 @@
       "from_pct": 10,
       "to_pct": 20
     }
+  },
+  "distribution": {
+    "n": 13,
+    "gate": 0.7,
+    "passing": 0,
+    "pass_rate": 0.0,
+    "median_completion": 0.1571,
+    "verdict": "NO video clears the 70% completion gate (median 16%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
+  },
+  "subscribers": {
+    "net_90d": 7,
+    "views_90d": 16836,
+    "per_1k_views": 0.42,
+    "videos": 23,
+    "days_to_500": 6428.6,
+    "days_to_1000": 12857.1
+  },
+  "originality": {
+    "episodes_examined": 0,
+    "window": 25,
+    "verdict": "not enough published episodes with a recorded script fingerprint yet"
   }
 }
