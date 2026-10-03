@@ -356,6 +356,12 @@ llm:
   mistral_review_models: [mistral-small-latest]
   cloudflare_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "@cf/meta/llama-3.1-8b-instruct"]
   cloudflare_review_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast"]
+  # Vision is the hard gate - if no vision model answers, the video is discarded - and
+  # until now Gemini was the only provider that could serve it. That single point of
+  # failure ended two of the last three full runs with a 429 after the script had
+  # already been written and verified. Cloudflare's free tier carries vision models, so
+  # one key removes the dependency. Ids are a guess; `doctor` checks them.
+  cloudflare_vision_models: ["@cf/meta/llama-3.2-11b-vision-instruct", "@cf/llava-hf/llava-1.5-7b-hf"]
   pollinations_models: [openai-fast, openai]
   # Fact-checking/review runs on a DIFFERENT model from the one that wrote the draft (a writer grading
   # its own homework agrees with itself). Deliberately the reverse order of `providers`, so when both
@@ -365,7 +371,7 @@ llm:
   groq_review_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b, openai/gpt-oss-20b]
   gemini_review_models: [gemini-flash-latest, gemini-flash-lite-latest]
   # image-checking models (keyless Pollinations can't see images, so it's never used for this)
-  vision_providers: [gemini]
+  vision_providers: [gemini, cloudflare]
   gemini_vision_models: [gemini-flash-lite-latest, gemini-flash-latest]   # gemini-2.5-* now return 404
   groq_vision_models: []
   temperature: 0.8

@@ -370,3 +370,19 @@ def test_the_writer_actually_uses_the_lane_rule():
     src = (ROOT / "autotube" / "scriptwriter.py").read_text()
     assert "lanes.writer_rule(topic, self.cfg)" in src
     assert "{lane_rule}" in src, "the rule must be interpolated into the prompt"
+
+
+def test_vision_is_not_a_single_point_of_failure():
+    """Vision is a hard gate: no vision model, no video, however good the script.
+
+    Gemini was the only provider that could serve it, and a 429 there ended two of the
+    last three full runs *after* the script had been written and verified. A second
+    keyed provider is the difference between a slow run and a lost one.
+    """
+    vis = CFG["llm"]["vision_providers"]
+    assert len(vis) >= 2, f"vision has only {vis} — one rate limit discards finished work"
+    keyed = {"gemini", "groq", "openrouter", "cerebras", "mistral", "cloudflare"}
+    for p in vis:
+        assert p in keyed, f"{p} is not a keyed provider; vision never uses the keyless tier"
+        assert CFG["llm"].get(f"{p}_vision_models") or p == "gemini", \
+            f"{p} is in vision_providers but has no vision models configured"
