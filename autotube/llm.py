@@ -598,5 +598,5 @@ def audit_models(cfg: dict) -> dict:
                 rows[m] = m in catalogue
         report[provider] = {"catalogue": len(catalogue), "configured": rows,
                             "missing": sorted(k for k, v in rows.items() if not v),
-                            "sample": catalogue[:40]}
+                            "sample": catalogue[:120]}
     return report
