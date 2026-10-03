@@ -93,9 +93,16 @@ def cmd_doctor(cfg: dict) -> int:
             continue
         for mdl in models[:2]:
             good, detail = probe_vision(cfg, prov, mdl)
-            print(f"  {prov:11s} {'WORKS' if good else 'FAILS'} {mdl}")
+            # A 429 is a spent quota, not a misconfiguration: it clears by itself and
+            # says nothing about whether the model is wired correctly. Failing the
+            # check on it would leave doctor red most evenings, and a check that is
+            # always red is one nobody reads. Structural failures still fail.
+            throttled = "429" in detail or "quota" in detail.lower()
+            label = "WORKS" if good else ("QUOTA" if throttled else "FAILS")
+            print(f"  {prov:11s} {label} {mdl}")
             if not good:
-                ok = False
+                if not throttled:
+                    ok = False
                 print(f"              -> {detail}")
     print("\nother vision-capable models in the catalogues you have keys for:")
     for prov in ("gemini", "groq", "mistral", "cloudflare", "cerebras", "openrouter"):
