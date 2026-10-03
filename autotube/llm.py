@@ -238,10 +238,17 @@ class LLM:
         order = [p for p in self.cfg.get("review_providers", []) if p in PROVIDERS] or list(self.order)
         try:
             return self.json(system, user, order=order, models_of=self._review_models, avoid=avoid, **kw)
-        except LLMError:
+        except LLMError as e:
             if not avoid:
                 raise
-            log.info("no independent reviewer reachable — falling back to the full provider list")
+            # Log WHY, not just that it happened. This message used to be bare, and the
+            # accumulated per-model errors - the only record of which provider refused
+            # and with what status - were discarded with the exception. Diagnosing a
+            # lost reviewer then took a full live run per guess. Independence feeds the
+            # provenance dossier, so a silent fallback is the one failure here that must
+            # never be quiet.
+            log.warning("no independent reviewer reachable, falling back to the full "
+                        "provider list — reviewer attempts failed with: %s", str(e)[:600])
             return self.json(system, user, **kw)
 
     def json(self, system: str, user: str, temperature: float | None = None,
@@ -272,6 +279,8 @@ class LLM:
                             validate(obj)
                         self.last_used = tag
                         log.debug("LLM ok via %s", tag)
+                        if avoid:            # a review call: say who graded it
+                            log.info("  reviewed by %s (writer was %s)", tag, avoid)
                         return obj
                     except LLMError as e:
                         msg = str(e)
