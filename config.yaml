@@ -308,7 +308,13 @@ research:
 llm:
   # Providers are tried in order; any provider without a key is skipped.
   # All have free tiers. Pollinations needs no key at all (last-resort fallback).
-  providers: [gemini, groq, pollinations]
+  providers: [groq, gemini, pollinations]
+  # Groq writes first, deliberately. Gemini is the ONLY vision-capable provider here
+  # (Groq serves no vision model and there is no OpenRouter key), and image verification
+  # is a hard gate - if it cannot run, the video is correctly thrown away. Letting Gemini
+  # also do every script burned its free-tier quota on text and then 429'd the vision
+  # call, losing the whole run. Text has three providers to fall back on; vision has one,
+  # so the scarce capability gets the quota.
   gemini_models: [gemini-flash-lite-latest, gemini-flash-latest, gemini-2.5-flash-lite, gemini-2.5-flash]
   # Live run 2026-10-03 (workflow_dispatch 37109430187) showed ALL THREE previous Groq
   # models failing: both gpt-oss models are reasoning models and reject Groq's

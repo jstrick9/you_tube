@@ -227,7 +227,10 @@ class Judge:
         self.strict = bool(m.get("require_llm_verdict", True))
         self.calls = 0
         self.fail_streak = 0
-        self.retry_pauses = [15, 45, 90] if self.strict else [15]
+        # Gemini is the only vision provider and its free tier rate-limits per minute, so a
+        # 429 here is usually a wait, not an outage. Backing off past the quota window is
+        # far cheaper than discarding a script that is already written and verified.
+        self.retry_pauses = [15, 45, 90, 150] if self.strict else [15, 45]
         self.llm_failed = False
 
     @property

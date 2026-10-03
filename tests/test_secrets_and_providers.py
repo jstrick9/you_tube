@@ -61,16 +61,37 @@ def test_no_workflow_references_a_secret_the_code_never_reads():
 
 
 # ── reviewer independence ───────────────────────────────────────────────────
-def test_the_reviewer_tries_a_different_provider_first():
-    """A writer grading its own draft agrees with itself. With GEMINI and GROQ both
-    configured the writer resolves to gemini and the reviewer to groq."""
-    writers = CFG["llm"]["providers"]
-    reviewers = CFG["llm"]["review_providers"]
-    assert writers[0] != reviewers[0], "review order must not open with the writer's provider"
-    available = [p for p in writers if p in ("gemini", "groq")]
-    avail_rev = [p for p in reviewers if p in ("gemini", "groq")]
-    assert available[0] != avail_rev[0], \
-        "with only gemini+groq keys, writer and reviewer must still differ"
+def test_the_reviewer_is_never_the_model_that_wrote_the_draft():
+    """A writer grading its own draft agrees with itself.
+
+    This used to require the reviewer to open on a *different provider*. That is no
+    longer the right guarantee. Gemini is the only vision-capable provider and image
+    verification is a hard gate, so spending its free-tier quota on reviews is what
+    429'd the vision call and discarded a finished script. Reviews now prefer Groq,
+    which is also where the writer starts.
+
+    Independence is enforced per model, not per provider, and Groq's models are not one
+    family - gpt-oss is OpenAI's and qwen is Alibaba's, different lineages with
+    different failure modes. A live run confirmed the pairing works in practice
+    (gpt-oss-120b reviewing a qwen draft and vice versa). What must never happen is a
+    model reviewing itself, so that is what this pins.
+    """
+    llm = CFG["llm"]
+    reviewers = llm["review_providers"]
+    assert reviewers, "there must be a review order"
+    # Whichever provider writes first must offer at least two models, so the reviewer
+    # always has somewhere else to go when it lands on the same provider.
+    first = llm["providers"][0]
+    if reviewers[0] == first:
+        pool = llm.get(f"{first}_review_models") or llm.get(f"{first}_models", [])
+        assert len(pool) >= 2, (
+            f"review opens on {first}, the same provider that writes, so {first} needs "
+            f"at least two models for the reviewer to differ from the writer")
+    # And a second provider must remain reachable as a fallback.
+    assert len(reviewers) >= 2, "review needs a fallback provider"
+    # Both keyed providers must stay in the review order so the fallback is real.
+    assert {"gemini", "groq"} <= set(reviewers), \
+        "both keyed providers should remain reachable for review"
 
 
 def test_every_review_provider_can_actually_be_reached():
