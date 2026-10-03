@@ -11,7 +11,7 @@ import logging
 import math
 from datetime import datetime, timedelta
 
-from . import youtube
+from . import originality, youtube
 from .common import now_utc, read_json, write_json
 from .strategy import Strategy
 
@@ -387,6 +387,10 @@ def run(cfg: dict) -> dict:
         # Shopping; 1,000 unlocks ad revenue. Reported as a 90-day rate so it reads as a trajectory
         # rather than a running total nobody can act on.
         "subscribers": _subs_progress(uploaded, now),
+        # What a policy reviewer sees looking at the channel rather than at one video.
+        # The per-draft similarity check is pairwise and cannot see aggregate drift:
+        # every episode can sit under the limit while all of them are one template.
+        "originality": originality.channel_audit(hist, cfg),
     }
     write_json("analytics_summary.json", summary)
     log.info("analytics: %d videos tracked, %d newly learned", len(uploaded), learned)

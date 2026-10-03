@@ -151,3 +151,68 @@ def check(script: dict, cfg: dict, history: list[dict] | None = None) -> list[st
                 f"limit {limit:.0%}) — five videos with under 20% script variation is treated as "
                 "bulk production and demonetized as a batch")
     return issues
+
+
+def channel_audit(history: list[dict], cfg: dict) -> dict:
+    """What a policy reviewer sees when they look at the channel rather than a video.
+
+    The per-draft check in check() is pairwise: it refuses a script that is too close to
+    any single predecessor. That is necessary and not sufficient. A channel can pass it
+    on every upload and still drift into exactly the pattern the policy describes,
+    because "5+ videos sharing a template" is an aggregate property - every episode can
+    sit comfortably under the pairwise limit while all of them are the same format, the
+    same shape and the same voice. Reviewers are documented as assessing channel theme,
+    the newest and most-viewed videos, and watch-time distribution. They look at the
+    body of work, so something here has to as well.
+
+    Reported, never enforced. These are slow-moving properties of a back catalogue, and
+    a run that refuses to publish because the last twenty episodes skewed toward one
+    format would be punishing today's video for last month's decisions - while also
+    leaving the channel with nothing new, which helps nobody.
+    """
+    ccfg = (cfg.get("content") or {})
+    window = int(ccfg.get("audit_window", 25))
+    recent = [h for h in list(history)[-window:] if h.get("sketch")]
+    n = len(recent)
+    out: dict = {"episodes_examined": n, "window": window}
+    if n < 2:
+        out["verdict"] = "not enough published episodes with a recorded script fingerprint yet"
+        return out
+
+    sims = []
+    for i in range(n):
+        for j in range(i + 1, n):
+            sims.append(similarity(recent[i]["sketch"], recent[j]["sketch"]))
+    limit = float(ccfg.get("max_script_similarity", 1.0))
+    out["mean_pairwise_similarity"] = round(sum(sims) / len(sims), 3)
+    out["max_pairwise_similarity"] = round(max(sims), 3)
+    # The policy number is five, so count how big the largest cluster of mutually
+    # similar episodes is rather than just averaging - an average hides a tight clique.
+    near = sum(1 for s in sims if s > limit)
+    out["pairs_over_similarity_limit"] = near
+
+    def concentration(key: str) -> tuple[str, float]:
+        vals = [((h.get("choice") or {}).get(key)) for h in recent]
+        vals = [v for v in vals if v]
+        if not vals:
+            return "", 0.0
+        top = max(set(vals), key=vals.count)
+        return top, round(vals.count(top) / len(vals), 3)
+
+    fmt, fmt_share = concentration("format")
+    cat, cat_share = concentration("category")
+    out["most_common_format"] = {"name": fmt, "share": fmt_share}
+    out["most_common_category"] = {"name": cat, "share": cat_share}
+    voiced = sum(1 for h in recent if (h.get("commentary_ratio") or 0) > 0)
+    out["share_with_narrator_commentary"] = round(voiced / n, 3)
+
+    flags = []
+    if near:
+        flags.append(f"{near} pairs of episodes exceed the {limit:.0%} phrase-overlap limit")
+    if fmt_share > 0.5 and n >= 5:
+        flags.append(f"{fmt_share:.0%} of recent episodes use the '{fmt}' format — reads as one template")
+    if out["share_with_narrator_commentary"] < 0.8:
+        flags.append(f"only {out['share_with_narrator_commentary']:.0%} of episodes have any narrator commentary")
+    out["flags"] = flags
+    out["verdict"] = "looks like a show" if not flags else "drifting toward a template: " + "; ".join(flags)
+    return out

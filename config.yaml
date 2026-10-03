@@ -128,6 +128,7 @@ content:
   # wide empty gap. Set to 1.0 to disable.
   max_script_similarity: 0.25
   similarity_window: 25       # how many recent episodes a new draft is compared against
+  audit_window: 25            # how many recent episodes the channel-level audit looks at
   # A count, not a percentage: a ratio floor makes the requirement depend on how wordy
   # the rest of the script is, and a script landing exactly on a float threshold gets
   # rejected by rounding. One aside is the whole ask - deliberately not a quota, because

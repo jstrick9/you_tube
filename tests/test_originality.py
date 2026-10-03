@@ -191,3 +191,77 @@ def test_shipped_config_actually_enables_both_defences():
     c = CFG["content"]
     assert c["max_script_similarity"] < 1.0
     assert c["min_asides"] >= 1
+
+
+# ── channel-level audit ─────────────────────────────────────────────────────
+# The per-draft check is pairwise and cannot see aggregate drift: every episode can sit
+# under the similarity limit while all of them are one template. Reviewers are
+# documented as assessing the body of work, so something has to look at it that way.
+
+def ep(text, fmt="creepy_true", cat="mysteries", commentary=0.05):
+    return {"sketch": o.sketch(text), "commentary_ratio": commentary,
+            "choice": {"format": fmt, "category": cat}}
+
+
+# These have to be genuinely different prose, not one sentence with the number changed.
+# The first draft of this fixture was the latter, and the audit correctly flagged it as
+# repetitive - which is the behaviour under test, so the fixture was the bug.
+VARIED_TEXTS = [
+    "three lighthouse keepers vanished behind a bolted door in nineteen hundred",
+    "an iron rich brine oxidises the moment antarctic air touches it",
+    "voyager one carries a gold record nobody alive will ever collect",
+    "roman concrete heals its own cracks when seawater floods them",
+    "a tardigrade survived ten days of hard vacuum and came back fine",
+    "octopuses taste what they touch because their arms are covered in receptors",
+]
+VARIED = [ep(t, fmt=f) for t, f in zip(VARIED_TEXTS, [
+    "creepy_true", "guess_reveal", "scale_shock", "what_if", "plot_twist", "myth_buster"])]
+
+
+def test_a_varied_back_catalogue_reads_as_a_show():
+    a = o.channel_audit(VARIED, CFG)
+    assert a["verdict"] == "looks like a show", a["flags"]
+
+
+def test_one_format_dominating_is_flagged_as_a_template():
+    same = [ep(t) for t in VARIED_TEXTS]
+    a = o.channel_audit(same, CFG)
+    assert any("one template" in f for f in a["flags"])
+    assert a["most_common_format"]["share"] == 1.0
+
+
+def test_rewriting_the_same_script_is_caught_in_aggregate():
+    dupes = [ep("the lighthouse keepers vanished without trace in nineteen hundred", fmt=f)
+             for f in ["creepy_true", "guess_reveal", "scale_shock", "what_if", "plot_twist"]]
+    a = o.channel_audit(dupes, CFG)
+    assert a["pairs_over_similarity_limit"] > 0
+    assert a["mean_pairwise_similarity"] > CFG["content"]["max_script_similarity"]
+
+
+def test_a_catalogue_without_commentary_is_flagged():
+    mute = [ep(t, fmt=f, commentary=0) for t, f in zip(VARIED_TEXTS, [
+        "creepy_true", "guess_reveal", "scale_shock", "what_if", "plot_twist"])]
+    assert any("narrator commentary" in f for f in o.channel_audit(mute, CFG)["flags"])
+
+
+def test_audit_says_so_rather_than_guessing_on_a_new_channel():
+    a = o.channel_audit([], CFG)
+    assert a["episodes_examined"] == 0 and "not enough" in a["verdict"]
+    assert "mean_pairwise_similarity" not in a, "must not imply a measurement it did not make"
+
+
+def test_audit_ignores_episodes_predating_the_sketch_field():
+    """Every entry currently in state/history.json has no sketch. They must not be
+    silently counted as evidence that the catalogue is varied."""
+    assert o.channel_audit([{"title": "old"}] * 10, CFG)["episodes_examined"] == 0
+
+
+def test_audit_only_looks_at_the_configured_window():
+    cfg = {"content": {"max_script_similarity": 0.25, "audit_window": 3}}
+    assert o.channel_audit(VARIED, cfg)["episodes_examined"] == 3
+
+
+def test_a_single_format_is_not_flagged_before_there_is_enough_evidence():
+    """Three episodes of one format is a new channel, not a content farm."""
+    few = [ep(t) for t in VARIED_TEXTS[:3]]
+    assert not any("one template" in f for f in o.channel_audit(few, CFG)["flags"])
