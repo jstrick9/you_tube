@@ -372,7 +372,12 @@ def available_models(provider: str) -> list[str]:
                 return []
             d = get_json("https://generativelanguage.googleapis.com/v1beta/models",
                          params={"key": key, "pageSize": 200})
-            return sorted(m["name"].removeprefix("models/") for m in d.get("models", []))
+            # Being listed is not the same as being usable. gemini-2.5-flash appears in
+            # the catalogue but 404s on generateContent, so doctor called it OK while
+            # live runs retired it on first use - exactly the false reassurance this
+            # check exists to prevent. Only count models that support the call we make.
+            return sorted(m["name"].removeprefix("models/") for m in d.get("models", [])
+                          if "generateContent" in (m.get("supportedGenerationMethods") or []))
         if provider == "openrouter":
             d = get_json("https://openrouter.ai/api/v1/models")
             return sorted(m["id"] for m in d.get("data", []))

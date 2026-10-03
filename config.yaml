@@ -323,7 +323,6 @@ llm:
   # silently fell back to Gemini - the same model that wrote the script, so the run
   # produced zero independent reviews.
   groq_models: [openai/gpt-oss-120b, openai/gpt-oss-20b, qwen/qwen3.8-27b]
-  openrouter_models: ["meta-llama/llama-3.3-70b-instruct:free", "deepseek/deepseek-chat-v3-0324:free"]
   pollinations_models: [openai-fast, openai]
   # Fact-checking/review runs on a DIFFERENT model from the one that wrote the draft (a writer grading
   # its own homework agrees with itself). Deliberately the reverse order of `providers`, so when both
@@ -331,13 +330,11 @@ llm:
   # the review falls back to the normal order and the run is flagged as non-independent.
   review_providers: [groq, gemini]
   groq_review_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b, openai/gpt-oss-20b]
-  openrouter_review_models: ["meta-llama/llama-3.3-70b-instruct:free", "deepseek/deepseek-chat-v3-0324:free"]
   gemini_review_models: [gemini-flash-latest, gemini-flash-lite-latest]
   # image-checking models (keyless Pollinations can't see images, so it's never used for this)
   vision_providers: [gemini]
   gemini_vision_models: [gemini-flash-lite-latest, gemini-flash-latest]   # gemini-2.5-* now return 404
   groq_vision_models: []
-  openrouter_vision_models: ["google/gemma-3-27b-it:free"]
   temperature: 0.8
 
 media:
