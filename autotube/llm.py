@@ -162,7 +162,14 @@ def _openai_compatible(base: str, key: str | None, model: str, system: str, user
         body.pop("response_format", None)
         r = http().post(base, headers=headers, json=body, timeout=120)
     if r.status_code != 200:
-        raise LLMError(f"{base} {model} HTTP {r.status_code}: {r.text[:200]}")
+        # 200 chars cut these messages off mid-sentence, immediately before the part that
+        # matters: a 429 body says whether the limit is per-minute or per-day and when it
+        # resets, and that is the difference between "wait 30 seconds" and "the quota is
+        # gone until tomorrow, stop retrying". Keep the retry hint too.
+        detail = r.text[:600]
+        hint = r.headers.get("retry-after") or r.headers.get("x-ratelimit-reset-requests")
+        raise LLMError(f"{base} {model} HTTP {r.status_code}"
+                       + (f" (retry after {hint})" if hint else "") + f": {detail}")
     data = r.json()
     try:
         content = data["choices"][0]["message"].get("content") or ""
