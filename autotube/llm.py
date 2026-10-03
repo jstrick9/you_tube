@@ -514,10 +514,19 @@ def available_models(provider: str) -> list[str]:
             key, acct = cloudflare_creds()
             if not (key and acct):
                 return []
-            d = get_json(f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/v1/models",
-                         headers={"Authorization": f"Bearer {key}"})
-            return sorted(m["id"] for m in d.get("data", []))
-    except Exception:  # noqa: BLE001 - diagnostics must never break the caller
+            # Workers AI publishes its catalogue at ai/models/search, not at the
+            # OpenAI-compatible ai/v1/models path the chat endpoint lives under. The
+            # first guess 404'd, and because the failure was swallowed it looked
+            # identical to a missing key.
+            d = get_json(f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/models/search",
+                         headers={"Authorization": f"Bearer {key}"}, params={"per_page": 200})
+            rows = d.get("result") or d.get("data") or []
+            return sorted(str(m.get("name") or m.get("id")) for m in rows if (m.get("name") or m.get("id")))
+    except Exception as e:  # noqa: BLE001 - diagnostics must never break the caller
+        # Reporting these two as one line is how a wrong catalogue URL spent a round
+        # trip looking like an absent key. The caller still gets [], but the reason is
+        # no longer invisible.
+        log.warning("%s catalogue unreachable: %s", provider, str(e)[:200])
         return []
     return []
 

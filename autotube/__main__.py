@@ -65,7 +65,9 @@ def cmd_doctor(cfg: dict) -> int:
     print("\nmodels:")
     for prov, r in audit_models(cfg).items():
         if r["catalogue"] is None:
-            print(f"  {prov:11s} (no key or catalogue unreachable — skipped)")
+            from .llm import _provider_key
+            why = "no key" if not _provider_key(prov) else "key present but catalogue unreachable (see warning above)"
+            print(f"  {prov:11s} (skipped — {why})")
             continue
         for m, present in r["configured"].items():
             print(f"  {prov:11s} {'OK  ' if present else 'GONE'} {m}")
