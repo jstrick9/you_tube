@@ -122,8 +122,18 @@ def test_titles_are_screened_for_shock_bait_not_vocabulary():
             "aside": "Cheerful bunch."},   # min_commentary_ratio: narration needs a voice
            {"text": "Each line records a season nobody wanted to repeat"},
            {"text": "so when you can read it, the warning has already arrived"}]
-    assert w.check({"title": "The stone that warns you", "segments": seg}, src)[0]
+    # This test reuses one body of segments to isolate the title as the only variable.
+    # check() now registers each APPROVED script so later videos in the same run are
+    # compared against it, which would make the second call collide with the first on
+    # similarity rather than on its title. Clearing the in-flight history between calls
+    # keeps the title the thing under test. Production never re-checks an approved
+    # script: produce() returns as soon as check() says ok.
+    def check(title):
+        w._history = []
+        return w.check({"title": title, "segments": seg}, src)[0]
+
+    assert check("The stone that warns you")
     # Deliberate change: "war" in a title is no longer banned — "The Shortest War In History" is a
     # perfectly good educational title. Titles are screened for shock-bait instead.
-    assert w.check({"title": "The war stone", "segments": seg}, src)[0]
-    assert not w.check({"title": "The murder stone", "segments": seg}, src)[0]
+    assert check("The war stone")
+    assert not check("The murder stone")

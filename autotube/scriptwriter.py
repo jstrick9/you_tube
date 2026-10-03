@@ -6,7 +6,7 @@ import logging
 import random
 import re
 
-from . import gates, originality, safety
+from . import gates, originality, safety, series
 from .common import now_utc, read_json
 from .llm import LLM, LLMError
 from .research import ground, unsupported_numbers
@@ -303,6 +303,14 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
             loop_rule = "answer the hook's question with the final surprising fact + a natural 'Follow for more.'"
         persona = self.cfg.get("persona") or {}
         max_asides = int(persona.get("max_asides", 2)) if persona.get("asides", True) else 0
+        # The series remit, so episodes conform to the show's promise rather than merely
+        # carrying its label. Without this the numbering is a prefix stapled to whatever
+        # the trend feed produced, which is the opposite of what a series is for.
+        _skey = series.assign(topic.get("category"), self.cfg)
+        _spec = series.definitions(self.cfg).get(_skey or "", {})
+        series_rule = (f'This episode is {_spec.get("tag", "")} in a recurring series. Its remit: '
+                       f'{_spec["remit"]}. Choose the angle that fits that remit.\n'
+                       if _spec.get("remit") else "")
         fmt = plan["format"] if plan["format"] in FORMAT_GUIDE else "sounds_fake"
         reveal_rule = ('  "reveal": true on exactly ONE segment — the line with the biggest surprise/answer/twist (the video adds '
                        'a beat of silence, a riser and a flash right before it). Never the hook; usually the last BODY line.\n')
@@ -359,8 +367,7 @@ Write the script as 4-5 segments. Each beat has a DIFFERENT job — do not write
 Leave ONE question deliberately open from the hook until the payoff — the viewer should be unable to stop
 watching without learning the answer. Never answer it in segment 2.
 The TOPIC line is just a trend headline — do NOT repeat its claims or numbers unless the SOURCE TEXT states them.
-{person_rule}
-ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with
+{person_rule}{series_rule}ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with
 comic timing and personality (reactions, contrast, "and it gets worse"). The facts stay 100% exact; the humour comes
 from HOW you tell them and from the asides, never from changing what happened.
 TOTAL narration (text + asides) MUST be {words_lo}-{words_hi} words. Count them. Too short = rejected.
@@ -433,6 +440,31 @@ Write YouTube metadata for this Short. Return JSON:
 
     # ── 3. programmatic + LLM review ─────────────────────────────────────────
     def check(self, script: dict, source: dict) -> tuple[bool, dict]:
+        """Approve or reject a draft, remembering what was approved.
+
+        The similarity gate reads history from disk, but history is only written at the
+        END of a run and a run makes up to three videos. Without this, videos two and
+        three are never compared against video one - and same-run videos are the most
+        likely to collide, because they are drawn from the same day's trends, the same
+        lane and the same format pool. Approved drafts are appended to the in-memory
+        history so the rest of the run can see them.
+
+        Only approved drafts are registered. A rejected draft is about to be rewritten
+        on the same topic, and holding it against its own replacement would guarantee
+        the retry fails too.
+        """
+        ok, review = self._check(script, source)
+        if ok:
+            if getattr(self, "_history", None) is None:
+                self._history = read_json("history.json", [])
+            self._history.append({
+                "title": script.get("title", ""),
+                "sketch": originality.sketch(originality.narration_of(script)),
+                "_in_flight": True,
+            })
+        return ok, review
+
+    def _check(self, script: dict, source: dict) -> tuple[bool, dict]:
         # numbers + blocked words are checked on EVERYTHING spoken (asides included); evidence only on facts
         narration = " ".join(spoken_text(s) for s in script["segments"])
         issues = []

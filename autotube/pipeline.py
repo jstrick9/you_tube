@@ -519,9 +519,15 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             # strike the work directory is long gone and the model that wrote the script
             # has been deprecated; the only surviving artefact would be the video itself,
             # which is the thing under suspicion.
-            entry["provenance"] = provenance.record(res, entry, cfg)
-        if do_upload:            # dry runs never touch history (no topic dedupe / slot booking side effects)
-            hist.append(entry)
+            #
+            # Gated on video_id, not on do_upload: an upload that raised leaves a fully
+            # rendered video that was never published, and recording it would have the
+            # dossier claim episodes that are not on the channel. A reviewer who checks
+            # one claimed episode and cannot find it discredits the whole archive, so
+            # inflated evidence is worse here than missing evidence.
+            if entry.get("video_id"):
+                entry["provenance"] = provenance.record(res, entry, cfg)
+            hist.append(entry)   # dry runs never touch history (no dedupe / slot side effects)
     if do_upload:
         write_json("history.json", hist[-int(cfg.get("analytics", {}).get("history_keep", 2000)):])
     if not keep_work:
