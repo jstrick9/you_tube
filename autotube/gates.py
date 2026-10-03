@@ -47,6 +47,39 @@ BANNED_TITLE = [
 ]
 
 # ── things that leak the production process into the narration ──
+# ── the turn (segment 2) ────────────────────────────────────────────────────────────────────────
+# Averaged over the channel's first 12 videos with retention curves, audience retention runs
+# 112% at the 10% mark and 71.5% at the 20% mark: a 41-point cliff between roughly second 3 and
+# second 5. The hook is not the problem - it is over by then. What loses them is beat two, which
+# the model reliably writes as background exposition: a birth date, a definition, a founding year.
+# The viewer came for the surprise promised in the hook and got a history lesson instead. These
+# are the openers that signal exposition rather than escalation, anchored at the start of the line.
+EXPOSITION_OPENERS = [
+    r"born in\b", r"it was born", r"the (story|history|origins?) of\b",
+    r"in (the )?(17|18|19|20)\d\d\b", r"back in\b", r"(it|he|she|they) (was|were) (first )?(built|founded|created|established|discovered|invented|published|opened)\b",
+    r"(was|is) (a|an|the) [a-z]+ (who|that|which)\b",
+    r"(located|situated|found) in\b", r"((it|this|that|they|he|she) )?dates? back to\b",
+    r"for (centuries|decades|years)\b",
+    r"throughout history\b", r"(it|this|he|she|they) (is|was) (also )?known as\b",
+    r"according to\b", r"to understand (this|it|that|why)\b", r"(first|originally) (built|made|created|used|appeared)\b",
+    r"the (idea|concept|practice|tradition) of\b", r"historians\b", r"scientists have long\b",
+]
+
+
+def check_turn(second: str) -> list[str]:
+    """Beat two must escalate, not explain. This is where the channel loses 41% of its audience."""
+    second = (second or "").strip()
+    if not second:
+        return []
+    low = second.lower().lstrip("\"'(- ")
+    for pat in EXPOSITION_OPENERS:
+        if re.match(pat, low):
+            return [f"segment 2 opens with background exposition ({re.match(pat, low).group(0)!r}). This is "
+                    "where most viewers leave. It must ESCALATE the hook - a second, bigger surprise, or the "
+                    "consequence of the first - never a definition, a date, an origin or a history lesson"]
+    return []
+
+
 STAGE_DIRECTION = re.compile(
     r"(^|\s)(\[|\(\s*(cut|pause|beat|music|sfx|narrator|voice ?over|vo)\b)|^\s*(narrator|host|vo)\s*:",
     re.I)
@@ -153,6 +186,8 @@ def run_all(script: dict, spoken, cfg: dict) -> list[str]:
     lo = int(ccfg.get("hook_words_min", 6))
     hi = int(ccfg.get("hook_words_max", 12))
     issues = check_hook(spoken(segs[0]), lo, hi)
+    if len(segs) > 2:
+        issues += check_turn(spoken(segs[1]))
     issues += check_closer(spoken(segs[-1]), bool(ccfg.get("loop_ending", True)))
     issues += check_title(script.get("title", ""))
     issues += check_narration(segs, spoken)

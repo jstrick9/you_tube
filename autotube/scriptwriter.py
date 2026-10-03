@@ -305,12 +305,18 @@ SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of fact
 \"\"\"{source['text'][:self.src_chars]}\"\"\"
 
 {HOOK_RULES}
-Write the script as 5-6 segments:
+Write the script as 5-6 segments. Each beat has a DIFFERENT job — do not write interchangeable body lines:
   - segment 1 = HOOK (see rules), spoken in under 3 seconds;
-  - segments 2..N-1 = BODY, each 12-14 words (1-2 sentences, one concrete fact with a specific detail each —
-    every line must add something new; no filler, no repetition). The body is a mini STORY, not a list: setup →
-    "and it gets stranger" escalation → the reveal. Use contrast and consequence ("so", "which meant", "except");
+  - segment 2 = THE TURN, 12-14 words. This single line decides whether the video is watched, and it is the
+    one most often written wrong. It must make the hook BIGGER — a second surprise, or the consequence of the
+    first ("which meant...", "except..."). It must NOT be setup, background, a definition, a birth date, a
+    founding year, an origin story or any sentence beginning "In 1923..." / "Born in..." / "X is a Y that...".
+    The viewer already decided the premise was interesting; explaining it to them is why they leave;
+  - segments 3..N-1 = ESCALATION, each 12-14 words, one concrete new fact each, every line raising the stakes
+    above the line before it. Use contrast and consequence ("so", "which meant", "except"). No filler, no repetition;
   - last segment = PAYOFF, 8-13 words: {loop_rule}
+Leave ONE question deliberately open from the hook until the payoff — the viewer should be unable to stop
+watching without learning the answer. Never answer it in segment 2.
 The TOPIC line is just a trend headline — do NOT repeat its claims or numbers unless the SOURCE TEXT states them.
 {person_rule}
 ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with

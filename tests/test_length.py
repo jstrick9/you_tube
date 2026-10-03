@@ -130,7 +130,13 @@ def test_script_structure_fits_the_configured_band():
     src = Path(__file__).resolve().parent.parent / "autotube" / "scriptwriter.py"
     text = src.read_text()
     n_lo, n_hi = map(int, re.search(r"Write the script as (\d)-(\d) segments", text).groups())
-    b_lo, b_hi = map(int, re.search(r"BODY, each (\d+)-(\d+) words", text).groups())
+    # the middle beats now have distinct jobs (THE TURN, then ESCALATION) but share a word budget;
+    # if they ever diverge this test must be taught the difference rather than silently using one
+    t_lo, t_hi = map(int, re.search(r"THE TURN, (\d+)-(\d+) words", text).groups())
+    b_lo, b_hi = map(int, re.search(r"ESCALATION, each (\d+)-(\d+) words", text).groups())
+    assert (t_lo, t_hi) == (b_lo, b_hi), (
+        f"the turn ({t_lo}-{t_hi}) and escalation ({b_lo}-{b_hi}) budgets differ; "
+        "the arithmetic below assumes they are the same")
     p_lo, p_hi = map(int, re.search(r"PAYOFF, (\d+)-(\d+) words", text).groups())
     hook_hi = int(cfg["content"]["hook_words_max"])
 
