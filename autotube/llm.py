@@ -152,6 +152,15 @@ def _openai_compatible(base: str, key: str | None, model: str, system: str, user
     if extra_body:
         body.update(extra_body)
     r = http().post(base, headers=headers, json=body, timeout=120)
+    if r.status_code == 400 and json_mode and "json_validate" in r.text.lower():
+        # Reasoning models (Groq's gpt-oss family) reject response_format=json_object:
+        # they emit a reasoning preamble that cannot satisfy strict JSON mode, so the
+        # server rejects the request outright. The prompt already demands JSON and the
+        # caller already tolerates fenced output, so drop the constraint and ask again.
+        # Without this the entire Groq provider 400s on every call, which is what left
+        # the review stage with no model but the writer's own.
+        body.pop("response_format", None)
+        r = http().post(base, headers=headers, json=body, timeout=120)
     if r.status_code != 200:
         raise LLMError(f"{base} {model} HTTP {r.status_code}: {r.text[:200]}")
     data = r.json()

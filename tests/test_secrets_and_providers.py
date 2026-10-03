@@ -94,3 +94,56 @@ def test_independence_is_recorded_rather_than_assumed():
     src = (ROOT / "autotube" / "provenance.py").read_text()
     assert '"independent": review.get("independent")' in src
     assert "independently_reviewed" in src
+
+
+def test_groq_retries_without_json_mode_when_the_model_refuses_it():
+    """Reasoning models 400 on response_format=json_object; we must ask again without it.
+
+    This single line is why the review stage had no model but the writer's own: every
+    Groq call 400'd, Groq was retired on first use, and the skip path logged nothing.
+    """
+    import autotube.llm as L
+
+    calls = []
+
+    class R:
+        def __init__(self, code, text, payload=None):
+            self.status_code, self.text, self._p = code, text, payload
+
+        def json(self):
+            return self._p
+
+    class FakeHTTP:
+        def post(self, url, headers=None, json=None, timeout=None):
+            calls.append(dict(json))
+            if "response_format" in json:
+                return R(400, '{"error":{"code":"json_validate_failed"}}')
+            return R(200, "", {"choices": [{"message": {"content": '{"ok": true}'}}]})
+
+    orig = L.http
+    L.http = lambda: FakeHTTP()
+    try:
+        out = L._openai_compatible("https://api.groq.com/openai/v1/chat/completions", "k",
+                             "openai/gpt-oss-120b", "sys", "usr", 0.0, json_mode=True)
+    finally:
+        L.http = orig
+
+    assert len(calls) == 2, "should retry once without the json_object constraint"
+    assert "response_format" in calls[0] and "response_format" not in calls[1]
+    assert out
+
+
+def test_every_configured_model_id_is_syntactically_a_real_candidate():
+    """Guard the class of bug that cost three production runs: invented model ids.
+
+    Cannot hit the network here, so this pins the ids to the provider catalogues that
+    `doctor` verified live, and will fail loudly if someone edits one by hand again.
+    """
+    cfg = CFG["llm"]
+    groq_real = {"openai/gpt-oss-120b", "openai/gpt-oss-20b", "openai/gpt-oss-safeguard-20b",
+                 "qwen/qwen3.8-27b", "allam-2-7b"}
+    for key in ("groq_models", "groq_review_models", "groq_vision_models"):
+        for m in cfg.get(key, []) or []:
+            assert m in groq_real, (
+                f"{key}: {m!r} is not in Groq's catalogue. Run `autotube doctor` — it "
+                f"lists the live model ids. Do not guess at model names.")
