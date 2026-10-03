@@ -134,3 +134,61 @@ def test_hook_card_ends_before_the_first_number_counter(tmp_path):
     assert hook_end, "no hook card rendered"
     if counts:
         assert hook_end[0] <= min(counts), f"hook card still up at {hook_end[0]}s when counter fires at {min(counts)}s"
+
+
+# ── pattern interrupt (AUDIT follow-up: +23% retention vs a static opening) ──
+def _build(kinetic, hook="SEALED FOR 15 MILLION YEARS", tmp=None):
+    import tempfile, pathlib
+    from autotube import render
+    segs, t = [], 0.0
+    for tx in ["This lake has not frozen in fifteen million years.",
+               "Which meant the water never stopped moving."]:
+        ws = []
+        for w in tx.split():
+            ws.append({"word": w, "start": round(t, 2), "end": round(t + 0.28, 2)})
+            t += 0.28
+        segs.append({"text": tx, "start": ws[0]["start"], "end": round(t, 2), "words": ws})
+    out = render.build_ass(segs, hook, "AutoTube", 1080, 1920, render.THEMES[0], "Anton",
+                           pathlib.Path(tmp or tempfile.mkdtemp()) / "c.ass", t,
+                           fx={"kinetic": kinetic}, arch=render.ARCHETYPES[0])
+    return out.read_text().split("[Events]")[1]
+
+
+def _secs(ts):
+    h, m, s = ts.split(":")
+    return int(h) * 3600 + int(m) * 60 + float(s)
+
+
+def test_pattern_interrupt_fires_inside_the_first_five_seconds(tmp_path):
+    body = _build(True, tmp=tmp_path)
+    fx = [l for l in body.splitlines() if ",Fx," in l]
+    assert len(fx) == 1, "expected exactly one opening interrupt"
+    start = _secs(fx[0].split(",")[1])
+    assert 0 < start <= 5.0, f"interrupt at {start}s is outside the window that matters"
+
+
+def test_pattern_interrupt_lands_on_the_hook_card_handoff(tmp_path):
+    """The most static moment of the opening: card fading, first shot not yet moving."""
+    body = _build(True, tmp=tmp_path)
+    hook_end = [_secs(l.split(",")[2]) for l in body.splitlines() if ",Hook," in l][0]
+    fx_start = [_secs(l.split(",")[1]) for l in body.splitlines() if ",Fx," in l][0]
+    assert abs(fx_start - hook_end) < 0.01
+
+
+def test_pattern_interrupt_is_brief(tmp_path):
+    body = _build(True, tmp=tmp_path)
+    l = [x for x in body.splitlines() if ",Fx," in x][0]
+    dur = _secs(l.split(",")[2]) - _secs(l.split(",")[1])
+    assert 0.1 <= dur <= 0.4, f"{dur}s flash is a reveal, not a beat"
+
+
+def test_no_interrupt_when_kinetic_effects_are_off(tmp_path):
+    assert not [l for l in _build(False, tmp=tmp_path).splitlines() if ",Fx," in l]
+
+
+def test_interrupt_is_fainter_than_the_reveal_flash(tmp_path):
+    """The reveal is the payoff; the opening beat must not upstage it."""
+    body = _build(True, tmp=tmp_path)
+    l = [x for x in body.splitlines() if ",Fx," in x][0]
+    alpha = int(l.split("alpha&H")[1][:2], 16)
+    assert alpha > 0x78, "opening interrupt is at least as strong as the reveal flash"

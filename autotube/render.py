@@ -394,6 +394,14 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         lines.append(f"Dialogue: 2,{_ts(0)},{_ts(hook_end)},Hook,,0,0,0,,"
                      f"{{\\fad(0,250)\\t(0,180,\\fscx112\\fscy112)\\t(180,320,\\fscx100\\fscy100)}}"
                      f"{_esc(fit_hook(hook_text.upper()))}")
+        # Pattern interrupt on the hook-card handoff. A visual disruption inside the first five
+        # seconds is worth roughly 23% retention against a static opening, and this is the moment
+        # the opening is most static: the card is fading and the first shot has not moved yet. It
+        # reuses the reveal flash primitive, shorter and fainter - this is a beat, not the payoff.
+        if fx.get("kinetic", False) and hook_end + 0.3 < total:
+            lines.append(f"Dialogue: 4,{_ts(hook_end)},{_ts(hook_end + 0.22)},Fx,,0,0,0,,"
+                         f"{{\\an7\\pos(0,0)\\alpha&HA0&\\fad(0,180)\\p1}}"
+                         f"m 0 0 l {W} 0 l {W} {H} l 0 {H}{{\\p0}}")
     lines.append(f"Dialogue: 1,{_ts(0)},{_ts(total)},Brand,,0,0,0,,{{\\alpha&H40&}}{_esc(channel)}")
     lines += extra
     asides = fx.get("asides") or []
