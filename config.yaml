@@ -366,7 +366,7 @@ llm:
   # returns empty content for a JSON instruction - it is too weak to follow the format
   # the vision gate needs. llama-3.2-vision 403s on a token that serves Cloudflare text
   # fine, so it is per-model access needing a licence accepted in the dashboard.
-  cloudflare_vision_models: ["@cf/meta/llama-4-scout-17b-16e-instruct", "@cf/llava-hf/llava-1.5-7b-hf", "@cf/meta/llama-3.2-11b-vision-instruct"]
+  cloudflare_vision_models: ["@cf/meta/llama-4-scout-17b-16e-instruct", "@cf/meta/llama-3.2-11b-vision-instruct"]
   pollinations_models: [openai-fast, openai]
   # Fact-checking/review runs on a DIFFERENT model from the one that wrote the draft (a writer grading
   # its own homework agrees with itself). Deliberately the reverse order of `providers`, so when both
