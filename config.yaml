@@ -203,9 +203,32 @@ trends:
     history_mystery:
       queries: ["unsolved mystery", "history facts", "disappeared without a trace", "declassified", "did you know history"]
       categories: [history, mysteries, culture]
+      # The profile is what stops the two lanes sounding like one channel. A single
+      # house voice across every upload is measurable template similarity, which is the
+      # "generic or repetitive content" rejection category - so this is a compliance
+      # setting as much as an editorial one.
+      profile:
+        tone: >-
+          cool, documentary, a little conspiratorial. You are reading from a file nobody
+          was meant to see. Understate the strangest detail rather than selling it.
+        hook_style: >-
+          open on the unresolved fact itself - the detail that should not be true. Never
+          open with a question or with scene-setting.
+        pacing: >-
+          slower, with one deliberate pause before the payoff. Let the final line land
+          without a wrap-up.
     science_nature:
       queries: ["science facts", "space facts", "animal facts", "ocean facts", "deep sea discovery"]
       categories: [science, space, nature, animals, geography]
+      profile:
+        tone: >-
+          bright, fast, delighted. You have just found this out and cannot wait to say
+          it. Awe rather than mystery.
+        hook_style: >-
+          open on the most absurd number or comparison, stated flatly. Scale is the hook.
+        pacing: >-
+          brisk, front-loaded, each line topping the last. End on the biggest fact, not
+          a reflection.
   # Each search.list costs 100 quota units, so 14 queries is ~1,400 of the 10,000/day ceiling.
   max_queries_per_run: 14
   youtube_outlier_queries: []            # legacy flat list; the lanes above supersede it

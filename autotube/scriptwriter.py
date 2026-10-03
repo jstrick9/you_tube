@@ -7,6 +7,7 @@ import random
 import re
 
 from . import gates, originality, safety, series
+from . import lanes
 from .common import now_utc, read_json
 from .llm import LLM, LLMError
 from .research import ground, unsupported_numbers
@@ -330,6 +331,7 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
         # A living person reached this point only because safety.check_person approved one specific
         # professional angle. The writer has to be told what that angle is, or the model will drift
         # back to whatever made the person trend — which is usually the thing we just refused.
+        lane_rule = lanes.writer_rule(topic, self.cfg)
         person_rule = ""
         if source.get("person"):
             person_rule = (
@@ -372,7 +374,7 @@ Write the script as 4-5 segments. Each beat has a DIFFERENT job — do not write
 Leave ONE question deliberately open from the hook until the payoff — the viewer should be unable to stop
 watching without learning the answer. Never answer it in segment 2.
 The TOPIC line is just a trend headline — do NOT repeat its claims or numbers unless the SOURCE TEXT states them.
-{person_rule}{series_rule}ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with
+{person_rule}{series_rule}{lane_rule}ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with
 comic timing and personality (reactions, contrast, "and it gets worse"). The facts stay 100% exact; the humour comes
 from HOW you tell them and from the asides, never from changing what happened.
 TOTAL narration (text + asides) MUST be {words_lo}-{words_hi} words — that is about {per_seg} words per segment,

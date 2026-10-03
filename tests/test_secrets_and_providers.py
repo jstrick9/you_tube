@@ -326,3 +326,47 @@ def test_new_free_providers_are_wired_end_to_end():
     for p in ("cerebras", "mistral", "cloudflare"):
         assert f'"{p}"' in src.split("def available_models")[1].split("def audit_models")[0], \
             f"available_models() cannot verify {p} ids"
+
+
+# ── per-lane editorial profiles ─────────────────────────────────────────────
+def test_the_two_lanes_do_not_sound_like_one_channel():
+    """A single house voice across every upload is measurable template similarity.
+
+    That is the "generic or repetitive content" rejection category, and bulk
+    demonetisation starts at five videos sharing a template with under 20% script
+    variation. So the lanes differing is a compliance property, not a style preference.
+    """
+    from autotube import lanes
+
+    hist = lanes.writer_rule({"category": "history"}, CFG)
+    sci = lanes.writer_rule({"category": "space"}, CFG)
+    assert hist and sci, "both lanes should carry a profile"
+    assert hist != sci, "the two lanes must not produce the same writer guidance"
+    for rule in (hist, sci):
+        assert "VOICE:" in rule and "HOOK SHAPE:" in rule and "PACING:" in rule
+
+
+def test_lane_resolves_from_category_when_not_stated():
+    """Only outlier topics carry `lane`; Wikipedia spikes and anniversaries do not."""
+    from autotube import lanes
+
+    assert lanes.lane_for({"lane": "history_mystery"}, CFG) == "history_mystery"
+    assert lanes.lane_for({"category": "history"}, CFG) == "history_mystery"
+    assert lanes.lane_for({"category": "Space"}, CFG) == "science_nature", "case-insensitive"
+    assert lanes.lane_for({"category": "nonsense"}, CFG) is None
+
+
+def test_an_unknown_lane_leaves_the_prompt_exactly_as_it_was():
+    """Adding this module must not quietly change output for unmapped topics."""
+    from autotube import lanes
+
+    assert lanes.writer_rule({"category": "nonsense"}, CFG) == ""
+    assert lanes.writer_rule({}, CFG) == ""
+    assert lanes.profile_for({}, CFG) == lanes.DEFAULT_PROFILE
+
+
+def test_the_writer_actually_uses_the_lane_rule():
+    """A profile nothing reads is just config."""
+    src = (ROOT / "autotube" / "scriptwriter.py").read_text()
+    assert "lanes.writer_rule(topic, self.cfg)" in src
+    assert "{lane_rule}" in src, "the rule must be interpolated into the prompt"
