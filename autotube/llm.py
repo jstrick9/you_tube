@@ -288,7 +288,15 @@ class LLM:
                         if msg.startswith("no ") and "_API_KEY" in msg:
                             self._dead.add(tag)
                             break
+
                         if "HTTP 404" in msg or "HTTP 400" in msg or "HTTP 401" in msg or "HTTP 403" in msg:
+                            # Retiring a model for the rest of the run is right - a 400 will
+                            # not fix itself - but it was silent, and a model skipped via
+                            # `continue` appends no error. A provider could therefore die on
+                            # its first call inside a request that then succeeded elsewhere,
+                            # and every later call would skip it with no trace at all. That is
+                            # how the reviewer was lost without a single Groq line in the log.
+                            log.warning("retiring %s for this run: %s", tag, msg[:200])
                             self._dead.add(tag)
                             break
                         # Only back off if we are going to try this model again. Sleeping on the
@@ -307,4 +315,16 @@ class LLM:
                             feedback = str(e)
                         if not last_try:
                             time.sleep(1)
+        # An empty `errors` list is not "nothing went wrong" - it means every candidate
+        # was skipped before being called, because it was already retired or was the
+        # model being avoided. Reporting that distinctly is the difference between a
+        # diagnosable failure and a dead end.
+        if not errors:
+            tried = [f"{p}:{m}" for p in (order or self.order)
+                     for m in (models_of(p) if models_of else self.cfg.get(PROVIDERS[p][1], []))]
+            skipped = [t for t in tried if t in self._dead]
+            raise LLMError(
+                "All LLM providers failed: no model was even attempted. "
+                f"candidates={tried or '[none configured]'} "
+                f"already-retired={skipped or '[]'} avoiding={avoid or '-'}")
         raise LLMError("All LLM providers failed:\n  " + "\n  ".join(errors[-12:]))
