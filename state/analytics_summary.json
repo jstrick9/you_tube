@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-03T12:27:28.105587+00:00",
+  "updated": "2026-10-03T13:53:21.595448+00:00",
   "videos_total": 29,
   "videos_7d": 22,
-  "views_7d": 9869,
+  "views_7d": 9912,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -299,9 +299,15 @@
   },
   "top_videos": [
     {
+      "title": "Why Beavers Bully Trees #shorts",
+      "id": "Rvls-5FVgdg",
+      "views": 1298,
+      "avg_view_pct": null
+    },
+    {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
-      "views": 1286,
+      "views": 1287,
       "avg_view_pct": null
     },
     {
@@ -309,12 +315,6 @@
       "id": "jnlRW0Ca1o8",
       "views": 1280,
       "avg_view_pct": 51.97999999999999
-    },
-    {
-      "title": "Why Beavers Bully Trees #shorts",
-      "id": "Rvls-5FVgdg",
-      "views": 1273,
-      "avg_view_pct": null
     },
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
@@ -396,7 +396,7 @@
   },
   "subscribers": {
     "net_90d": 7,
-    "views_90d": 17021,
+    "views_90d": 17064,
     "per_1k_views": 0.41,
     "videos": 23,
     "days_to_500": 6428.6,
