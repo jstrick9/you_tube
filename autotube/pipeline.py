@@ -48,18 +48,53 @@ def taken_slots(hist: list[dict]) -> set[str]:
     return out
 
 
+def slot_jitter(day, idx: int, spread: int) -> int:
+    """Deterministic ±spread minute offset for one slot on one day.
+
+    Publishing at 12:00:00, 17:30:00 and 20:30:00 to the second, every single day, is a machine
+    fingerprint and one of the cadence signals a channel review looks at. The offset has to be
+    deterministic rather than random, because top-up runs recompute slots several times a day and
+    must agree with the booking the earlier run already made.
+    """
+    if spread <= 0:
+        return 0
+    h = hashlib.md5(f"{day.isoformat()}:{idx}".encode()).hexdigest()
+    return int(h[:8], 16) % (2 * spread + 1) - spread
+
+
+def daily_target(cfg: dict) -> int:
+    """How many videos today. Accepts a fixed int or a [lo, hi] range in videos_per_day.
+
+    A fixed count forever is the same fingerprint problem as a fixed clock time. Varying it is
+    free, but it must be stable for the whole day or the 2-hourly top-up runs would disagree with
+    each other about whether the day is finished, so it is derived from the date.
+    """
+    v = cfg["schedule"]["videos_per_day"]
+    if isinstance(v, (list, tuple)):
+        lo, hi = int(v[0]), int(v[-1])
+        if hi <= lo:
+            return max(0, lo)
+        tz = ZoneInfo(cfg["channel"].get("timezone", "UTC"))
+        day = now_utc().astimezone(tz).date()
+        h = hashlib.md5(f"count:{day.isoformat()}".encode()).hexdigest()
+        return lo + int(h[:8], 16) % (hi - lo + 1)
+    return max(0, int(v))
+
+
 def publish_slots(cfg: dict, n: int, taken: set[str] | None = None) -> list[datetime | None]:
-    """Next n free publish slots (local schedule times), skipping past slots and ones already booked."""
+    """Next n free publish slots (local schedule times, jittered), skipping past and booked ones."""
     tz = ZoneInfo(cfg["channel"].get("timezone", "UTC"))
     now_local = now_utc().astimezone(tz)
     taken = taken or set()
     slots = []
     times = cfg["schedule"]["publish_times"]
+    spread = int(cfg["schedule"].get("jitter_minutes", 0))
     day = now_local.date()
     for _ in range(60):                                  # hard stop: never loop forever
-        for t in times:
+        for idx, t in enumerate(times):
             hh, mm = map(int, t.split(":"))
-            dt = datetime(day.year, day.month, day.day, hh, mm, tzinfo=tz)
+            dt = (datetime(day.year, day.month, day.day, hh, mm, tzinfo=tz)
+                  + timedelta(minutes=slot_jitter(day, idx, spread)))
             if dt > now_local + timedelta(minutes=20) and _slot_key(dt) not in taken:   # publishAt must be future
                 slots.append(dt.astimezone(ZoneInfo("UTC")))
             if len(slots) >= n:
@@ -76,7 +111,7 @@ def remaining_today(cfg: dict, upload: bool = True) -> int:
     done = sum(1 for h in read_json("history.json", [])
                if h.get("status") in ok and h.get("created_at")
                and datetime.fromisoformat(h["created_at"]).astimezone(tz).date() == today)
-    return max(0, int(cfg["schedule"]["videos_per_day"]) - done)
+    return max(0, daily_target(cfg) - done)
 
 
 def weakest_segment(segments: list[dict]) -> int | None:
@@ -307,7 +342,7 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     }
     record = {"meta": meta, "script": script, "review": review, "source": {k: source[k] for k in ("title", "url")},
               "plan": plan, "tts_engine": tts["engine"], "duration": r["duration"],
-              "words": sum(len(spoken_text(x).split()) for x in script["segments"]),
+              "archetype": r.get("archetype"), "words": sum(len(spoken_text(x).split()) for x in script["segments"]),
               "qa": {k: report.get(k) for k in ("passed", "attempt", "issues", "frames", "meta")},
               "shots": [{"seg": v["seg"], "kind": v.get("kind", "image"), "window": v.get("window"),
                          "score": v.get("score"), "judge": v.get("judge"), "shows": v.get("shows"),
@@ -324,13 +359,13 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
     out.with_suffix(".json").write_text(json.dumps(record, indent=2, default=str))
     log.info("  ✓ rendered %s (%.1fs, review=%s)", out.name, r["duration"], review.get("score"))
     return {"file": out, "thumb": thumb, "meta": meta, "script": script, "source": source, "review": review,
-            "topic": topic, "plan": plan, "duration": r["duration"], "tts_engine": tts["engine"],
+            "topic": topic, "plan": plan, "duration": r["duration"], "archetype": r.get("archetype"), "tts_engine": tts["engine"],
             "words": sum(len(spoken_text(x).split()) for x in script["segments"]), "qa": report}
 
 
 def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_work: bool = False) -> list[dict]:
     run_id = now_utc().strftime("%Y%m%d-%H%M")
-    n = count or cfg["schedule"]["videos_per_day"]
+    n = count or daily_target(cfg)
     do_upload = cfg["upload"]["enabled"] if upload is None else upload
     llm = LLM(cfg)
     strat = Strategy(cfg)
@@ -406,7 +441,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             "review_score": res["review"].get("score"),
             "reviewer": res["review"].get("reviewer"),
             "review_independent": res["review"].get("independent"),
-            "duration": res["duration"], "words": res.get("words"),
+            "duration": res["duration"], "words": res.get("words"), "archetype": res.get("archetype"),
             "tts_engine": res["tts_engine"], "file": res["file"].name, "publish_at": slot.isoformat() if slot else None,
             "llm": llm.last_used,
         }

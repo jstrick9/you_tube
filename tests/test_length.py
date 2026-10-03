@@ -150,3 +150,44 @@ def test_band_is_within_shorts_limits():
     from autotube.common import load_config
     lo_s, hi_s = load_config()["video"]["target_seconds"]
     assert 15 <= lo_s < hi_s <= 50, "a Short must stay well under the 60s classification cliff"
+
+
+# ── cadence (AUDIT 4: fixed times and a fixed count are a machine fingerprint) ─
+def test_slot_jitter_is_stable_for_a_given_day_and_slot():
+    """Top-up runs recompute slots several times a day and must agree with the earlier booking."""
+    import datetime as dt
+    from autotube.pipeline import slot_jitter
+    day = dt.date(2026, 10, 2)
+    assert slot_jitter(day, 0, 40) == slot_jitter(day, 0, 40)
+    assert slot_jitter(day, 0, 0) == 0
+
+
+def test_slot_jitter_stays_within_the_configured_spread_and_actually_moves():
+    import datetime as dt
+    from autotube.pipeline import slot_jitter
+    vals = {slot_jitter(dt.date(2026, 1, 1) + dt.timedelta(days=d), i, 40)
+            for d in range(200) for i in range(3)}
+    assert all(-40 <= v <= 40 for v in vals)
+    assert len(vals) > 20, "jitter is barely moving — the fingerprint remains"
+
+
+def test_daily_target_varies_but_is_stable_within_a_day(monkeypatch):
+    import datetime as dt
+    import autotube.pipeline as pl
+
+    cfg = {"schedule": {"videos_per_day": [1, 3]}, "channel": {"timezone": "UTC"}}
+    seen = set()
+    for d in range(120):
+        monkeypatch.setattr(pl, "now_utc",
+                            lambda x=d: dt.datetime(2026, 1, 1, 12, tzinfo=dt.timezone.utc) + dt.timedelta(days=x))
+        a, b = pl.daily_target(cfg), pl.daily_target(cfg)
+        assert a == b, "two runs on the same day disagreed about the day's target"
+        assert 1 <= a <= 3
+        seen.add(a)
+    assert seen == {1, 2, 3}, f"the count is not varying across the range: {seen}"
+
+
+def test_daily_target_still_accepts_a_plain_integer():
+    from autotube.pipeline import daily_target
+    cfg = {"schedule": {"videos_per_day": 2}, "channel": {"timezone": "UTC"}}
+    assert daily_target(cfg) == 2

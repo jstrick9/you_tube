@@ -24,6 +24,22 @@ SS = 1.5           # supersampling factor for smooth zoompan
 CAPTION_Y = 0.62   # caption baseline as a fraction of H (keeps clear of the Shorts UI chrome)
 HOOK_CARD_SECONDS = 1.6   # hook title card: long enough to read, short enough not to fight the captions
 
+# Visual archetypes. YouTube's Generic or Repetitive Content policy is assessed channel-level and
+# explicitly targets "near-identical videos with minimal variation", so varying only the caption
+# colour is not enough — every video had the same typeface, the same caption height, the same hook
+# card timing and the same end card. These are the three bundled fonts (family names verified
+# against the TTFs; a wrong name makes libass fall back silently to DejaVu and the variation
+# disappears with no error anywhere — "Montserrat" does exactly that, it must be "Montserrat Black".
+# tests/test_archetypes.py asserts every one of these resolves to a bundled file.)
+ARCHETYPES = [
+    {"name": "bold",      "font": "Anton",      "caption_y": 0.62, "cap_scale": 1.00,
+     "hook_seconds": 1.6, "stamp": True},
+    {"name": "condensed", "font": "Bebas Neue", "caption_y": 0.55, "cap_scale": 1.12,
+     "hook_seconds": 1.2, "stamp": False},
+    {"name": "heavy",     "font": "Montserrat Black", "caption_y": 0.66, "cap_scale": 0.88,
+     "hook_seconds": 2.0, "stamp": True},
+]
+
 # caption colour themes (ASS colours are &HAABBGGRR) — rotated per video for variety
 THEMES = [
     {"hi": "&H0000F0FF", "box": "&H0000D7FF", "boxtxt": "&H00101010"},   # yellow
@@ -240,10 +256,11 @@ def fx_lines(segments: list[dict], fx: dict, theme: dict, emph_col: str, W: int,
 
 
 def build_ass(segments: list[dict], hook_text: str, channel: str, W: int, H: int, theme: dict,
-              font_name: str, out: Path, total: float, fx: dict | None = None,
+              font_name: str, out: Path, total: float, fx: dict | None = None, arch: dict | None = None,
               emph_col: str = "&H003C8CFF") -> Path:
     fx = fx or {}
-    fs = 112
+    arch = arch or ARCHETYPES[0]
+    fs = int(112 * float(arch.get("cap_scale", 1.0)))
     head = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: {W}
@@ -268,10 +285,10 @@ Style: Source,{font_name},46,&H00FFFFFF,&H00FFFFFF,&H00000000,&HB4000000,0,0,0,0
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     lines = []
-    cy = int(H * CAPTION_Y)   # Shorts UI overlays the bottom ~18% and the right ~15%
+    cy = int(H * float(arch.get("caption_y", CAPTION_Y)))   # Shorts UI overlays the bottom ~18% and right ~15%
     # hook title card (first ~2.8 s) with pop-in
     if hook_text:
-        lines.append(f"Dialogue: 2,{_ts(0)},{_ts(min(HOOK_CARD_SECONDS, total))},Hook,,0,0,0,,"
+        lines.append(f"Dialogue: 2,{_ts(0)},{_ts(min(float(arch.get('hook_seconds', HOOK_CARD_SECONDS)), total))},Hook,,0,0,0,,"
                      f"{{\\fad(0,250)\\t(0,180,\\fscx112\\fscy112)\\t(180,320,\\fscx100\\fscy100)}}{_esc(hook_text.upper())}")
     lines.append(f"Dialogue: 1,{_ts(0)},{_ts(total)},Brand,,0,0,0,,{{\\alpha&H40&}}{_esc(channel)}")
 
@@ -472,6 +489,7 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
     W, H, fps = cfg["video"]["width"], cfg["video"]["height"], cfg["video"]["fps"]
     theme_idx = rng.randrange(len(THEMES))
     theme = THEMES[theme_idx]
+    arch = ARCHETYPES[rng.randrange(len(ARCHETYPES))]
     segs = tts["segments"]
     total = tts["duration"] + TAIL
 
@@ -512,8 +530,12 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
         frames.append(compose_frame(still, work / f"frame{i:02d}.jpg", W, H))
 
     emph_col = THEMES[EMPH_FOR[theme_idx]]["hi"]      # keyword colour clearly different from the karaoke highlight
-    ass = build_ass(segs, hook_text, channel, W, H, theme, "Anton", work / "captions.ass", total, fx=fx,
-                    emph_col=emph_col)
+    # an archetype that drops the end stamp must also drop its sound effect, or the audio keeps
+    # punctuating a stamp that is no longer on screen
+    if fx and not arch.get("stamp", True):
+        fx = {**fx, "stamp": None}
+    ass = build_ass(segs, hook_text, channel, W, H, theme, arch["font"], work / "captions.ass", total,
+                    fx=fx, arch=arch, emph_col=emph_col)
     sfx_wav = None
     if fx and fx.get("sfx"):
         _, num_times, reveal_at, stamp_at = fx_lines(segs, fx, theme, emph_col, W, H, total)
@@ -582,4 +604,5 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
     for v, d in zip(shots, durs):
         timeline.append({"seg": v["seg"], "path": str(v["path"]), "start": round(t, 3), "end": round(t + d, 3)})
         t += d
-    return {"duration": total, "theme": theme_idx, "first_frame": frames[0], "timeline": timeline}
+    return {"duration": total, "theme": theme_idx, "archetype": arch["name"],
+            "first_frame": frames[0], "timeline": timeline}

@@ -55,9 +55,14 @@ persona:
   voice: en-US-AndrewNeural        # null = learned by the bandit (not recommended below ~500 videos)
 
 schedule:
-  videos_per_day: 3                      # keep modest: quality > quantity (see README → Compliance)
+  # A range, not a fixed number: a channel that publishes exactly N videos at exactly the same
+  # clock times every day is showing a machine fingerprint, and cadence is one of the signals a
+  # channel-level review weighs. Resolved once per day from the date so top-up runs agree.
+  # Lowered from 3 — two good videos beat three adequate ones on reach, retention and policy risk.
+  videos_per_day: [1, 3]                      # keep modest: quality > quantity (see README → Compliance)
+  jitter_minutes: 40                     # deterministic +/- offset applied to each slot
   publish_times: ["12:00", "17:30", "20:30"]   # local time slots (channel.timezone)
-  notify_subscribers: true
+  notify_subscribers: false              # 2-3 notifications a day drives unsubs and 'don't recommend'
   max_run_minutes: 120                   # stop producing after this (GitHub job timeout is 150)
 
 video:
