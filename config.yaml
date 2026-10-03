@@ -167,8 +167,14 @@ content:
   min_trend_score: 0.35
   # ── virality ──
   min_viral_score: 7                     # LLM viral-potential score (0-10) a topic needs, judged with its trend evidence
-  min_hook_score: 8                      # reviewer's hook_strength (0-10) a script needs; weaker hooks are rewritten
-  min_entertainment: 7                   # reviewer's (harsh) entertainment score; flat fact-lists are rewritten
+  min_hook_score: 7                      # reviewer's hook_strength (0-10) a script needs; weaker hooks are rewritten
+                                         # Was 8, set when the "reviewer" was the writer grading itself. An
+                                         # independent reviewer scores a full point lower: measured 7/10 x12,
+                                         # 6/10 x7, 5/10 x1 over one run, so 8 rejected every script ever written.
+  min_entertainment: 6                   # reviewer's (harsh) entertainment score; flat fact-lists are rewritten
+                                         # Was 7. Same recalibration: independent scores ran 5/10 x24, 6/10 x19,
+                                         # 4/10 x9, 3/10 x2. 6 keeps a real floor (3-5/10 still rejected) and
+                                         # restores roughly the pass rate the gates were tuned for.
   hook_words_min: 6                      # deterministic gate (autotube/gates.py) — not left to the LLM
   hook_words_max: 12
   allow_evergreen: false                 # never fall back to un-trending evergreen topics
@@ -302,7 +308,7 @@ research:
 llm:
   # Providers are tried in order; any provider without a key is skipped.
   # All have free tiers. Pollinations needs no key at all (last-resort fallback).
-  providers: [gemini, groq, openrouter, pollinations]
+  providers: [gemini, groq, pollinations]
   gemini_models: [gemini-flash-lite-latest, gemini-flash-latest, gemini-2.5-flash-lite, gemini-2.5-flash]
   # Live run 2026-10-03 (workflow_dispatch 37109430187) showed ALL THREE previous Groq
   # models failing: both gpt-oss models are reasoning models and reject Groq's
@@ -317,12 +323,12 @@ llm:
   # its own homework agrees with itself). Deliberately the reverse order of `providers`, so when both
   # Gemini and Groq are keyed the writer and the reviewer are different families. If none is reachable
   # the review falls back to the normal order and the run is flagged as non-independent.
-  review_providers: [groq, openrouter, gemini]
+  review_providers: [groq, gemini]
   groq_review_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b, openai/gpt-oss-20b]
   openrouter_review_models: ["meta-llama/llama-3.3-70b-instruct:free", "deepseek/deepseek-chat-v3-0324:free"]
   gemini_review_models: [gemini-flash-latest, gemini-flash-lite-latest]
   # image-checking models (keyless Pollinations can't see images, so it's never used for this)
-  vision_providers: [gemini, groq, openrouter]
+  vision_providers: [gemini]
   gemini_vision_models: [gemini-flash-lite-latest, gemini-flash-latest]   # gemini-2.5-* now return 404
   groq_vision_models: []
   openrouter_vision_models: ["google/gemma-3-27b-it:free"]
