@@ -152,6 +152,7 @@ def main(argv=None) -> int:
             notify(cfg, "AutoTube analytics failed", str(e)[:500], ok=False)
             return 1
 
+    from . import llm as llm_mod
     from . import pipeline
     if a.top_up and not a.count:
         left = pipeline.remaining_today(cfg, upload=not a.dry_run and cfg["upload"]["enabled"])
@@ -172,7 +173,22 @@ def main(argv=None) -> int:
            ok=len(res) > 0)
     print("\n".join(lines))
     failed_uploads = [r for r in res if str(r["entry"].get("status", "")).startswith("upload_failed")]
-    return 0 if res and not failed_uploads else 1
+    if res and not failed_uploads:
+        return 0
+    # A run that produced nothing because every provider was rate limited is not a
+    # broken build - it is a free tier doing what free tiers do, and it clears by
+    # itself. Reporting it as a failure put five red runs on one day next to the real
+    # ones, which is how a red X stops being read at all. The alert still fires with
+    # ok=False so the channel not publishing is never silent; only the exit code
+    # changes, so CI red keeps meaning "the code is wrong".
+    if not res:
+        limited = llm_mod.rate_limited()
+        if limited:
+            log.warning("no videos produced: every provider was rate limited (%s). "
+                        "Not failing the run — free-tier quota resets on its own; the "
+                        "next scheduled run retries.", ", ".join(sorted(limited)))
+            return 0
+    return 1
 
 
 if __name__ == "__main__":

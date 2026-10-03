@@ -181,3 +181,29 @@ def test_length_instruction_rejects_both_ends_not_just_short():
     assert "Too short = rejected." not in src, "one-sided length instruction is back"
     assert "words per segment" in src, "per-segment budget is easier to hit than a total"
     assert "too short AND too long" in src.lower() or "Both ends are rejected" in src
+
+
+def test_rate_limited_runs_are_not_reported_as_broken_builds():
+    """Free-tier exhaustion is an operating condition, not a defect.
+
+    Both ended as "produced nothing, exit 1", so five rate-limited runs in one day sat
+    next to real failures and trained the red X to mean nothing. The alert must still
+    fire; only the exit code changes.
+    """
+    import autotube.llm as L
+
+    src = (ROOT / "autotube" / "__main__.py").read_text()
+    assert "rate_limited()" in src, "the run must distinguish rate limiting from failure"
+    assert "notify(" in src, "a rate-limited run must still alert; it just must not go red"
+
+    before = L.rate_limited()
+    L.note_rate_limited("groq:openai/gpt-oss-20b")
+    assert "groq:openai/gpt-oss-20b" in L.rate_limited()
+    assert L.rate_limited() >= before
+
+
+def test_provider_errors_keep_enough_body_to_act_on():
+    """200 chars cut 429s off before they said per-minute or per-day."""
+    src = (ROOT / "autotube" / "llm.py").read_text()
+    assert "r.text[:200]" not in src, "429 bodies truncated before the useful part"
+    assert src.count("retry after") >= 2, "both error paths should surface retry-after"

@@ -123,7 +123,14 @@ def _gemini(model: str, system: str, user: str, temperature: float, images: list
     }
     r = http().post(url, params={"key": key}, json=body, timeout=90)
     if r.status_code != 200:
-        raise LLMError(f"gemini {model} HTTP {r.status_code}: {r.text[:200]}")
+        # Same treatment as the OpenAI-compatible path: keep enough of the body to see
+        # whether a 429 is a per-minute wait or a spent daily quota, and record it so the
+        # run can tell "rate limited" apart from "broken".
+        if r.status_code == 429:
+            note_rate_limited(model)
+        hint = r.headers.get("retry-after")
+        raise LLMError(f"gemini {model} HTTP {r.status_code}"
+                       + (f" (retry after {hint})" if hint else "") + f": {r.text[:600]}")
     data = r.json()
     try:
         return "".join(p.get("text", "") for p in data["candidates"][0]["content"]["parts"])
@@ -166,6 +173,8 @@ def _openai_compatible(base: str, key: str | None, model: str, system: str, user
         # matters: a 429 body says whether the limit is per-minute or per-day and when it
         # resets, and that is the difference between "wait 30 seconds" and "the quota is
         # gone until tomorrow, stop retrying". Keep the retry hint too.
+        if r.status_code == 429:
+            note_rate_limited(f"{model}")
         detail = r.text[:600]
         hint = r.headers.get("retry-after") or r.headers.get("x-ratelimit-reset-requests")
         raise LLMError(f"{base} {model} HTTP {r.status_code}"
@@ -344,6 +353,22 @@ class LLM:
                 f"candidates={tried or '[none configured]'} "
                 f"already-retired={skipped or '[]'} avoiding={avoid or '-'}")
         raise LLMError("All LLM providers failed:\n  " + "\n  ".join(errors[-12:]))
+
+
+# ── rate-limit tracking ──────────────────────────────────────────────────────
+# Free-tier exhaustion is an expected operating condition for this channel, not a
+# defect, but it was indistinguishable from a crash: both ended as a red run that
+# produced nothing. Five such runs in one day is how a red X stops meaning anything.
+_RATE_LIMITED: set[str] = set()
+
+
+def note_rate_limited(tag: str) -> None:
+    _RATE_LIMITED.add(tag)
+
+
+def rate_limited() -> set[str]:
+    """provider:model tags that returned 429 since the process started."""
+    return set(_RATE_LIMITED)
 
 
 # ── model catalogue ──────────────────────────────────────────────────────────
