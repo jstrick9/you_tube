@@ -304,7 +304,13 @@ llm:
   # All have free tiers. Pollinations needs no key at all (last-resort fallback).
   providers: [gemini, groq, openrouter, pollinations]
   gemini_models: [gemini-flash-lite-latest, gemini-flash-latest, gemini-2.5-flash-lite, gemini-2.5-flash]
-  groq_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b, openai/gpt-oss-20b]   # verified on Groq Sep 2026
+  # Live run 2026-10-03 (workflow_dispatch 37109430187) showed ALL THREE previous Groq
+  # models failing: both gpt-oss models are reasoning models and reject Groq's
+  # json_object mode with HTTP 400 "Failed to validate JSON", and qwen/qwen3.8-27b
+  # returned 429 on every call. Groq therefore contributed nothing and every review
+  # silently fell back to Gemini - the same model that wrote the script, so the run
+  # produced zero independent reviews.
+  groq_models: [llama-3.3-70b-versatile, llama-3.1-8b-instant]
   openrouter_models: ["meta-llama/llama-3.3-70b-instruct:free", "deepseek/deepseek-chat-v3-0324:free"]
   pollinations_models: [openai-fast, openai]
   # Fact-checking/review runs on a DIFFERENT model from the one that wrote the draft (a writer grading
@@ -312,13 +318,13 @@ llm:
   # Gemini and Groq are keyed the writer and the reviewer are different families. If none is reachable
   # the review falls back to the normal order and the run is flagged as non-independent.
   review_providers: [groq, openrouter, gemini]
-  groq_review_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b]
+  groq_review_models: [llama-3.3-70b-versatile, llama-3.1-8b-instant]
   openrouter_review_models: ["meta-llama/llama-3.3-70b-instruct:free", "deepseek/deepseek-chat-v3-0324:free"]
   gemini_review_models: [gemini-flash-latest, gemini-flash-lite-latest]
   # image-checking models (keyless Pollinations can't see images, so it's never used for this)
   vision_providers: [gemini, groq, openrouter]
   gemini_vision_models: [gemini-flash-lite-latest, gemini-flash-latest]   # gemini-2.5-* now return 404
-  groq_vision_models: [qwen/qwen3.8-27b]                                     # verified: reads images correctly
+  groq_vision_models: [meta-llama/llama-4-scout-17b-16e-instruct]            # qwen3.8-27b was not a real model id
   openrouter_vision_models: ["google/gemma-3-27b-it:free"]
   temperature: 0.8
 
