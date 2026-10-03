@@ -117,7 +117,13 @@ def video_stats(ids: list[str]) -> dict[str, dict]:
 
 
 def retention(ids: list[str], start: str, end: str) -> dict[str, dict]:
-    """averageViewPercentage + averageViewDuration via YouTube Analytics API (free)."""
+    """Per-video retention, subscriber conversion and shares via the Analytics API (free).
+
+    subscribersGained rides along on the query we were already making, at no extra quota cost. It
+    matters more than its size suggests: YPP is gated on 1,000 subscribers (500 for fan funding) as
+    well as views, and a channel can accumulate views indefinitely without ever crossing it. Until
+    this was added, nothing in the optimisation loop could see the binding constraint.
+    """
     if not ids:
         return {}
     try:
@@ -125,11 +131,13 @@ def retention(ids: list[str], start: str, end: str) -> dict[str, dict]:
         out = {}
         for i in range(0, len(ids), 200):
             r = ya.reports().query(ids="channel==MINE", startDate=start, endDate=end,
-                                   metrics="views,averageViewPercentage,averageViewDuration",
+                                   metrics="views,averageViewPercentage,averageViewDuration,"
+                                           "subscribersGained,subscribersLost,shares",
                                    dimensions="video", filters="video==" + ",".join(ids[i:i + 200]),
                                    maxResults=200).execute()
             for row in r.get("rows", []):
-                out[row[0]] = {"a_views": row[1], "avg_view_pct": row[2], "avg_view_dur": row[3]}
+                out[row[0]] = {"a_views": row[1], "avg_view_pct": row[2], "avg_view_dur": row[3],
+                               "subs_gained": row[4], "subs_lost": row[5], "shares": row[6]}
         return out
     except Exception as e:  # noqa: BLE001
         log.warning("analytics API unavailable: %s", str(e)[:200])

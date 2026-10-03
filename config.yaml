@@ -339,9 +339,15 @@ analytics:
   # Weighted toward RETENTION, not views. Views/hour is downstream of how much traffic the algorithm
   # chose to send; retention is the upstream signal we control and the one that decides whether a Short
   # escapes its seed audience at all.
-  w_retention: 0.65
-  w_reach: 0.25
+  # Retention is upstream of everything (it decides distribution), so it keeps the largest share.
+  # The remaining weight is split between the two things YPP actually gates on: views (reach) and
+  # SUBSCRIBERS. A channel can accumulate views forever and never cross 1,000 subs, and until
+  # subscribersGained was fetched nothing here could tell those two outcomes apart.
+  w_retention: 0.50
+  w_reach: 0.20
+  w_subs: 0.20
   w_engagement: 0.10
+  target_subs_per_1k: 2.0                 # net new subscribers per 1,000 views scoring a full 1.0
   # Every component above is clamped at 1.0, so without this a 300x video and a 1x video score the
   # same and the bandit cannot see virality at all. This term does not saturate at the target, so an
   # arm that occasionally breaks out beats one that is reliably average. Growth is a power law; the

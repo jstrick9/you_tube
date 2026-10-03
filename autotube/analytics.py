@@ -114,6 +114,14 @@ def compute_reward(m: dict, pools: dict, acfg: dict) -> tuple[float, dict]:
     # ── reach ──
     r_reach = _score(pools["vph"], m.get("vph", 0.0), float(acfg.get("target_vph", 40.0)), min_n, min_spread)
 
+    # ── subscriber conversion: the other YPP gate, and the one views cannot substitute for ──
+    # 1,000 subscribers is required no matter how many views accumulate (500 for fan funding). A
+    # video that is watched and forgotten moves the channel toward one threshold and not the other,
+    # and nothing here could see the difference until subscribersGained was fetched.
+    net_subs = (m.get("subs_gained") or 0) - (m.get("subs_lost") or 0)
+    subs_per_1k = net_subs / max(1, int(m.get("views") or 0)) * 1000.0
+    r_subs = max(0.0, min(1.0, subs_per_1k / float(acfg.get("target_subs_per_1k", 2.0))))
+
     # ── engagement: comments are worth more than likes; both are strong "send it to a friend" proxies ──
     views = max(1, int(m.get("views") or 0))
     eng = ((m.get("likes") or 0) + 3 * (m.get("comments") or 0)) / views
@@ -122,8 +130,9 @@ def compute_reward(m: dict, pools: dict, acfg: dict) -> tuple[float, dict]:
     if r_ret is None:                 # no retention data yet → redistribute its weight onto reach
         w_reach, w_ret = w_reach + w_ret, 0.0
         r_ret = 0.0
-    total = w_ret + w_reach + w_eng or 1.0
-    reward = (w_ret * r_ret + w_reach * r_reach + w_eng * r_eng) / total
+    w_subs = float(acfg.get("w_subs", 0.20))
+    total = w_ret + w_reach + w_eng + w_subs or 1.0
+    reward = (w_ret * r_ret + w_reach * r_reach + w_eng * r_eng + w_subs * r_subs) / total
 
     # ── breakout: the one term that does not saturate ───────────────────────────────────────────
     # Every component above is clamped at 1.0, so a video at 1x the target and a video at 300x the
@@ -145,7 +154,7 @@ def compute_reward(m: dict, pools: dict, acfg: dict) -> tuple[float, dict]:
 
     return round(max(0.0, min(1.0, reward)), 4), {
         "retention": round(r_ret, 3), "reach": round(r_reach, 3), "engagement": round(r_eng, 3),
-        "breakout": round(r_break, 3),
+        "subs": round(r_subs, 3), "subs_per_1k": round(subs_per_1k, 2), "breakout": round(r_break, 3),
         "mode": "absolute" if len(pools["vph"]) < min_n or _spread(pools["vph"]) < min_spread else "blended",
     }
 
@@ -156,6 +165,25 @@ def _median(v: list[float]) -> float | None:
         return None
     n = len(v)
     return v[n // 2] if n % 2 else (v[n // 2 - 1] + v[n // 2]) / 2
+
+
+def _subs_progress(uploaded: list[dict], now) -> dict:
+    """Net subscribers from the last 90 days of uploads, and what that pace implies."""
+    recent = [h for h in uploaded
+              if datetime.fromisoformat(h["created_at"]) > now - timedelta(days=90)
+              and h.get("metrics")]
+    net = sum((h["metrics"].get("subs_gained") or 0) - (h["metrics"].get("subs_lost") or 0)
+              for h in recent)
+    views = sum(h["metrics"].get("views") or 0 for h in recent)
+    per_1k = round(net / max(1, views) * 1000.0, 2)
+    out = {"net_90d": net, "views_90d": views, "per_1k_views": per_1k, "videos": len(recent)}
+    if net > 0:
+        # how long at this pace to each YPP gate
+        out["days_to_500"] = round(500 / (net / 90.0), 1)
+        out["days_to_1000"] = round(1000 / (net / 90.0), 1)
+    else:
+        out["days_to_500"] = out["days_to_1000"] = None
+    return out
 
 
 def distribution_gate(matured: list[dict], acfg: dict) -> dict:
@@ -355,6 +383,10 @@ def run(cfg: dict) -> dict:
         "rejected": [h["video_id"] for h in uploaded if h.get("status") == "rejected"],
         "retention": diag,
         "distribution": gate,
+        # Progress against the gate views cannot substitute for. 500 subs unlocks fan funding and
+        # Shopping; 1,000 unlocks ad revenue. Reported as a 90-day rate so it reads as a trajectory
+        # rather than a running total nobody can act on.
+        "subscribers": _subs_progress(uploaded, now),
     }
     write_json("analytics_summary.json", summary)
     log.info("analytics: %d videos tracked, %d newly learned", len(uploaded), learned)

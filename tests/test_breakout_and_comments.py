@@ -115,3 +115,54 @@ def test_device_shaped_endings_survive_the_closer_gate(closer):
 def test_real_ctas_are_still_blocked(closer):
     from autotube.gates import check_closer
     assert check_closer(closer) != []
+
+
+# ── subscriber conversion: the YPP gate views cannot substitute for ─────────
+SUBCFG = {"target_vph": 40.0, "w_retention": 0.50, "w_reach": 0.20, "w_subs": 0.20,
+          "w_engagement": 0.10, "target_subs_per_1k": 2.0, "w_breakout": 0.15}
+
+
+def _r(subs_gained=0, subs_lost=0, views=1000):
+    m = {"vph": 20, "views": views, "likes": 10, "comments": 0, "avg_view_pct": 50.8,
+         "subs_gained": subs_gained, "subs_lost": subs_lost}
+    return compute_reward(m, POOLS, SUBCFG)
+
+
+def test_subscriber_conversion_changes_the_reward():
+    """1,000 subscribers is required regardless of view count; the optimiser must be able to see it."""
+    assert _r(subs_gained=2)[0] > _r(subs_gained=0)[0] + 0.1
+
+
+def test_subscriber_component_is_monotonic_and_capped():
+    vals = [_r(subs_gained=n)[1]["subs"] for n in (0, 1, 2, 10)]
+    assert vals == sorted(vals) and vals[-1] == 1.0 and vals[0] == 0.0
+
+
+def test_lost_subscribers_are_netted_off():
+    assert _r(subs_gained=5, subs_lost=5)[1]["subs"] == 0.0
+    assert _r(subs_gained=5, subs_lost=10)[1]["subs"] == 0.0        # never negative
+
+
+def test_conversion_is_a_rate_not_a_count():
+    """A video with 10x the views and 10x the subs converted equally well."""
+    a = _r(subs_gained=2, views=1000)[1]["subs"]
+    b = _r(subs_gained=20, views=10000)[1]["subs"]
+    assert a == b
+
+
+def test_missing_subscriber_data_does_not_crash_or_punish_silently():
+    r, parts = compute_reward({"vph": 20, "views": 1000, "avg_view_pct": 50}, POOLS, SUBCFG)
+    assert 0.0 <= r <= 1.0 and parts["subs"] == 0.0
+
+
+def test_analytics_actually_requests_the_metric():
+    """The reward can only see subscribers if the API call asks for them."""
+    from autotube import youtube
+    src = Path(youtube.__file__).read_text()
+    assert "subscribersGained" in src and "subscribersLost" in src
+
+
+def test_weights_still_sum_to_one():
+    a = yaml.safe_load((ROOT / "config.yaml").read_text())["analytics"]
+    total = a["w_retention"] + a["w_reach"] + a["w_subs"] + a["w_engagement"]
+    assert abs(total - 1.0) < 1e-9, f"weights sum to {total}"
