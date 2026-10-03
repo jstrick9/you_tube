@@ -11,8 +11,15 @@ on:
     # GitHub often starts scheduled runs late (we've seen 4–5 hours), so:
     - cron: "17 10 * * *"        # main run   10:17 UTC = 6:17 AM EDT / 5:17 AM EST
     # GitHub silently drops scheduled runs under load (Sep 29 2026: none of the day's crons fired), so there are
-    # extra top-up slots every 2 hours. Each one checks first and exits in seconds when nothing is missing.
-    - cron: "47 11-23/2 * * *"    # top-ups 11:47, 13:47 … 23:47 UTC (only fill what's missing)
+    # extra top-up slots. Each one checks first and exits in seconds when nothing is missing.
+    #
+    # Every 4 hours, not every 2. A satisfied top-up costs nothing — it reads history.json and exits — so the
+    # old cadence was free on a good day. The problem is a bad one: if the morning run fails, every remaining
+    # slot attempts a full production, and seven attempts at 50+ LLM calls each will exhaust a free tier and
+    # leave the day unable to recover. Groq's free tier hands out roughly 20-minute quota windows, so the
+    # retries were competing with each other for the quota they all needed.
+    # Four slots still give several independent chances against a dropped cron, which is what these are for.
+    - cron: "47 11-23/4 * * *"    # top-ups 11:47, 15:47, 19:47, 23:47 UTC (only fill what's missing)
   workflow_dispatch:
     inputs:
       count:

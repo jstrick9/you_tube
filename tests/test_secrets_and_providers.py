@@ -225,3 +225,24 @@ def test_a_long_quota_window_retires_the_model_instead_of_sleeping():
 
     src = (ROOT / "autotube" / "llm.py").read_text()
     assert "advertised_retry(msg) > 60" in src, "long quota windows must retire the model"
+
+
+def test_top_up_cadence_stays_within_free_tier_budget():
+    """Top-ups guard against GitHub dropping crons, but they must not starve each other.
+
+    A satisfied top-up is free: it reads history.json and exits. The cost appears on a
+    bad day, when every remaining slot attempts a full production of 50+ LLM calls.
+    At the old two-hour cadence that was seven attempts competing for the same ~20
+    minute Groq quota window, so one failed morning could lock out the whole day.
+    """
+    wf = yaml.safe_load((WF / "daily.yml").read_text())
+    crons = [c["cron"] for c in wf[True]["schedule"]]
+    topups = [c for c in crons if "/" in c.split()[1]]
+    assert topups, "the drop-resilience top-up slot should still exist"
+    step = int(topups[0].split()[1].split("/")[1])
+    assert step >= 4, (
+        f"top-ups every {step}h will stack full production attempts on a failed day; "
+        f"keep them at 4h or sparser")
+    # Still enough slots to survive GitHub silently dropping a scheduled run.
+    lo, hi = (int(x) for x in topups[0].split()[1].split("/")[0].split("-"))
+    assert len(range(lo, hi + 1, step)) >= 3, "need several independent chances per day"
