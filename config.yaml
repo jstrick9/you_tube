@@ -101,6 +101,12 @@ content:
   seasonal_formats:
     creepy_true: [10]              # October: "creepy but true" (eerie, never gory)
   hook_styles: [question, bold_claim, number_first, you_statement, disbelief]
+  # Across the channel's first 22 measured videos: 233 likes and FIVE comments. Comments are a heavy
+  # ranking signal and the strongest "worth replying to" proxy the algorithm has, and the scripts were
+  # giving nobody a reason to leave one - they were closed, complete and correct. Each device is one
+  # concrete way to leave the viewer with something to say. Learned as a bandit dimension so the
+  # channel finds out which actually works rather than guessing.
+  comment_devices: [none, poll, hot_take, unanswered_question, challenge, correction_bait]
   require_grounding: true                # every claim must be supported by fetched source text
   min_grounded_segments: 3
   # Living people are allowed, but only as PUBLIC FIGURES discussed in their professional
@@ -322,6 +328,12 @@ analytics:
   w_retention: 0.65
   w_reach: 0.25
   w_engagement: 0.10
+  # Every component above is clamped at 1.0, so without this a 300x video and a 1x video score the
+  # same and the bandit cannot see virality at all. This term does not saturate at the target, so an
+  # arm that occasionally breaks out beats one that is reliably average. Growth is a power law; the
+  # optimiser has to be pointed at the tail or it will keep selecting for the middle.
+  w_breakout: 0.15
+  breakout_multiple: 5.0                  # views/hour, as a multiple of target_vph, that counts as a full breakout
   # Absolute targets. A video scoring exactly the target gets 1.0 on that component. These are what the
   # reward is measured against until the channel has enough SPREAD for percentile ranking to mean
   # something — with every video landing in a narrow band, ranking noise is not a learning signal.

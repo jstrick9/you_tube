@@ -21,7 +21,7 @@ from .common import now_utc, read_json, write_json
 
 log = logging.getLogger("autotube.strategy")
 
-DIMENSIONS = ("category", "format", "hook_style", "voice", "source")
+DIMENSIONS = ("category", "format", "hook_style", "voice", "source", "comment_device")
 HALF_LIFE_DAYS = 45.0   # evidence decays with TIME, not with upload count (see Strategy.age)
 PRIOR = (1.0, 1.0)      # Beta(1,1)
 
@@ -59,6 +59,7 @@ class Strategy:
             "voice": list(c["video"]["voices"]),
             "source": ["youtube_outliers", "wikipedia", "google_trends", "reddit", "hackernews", "on_this_day",
                        "youtube_chart", "evergreen"],
+            "comment_device": list(c["content"].get("comment_devices") or ["none"]),
         }
 
     def formats_in_season(self, month: int | None = None) -> list[str]:
@@ -148,6 +149,7 @@ class Strategy:
                 "hook_style": self.sample("hook_style"),
                 "voice": self.cfg.get("persona", {}).get("voice") or self.sample(
                     "voice", exclude=used_voices if len(used_voices) < len(self.options()["voice"]) - 1 else None),
+                "comment_device": self.sample("comment_device"),
             })
             used_voices.add(plans[-1]["voice"])
         return plans

@@ -55,6 +55,26 @@ FORMAT_GUIDE = {
 # formats whose structure centres on one big reveal (gets the riser, flash and a beat of silence)
 REVEAL_FORMATS = {"guess_reveal", "plot_twist", "myth_buster", "sounds_fake", "ranked_escalation", "creepy_true",
                   "dumbest_decision", "would_you_survive"}
+# How to leave the viewer with something to say. Across the channel's first 22 measured videos:
+# 233 likes and five comments. Comments are a heavy ranking input and the closest thing the
+# algorithm has to a "worth replying to" signal, and the scripts were earning none of them -
+# they were closed, complete and correct, which is exactly what nobody replies to. Learned as a
+# bandit dimension, so the channel discovers which of these works instead of assuming.
+COMMENT_GUIDE = {
+    "none": "",
+    "poll": "Finish by making the viewer pick between two concrete options from the story itself "
+            "(\"the pipe or the tunnel - which would you have taken?\").",
+    "hot_take": "State one defensible opinion about the facts as though it were obvious. People "
+                "correct a confident opinion far more readily than they answer a question.",
+    "unanswered_question": "Leave one genuinely open question that the source does not settle, and "
+                           "say plainly that nobody knows.",
+    "challenge": "Pit the story against what the viewer thinks they know (\"almost nobody gets the "
+                 "next part right\") so they want to prove that they did.",
+    "correction_bait": "Name the popular WRONG version of this story explicitly, so everyone who "
+                       "believed it has something to say. Never assert anything false in your own voice.",
+}
+
+
 HOOK_GUIDE = {
     "question": "Open with a specific question a stranger can't answer but instantly wants to (not 'Did you know...?').",
     "bold_claim": "Open with the single most surprising TRUE claim from the source, stated flatly, no preamble.",
@@ -293,12 +313,18 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
         persona_line = (f"NARRATOR PERSONA: {persona['character']}\nCHANNEL PROMISE: \"{persona.get('catchphrase', '')}\" "
                         "— every wild claim is proven by the source (a PROVEN stamp + source card closes each video).\n"
                         if persona.get("character") else "")
+        _cd = plan.get("comment_device") or "none"
+        _cg = COMMENT_GUIDE.get(_cd, "")
+        # The device must never override the facts or the loop ending; it shapes the LAST line only.
+        comment_line = (f"LEAVE THEM SOMETHING TO SAY ({_cd}): {_cg} Work this into the PAYOFF line's "
+                        f"wording — do NOT add a segment, do not say \"comment below\", \"let me know\" or "
+                        f"any call to action, and do not change a single fact to make it land.\n") if _cg else ""
         user = f"""TOPIC: {topic['topic']}
 WHY IT'S TRENDING: {topic.get('why_trending') or ', '.join(topic.get('sources', []))}
 ANGLE: {topic.get('angle') or 'most surprising educational angle'}
 FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
 HOOK STYLE: {plan['hook_style']} — {HOOK_GUIDE[plan['hook_style']]}
-LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
+{comment_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
 CHANNEL: {self.cfg['channel']['name']}
 {persona_line}
 SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of facts:

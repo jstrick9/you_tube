@@ -8,6 +8,7 @@ got rejected/blocked are penalized hard and alert the operator.
 from __future__ import annotations
 
 import logging
+import math
 from datetime import datetime, timedelta
 
 from . import youtube
@@ -123,8 +124,28 @@ def compute_reward(m: dict, pools: dict, acfg: dict) -> tuple[float, dict]:
         r_ret = 0.0
     total = w_ret + w_reach + w_eng or 1.0
     reward = (w_ret * r_ret + w_reach * r_reach + w_eng * r_eng) / total
+
+    # ── breakout: the one term that does not saturate ───────────────────────────────────────────
+    # Every component above is clamped at 1.0, so a video at 1x the target and a video at 300x the
+    # target score exactly the same. That makes the bandit blind to the only outcome that matters:
+    # channel growth is a power law, decided entirely by the tail. Optimising mean reward actively
+    # selects for reliably-average arms, which is what the channel's own numbers show happening -
+    # 22 videos with a max/median view ratio of 1.36 and rewards clustered in 0.32-0.73.
+    # This term keeps climbing above the target, so an arm that occasionally produces a 5x video
+    # beats one that always produces a 1x video. Log-scaled, because the difference between 1x and
+    # 5x matters far more than the difference between 50x and 100x.
+    r_break = 0.0
+    tgt_vph = float(acfg.get("target_vph", 40.0))
+    mult = max(1.5, float(acfg.get("breakout_multiple", 5.0)))
+    if tgt_vph > 0 and (m.get("vph") or 0) > tgt_vph:
+        over = (m["vph"] / tgt_vph - 1.0) / (mult - 1.0)
+        r_break = max(0.0, min(1.0, math.log1p(over * (math.e - 1))))
+    w_break = float(acfg.get("w_breakout", 0.15))
+    reward = (1.0 - w_break) * reward + w_break * r_break
+
     return round(max(0.0, min(1.0, reward)), 4), {
         "retention": round(r_ret, 3), "reach": round(r_reach, 3), "engagement": round(r_eng, 3),
+        "breakout": round(r_break, 3),
         "mode": "absolute" if len(pools["vph"]) < min_n or _spread(pools["vph"]) < min_spread else "blended",
     }
 
