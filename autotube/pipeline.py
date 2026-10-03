@@ -18,7 +18,7 @@ from zoneinfo import ZoneInfo
 
 from . import media, music, qa, render, trends
 from . import series as series_mod
-from . import originality
+from . import originality, provenance
 from .vision import VisionUnavailable
 from .common import OUTPUT_DIR, WORK_DIR, now_utc, read_json, slugify, write_json
 from .llm import LLM
@@ -114,6 +114,13 @@ def remaining_today(cfg: dict, upload: bool = True) -> int:
                if h.get("status") in ok and h.get("created_at")
                and datetime.fromisoformat(h["created_at"]).astimezone(tz).date() == today)
     return max(0, daily_target(cfg) - done)
+
+
+def _max_similarity(script: dict, history: list[dict]) -> float:
+    """How close this script came to the nearest thing already published."""
+    mine = originality.sketch(originality.narration_of(script))
+    sims = [originality.similarity(mine, h.get("sketch") or []) for h in history[-50:]]
+    return round(max(sims), 3) if sims else 0.0
 
 
 def weakest_segment(segments: list[dict]) -> int | None:
@@ -485,6 +492,9 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             # Phrase sketch of what was actually said, so the next run can refuse to
             # publish a near-duplicate. Fixed width, so history cannot grow without bound.
             "sketch": originality.sketch(originality.narration_of(res["script"])),
+            # Recorded now, not derived later: once this entry joins history nobody can
+            # reconstruct what the back catalogue looked like when it was written.
+            "max_similarity": _max_similarity(res["script"], hist),
             "commentary_ratio": round(originality.commentary_ratio(res["script"]), 3),
             "duration": res["duration"], "words": res.get("words"), "archetype": res.get("archetype"),
             "tts_engine": res["tts_engine"], "file": res["file"].name, "publish_at": slot.isoformat() if slot else None,
@@ -504,6 +514,12 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
         else:
             entry["status"] = "rendered"
         res["entry"] = entry
+        if do_upload:
+            # The appeal packet, written at the moment the evidence still exists. After a
+            # strike the work directory is long gone and the model that wrote the script
+            # has been deprecated; the only surviving artefact would be the video itself,
+            # which is the thing under suspicion.
+            entry["provenance"] = provenance.record(res, entry, cfg)
         if do_upload:            # dry runs never touch history (no topic dedupe / slot booking side effects)
             hist.append(entry)
     if do_upload:

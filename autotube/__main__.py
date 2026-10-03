@@ -94,7 +94,7 @@ def cmd_doctor(cfg: dict) -> int:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="autotube")
-    ap.add_argument("command", choices=["run", "trends", "analytics", "report", "doctor"])
+    ap.add_argument("command", choices=["run", "trends", "analytics", "report", "doctor", "dossier"])
     ap.add_argument("-n", "--count", type=int)
     ap.add_argument("--dry-run", action="store_true", help="render but do not upload")
     ap.add_argument("--keep-work", action="store_true")
@@ -112,6 +112,13 @@ def main(argv=None) -> int:
         from . import trends
         for c in trends.collect(cfg)[:40]:
             print(f"{c['score']:.2f}  {c['topic'][:70]:70s} {','.join(sorted(set(c['sources'])))}")
+        return 0
+    if a.command == "dossier":
+        # The originality evidence an appeal opens with. Appeals against automated
+        # faceless-channel enforcement succeed on documentation, and enforcement is
+        # retroactive, so this has to be answerable on the day it is asked for.
+        from . import provenance
+        print(json.dumps(provenance.dossier(a.count or 0), indent=2))
         return 0
     if a.command == "report":
         from .strategy import Strategy
