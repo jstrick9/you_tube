@@ -64,13 +64,46 @@ own substance is the one that survives review.
 | Repo | Stars | Licence | Fit |
 |---|---|---|---|
 | `harry0703/MoneyPrinterTurbo` | 128,218 | MIT | Mature, but does **less** than this repo: no provenance, no originality gate, no compliance layer |
-| `calesthio/OpenMontage` | 62,636 | AGPL-3.0 | Agentic, 12 pipelines. AGPL + needs paid providers |
+| `calesthio/OpenMontage` | 62,636 | AGPL-3.0 | Agentic, 12 pipelines. **See §2b — my first assessment of this was wrong** |
 | `ATH-MaaS/Pixelle-Video` | 28,607 | Apache-2.0 | Strong, but leans on ComfyUI / 48GB GPU hosts — not free on our runner |
 | `rushindrasinha/youtube-shorts-pipeline` (Verticals v3) | 2,306 | MIT | **Closest analogue to us.** Worth reading properly — see §3 |
 
 Switching wholesale would be a downgrade. This repo already has the compliance,
 provenance, originality and QA layers these lack — which are precisely the parts that
 decide monetisation.
+
+### 2b. Correction: OpenMontage does have a genuine free path
+
+My first pass said it "needs paid providers". **That was wrong**, and worth correcting
+because the mistake was dismissing a 62k★ project on a skim.
+
+It ships a documented **"What You Get With Zero API Keys"** path: Piper TTS for
+narration, **Archive.org + NASA + Wikimedia Commons** for real footage, Remotion and
+HyperFrames for composition, FFmpeg for post, and built-in word-level captions. GPU is
+explicitly optional — it unlocks local video models, it is not required.
+
+Two things follow from reading it properly:
+
+1. **It independently validates the plan in `FREE-STACK-RESEARCH.md`.** Its free
+   real-footage route is a documentary-montage pipeline building a **CLIP-searchable
+   corpus from Archive.org, NASA and Wikimedia** — arrived at separately, the same three
+   sources, for the same reason. That is strong corroboration that archival montage is
+   the right free architecture.
+2. **The blocker is operational, not financial.** OpenMontage is driven by an AI coding
+   assistant, not by a scheduler. Its top level is `.agents`, `.claude`, `.codex`,
+   `.cursor`, `.windsurfrules`, `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `COPILOT.md`,
+   `CURSOR.md`; the documented workflow is *"open the project in your AI coding
+   assistant and tell it what you want"*. There is no headless generate command —
+   `python -m backlot` is a project viewer.
+
+So running it daily and unattended means paying for a coding agent to sit in the loop,
+accepting non-deterministic output, and losing the compliance, provenance, originality
+and QA gates this repo already has — the parts that decide monetisation. Minor issues
+on top: it narrates with **Piper, which is archived**, and composes with Remotion.
+
+**Conclusion: borrow, don't adopt.** The valuable, portable idea is the CLIP-searchable
+Archive.org/NASA/Wikimedia montage corpus. That drops into our cron-native pipeline
+behind the existing vision gate, and is already item 3 on the roadmap.
 
 ### C. Long-form → Shorts clippers — **only on your own footage**
 `Anil-matcha/AI-Youtube-Shorts-Generator` (5,223★ MIT), `zhouxiaoka/autoclip` (9,132★
