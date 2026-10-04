@@ -540,18 +540,36 @@ def test_pixazo_is_configured_last_in_the_source_order():
 
 
 # ── series numbering ────────────────────────────────────────────────────────
-def test_package_carries_series_and_episode_into_history():
-    """episode_number() derives the next number from history's `series` field.
+def test_package_returns_series_and_episode(monkeypatch, tmp_path):
+    """Exercise package() rather than grep it.
 
-    package() dropped both on the way from assembly to the stored record, so every
-    entry had series=None and the counter restarted every run. A recurring numbered
-    series that reissues #001 and #002 forever is worse than one that skips: it tells
-    a viewer the archive is fake.
+    The previous version of this test searched pipeline.py for the fix and passed
+    while the behaviour was still broken, because package() builds two dicts: a
+    `record` written beside the video, and a separate return value that run() reads to
+    build the history entry. The fix had gone into the first one. A test that reads
+    source can only confirm that code exists, not that it runs.
     """
-    src = (ROOT / "autotube" / "pipeline.py").read_text()
-    pkg = src.split("def package(")[1].split("\ndef ")[0]
-    assert '"series": a.get("series")' in pkg, "package must carry series into the record"
-    assert '"episode": a.get("episode")' in pkg, "package must carry episode into the record"
+    import types
+    import autotube.pipeline as P
+
+    monkeypatch.setattr(P, "render", types.SimpleNamespace(thumbnail=lambda *a, **k: "t.jpg"))
+    monkeypatch.setattr(P, "_shots_sheet", lambda *a, **k: None)
+    monkeypatch.setattr(P, "build_description", lambda *a, **k: "desc")
+
+    out = tmp_path / "v.mp4"
+    out.write_bytes(b"x")
+    a = {"script": {"segments": [{"text": "a b c"}], "tags": ["t"]},
+         "source": {"title": "T", "url": "u"}, "visuals": {"shots": []}, "out": out,
+         "review": {"score": 8}, "plan": {"format": "f"}, "tts": {"engine": "e"},
+         "hook_card": "h", "title": "FIELD #003 — X", "topic": {"topic": "x"},
+         "series": "field", "episode": 3}
+    r = {"first_frame": "f", "theme": "th", "duration": 18.5, "timeline": [], "archetype": "arch"}
+    rep = {"passed": True, "attempt": 1, "issues": [], "frames": 5, "meta": {}}
+
+    res = P.package(a, r, rep, {"video": {}})
+    assert res is not None
+    assert res.get("series") == "field", "run() reads this dict to write history"
+    assert res.get("episode") == 3
 
 
 def test_episode_numbers_advance_once_history_records_them():

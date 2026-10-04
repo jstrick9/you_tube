@@ -386,6 +386,12 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
     return {"file": out, "thumb": thumb, "meta": meta, "script": script, "source": source,
             "review": a["review"], "topic": a["topic"], "plan": a["plan"], "duration": r["duration"],
             "archetype": r.get("archetype"), "tts_engine": a["tts"]["engine"], "words": words,
+            # package() builds two dicts: `record` above, which is written beside the
+            # video as the run artifact, and this one, which is what run() actually
+            # reads to build the history entry. Series and episode were added to the
+            # first and not the second, so the artifact looked correct while history
+            # kept recording None and the episode counter kept resetting.
+            "series": a.get("series"), "episode": a.get("episode"),
             "qa": report}
 
 
