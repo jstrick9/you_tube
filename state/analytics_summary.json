@@ -1,18 +1,23 @@
 {
-  "updated": "2026-10-03T20:47:24.997736+00:00",
+  "updated": "2026-10-03T22:27:00.462851+00:00",
   "videos_total": 29,
   "videos_7d": 19,
-  "views_7d": 7748,
-  "learned_this_run": 0,
+  "views_7d": 7779,
+  "learned_this_run": 1,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 13,
+      "observations": 14,
       "arms": [
         {
           "arm": "history",
           "mean": 0.565,
           "n": 3
+        },
+        {
+          "arm": "animals",
+          "mean": 0.539,
+          "n": 1
         },
         {
           "arm": "entertainment",
@@ -36,11 +41,6 @@
         },
         {
           "arm": "sports",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
-          "arm": "animals",
           "mean": 0.5,
           "n": 0
         },
@@ -73,8 +73,13 @@
     },
     "format": {
       "status": "learning",
-      "observations": 13,
+      "observations": 14,
       "arms": [
+        {
+          "arm": "scale_shock",
+          "mean": 0.539,
+          "n": 1
+        },
         {
           "arm": "by_the_numbers",
           "mean": 0.528,
@@ -127,11 +132,6 @@
         },
         {
           "arm": "dumbest_decision",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
-          "arm": "scale_shock",
           "mean": 0.5,
           "n": 0
         },
@@ -301,13 +301,13 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1337,
+      "views": 1340,
       "avg_view_pct": null
     },
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
-      "views": 1326,
+      "views": 1331,
       "avg_view_pct": 62.5
     },
     {
@@ -329,16 +329,16 @@
       "avg_view_pct": 59.75
     },
     {
+      "title": "How the Largest Animal Ever Eats Tiny Prey #shorts",
+      "id": "1ed_FohPwqs",
+      "views": 1192,
+      "avg_view_pct": 54.32
+    },
+    {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
       "views": 1183,
       "avg_view_pct": 41.66
-    },
-    {
-      "title": "How the Largest Animal Ever Eats Tiny Prey #shorts",
-      "id": "1ed_FohPwqs",
-      "views": 1177,
-      "avg_view_pct": 54.32
     },
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
@@ -396,7 +396,7 @@
   },
   "subscribers": {
     "net_90d": 13,
-    "views_90d": 17641,
+    "views_90d": 17672,
     "per_1k_views": 0.74,
     "videos": 23,
     "days_to_500": 3461.5,

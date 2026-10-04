@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-04T00:22:20.850833+00:00",
+  "video": {
+    "title": "CASE #002 — The Alpine Fault's Geological Timer #shorts",
+    "video_id": "jQfy3GhI-xo",
+    "series": null,
+    "episode": null,
+    "duration": 18.530045351473923,
+    "file": "20261003-2227-01-alpine-fault.mp4",
+    "published_at": "2026-10-04T16:12:00+00:00"
+  },
+  "selection": {
+    "topic": "there is a 75% chance of a magnitude 8 earthquake breaking out in New Zealand within the next 50 years, called the \"Alpine Fault\". It has ruptured four times in the past 1100 years, and will produce one of the biggest earthquakes since European settlement.",
+    "category": "mysteries",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "why_trending": "High engagement on r/todayilearned regarding the geological inevitability of the fault.",
+    "viral_score": 8.8,
+    "evidence": [
+      "TIL there is a 75% chance of a magnitude 8 earthquake breaking out in New Zealand within the next 50 years, called the \"Alpine Fault\". It has ruptured four times in the past 1100 years, and will produce one of the biggest earthquakes since European settlement."
+    ],
+    "format": "would_you_survive",
+    "hook_style": "disbelief"
+  },
+  "grounding": {
+    "primary": {
+      "title": "Alpine Fault",
+      "url": "https://en.wikipedia.org/wiki/Alpine_Fault"
+    },
+    "corroboration": [
+      {
+        "title": "NASA — Alpine Fault, New Zealand, SRTM Shaded Relief and Colored Height",
+        "url": "https://images.nasa.gov/details/PIA06661"
+      }
+    ],
+    "claims": [
+      {
+        "says": "A magnitude 8 earthquake is 75 percent likely soon. Seriously.",
+        "evidence": "The probability of another one occurring before 2068 was estimated at 75 percent"
+      },
+      {
+        "says": "You are standing on a 600 kilometer long fault.",
+        "evidence": "The Alpine Fault is a geological fault that runs almost the entire length of New Zealand's South Island, being about 600 km"
+      },
+      {
+        "says": "The last massive rupture happened way back in 1717.",
+        "evidence": "The last whole fault rupture event was in 1717"
+      },
+      {
+        "says": "Almost nobody predicts when the timer hits zero.",
+        "evidence": "predicting the next mode is a challenge"
+      }
+    ]
+  },
+  "script": {
+    "title": "The Alpine Fault's Geological Timer",
+    "segments": [
+      "A magnitude 8 earthquake is 75 percent likely soon. Seriously.",
+      "You are standing on a 600 kilometer long fault.",
+      "The last massive rupture happened way back in 1717.",
+      "Almost nobody predicts when the timer hits zero."
+    ],
+    "asides": [
+      "Great spot for a picnic.",
+      "Nature is just chaotic."
+    ],
+    "commentary_ratio": 0.2
+  },
+  "review": {
+    "score": 8,
+    "reviewer": "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:meta/llama-3.2-90b-vision-instruct:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261003-2227"
+  },
+  "originality": {
+    "sketch": [
+      "02fa04bc56f6253c",
+      "0496c41683e7119a",
+      "10362fef4bbd4a82",
+      "1a30959dfe76ad6b",
+      "2c2afca59b810800",
+      "34648d266c90fef7",
+      "3b92ce66b540da9a",
+      "45c3cd90e0d4c092",
+      "48c8fe16c039a1d7",
+      "6acdcbed66f4cb6b",
+      "7d1d4224b88674bc",
+      "8ade10e8641f2f60",
+      "8b391c4285a07fa1",
+      "93321ef5341e8601",
+      "93491e8141ce73e1",
+      "987a9ed1f3213802",
+      "a06285931144920a",
+      "a491713017446d9c",
+      "ac2cd3969cf05471",
+      "bb4cd772b49d9b6b",
+      "cb3e036b6c68c714",
+      "cf4825d32a8f466d",
+      "d34201de1c5f1eb5",
+      "d8224c6d35eff4ed",
+      "e8ef4d5c9ed6f9a7",
+      "ef3a4412e4913357",
+      "f568aea018d21cf3",
+      "f733492d38b2acef",
+      "f7f1e1fe91f40f51",
+      "fc1b481a7c7c36d9"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}
