@@ -581,3 +581,55 @@ def test_episode_numbers_advance_once_history_records_them():
     # max+1, not len+1: pruning history must never reissue a live number
     assert episode_number("unsolved", [{"series": "unsolved", "episode": 9}]) == 10
     assert episode_number("field", hist) == 1, "series are numbered independently"
+
+
+# ── prompt assembly, exercised rather than grepped ──────────────────────────
+def _capture_prompt(category="history"):
+    """Build a real writer prompt and return it, by stubbing the LLM mid-call."""
+    import yaml as _y
+    from autotube.scriptwriter import ScriptWriter
+
+    cfg = _y.safe_load((ROOT / "config.yaml").read_text())
+    seen = {}
+
+    class FakeLLM:
+        lite = False
+        last_used = "fake:model"
+
+        def json(self, system, user, **kw):
+            seen["user"] = user
+            raise RuntimeError("captured")
+
+    class FakeStrat:
+        def fit(self, *a, **k):
+            return {}
+
+    w = ScriptWriter(cfg, FakeLLM(), FakeStrat())
+    try:
+        w.write({"topic": "A strange disappearance", "category": category},
+                {"format": "sounds_fake", "hook_style": "bold_claim", "voice": "v"},
+                {"title": "T", "url": "u", "text": "Sourced text.", "summary": "s"})
+    except Exception:
+        pass
+    return seen.get("user", "")
+
+
+def test_lane_voice_actually_reaches_the_prompt():
+    """Grepping for "{lane_rule}" proves the placeholder exists, not that it is filled.
+
+    The series bug was exactly this shape - a value computed, carried into one dict and
+    never into the one that mattered - and its test passed throughout by reading source.
+    """
+    hist = _capture_prompt("history")
+    sci = _capture_prompt("space")
+    assert "cool, documentary" in hist, "history lane voice missing from the real prompt"
+    assert "bright, fast, delighted" in sci, "science lane voice missing from the real prompt"
+    assert hist != sci, "the two lanes must produce different prompts"
+    for probe in ("VOICE:", "HOOK SHAPE:", "PACING:"):
+        assert probe in hist
+
+
+def test_length_budget_actually_reaches_the_prompt():
+    p = _capture_prompt("history")
+    assert "words per segment" in p, "per-segment budget missing"
+    assert "Both ends are rejected" in p, "one-sided length instruction is back"
