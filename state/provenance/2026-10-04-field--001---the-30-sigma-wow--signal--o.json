@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-04T15:33:30.621504+00:00",
+  "video": {
+    "title": "FIELD #001 — The 30‑Sigma Wow! Signal: One‑Off Alien‑Like Burst #shorts",
+    "video_id": "rhZIc0IMKX8",
+    "series": null,
+    "episode": null,
+    "duration": 18.458049886621314,
+    "file": "20261004-1526-01-wow-signal.mp4",
+    "published_at": "2026-10-04T16:12:00+00:00"
+  },
+  "selection": {
+    "topic": "This Signal From Space Still Has No Explanation",
+    "category": "space",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "why_trending": "viral Short 7.55M views in 80h; proven demand for mysterious space signals",
+    "viral_score": 10.0,
+    "evidence": [
+      "viral Short now: 7,551,191 views in 80h, 699x its channel's subscribers",
+      "This Signal From Space Still Has No Explanation In 1977, a radio telescope picked up something incredibly strange from deep space. On August"
+    ],
+    "format": "sounds_fake",
+    "hook_style": "question"
+  },
+  "grounding": {
+    "primary": {
+      "title": "Wow! signal",
+      "url": "https://en.wikipedia.org/wiki/Wow%21_signal"
+    },
+    "corroboration": [
+      {
+        "title": "Wikidata — Wikidata: Wow! signal",
+        "url": "https://www.wikidata.org/wiki/Q33297"
+      }
+    ],
+    "claims": [
+      {
+        "says": "Could a 30‑sigma radio blip last exactly 72 seconds?",
+        "evidence": "The Wow! signal's highest measured value was 'U', between 30 and 31."
+      },
+      {
+        "says": "It appeared right where hydrogen's natural 1420 MHz line should be.",
+        "evidence": "This is (50±5 kHz) above the hydrogen line value"
+      },
+      {
+        "says": "Big Ear could only watch any spot for exactly 72 seconds.",
+        "evidence": "The entire signal sequence lasted for the full 72‑second window"
+      },
+      {
+        "says": "It was a one‑off alien‑like transmission, never repeated.",
+        "evidence": "some researchers have suggested it could represent an extraterrestrial transmission"
+      }
+    ]
+  },
+  "script": {
+    "title": "The 30‑Sigma Wow! Signal: One‑Off Alien‑Like Burst",
+    "segments": [
+      "Could a 30‑sigma radio blip last exactly 72 seconds?",
+      "It appeared right where hydrogen's natural 1420 MHz line should be.",
+      "Big Ear could only watch any spot for exactly 72 seconds.",
+      "It was a one‑off alien‑like transmission, never repeated."
+    ],
+    "asides": [],
+    "commentary_ratio": 0.0
+  },
+  "review": {
+    "score": 8,
+    "reviewer": "groq:qwen/qwen3.8-27b",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:meta/llama-3.2-90b-vision-instruct:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261004-1526"
+  },
+  "originality": {
+    "sketch": [
+      "095a7f8b07c10717",
+      "12a2032148ef694e",
+      "1e89ac7502d0a9ba",
+      "23b8e74c1b0983cd",
+      "2a56cdae148fe2cf",
+      "2cdd06805ddad753",
+      "313009fd52421bd4",
+      "38a92e7cd6f6532a",
+      "393aeb9850d98166",
+      "398a02fe3766f187",
+      "45622650cb87bbf7",
+      "597f5e738d5b1c9f",
+      "654dc70a5e62edd3",
+      "68b06fe063effb4f",
+      "7b076d10081bb61e",
+      "8f44df5754f97397",
+      "977208f412f0db16",
+      "a1f0392cb4c17bf5",
+      "a282b05f73d48280",
+      "a573b7b5d8be0f3e",
+      "a89b0ab0e16f2fd4",
+      "ae3ac14b63b325be",
+      "b72add555c08ca64",
+      "b848cdf795465fb4",
+      "bd8500a68b392237",
+      "caea71318ff2d7d9",
+      "e8e2bd4fa7ecc7f3",
+      "ed8e2648590d00b9"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}

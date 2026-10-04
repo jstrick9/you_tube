@@ -1,5 +1,5 @@
 {
-  "yt_outliers_date": "2026-10-03",
+  "yt_outliers_date": "2026-10-04",
   "yt_outliers": [
     {
       "topic": "This Signal From Space Still Has No Explanation",
@@ -9,14 +9,14 @@
       "hook": "bold_claim",
       "score": 1.0,
       "context": [
-        "viral Short now: 4,660,588 views in 49h, 561x its channel's subscribers",
+        "viral Short now: 7,551,191 views in 80h, 699x its channel's subscribers",
         "This Signal From Space Still Has No Explanation In 1977, a radio telescope picked up something incredibly strange from deep space. On August"
       ],
       "evidence": {
-        "views": 4660588,
-        "hours": 49.3,
-        "vph": 94449,
-        "breakout": 560.8
+        "views": 7551191,
+        "hours": 80.4,
+        "vph": 93915,
+        "breakout": 699.2
       }
     },
     {
@@ -25,196 +25,52 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.9969,
+      "score": 0.9967,
       "context": [
-        "viral Short now: 4,355,638 views in 29h, 121x its channel's subscribers",
+        "viral Short now: 4,817,767 views in 60h, 130x its channel's subscribers",
         "It sounds impossible, but insects are built very differently from humans. A fly’s nervous system isn’t controlled exclusively by its brain n"
       ],
       "evidence": {
-        "views": 4355638,
-        "hours": 29.4,
-        "vph": 148272,
-        "breakout": 121.0
+        "views": 4817767,
+        "hours": 60.4,
+        "vph": 79718,
+        "breakout": 129.9
       }
     },
     {
-      "topic": "Elephant Foot Care",
+      "topic": "This Is What Raw Copper Looks Like",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9937,
+      "score": 0.9933,
       "context": [
-        "viral Short now: 1,508,733 views in 44h, 388x its channel's subscribers",
-        "Did you know an elephant’s feet need special care too? When a thorn or nail gets stuck in their foot, caretakers carefully remove it and cle"
+        "viral Short now: 815,714 views in 42h, 53x its channel's subscribers",
+        "Original Video Credit: IGmichigan_rocks_and_minerals Interesting facts about geology, science, minerals, and how things form beneath the gro"
       ],
       "evidence": {
-        "views": 1508733,
-        "hours": 44.0,
-        "vph": 34289,
-        "breakout": 387.8
+        "views": 815714,
+        "hours": 42.4,
+        "vph": 19222,
+        "breakout": 52.6
       }
     },
     {
-      "topic": "How Whale Calves Nurse",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.9905,
-      "context": [
-        "viral Short now: 495,113 views in 45h, 193x its channel's subscribers",
-        "A WHALE CALF can nurse beneath the ocean's surface, receiving milk directly from its mother while both remain underwater. Unlike land mammal"
-      ],
-      "evidence": {
-        "views": 495113,
-        "hours": 44.6,
-        "vph": 11096,
-        "breakout": 192.7
-      }
-    },
-    {
-      "topic": "How Blue Whales Feed",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.9874,
-      "context": [
-        "viral Short now: 670,644 views in 82h, 261x its channel's subscribers",
-        "The BLUE WHALE is the largest animal on Earth, yet much of its diet consists of tiny creatures called KRILL. Instead of teeth, it has rows o"
-      ],
-      "evidence": {
-        "views": 670644,
-        "hours": 81.6,
-        "vph": 8216,
-        "breakout": 261.0
-      }
-    },
-    {
-      "topic": "The 163-Year-Old Monk Wasn't 163",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9842,
-      "context": [
-        "viral Short now: 473,898 views in 46h, 157x its channel's subscribers",
-        "Viral videos in 2022 falsely claimed that a Thai Buddhist monk named Luang Pho Yai was 163 years old and was mummifying himself while still "
-      ],
-      "evidence": {
-        "views": 473898,
-        "hours": 45.7,
-        "vph": 10368,
-        "breakout": 157.4
-      }
-    },
-    {
-      "topic": "Why Is This Beaver Destroying Trees?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9811,
-      "context": [
-        "viral Short now: 921,666 views in 67h, 64x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 921666,
-        "hours": 67.4,
-        "vph": 13666,
-        "breakout": 64.0
-      }
-    },
-    {
-      "topic": "Animal Lifespan Comparison How Long Do Animals Live Amazing Wildlife Facts",
+      "topic": "Esse CACHORRO é APAIXONADO pelo bluey!",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9779,
+      "score": 0.99,
       "context": [
-        "viral Short now: 218,328 views in 19h, 87x its channel's subscribers",
-        "Animal Lifespan Comparison How Long Do Animals Live Amazing Wildlife Facts Did you know that different animals have vastly different lifespa"
+        "viral Short now: 899,840 views in 26h, 17x its channel's subscribers",
+        "creditos respective owner"
       ],
       "evidence": {
-        "views": 218328,
-        "hours": 19.2,
-        "vph": 11378,
-        "breakout": 86.6
-      }
-    },
-    {
-      "topic": "ఈ గరర 3 రజలగ నళల ఎదక తగలకపయద?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9747,
-      "context": [
-        "viral Short now: 1,232,565 views in 94h, 53x its channel's subscribers",
-        "ఈ చనన గరర మడ రజలగ దహత ఉనన నళల తగలకపయద. అద గమనచన అబబయ తన చతలత నటన అదచ దన దహ తరచడ. చనన సహయ కడ ఒక పరణక ఎత పదద ఆనదనన ఇసతద ఈ వడయ చపసతద."
-      ],
-      "evidence": {
-        "views": 1232565,
-        "hours": 93.9,
-        "vph": 13130,
-        "breakout": 53.1
-      }
-    },
-    {
-      "topic": "जगल म य आवज सनई द, त रकन मत!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9716,
-      "context": [
-        "viral Short now: 1,087,222 views in 89h, 53x its channel's subscribers",
-        "Jungle mein agar aapko ye ajeeb awaaz sunai de, to use ignore mat karna! Kuch jaanwar apni awaaz se khatre ka signal de sakte hain. Is video"
-      ],
-      "evidence": {
-        "views": 1087222,
-        "hours": 88.9,
-        "vph": 12233,
-        "breakout": 52.8
-      }
-    },
-    {
-      "topic": "fish intake oxygen",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9684,
-      "context": [
-        "viral Short now: 250,700 views in 73h, 126x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 250700,
-        "hours": 72.9,
-        "vph": 3440,
-        "breakout": 126.0
-      }
-    },
-    {
-      "topic": "Animal Diffrent Angle View Animal Facts",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9652,
-      "context": [
-        "viral Short now: 972,773 views in 44h, 4x its channel's subscribers",
-        "Animal Diffrent Angle View Animal Facts All videos on this channel are original and created with significant research, time, and effort. A l"
-      ],
-      "evidence": {
-        "views": 972773,
-        "hours": 43.9,
-        "vph": 22172,
-        "breakout": 4.5
+        "views": 899840,
+        "hours": 26.2,
+        "vph": 34385,
+        "breakout": 16.8
       }
     },
     {
@@ -223,70 +79,142 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9621,
+      "score": 0.9867,
       "context": [
-        "viral Short now: 576,204 views in 51h, 13x its channel's subscribers",
+        "viral Short now: 1,613,480 views in 82h, 34x its channel's subscribers",
         ""
       ],
       "evidence": {
-        "views": 576204,
-        "hours": 51.4,
-        "vph": 11215,
-        "breakout": 13.4
+        "views": 1613480,
+        "hours": 82.4,
+        "vph": 19572,
+        "breakout": 34.2
       }
     },
     {
-      "topic": "Why FEATHER Swords? Aztec",
+      "topic": "How Whale Calves Nurse",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "question",
-      "score": 0.9589,
+      "score": 0.9834,
       "context": [
-        "viral Short now: 806,344 views in 89h, 17x its channel's subscribers",
-        "Why Aztecs fought with swords with feather edges."
+        "viral Short now: 500,596 views in 76h, 192x its channel's subscribers",
+        "A WHALE CALF can nurse beneath the ocean's surface, receiving milk directly from its mother while both remain underwater. Unlike land mammal"
       ],
       "evidence": {
-        "views": 806344,
-        "hours": 89.4,
-        "vph": 9022,
-        "breakout": 17.0
+        "views": 500596,
+        "hours": 75.7,
+        "vph": 6614,
+        "breakout": 191.8
       }
     },
     {
-      "topic": "Coca-Cola Bottle Evolution Since 1899",
+      "topic": "Animal Lifespan Comparison How Long Do Animals Live Amazing Wildlife Facts",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9801,
+      "context": [
+        "viral Short now: 398,104 views in 50h, 131x its channel's subscribers",
+        "Animal Lifespan Comparison How Long Do Animals Live Amazing Wildlife Facts Did you know that different animals have vastly different lifespa"
+      ],
+      "evidence": {
+        "views": 398104,
+        "hours": 50.2,
+        "vph": 7923,
+        "breakout": 130.5
+      }
+    },
+    {
+      "topic": "The 163-Year-Old Monk Wasn't 163",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9558,
+      "score": 0.9767,
       "context": [
-        "viral Short now: 391,872 views in 92h, 61x its channel's subscribers",
-        "Take a look at the evolution of Coca-Cola bottles from 1899 to 1986! See how the bottle designs changed through the years. Which one is your"
+        "viral Short now: 489,132 views in 77h, 160x its channel's subscribers",
+        "Viral videos in 2022 falsely claimed that a Thai Buddhist monk named Luang Pho Yai was 163 years old and was mummifying himself while still "
       ],
       "evidence": {
-        "views": 391872,
-        "hours": 91.9,
-        "vph": 4265,
-        "breakout": 60.7
+        "views": 489132,
+        "hours": 76.8,
+        "vph": 6372,
+        "breakout": 160.4
       }
     },
     {
-      "topic": "Mengapa Putri Diana Duduk Sendiri di Taj Mahal",
+      "topic": "How Seals Breathe Underwater Without Drowning",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.9734,
+      "context": [
+        "viral Short now: 187,060 views in 24h, 74x its channel's subscribers",
+        "Educational Disclaimer & Content Notice: The facts and figures presented in this content are shared strictly for educational, historical, an"
+      ],
+      "evidence": {
+        "views": 187060,
+        "hours": 23.9,
+        "vph": 7816,
+        "breakout": 73.6
+      }
+    },
+    {
+      "topic": "Animal Diffrent Angle View Animal Facts",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9701,
+      "context": [
+        "viral Short now: 1,598,353 views in 75h, 7x its channel's subscribers",
+        "Animal Diffrent Angle View Animal Facts All videos on this channel are original and created with significant research, time, and effort. A l"
+      ],
+      "evidence": {
+        "views": 1598353,
+        "hours": 74.9,
+        "vph": 21331,
+        "breakout": 7.3
+      }
+    },
+    {
+      "topic": "The Most Kissed Face in History",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9526,
+      "score": 0.9667,
       "context": [
-        "viral Short now: 378,252 views in 56h, 21x its channel's subscribers",
-        "Mengapa Putri Diana duduk sendirian di depan simbol cinta abadi, Taj Mahal? Video legendaris tahun 1992 ini menyimpan cerita mendalam tentan"
+        "viral Short now: 251,679 views in 45h, 53x its channel's subscribers",
+        "If you’ve ever trained in CPR or worked in healthcare, chances are you’ve touched her faceand even placed your lips on hers without knowing "
       ],
       "evidence": {
-        "views": 378252,
-        "hours": 55.8,
-        "vph": 6777,
-        "breakout": 20.8
+        "views": 251679,
+        "hours": 45.4,
+        "vph": 5538,
+        "breakout": 52.5
+      }
+    },
+    {
+      "topic": "The Cat Missed Him So Much",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.9634,
+      "context": [
+        "viral Short now: 183,612 views in 40h, 66x its channel's subscribers",
+        "After being missing for two days, a dog was finally reunited with the cat waiting at home. The cat immediately stood up, wrapped both paws a"
+      ],
+      "evidence": {
+        "views": 183612,
+        "hours": 40.4,
+        "vph": 4544,
+        "breakout": 66.3
       }
     },
     {
@@ -295,16 +223,52 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9494,
+      "score": 0.9601,
       "context": [
-        "viral Short now: 385,027 views in 44h, 12x its channel's subscribers",
+        "viral Short now: 616,663 views in 75h, 18x its channel's subscribers",
         "Scarface Brother Morani Vs Gunga Tiger Disclaimer This video has been created solely for educational and entertainment purposes. The informa"
       ],
       "evidence": {
-        "views": 385027,
-        "hours": 44.1,
-        "vph": 8726,
-        "breakout": 12.3
+        "views": 616663,
+        "hours": 75.2,
+        "vph": 8202,
+        "breakout": 18.2
+      }
+    },
+    {
+      "topic": "He Comes For a Hug Every Morning",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.9568,
+      "context": [
+        "viral Short now: 160,967 views in 42h, 58x its channel's subscribers",
+        "A donkey has gone viral for a morning routine that looks almost human. He walks into a workshop, finds his owner, and leans in for a hug bef"
+      ],
+      "evidence": {
+        "views": 160967,
+        "hours": 42.5,
+        "vph": 3792,
+        "breakout": 58.1
+      }
+    },
+    {
+      "topic": "Unbelievable Animal Moments You Won't Believe exist!",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "disbelief",
+      "score": 0.9534,
+      "context": [
+        "viral Short now: 166,360 views in 85h, 166x its channel's subscribers",
+        "From pulling a massive shark off the shore and holding tiny snakes to giant anacondas and huge pit bulls, check out these insane and incredi"
+      ],
+      "evidence": {
+        "views": 166360,
+        "hours": 84.7,
+        "vph": 1965,
+        "breakout": 166.4
       }
     },
     {
@@ -313,34 +277,178 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.9463,
+      "score": 0.9501,
       "context": [
-        "viral Short now: 231,952 views in 13h, 2x its channel's subscribers",
+        "viral Short now: 593,331 views in 45h, 5x its channel's subscribers",
         "What would happen if you poured tons of Mountain Dew around a coconut tree? Would the coconuts actually start tasting like Mountain Dew? Fin"
       ],
       "evidence": {
-        "views": 231952,
-        "hours": 13.5,
-        "vph": 17188,
-        "breakout": 2.4
+        "views": 593331,
+        "hours": 44.6,
+        "vph": 13317,
+        "breakout": 5.2
       }
     },
     {
-      "topic": "How King Cobras Drink Water",
+      "topic": "Ini Adalah Bentuk Asli Dari Camilan Yang Biasanya Kamu Makan",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9468,
+      "context": [
+        "viral Short now: 86,900 views in 32h, 87x its channel's subscribers",
+        "Kalau kamu suka rumput laut, tunggu sampai kamu liat bentuknya di alam. Ini adalah Bull Kelp, salah satu jenis rumput laut yang banyak ditem"
+      ],
+      "evidence": {
+        "views": 86900,
+        "hours": 32.1,
+        "vph": 2707,
+        "breakout": 86.9
+      }
+    },
+    {
+      "topic": "Trainer Slips And Falls Into Orca Tank",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.9434,
+      "context": [
+        "viral Short now: 166,164 views in 40h, 39x its channel's subscribers",
+        "A trainer accidentally slipped and fell into a pool while feeding captive orcas. Despite their immense size and power, the animals remained "
+      ],
+      "evidence": {
+        "views": 166164,
+        "hours": 40.4,
+        "vph": 4109,
+        "breakout": 39.3
+      }
+    },
+    {
+      "topic": "In Cow ke इतन बड़ सग kyu hai",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9402,
+      "context": [
+        "viral Short now: 233,572 views in 80h, 66x its channel's subscribers",
+        "Ever seen cattle with horns bigger than a human? Meet the Ankole-Watusi and Texas Longhorntwo extraordinary breeds famous for their massive "
+      ],
+      "evidence": {
+        "views": 233572,
+        "hours": 79.8,
+        "vph": 2928,
+        "breakout": 66.2
+      }
+    },
+    {
+      "topic": "Why NAIL-FILLED Roman Boots",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "question",
-      "score": 0.9431,
+      "score": 0.9368,
       "context": [
-        "viral Short now: 122,489 views in 34h, 41x its channel's subscribers",
-        "A king cobra does not drink water in the same way mammals do. Instead, it places its mouth at the water's surface and uses movements of its "
+        "viral Short now: 369,203 views in 43h, 8x its channel's subscribers",
+        "Why Legionaries filled their boots with nails."
       ],
       "evidence": {
-        "views": 122489,
-        "hours": 33.7,
-        "vph": 3634,
-        "breakout": 40.7
+        "views": 369203,
+        "hours": 42.6,
+        "vph": 8665,
+        "breakout": 7.8
+      }
+    },
+    {
+      "topic": "Cats HATE This Sound!",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9335,
+      "context": [
+        "viral Short now: 102,187 views in 52h, 102x its channel's subscribers",
+        "Cats HATE This Sound! একট সধরণ চরনর শবদ বডল কন এমন অদভত পরতকরয দখয? এই ভডওত জনব চরনর শবদ বডলর এমন পরতকরযর সমভবয করণ, আর বঘর কষতর এই শবদর বযপ"
+      ],
+      "evidence": {
+        "views": 102187,
+        "hours": 51.9,
+        "vph": 1968,
+        "breakout": 102.2
+      }
+    },
+    {
+      "topic": "How Long Would It Take to Reach the Sun?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9302,
+      "context": [
+        "viral Short now: 68,801 views in 12h, 15x its channel's subscribers",
+        "How Long Would It Take to Reach the Sun? Have you ever wondered how long it would actually take to travel the 150 million kilometers from Ea"
+      ],
+      "evidence": {
+        "views": 68801,
+        "hours": 11.9,
+        "vph": 5802,
+        "breakout": 15.0
+      }
+    },
+    {
+      "topic": "THE SHARK'S FIRST QUESTION",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9268,
+      "context": [
+        "viral Short now: 191,525 views in 20h, 6x its channel's subscribers",
+        "Great white sharks investigate unfamiliar objects with electroreceptors that detect tiny electric fields from nearby animals. Humans are lea"
+      ],
+      "evidence": {
+        "views": 191525,
+        "hours": 20.2,
+        "vph": 9491,
+        "breakout": 6.0
+      }
+    },
+    {
+      "topic": "Where Airplane Toilet Waste REALLY Goes! Vacuum Toilet Facts All Facts Tamil",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9235,
+      "context": [
+        "viral Short now: 76,989 views in 6h, 3x its channel's subscribers",
+        "Have you ever wondered where airplane toilet waste actually goes? Discover the powerful vacuum suction technology inside commercial aircraft"
+      ],
+      "evidence": {
+        "views": 76989,
+        "hours": 5.8,
+        "vph": 13263,
+        "breakout": 2.6
+      }
+    },
+    {
+      "topic": "Mengapa Putri Diana Duduk Sendiri di Taj Mahal",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.9202,
+      "context": [
+        "viral Short now: 387,875 views in 87h, 21x its channel's subscribers",
+        "Mengapa Putri Diana duduk sendirian di depan simbol cinta abadi, Taj Mahal? Video legendaris tahun 1992 ini menyimpan cerita mendalam tentan"
+      ],
+      "evidence": {
+        "views": 387875,
+        "hours": 86.9,
+        "vph": 4465,
+        "breakout": 21.1
       }
     },
     {
@@ -349,52 +457,142 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9399,
+      "score": 0.9168,
       "context": [
-        "viral Short now: 107,927 views in 55h, 84x its channel's subscribers",
+        "viral Short now: 140,726 views in 86h, 107x its channel's subscribers",
         "Jupiter is big enough to swallow 1,300 Earths... and it's still a speck. Here's the scale chain that breaks your brain. The Sun holds about "
       ],
       "evidence": {
-        "views": 107927,
-        "hours": 55.0,
-        "vph": 1962,
-        "breakout": 84.3
+        "views": 140726,
+        "hours": 86.1,
+        "vph": 1635,
+        "breakout": 107.4
       }
     },
     {
-      "topic": "What can an angler fish do?",
+      "topic": "तम Insan नह हत pt78 Find Your Animal Name Facts Shorts",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "you_statement",
+      "score": 0.9135,
+      "context": [
+        "viral Short now: 729,206 views in 33h, 0x its channel's subscribers",
+        "तम Insan नह हत pt78 Find Your Animal Name Facts Shorts AnimalPersonalityTest GuessYourAnimal AnimalQuiz PersonalityTest SpiritAnimal AnimalP"
+      ],
+      "evidence": {
+        "views": 729206,
+        "hours": 32.7,
+        "vph": 22325,
+        "breakout": 0.2
+      }
+    },
+    {
+      "topic": "24 KM Couldn’t Stop Him",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "number_first",
+      "score": 0.9102,
+      "context": [
+        "viral Short now: 108,907 views in 43h, 39x its channel's subscribers",
+        "A man finished work and found his dog waiting on top of his car after the animal had traveled 24 kilometers from home to reach him. The dog "
+      ],
+      "evidence": {
+        "views": 108907,
+        "hours": 42.8,
+        "vph": 2544,
+        "breakout": 39.3
+      }
+    },
+    {
+      "topic": "What If Every Desert on Earth Suddenly Became Green? What Would Happen to Earth?",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.9368,
+      "score": 0.9069,
       "context": [
-        "viral Short now: 125,307 views in 92h, 125x its channel's subscribers",
-        ""
+        "viral Short now: 49,649 views in 25h, 50x its channel's subscribers",
+        "What if every desert on Earth suddenly became green? Imagine the Sahara, Arabian Desert, Gobi Desert and other massive deserts transforming "
       ],
       "evidence": {
-        "views": 125307,
-        "hours": 92.0,
-        "vph": 1362,
-        "breakout": 125.3
+        "views": 49649,
+        "hours": 24.9,
+        "vph": 1991,
+        "breakout": 49.6
       }
     },
     {
-      "topic": "Pirates Is Ship Se Kyun Darte Hain?",
+      "topic": "Why Did People Seal Letters With Wax?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.9036,
+      "context": [
+        "viral Short now: 193,741 views in 11h, 0x its channel's subscribers",
+        "In the past, people often sealed letters with melted wax to help protect their private messages. The sender would press a unique mark or sea"
+      ],
+      "evidence": {
+        "views": 193741,
+        "hours": 10.9,
+        "vph": 17768,
+        "breakout": 0.3
+      }
+    },
+    {
+      "topic": "5 حيوانات شكلها كيوت بس ممكن تقتلك!",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9336,
+      "hook": "number_first",
+      "score": 0.9002,
       "context": [
-        "viral Short now: 108,001 views in 91h, 108x its channel's subscribers",
-        "इस जहज क कई भ लटर लट नह सकत RORO VESSEL Samundari lutere (pirates) Ro-Ro ships par hamla karne se kyun darte hain? Ro-Ro ships ka matlab 'Ro"
+        "viral Short now: 498,738 views in 44h, 2x its channel's subscribers",
+        "شكلها كيوت لكن الاقتراب منها ممكن يكون آخر غلطة تعملها! في الفيديو ده هتشوف 5 حيوانات شكلها بريء ولطيف لكن عندها قدرات دفاعية أو سموم ممكن ت"
       ],
       "evidence": {
-        "views": 108001,
-        "hours": 91.0,
-        "vph": 1187,
-        "breakout": 108.0
+        "views": 498738,
+        "hours": 44.4,
+        "vph": 11223,
+        "breakout": 1.7
+      }
+    },
+    {
+      "topic": "How King Cobras Drink Water",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.8969,
+      "context": [
+        "viral Short now: 124,708 views in 65h, 41x its channel's subscribers",
+        "A king cobra does not drink water in the same way mammals do. Instead, it places its mouth at the water's surface and uses movements of its "
+      ],
+      "evidence": {
+        "views": 124708,
+        "hours": 64.8,
+        "vph": 1926,
+        "breakout": 40.9
+      }
+    },
+    {
+      "topic": "He Found Safety in One Person",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.8936,
+      "context": [
+        "viral Short now: 143,739 views in 91h, 52x its channel's subscribers",
+        "In Russia, a young bear cub was walking along a mountain trail beside a man when thick fog covered the path. As visibility disappeared, the "
+      ],
+      "evidence": {
+        "views": 143739,
+        "hours": 90.8,
+        "vph": 1583,
+        "breakout": 51.9
       }
     },
     {
@@ -403,52 +601,88 @@
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9305,
+      "score": 0.8902,
       "context": [
-        "viral Short now: 91,478 views in 31h, 22x its channel's subscribers",
+        "viral Short now: 122,747 views in 62h, 29x its channel's subscribers",
         "He entered an arranged marriage expecting nothing more than a family decision. But when he finally saw his future wife, she turned out to be"
       ],
       "evidence": {
-        "views": 91478,
-        "hours": 31.4,
-        "vph": 2915,
-        "breakout": 21.6
+        "views": 122747,
+        "hours": 62.4,
+        "vph": 1966,
+        "breakout": 28.8
       }
     },
     {
-      "topic": "Surprising Animal Moments Caught On Camera",
+      "topic": "Why Does the Airbus A380 Need 22 Tires",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.8869,
+      "context": [
+        "viral Short now: 77,263 views in 25h, 11x its channel's subscribers",
+        "The Airbus A380 is the world’s largest passenger airliner, and its enormous size creates some serious engineering challenges. When fully loa"
+      ],
+      "evidence": {
+        "views": 77263,
+        "hours": 25.2,
+        "vph": 3067,
+        "breakout": 11.0
+      }
+    },
+    {
+      "topic": "Sigma Physics Teacher",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9273,
+      "score": 0.8836,
       "context": [
-        "viral Short now: 476,720 views in 67h, 3x its channel's subscribers",
-        "Surprising Animal Moments Caught On Camera Some animal moments are so unexpected that you have to see them to believe them. Bull Joins the H"
+        "viral Short now: 37,857 views in 13h, 11x its channel's subscribers",
+        "Sigma Physics Teacher Albert Einstein once said: Time is an illusion... But what does that really mean? In this short, you’ll have to find o"
       ],
       "evidence": {
-        "views": 476720,
-        "hours": 67.2,
-        "vph": 7097,
-        "breakout": 3.3
+        "views": 37857,
+        "hours": 13.4,
+        "vph": 2816,
+        "breakout": 11.4
       }
     },
     {
-      "topic": "तम Insan नह हत pt76 Find Your Animal Name Facts Shorts",
+      "topic": "How Do Fishermen Eat Without Spilling Food in Giant Ocean Waves?",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
-      "hook": "you_statement",
-      "score": 0.9241,
+      "hook": "question",
+      "score": 0.8803,
       "context": [
-        "viral Short now: 1,027,082 views in 72h, 0x its channel's subscribers",
-        "तम Insan नह हत pt76 Find Your Animal Name Facts Shorts AnimalPersonalityTest GuessYourAnimal AnimalQuiz PersonalityTest SpiritAnimal AnimalP"
+        "viral Short now: 186,795 views in 51h, 6x its channel's subscribers",
+        "How can fishermen enjoy a meal while their boat is rocking through huge ocean waves?"
       ],
       "evidence": {
-        "views": 1027082,
-        "hours": 72.2,
-        "vph": 14220,
-        "breakout": 0.3
+        "views": 186795,
+        "hours": 50.5,
+        "vph": 3697,
+        "breakout": 6.2
+      }
+    },
+    {
+      "topic": "Эта рыба живёт внутри другого животного",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.8769,
+      "context": [
+        "viral Short now: 245,086 views in 72h, 6x its channel's subscribers",
+        "This video is made for educational and informational purposes only. All content shown in this video is intended to educate and spread knowle"
+      ],
+      "evidence": {
+        "views": 245086,
+        "hours": 72.5,
+        "vph": 3381,
+        "breakout": 6.4
       }
     },
     {
@@ -457,268 +691,34 @@
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.921,
+      "score": 0.8736,
       "context": [
-        "viral Short now: 124,105 views in 44h, 18x its channel's subscribers",
+        "viral Short now: 134,169 views in 75h, 20x its channel's subscribers",
         "Mi-24 helicopter pilots dip their nose to take off. Primary Source: Mil Mi-24 Hind Operational Manuals & High-Altitude Flight Physics In the"
       ],
       "evidence": {
-        "views": 124105,
-        "hours": 44.4,
-        "vph": 2796,
-        "breakout": 18.3
+        "views": 134169,
+        "hours": 75.4,
+        "vph": 1778,
+        "breakout": 19.7
       }
     },
     {
-      "topic": "मगरमचछ क अड पर हन बजर क नजर पड, फर शर हई खतरनक लडई!",
+      "topic": "Cast Saw Working Mechanism",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9178,
+      "score": 0.8703,
       "context": [
-        "viral Short now: 629,971 views in 79h, 2x its channel's subscribers",
-        "A honey badger discovers a crocodile's nest and tries to steal its eggs, but the mother crocodile returns just in time to defend her nest. W"
+        "viral Short now: 176,965 views in 31h, 2x its channel's subscribers",
+        "Cast Saw Working Mechanism"
       ],
       "evidence": {
-        "views": 629971,
-        "hours": 78.8,
-        "vph": 7998,
-        "breakout": 2.0
-      }
-    },
-    {
-      "topic": "THIS TINY ANIMAL CAN DODGE AN OWL IN MID-AIR! THE JERBOA IS ABSOLUTELY INSANE!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "disbelief",
-      "score": 0.9146,
-      "context": [
-        "viral Short now: 75,828 views in 72h, 76x its channel's subscribers",
-        "option activetrue subjectTitle This Tiny Animal Can DODGE an Owl in Mid-Air! ---option subjectDescription What if a tiny mouse had giant kan"
-      ],
-      "evidence": {
-        "views": 75828,
-        "hours": 72.2,
-        "vph": 1050,
-        "breakout": 75.8
-      }
-    },
-    {
-      "topic": "Fearless Honey Badger Secret!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9115,
-      "context": [
-        "viral Short now: 103,726 views in 82h, 52x its channel's subscribers",
-        "The honey badger is widely known as nature's most fearless explorer. Its exceptionally thick skin easily resists hundreds of aggressive bee "
-      ],
-      "evidence": {
-        "views": 103726,
-        "hours": 82.0,
-        "vph": 1266,
-        "breakout": 51.6
-      }
-    },
-    {
-      "topic": "Why Everest Isn't Named After the Indian Who Measured It Radhanath Sikdar",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.9083,
-      "context": [
-        "viral Short now: 243,171 views in 69h, 8x its channel's subscribers",
-        "Why Everest Isn't Named After the Indian Who Measured It Radhanath Sikdar जस आदम क नम पर मउट एवरसट ह, उसन एवरसट कभ दख तक नह दनय क सबस ऊच चट "
-      ],
-      "evidence": {
-        "views": 243171,
-        "hours": 68.8,
-        "vph": 3535,
-        "breakout": 8.2
-      }
-    },
-    {
-      "topic": "LPU Unsolved Mystery Kuldeep Singhaniaa",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9052,
-      "context": [
-        "viral Short now: 1,112,785 views in 93h, 0x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 1112785,
-        "hours": 93.2,
-        "vph": 11934,
-        "breakout": 0.1
-      }
-    },
-    {
-      "topic": "Guess the animal voice",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.902,
-      "context": [
-        "viral Short now: 212,967 views in 78h, 10x its channel's subscribers",
-        "Guess the animal voice"
-      ],
-      "evidence": {
-        "views": 212967,
-        "hours": 77.8,
-        "vph": 2739,
-        "breakout": 9.8
-      }
-    },
-    {
-      "topic": "Everyone On Earth Fits In Here",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.8988,
-      "context": [
-        "viral Short now: 73,167 views in 89h, 73x its channel's subscribers",
-        "Could every human alive fit inside a sugar cube? Squeeze out the empty space in atoms, and yes. All 8 billion of us would take up about 2 cu"
-      ],
-      "evidence": {
-        "views": 73167,
-        "hours": 89.0,
-        "vph": 822,
-        "breakout": 73.2
-      }
-    },
-    {
-      "topic": "படடய தடடயலரநத தபபசச ஆகடபஸ மரளவதத இனக",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.8957,
-      "context": [
-        "viral Short now: 49,556 views in 50h, 50x its channel's subscribers",
-        "Keywords: Octopus Facts, Octopus Facts Tamil, Octopus Information, Facts About Octopus, Amazing Octopus Facts, Interesting Octopus Facts, Oc"
-      ],
-      "evidence": {
-        "views": 49556,
-        "hours": 50.1,
-        "vph": 990,
-        "breakout": 49.6
-      }
-    },
-    {
-      "topic": "भगरथ बकनर महरज गगसह ज रठड क रयसत कलन छव!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.8925,
-      "context": [
-        "viral Short now: 106,419 views in 51h, 13x its channel's subscribers",
-        "भगरथ बकनर महरज गगसह ज रठड क रयसत कलन छव!"
-      ],
-      "evidence": {
-        "views": 106419,
-        "hours": 51.1,
-        "vph": 2083,
-        "breakout": 13.2
-      }
-    },
-    {
-      "topic": "Power Of Lion, Tiger And leopard Combined In One Hunter",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.8893,
-      "context": [
-        "viral Short now: 248,892 views in 93h, 8x its channel's subscribers",
-        "Power Of Lion, Tiger And leopard Combined In One Hunter"
-      ],
-      "evidence": {
-        "views": 248892,
-        "hours": 92.9,
-        "vph": 2680,
-        "breakout": 7.9
-      }
-    },
-    {
-      "topic": "Bumi dan Bulan dari Saturnus? Mungkinkah ini rekaman asli? cek dulu!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.8862,
-      "context": [
-        "viral Short now: 408,400 views in 80h, 1x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 408400,
-        "hours": 79.8,
-        "vph": 5118,
-        "breakout": 1.2
-      }
-    },
-    {
-      "topic": "Rare October 2026 Night Sky Events Revealed!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.883,
-      "context": [
-        "viral Short now: 105,386 views in 81h, 20x its channel's subscribers",
-        "Get ready for October 2026! Mark these 7 rare celestial events on your calendar right now: Oct 3: Andromeda Galaxy Best Viewing Oct 4: Satur"
-      ],
-      "evidence": {
-        "views": 105386,
-        "hours": 80.9,
-        "vph": 1303,
-        "breakout": 20.5
-      }
-    },
-    {
-      "topic": "The Secret Behind Increasing Salmon Numbers!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.8799,
-      "context": [
-        "viral Short now: 107,723 views in 54h, 9x its channel's subscribers",
-        "The Secret Behind Increasing Salmon Numbers! Salmon travel thousands of kilometers to spawn! But how do scientists help increase their numbe"
-      ],
-      "evidence": {
-        "views": 107723,
-        "hours": 54.4,
-        "vph": 1981,
-        "breakout": 9.4
-      }
-    },
-    {
-      "topic": "జరఫ నళల తగడ ఎపపడన చసర?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.8767,
-      "context": [
-        "viral Short now: 268,184 views in 78h, 3x its channel's subscribers",
-        "Some content (images, videos, audio) belongs to their respective copyright owners. This video is created solely for educational, information"
-      ],
-      "evidence": {
-        "views": 268184,
-        "hours": 77.9,
-        "vph": 3444,
-        "breakout": 2.9
+        "views": 176965,
+        "hours": 31.2,
+        "vph": 5675,
+        "breakout": 1.8
       }
     }
   ]
