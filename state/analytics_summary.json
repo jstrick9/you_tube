@@ -1,18 +1,23 @@
 {
-  "updated": "2026-10-03T22:27:00.462851+00:00",
-  "videos_total": 29,
-  "videos_7d": 19,
-  "views_7d": 7779,
+  "updated": "2026-10-04T07:22:07.304847+00:00",
+  "videos_total": 30,
+  "videos_7d": 20,
+  "views_7d": 8189,
   "learned_this_run": 1,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 14,
+      "observations": 15,
       "arms": [
         {
           "arm": "history",
-          "mean": 0.565,
+          "mean": 0.564,
           "n": 3
+        },
+        {
+          "arm": "space",
+          "mean": 0.543,
+          "n": 1
         },
         {
           "arm": "animals",
@@ -23,11 +28,6 @@
           "arm": "entertainment",
           "mean": 0.529,
           "n": 1
-        },
-        {
-          "arm": "space",
-          "mean": 0.5,
-          "n": 0
         },
         {
           "arm": "nature",
@@ -73,8 +73,13 @@
     },
     "format": {
       "status": "learning",
-      "observations": 14,
+      "observations": 15,
       "arms": [
+        {
+          "arm": "would_you_survive",
+          "mean": 0.543,
+          "n": 1
+        },
         {
           "arm": "scale_shock",
           "mean": 0.539,
@@ -122,11 +127,6 @@
         },
         {
           "arm": "myth_buster",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
-          "arm": "would_you_survive",
           "mean": 0.5,
           "n": 0
         },
@@ -301,13 +301,13 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1340,
+      "views": 1372,
       "avg_view_pct": null
     },
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
-      "views": 1331,
+      "views": 1346,
       "avg_view_pct": 62.5
     },
     {
@@ -319,7 +319,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1223,
+      "views": 1224,
       "avg_view_pct": 80.2
     },
     {
@@ -331,7 +331,7 @@
     {
       "title": "How the Largest Animal Ever Eats Tiny Prey #shorts",
       "id": "1ed_FohPwqs",
-      "views": 1192,
+      "views": 1199,
       "avg_view_pct": 54.32
     },
     {
@@ -361,49 +361,49 @@
   ],
   "rejected": [],
   "retention": {
-    "videos": 13,
+    "videos": 14,
     "where": "ending",
     "verdict": "ENDING is the leak: 16% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
     "avg_curve": [
-      1.169,
-      1.122,
-      0.704,
-      0.542,
-      0.449,
-      0.398,
-      0.356,
+      1.174,
+      1.125,
+      0.722,
+      0.549,
+      0.455,
+      0.4,
+      0.358,
       0.329,
       0.304,
-      0.28,
-      0.192
+      0.279,
+      0.189
     ],
-    "median_hook_retention": 0.955,
-    "median_completion": 0.157,
-    "median_swipe_point": 0.34,
+    "median_hook_retention": 0.96,
+    "median_completion": 0.156,
+    "median_swipe_point": 0.36,
     "worst_drop": {
-      "size": 0.419,
+      "size": 0.403,
       "from_pct": 10,
       "to_pct": 20
     }
   },
   "distribution": {
-    "n": 13,
+    "n": 14,
     "gate": 0.7,
     "passing": 0,
     "pass_rate": 0.0,
-    "median_completion": 0.1571,
+    "median_completion": 0.1563,
     "verdict": "NO video clears the 70% completion gate (median 16%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
   },
   "subscribers": {
     "net_90d": 13,
-    "views_90d": 17672,
-    "per_1k_views": 0.74,
+    "views_90d": 18083,
+    "per_1k_views": 0.72,
     "videos": 23,
     "days_to_500": 3461.5,
     "days_to_1000": 6923.1
   },
   "originality": {
-    "episodes_examined": 0,
+    "episodes_examined": 1,
     "window": 25,
     "verdict": "not enough published episodes with a recorded script fingerprint yet"
   }
