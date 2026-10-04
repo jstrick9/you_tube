@@ -356,6 +356,14 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
         "tags": list(dict.fromkeys([t.strip("#") for t in script.get("tags", [])] + ["shorts", "facts"]))[:25],
     }
     record = {"meta": meta, "script": script, "review": a["review"],
+              # Carried explicitly. These are set during assembly and were dropped here,
+              # so every history entry recorded series=None - and episode_number()
+              # derives the next number from exactly that field. The counter therefore
+              # reset on every run, which is why a channel with a recurring numbered
+              # series published CASE #002 with no CASE #001 before it and would have
+              # reissued the same numbers indefinitely. Derived numbering cannot drift,
+              # but only if the thing it derives from is actually written down.
+              "series": a.get("series"), "episode": a.get("episode"),
               "source": {k: source[k] for k in ("title", "url")},
               "plan": a["plan"], "tts_engine": a["tts"]["engine"], "duration": r["duration"],
               "archetype": r.get("archetype"), "words": words,

@@ -537,3 +537,29 @@ def test_generated_imagery_is_labelled_and_last():
 def test_pixazo_is_configured_last_in_the_source_order():
     srcs = CFG["media"]["sources"]
     assert srcs[-1] == "pixazo", f"generated imagery should be the final fallback, got {srcs}"
+
+
+# ── series numbering ────────────────────────────────────────────────────────
+def test_package_carries_series_and_episode_into_history():
+    """episode_number() derives the next number from history's `series` field.
+
+    package() dropped both on the way from assembly to the stored record, so every
+    entry had series=None and the counter restarted every run. A recurring numbered
+    series that reissues #001 and #002 forever is worse than one that skips: it tells
+    a viewer the archive is fake.
+    """
+    src = (ROOT / "autotube" / "pipeline.py").read_text()
+    pkg = src.split("def package(")[1].split("\ndef ")[0]
+    assert '"series": a.get("series")' in pkg, "package must carry series into the record"
+    assert '"episode": a.get("episode")' in pkg, "package must carry episode into the record"
+
+
+def test_episode_numbers_advance_once_history_records_them():
+    from autotube.series import episode_number
+
+    assert episode_number("unsolved", []) == 1
+    hist = [{"series": "unsolved", "episode": 1}, {"series": "unsolved", "episode": 2}]
+    assert episode_number("unsolved", hist) == 3, "must continue, not restart"
+    # max+1, not len+1: pruning history must never reissue a live number
+    assert episode_number("unsolved", [{"series": "unsolved", "episode": 9}]) == 10
+    assert episode_number("field", hist) == 1, "series are numbered independently"
