@@ -97,8 +97,12 @@ def cmd_doctor(cfg: dict) -> int:
             # says nothing about whether the model is wired correctly. Failing the
             # check on it would leave doctor red most evenings, and a check that is
             # always red is one nobody reads. Structural failures still fail.
-            throttled = "429" in detail or "quota" in detail.lower()
-            label = "WORKS" if good else ("QUOTA" if throttled else "FAILS")
+            # 503/502/500 are the provider being busy, same category as a 429: transient,
+            # self-clearing, and no evidence the model is wired wrongly. Only treat a
+            # response that will still be wrong tomorrow as a failure.
+            throttled = ("429" in detail or "quota" in detail.lower()
+                         or any(f"HTTP {c}" in detail for c in (500, 502, 503, 504)))
+            label = "WORKS" if good else ("BUSY " if throttled else "FAILS")
             print(f"  {prov:11s} {label} {mdl}")
             if not good:
                 if not throttled:
