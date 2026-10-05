@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-05T20:07:47.480402+00:00",
+  "video": {
+    "title": "CASE #001 — The Drowning Victim Who Taught the World CPR #shorts",
+    "video_id": "0JGcccDXYFc",
+    "series": "unsolved",
+    "episode": 1,
+    "duration": 16.898049886621315,
+    "file": "20261005-1920-02-l-inconnue-de-la-seine.mp4",
+    "published_at": "2026-10-06T01:03:00+00:00"
+  },
+  "selection": {
+    "topic": "The Most Kissed Face in History",
+    "category": "mysteries",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "why_trending": "viral Short now with 449k views in 73 hours; spooky/eerie true history for October",
+    "viral_score": 9.4,
+    "evidence": [
+      "viral Short now: 449,311 views in 73h, 90x its channel's subscribers",
+      "If you’ve ever trained in CPR or worked in healthcare, chances are you’ve touched her faceand even placed your lips on hers without knowing "
+    ],
+    "format": "plot_twist",
+    "hook_style": "bold_claim"
+  },
+  "grounding": {
+    "primary": {
+      "title": "L'Inconnue de la Seine",
+      "url": "https://en.wikipedia.org/wiki/L%27Inconnue_de_la_Seine"
+    },
+    "corroboration": [],
+    "claims": [
+      {
+        "says": "A dead girl from the Seine became a Parisian art icon.",
+        "evidence": ""
+      },
+      {
+        "says": "Except artists were just the warm-up act.",
+        "evidence": "Her visage inspired numerous literary works."
+      },
+      {
+        "says": "Her face was cast onto the standard CPR training dummy.",
+        "evidence": "Moreover, she became famous for being used for decades for mouth-to-mouth resuscitation dummies."
+      },
+      {
+        "says": "So an unidentified drowning victim taught the world how to save lives.",
+        "evidence": "The identity of the girl was never discovered."
+      }
+    ]
+  },
+  "script": {
+    "title": "The Drowning Victim Who Taught the World CPR",
+    "segments": [
+      "A dead girl from the Seine became a Parisian art icon.",
+      "Except artists were just the warm-up act.",
+      "Her face was cast onto the standard CPR training dummy.",
+      "So an unidentified drowning victim taught the world how to save lives."
+    ],
+    "asides": [
+      "Naturally.",
+      "History is wild."
+    ],
+    "commentary_ratio": 0.091
+  },
+  "review": {
+    "score": 7,
+    "reviewer": "groq:openai/gpt-oss-120b",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:meta/llama-3.2-90b-vision-instruct:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261005-1920"
+  },
+  "originality": {
+    "sketch": [
+      "03dc2175fba2d330",
+      "0432532c8bf37953",
+      "1a6291be8fa4b0f5",
+      "23203a673f524f68",
+      "2567d3f58955911b",
+      "2fb5458970277cc1",
+      "399197e5e8f2b97b",
+      "5281a2c563bcaa0f",
+      "67959b3a111c287f",
+      "6cadc91ffb25b429",
+      "7befc15f96661d26",
+      "7eee2fe2afc47630",
+      "7eee9b2ff5aab1d6",
+      "9471531bd98e7bff",
+      "957eb3321fc0ca55",
+      "a11fb3a3b411b20e",
+      "b0716240c4736d1b",
+      "b217786e1ab31e60",
+      "b87c109e2ba74ccb",
+      "de139ed53b04ad2d",
+      "e21b025c62b26dfd",
+      "e5d31c86b8c8332a",
+      "ec3dd4c7711a93fa",
+      "f411e08f6c86e866",
+      "f66c1b9fbc8cddec",
+      "fac185fed5996777",
+      "fc45a0b976fae96e"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}

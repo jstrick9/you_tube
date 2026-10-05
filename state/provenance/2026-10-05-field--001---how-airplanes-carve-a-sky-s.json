@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-05T20:07:44.869981+00:00",
+  "video": {
+    "title": "FIELD #001 — How airplanes carve a sky‑sized Swiss cheese #shorts",
+    "video_id": "zWe9txQMrTw",
+    "series": "field",
+    "episode": 1,
+    "duration": 17.378027210884355,
+    "file": "20261005-1920-01-fallstreak-hole.mp4",
+    "published_at": "2026-10-05T21:20:00+00:00"
+  },
+  "selection": {
+    "topic": "Fallstreak hole",
+    "category": "nature",
+    "trend_sources": [
+      "wikipedia"
+    ],
+    "why_trending": "Wikipedia page spikes to 108k daily views, 1260× normal.",
+    "viral_score": 8.0,
+    "evidence": [
+      "Wikipedia: 107,963 views/day, 1262.7x its normal"
+    ],
+    "format": "creepy_true",
+    "hook_style": "disbelief"
+  },
+  "grounding": {
+    "primary": {
+      "title": "Fallstreak hole",
+      "url": "https://en.wikipedia.org/wiki/Fallstreak_hole"
+    },
+    "corroboration": [
+      {
+        "title": "Cirrocumulus lacunosus",
+        "url": "https://en.wikipedia.org/wiki/Cirrocumulus_lacunosus"
+      },
+      {
+        "title": "Fall streaks",
+        "url": "https://en.wikipedia.org/wiki/Fall_streaks"
+      },
+      {
+        "title": "International Cloud Atlas",
+        "url": "https://en.wikipedia.org/wiki/International_Cloud_Atlas"
+      },
+      {
+        "title": "Contrail",
+        "url": "https://en.wikipedia.org/wiki/Contrail"
+      },
+      {
+        "title": "Cirrus cloud",
+        "url": "https://en.wikipedia.org/wiki/Cirrus_cloud"
+      }
+    ],
+    "claims": [
+      {
+        "says": "Can a plane punch a perfect hole in clouds?",
+        "evidence": "The ice crystals can be formed by passing aircraft"
+      },
+      {
+        "says": "The cloud’s water is supercooled yet remains liquid until",
+        "evidence": "When ice crystals do form, a domino effect is set off"
+      },
+      {
+        "says": "The result is a clear, circular hole with streaks below.",
+        "evidence": "creating a hole with brush-like streaks of ice crystals below it"
+      },
+      {
+        "says": "Yes—aircraft seed ice, creating a sky‑sized Swiss cheese.",
+        "evidence": "A fallstreak hole is a large gap, usually circular or elliptical"
+      }
+    ]
+  },
+  "script": {
+    "title": "How airplanes carve a sky‑sized Swiss cheese",
+    "segments": [
+      "Can a plane punch a perfect hole in clouds?",
+      "The cloud’s water is supercooled yet remains liquid until",
+      "The result is a clear, circular hole with streaks below.",
+      "Yes—aircraft seed ice, creating a sky‑sized Swiss cheese."
+    ],
+    "asides": [
+      "Nature, please.",
+      "Mind blown."
+    ],
+    "commentary_ratio": 0.1
+  },
+  "review": {
+    "score": 7,
+    "reviewer": "groq:qwen/qwen3.8-27b",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:meta/llama-3.2-90b-vision-instruct:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261005-1920"
+  },
+  "originality": {
+    "sketch": [
+      "0f2375fd55287555",
+      "133ab55f1beff5a5",
+      "15e415ffa1a95819",
+      "1c1864986e0df1f7",
+      "20672822075c9107",
+      "21b2c5a22cb07421",
+      "27ebb35c60726ed3",
+      "2a29f538954c5553",
+      "2e056d28b53377f8",
+      "332c76d7eb730930",
+      "35df6555df9727dc",
+      "39f9af9e2aac4fb2",
+      "49aba9c6c6cd6ae3",
+      "5cd3797a95ab3c08",
+      "605a2acafa2b4bd7",
+      "638b02d9238eca9e",
+      "6ebed2b991038b2e",
+      "78f57a159f97e50c",
+      "7e195391000a5d2e",
+      "8d0467cb8c467ad7",
+      "8d54f01ade8ffed7",
+      "9d1c17a8dc4a7800",
+      "b2801c002360b37a",
+      "b4e0ae089928df9e",
+      "bbdaba511a7de198",
+      "c158ed1c933094ac",
+      "c9bc068b57a49cbb",
+      "dda501c92db34413",
+      "f53890a58d890f32",
+      "fc5c133594044af4"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}

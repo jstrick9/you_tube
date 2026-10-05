@@ -1,17 +1,17 @@
 {
-  "updated": "2026-10-05T07:40:24.899944+00:00",
+  "updated": "2026-10-05T19:20:46.064898+00:00",
   "videos_total": 31,
-  "videos_7d": 18,
-  "views_7d": 5979,
-  "learned_this_run": 3,
+  "videos_7d": 15,
+  "views_7d": 6025,
+  "learned_this_run": 1,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 18,
+      "observations": 19,
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.592,
+          "mean": 0.591,
           "n": 1
         },
         {
@@ -37,7 +37,7 @@
         {
           "arm": "technology",
           "mean": 0.5,
-          "n": 0
+          "n": 1
         },
         {
           "arm": "sports",
@@ -73,12 +73,12 @@
     },
     "format": {
       "status": "learning",
-      "observations": 18,
+      "observations": 19,
       "arms": [
         {
           "arm": "sounds_fake",
-          "mean": 0.592,
-          "n": 1
+          "mean": 0.568,
+          "n": 2
         },
         {
           "arm": "scale_shock",
@@ -92,7 +92,7 @@
         },
         {
           "arm": "by_the_numbers",
-          "mean": 0.528,
+          "mean": 0.527,
           "n": 2
         },
         {
@@ -147,7 +147,7 @@
         },
         {
           "arm": "myth_buster",
-          "mean": 0.453,
+          "mean": 0.454,
           "n": 1
         }
       ]
@@ -301,14 +301,14 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1392,
-      "avg_view_pct": 94.34
+      "views": 1410,
+      "avg_view_pct": 92.56
     },
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
-      "views": 1375,
-      "avg_view_pct": 63.88
+      "views": 1386,
+      "avg_view_pct": 63.36999999999999
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -320,7 +320,7 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1225,
-      "avg_view_pct": 80.07
+      "avg_view_pct": 80.1
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -332,7 +332,7 @@
       "title": "How the Largest Animal Ever Eats Tiny Prey #shorts",
       "id": "1ed_FohPwqs",
       "views": 1200,
-      "avg_view_pct": 55.00000000000001
+      "avg_view_pct": 54.59
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
@@ -356,51 +356,51 @@
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
       "views": 1157,
-      "avg_view_pct": 59.209999999999994
+      "avg_view_pct": 59.31000000000001
     }
   ],
   "rejected": [],
   "retention": {
-    "videos": 15,
+    "videos": 18,
     "where": "ending",
-    "verdict": "ENDING is the leak: 16% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
+    "verdict": "ENDING is the leak: 19% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
     "avg_curve": [
-      1.186,
-      1.127,
-      0.726,
-      0.555,
-      0.462,
-      0.409,
-      0.367,
-      0.338,
-      0.313,
-      0.289,
-      0.204
+      1.224,
+      1.146,
+      0.758,
+      0.589,
+      0.497,
+      0.444,
+      0.398,
+      0.369,
+      0.343,
+      0.32,
+      0.245
     ],
-    "median_hook_retention": 0.964,
-    "median_completion": 0.157,
-    "median_swipe_point": 0.38,
+    "median_hook_retention": 1.003,
+    "median_completion": 0.188,
+    "median_swipe_point": 0.39,
     "worst_drop": {
-      "size": 0.401,
+      "size": 0.388,
       "from_pct": 10,
       "to_pct": 20
     }
   },
   "distribution": {
-    "n": 15,
+    "n": 18,
     "gate": 0.7,
     "passing": 0,
     "pass_rate": 0.0,
-    "median_completion": 0.1571,
-    "verdict": "NO video clears the 70% completion gate (median 16%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
+    "median_completion": 0.1885,
+    "verdict": "NO video clears the 70% completion gate (median 19%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
   },
   "subscribers": {
-    "net_90d": 19,
-    "views_90d": 18493,
-    "per_1k_views": 1.03,
+    "net_90d": 20,
+    "views_90d": 18540,
+    "per_1k_views": 1.08,
     "videos": 23,
-    "days_to_500": 2368.4,
-    "days_to_1000": 4736.8
+    "days_to_500": 2250.0,
+    "days_to_1000": 4500.0
   },
   "originality": {
     "episodes_examined": 2,
