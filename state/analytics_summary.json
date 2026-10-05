@@ -1,18 +1,18 @@
 {
-  "updated": "2026-10-04T15:26:22.517807+00:00",
-  "videos_total": 30,
-  "videos_7d": 17,
-  "views_7d": 5667,
-  "learned_this_run": 0,
+  "updated": "2026-10-05T07:40:24.899944+00:00",
+  "videos_total": 31,
+  "videos_7d": 18,
+  "views_7d": 5979,
+  "learned_this_run": 3,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 15,
+      "observations": 18,
       "arms": [
         {
-          "arm": "history",
-          "mean": 0.564,
-          "n": 3
+          "arm": "nature",
+          "mean": 0.592,
+          "n": 1
         },
         {
           "arm": "space",
@@ -25,14 +25,14 @@
           "n": 1
         },
         {
+          "arm": "history",
+          "mean": 0.529,
+          "n": 4
+        },
+        {
           "arm": "entertainment",
           "mean": 0.528,
           "n": 1
-        },
-        {
-          "arm": "nature",
-          "mean": 0.5,
-          "n": 0
         },
         {
           "arm": "technology",
@@ -55,14 +55,14 @@
           "n": 0
         },
         {
+          "arm": "science",
+          "mean": 0.495,
+          "n": 5
+        },
+        {
           "arm": "geography",
           "mean": 0.487,
           "n": 2
-        },
-        {
-          "arm": "science",
-          "mean": 0.482,
-          "n": 4
         },
         {
           "arm": "culture",
@@ -73,16 +73,21 @@
     },
     "format": {
       "status": "learning",
-      "observations": 15,
+      "observations": 18,
       "arms": [
         {
-          "arm": "would_you_survive",
-          "mean": 0.542,
+          "arm": "sounds_fake",
+          "mean": 0.592,
           "n": 1
         },
         {
           "arm": "scale_shock",
-          "mean": 0.539,
+          "mean": 0.548,
+          "n": 2
+        },
+        {
+          "arm": "would_you_survive",
+          "mean": 0.542,
           "n": 1
         },
         {
@@ -106,11 +111,6 @@
           "n": 0
         },
         {
-          "arm": "sounds_fake",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
           "arm": "ranked_escalation",
           "mean": 0.5,
           "n": 0
@@ -122,11 +122,6 @@
         },
         {
           "arm": "plot_twist",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
-          "arm": "myth_buster",
           "mean": 0.5,
           "n": 0
         },
@@ -149,6 +144,11 @@
           "arm": "myth_vs_fact",
           "mean": 0.465,
           "n": 2
+        },
+        {
+          "arm": "myth_buster",
+          "mean": 0.453,
+          "n": 1
         }
       ]
     },
@@ -301,14 +301,14 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1378,
-      "avg_view_pct": null
+      "views": 1392,
+      "avg_view_pct": 94.34
     },
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
-      "views": 1353,
-      "avg_view_pct": 62.5
+      "views": 1375,
+      "avg_view_pct": 63.88
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -319,8 +319,8 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1224,
-      "avg_view_pct": 80.2
+      "views": 1225,
+      "avg_view_pct": 80.07
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -332,7 +332,7 @@
       "title": "How the Largest Animal Ever Eats Tiny Prey #shorts",
       "id": "1ed_FohPwqs",
       "views": 1200,
-      "avg_view_pct": 54.32
+      "avg_view_pct": 55.00000000000001
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
@@ -344,7 +344,7 @@
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
       "views": 1176,
-      "avg_view_pct": 50.03999999999999
+      "avg_view_pct": 50.29
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
@@ -355,7 +355,7 @@
     {
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
-      "views": 1156,
+      "views": 1157,
       "avg_view_pct": 59.209999999999994
     }
   ],
@@ -395,16 +395,31 @@
     "verdict": "NO video clears the 70% completion gate (median 16%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
   },
   "subscribers": {
-    "net_90d": 13,
-    "views_90d": 18174,
-    "per_1k_views": 0.72,
+    "net_90d": 19,
+    "views_90d": 18493,
+    "per_1k_views": 1.03,
     "videos": 23,
-    "days_to_500": 3461.5,
-    "days_to_1000": 6923.1
+    "days_to_500": 2368.4,
+    "days_to_1000": 4736.8
   },
   "originality": {
-    "episodes_examined": 1,
+    "episodes_examined": 2,
     "window": 25,
-    "verdict": "not enough published episodes with a recorded script fingerprint yet"
+    "mean_pairwise_similarity": 0.0,
+    "max_pairwise_similarity": 0.0,
+    "pairs_over_similarity_limit": 0,
+    "most_common_format": {
+      "name": "would_you_survive",
+      "share": 0.5
+    },
+    "most_common_category": {
+      "name": "space",
+      "share": 0.5
+    },
+    "share_with_narrator_commentary": 0.5,
+    "flags": [
+      "only 50% of episodes have any narrator commentary"
+    ],
+    "verdict": "drifting toward a template: only 50% of episodes have any narrator commentary"
   }
 }
