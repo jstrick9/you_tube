@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-06T18:33:34.076000+00:00",
+  "video": {
+    "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
+    "video_id": "iEXe-QyrmkY",
+    "series": "unsolved",
+    "episode": 5,
+    "duration": 15.578027210884352,
+    "file": "20261006-1652-02-military-rations.mp4",
+    "published_at": "2026-10-07T00:40:00+00:00"
+  },
+  "selection": {
+    "topic": "87-Year-Old Military Rations Revealed",
+    "category": "history",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "why_trending": "Viral Short now: 367,476 views in 46h, 42x its channel's subscribers",
+    "viral_score": 8.5,
+    "evidence": [
+      "viral Short now: 367,476 views in 46h, 42x its channel's subscribers",
+      ""
+    ],
+    "format": "dumbest_decision",
+    "hook_style": "question"
+  },
+  "grounding": {
+    "primary": {
+      "title": "Military rations",
+      "url": "https://en.wikipedia.org/wiki/Military_rations"
+    },
+    "corroboration": [],
+    "claims": [
+      {
+        "says": "Roman soldiers were sometimes forced to eat barley.",
+        "evidence": "barley, which was issued to soldiers as punishment for minor offenses"
+      },
+      {
+        "says": "Most soldiers got wheat, but barley was for animals.",
+        "evidence": "oats, which were seen as fodder and only eaten in times of desperation"
+      },
+      {
+        "says": "One soldier's wheat ration was 66 pounds monthly.",
+        "evidence": "In the second century BC, a soldier's wheat ration was 66 pounds (30 kg) per month."
+      },
+      {
+        "says": "They also ate twice-baked hardtack biscuits called buccellatum.",
+        "evidence": "grain rations also included hardtack biscuits called buccellatum"
+      }
+    ]
+  },
+  "script": {
+    "title": "The Roman Army's Bizarre Punishment Ration",
+    "segments": [
+      "Roman soldiers were sometimes forced to eat barley.",
+      "Most soldiers got wheat, but barley was for animals.",
+      "One soldier's wheat ration was 66 pounds monthly.",
+      "They also ate twice-baked hardtack biscuits called buccellatum."
+    ],
+    "asides": [
+      "That is a lot of bread."
+    ],
+    "commentary_ratio": 0.154
+  },
+  "review": {
+    "score": 8,
+    "reviewer": "gemini:gemini-flash-lite-latest",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:google/gemma-4-31b-it",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261006-1652"
+  },
+  "originality": {
+    "sketch": [
+      "1188f3e0bfb873ed",
+      "15087a3c24186d39",
+      "20836f288e98791e",
+      "2fa9d49eda3f23bc",
+      "3196a841813e0522",
+      "3fd97962fb668ca8",
+      "46d347c0544bec22",
+      "50499d0d2452a128",
+      "5806db3dc62c5ab5",
+      "5b7c5b83a6a60ee3",
+      "7e5533b4ac0dbb28",
+      "8b953c5db9140913",
+      "93597b01aae8a170",
+      "9760988d9c6cf54b",
+      "a42e8b8c964c1ed6",
+      "a60a38bae949a9b9",
+      "aa3988a637a74048",
+      "abf07ba49c04605f",
+      "b29ec30e7f829963",
+      "c26483ec3f7a48bd",
+      "c7dfa5583058ed20",
+      "e030a83b114b375c",
+      "e5a6ed7b3b72251d",
+      "eb9a0674d0a66447",
+      "efcd05d13685d4ed"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-06T18:33:31.116042+00:00",
+  "video": {
+    "title": "FIELD #002 — The Crickets With the Strongest Bite on Earth #shorts",
+    "video_id": "Lx22fpNof2w",
+    "series": "field",
+    "episode": 2,
+    "duration": 19.874058956916098,
+    "file": "20261006-1652-01-cricket-insect.mp4",
+    "published_at": "2026-10-06T22:07:00+00:00"
+  },
+  "selection": {
+    "topic": "How Can a Fly Keep Moving Without Its Head?",
+    "category": "animals",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "why_trending": "youtube_outliers: viral Short 4,881,213 views in 94h, 126× channel size",
+    "viral_score": 7.0,
+    "evidence": [
+      "viral Short now: 4,881,213 views in 94h, 126x its channel's subscribers",
+      "It sounds impossible, but insects are built very differently from humans. A fly’s nervous system isn’t controlled exclusively by its brain n"
+    ],
+    "format": "ranked_escalation",
+    "hook_style": "bold_claim"
+  },
+  "grounding": {
+    "primary": {
+      "title": "Cricket (insect)",
+      "url": "https://en.wikipedia.org/wiki/Cricket_%28insect%29"
+    },
+    "corroboration": [],
+    "claims": [
+      {
+        "says": "A raspy cricket has the single strongest bite of any insect.",
+        "evidence": ""
+      },
+      {
+        "says": "Weird: males chirp by scraping a file on one wing.",
+        "evidence": "Most male crickets make a loud chirping sound by stridulation"
+      },
+      {
+        "says": "Weirder: bull crickets excavate burrows a whole metre deep.",
+        "evidence": "bull crickets which excavate burrows a metre or more deep"
+      },
+      {
+        "says": "Completely unhinged: some beach-dwelling species run and jump right across water.",
+        "evidence": "certain beach-dwelling species can run and jump over the surface of water"
+      }
+    ]
+  },
+  "script": {
+    "title": "The Crickets With the Strongest Bite on Earth",
+    "segments": [
+      "A raspy cricket has the single strongest bite of any insect.",
+      "Weird: males chirp by scraping a file on one wing.",
+      "Weirder: bull crickets excavate burrows a whole metre deep.",
+      "Completely unhinged: some beach-dwelling species run and jump right across water."
+    ],
+    "asides": [
+      "A built-in instrument.",
+      "Better diggers than my neighbors."
+    ],
+    "commentary_ratio": 0.163
+  },
+  "review": {
+    "score": 7,
+    "reviewer": "nvidia:google/gemma-4-31b-it",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:google/gemma-4-31b-it",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261006-1652"
+  },
+  "originality": {
+    "sketch": [
+      "08247e32e777557a",
+      "0bbd5ca2f832d2f5",
+      "1f5009072a627f63",
+      "21a1db25b0d7cd3d",
+      "221d70a0d2b80775",
+      "26b592f8a82f61e8",
+      "34e8a56df16dc82d",
+      "3b08c04afffa5e10",
+      "4046fe3643c093b4",
+      "43dca37cc1563ccd",
+      "545935a7e1b9df71",
+      "59d444e9e7b91992",
+      "7489cee286f8ee3d",
+      "7c58cc27e388fefd",
+      "816ee22b3ca80231",
+      "89d2c4d1d79c6460",
+      "89fe95c6d5e57796",
+      "8aa4f2fb12213c6c",
+      "8cc8844742996f10",
+      "8e686c5237ad8dc3",
+      "9624e60d85c433d2",
+      "969942c54321d9b2",
+      "99e6b52cd8d5e219",
+      "a968d015b3e3629f",
+      "ae80b7d63901fba2",
+      "b56d347997d5220a",
+      "b9c4926390ad83bb",
+      "be97eb619b69e19b",
+      "c43582fafacba646",
+      "cfc21cc8d930e700",
+      "d3ab9af01b8039d6",
+      "d4643710fbf385c6",
+      "d70b2c9584454435",
+      "ecee8f7287fe2c95",
+      "f4ce2a9aad3b0bed",
+      "fa3d11c10d800fba"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}
