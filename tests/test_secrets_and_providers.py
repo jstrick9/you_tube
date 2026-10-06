@@ -1018,3 +1018,35 @@ def test_both_are_enforced_by_the_real_validator():
     asking[-1]["text"] = "The Hittite Empire or the Nile's floods—which won?"
     with pytest.raises(AssertionError, match="asks a question"):
         v({"title": "T", "segments": asking})
+
+
+# ── topic selection: specificity ───────────────────────────────────────────
+def test_selection_demands_the_specific_article_not_the_category():
+    """The selection prompt used to instruct generalisation.
+
+    It said to prefer "the underlying record, place, object or phenomenon", which is
+    how "the longest conveyor belt in the world" grounded to "Conveyor belt" and
+    "nail-filled Roman boots" to "Imperial Roman army". The writer may only cite the
+    grounded article, so widening it deletes the one detail that made the topic worth
+    watching, and the script falls back to generalities.
+    """
+    src = (ROOT / "autotube" / "scriptwriter.py").read_text()
+    assert "prefer the underlying record, place, object or phenomenon" not in src, \
+        "the generalising instruction is back"
+    assert "MOST SPECIFIC one that actually contains the surprising claim" in src
+    assert "Conveyor belt" in src, "keep the worked example that motivated this"
+
+
+def test_an_empty_wiki_query_drops_the_topic_instead_of_widening_it():
+    """Honour the selector's refusal.
+
+    `p.get("wiki_query") or c["topic"]` silently fell back to the raw headline, which
+    then Wikipedia-searched onto the category page - the exact behaviour the prompt
+    change exists to avoid. Asking the model to say "no specific article" only helps
+    if saying it does something.
+    """
+    src = (ROOT / "autotube" / "scriptwriter.py").read_text()
+    body = src.split("def select_topics(")[1].split("\n    def ")[0]
+    i_drop = body.index("no specific article")
+    i_fallback = body.index('p.get("wiki_query") or c["topic"]')
+    assert i_drop < i_fallback, "the refusal must be handled before the fallback widens it"

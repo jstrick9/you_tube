@@ -417,8 +417,18 @@ FORMATS we can make (pick the 2-4 this topic can HONESTLY support from its Wikip
 if the article describes a misconception, dumbest_decision only for a documented absurd decision):
 {fmt_list}
 For a viral Short topic, give our OWN angle (never copy the other video) and the English Wikipedia article that
-grounds it (for a trending person or event, prefer the underlying record, place, object or phenomenon unless the
-person is historical; for a TIL/viral post, the underlying subject).
+grounds it.
+
+The article must be the MOST SPECIFIC one that actually contains the surprising claim - the named thing, event,
+person, creature or place the claim is about. Do NOT widen to the category: "the longest conveyor belt in the
+world" is grounded by the specific installation, not by "Conveyor belt"; "nail-filled Roman boots" by "Caliga",
+not by "Imperial Roman army". The writer may only state facts that appear in the article you name, so a category
+article silently deletes the one detail that made the topic worth watching and leaves a dull list of generalities.
+If no specific article carries the claim, say so with "wiki_query": "" and we will drop the topic rather than
+publish the generic version of it.
+
+For a trending living person, ground on the historical record, object or phenomenon instead - but still the
+specific one.
 
 Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<one of categories>",
 "angle": "<one sentence: the single most surprising/funny true hook>", "wiki_query": "<wikipedia article title>",
@@ -444,6 +454,14 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                 c = dict(pool[idx])
                 if vs < min_viral:
                     dropped.append(f"{c['topic'][:40]} ({vs:.0f})")
+                    continue
+                # An empty wiki_query is the selector saying "no specific article carries
+                # this claim". Falling back to the raw topic here is what produced the
+                # generic videos: the headline gets Wikipedia-searched, lands on the
+                # category page, and the surprising detail is gone before drafting.
+                # Honour the refusal instead.
+                if "wiki_query" in p and not str(p.get("wiki_query") or "").strip():
+                    dropped.append(f"{c['topic'][:40]} (no specific article)")
                     continue
                 cat = p.get("category") if p.get("category") in cats else random.choice(cats)
                 fits = [f for f in (p.get("formats") or []) if isinstance(f, str) and f in formats]
