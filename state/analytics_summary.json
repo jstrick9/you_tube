@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-06T16:52:27.414647+00:00",
-  "videos_total": 33,
-  "videos_7d": 16,
-  "views_7d": 6756,
+  "updated": "2026-10-06T19:06:24.578518+00:00",
+  "videos_total": 35,
+  "videos_7d": 15,
+  "views_7d": 6757,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -11,7 +11,7 @@
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.591,
+          "mean": 0.59,
           "n": 1
         },
         {
@@ -301,14 +301,14 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1435,
-      "avg_view_pct": 92.56
+      "views": 1436,
+      "avg_view_pct": 92.08
     },
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
       "views": 1394,
-      "avg_view_pct": 63.36999999999999
+      "avg_view_pct": 63.190000000000005
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -320,7 +320,7 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1225,
-      "avg_view_pct": 80.1
+      "avg_view_pct": 79.99
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -396,30 +396,28 @@
   },
   "subscribers": {
     "net_90d": 20,
-    "views_90d": 19599,
+    "views_90d": 19600,
     "per_1k_views": 1.02,
-    "videos": 25,
+    "videos": 27,
     "days_to_500": 2250.0,
     "days_to_1000": 4500.0
   },
   "originality": {
-    "episodes_examined": 4,
+    "episodes_examined": 6,
     "window": 25,
     "mean_pairwise_similarity": 0.0,
     "max_pairwise_similarity": 0.0,
     "pairs_over_similarity_limit": 0,
     "most_common_format": {
-      "name": "creepy_true",
-      "share": 0.25
+      "name": "sounds_fake",
+      "share": 0.167
     },
     "most_common_category": {
       "name": "mysteries",
-      "share": 0.5
+      "share": 0.333
     },
-    "share_with_narrator_commentary": 0.75,
-    "flags": [
-      "only 75% of episodes have any narrator commentary"
-    ],
-    "verdict": "drifting toward a template: only 75% of episodes have any narrator commentary"
+    "share_with_narrator_commentary": 0.833,
+    "flags": [],
+    "verdict": "looks like a show"
   }
 }
