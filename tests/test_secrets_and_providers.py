@@ -764,3 +764,46 @@ def test_validator_actually_rejects_an_all_ambient_script():
     ]}
     with pytest.raises(AssertionError, match="no shot shows"):
         v(ambient)
+
+
+def test_rejects_the_empty_payoff_the_echo_gate_created():
+    """Closing one exit opened another.
+
+    With hook-echoing blocked, a real run ended "And that's exactly why we have to
+    ask..." - no fact, no number, no answer - with the video's best fact stranded
+    mid-script. Same failure as the echo wearing different clothes: a last line
+    carrying no information.
+    """
+    from autotube.scriptwriter import payoff_is_empty
+
+    assert payoff_is_empty("Asia has a 1,500-mile-long scar.",
+                           "And that's exactly why we have to ask...")
+    assert payoff_is_empty("Asia has a scar.", "So the question remains.")
+
+    # Real payoffs, including two this pipeline actually produced, must survive.
+    assert not payoff_is_empty("How do arms reach 25 feet long?",
+                               "And nobody has ever caught a single adult specimen.")
+    assert not payoff_is_empty("Asia has a scar.",
+                               "More than 100 peaks tower past 23,600 feet.")
+    assert not payoff_is_empty("A waterfall that runs blood red.",
+                               "So the ice down there is still bleeding.")
+
+
+def test_empty_payoff_is_enforced_in_validation():
+    """Run the validator, do not grep for it."""
+    import pytest
+
+    v = _grab_validator()
+    assert v is not None
+    trailing = {"title": "T", "segments": [
+        {"text": "Asia has a 1,500-mile-long scar that is still growing.",
+         "visual": {"shows": "the Montauk Monster carcass", "queries": ["montauk monster"]}},
+        {"text": "It is the slowest heaviest collision in all of history.",
+         "visual": {"shows": "mountain range", "queries": ["mountains"]}},
+        {"text": "Peaks there keep climbing a little every single year.",
+         "visual": {"shows": "summit", "queries": ["summit"]}},
+        {"text": "And that's exactly why we have to ask...",
+         "visual": {"shows": "plateau", "queries": ["plateau"]}},
+    ]}
+    with pytest.raises(AssertionError, match="trails off"):
+        v(trailing)

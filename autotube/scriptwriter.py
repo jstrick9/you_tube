@@ -203,6 +203,39 @@ def names_subject(script: dict, subject: str) -> bool:
     return False
 
 
+def payoff_is_empty(hook: str, last: str) -> bool:
+    """Does the closing line actually say anything new?
+
+    Closing the "repeat the hook" exit opened another one. With echoing blocked, a
+    script ended "And that's exactly why we have to ask..." - no fact, no number, no
+    answer, just a rhetorical lead-in to nothing, with the video's best fact stranded
+    mid-script. That is the same failure as the echo in a different costume: the last
+    line carries no information.
+
+    A payoff qualifies if it contributes something the hook did not: a number, or at
+    least two content words the hook does not already have. Trailing teasers are
+    rejected outright because they are the specific shape the model reaches for.
+    """
+    import re as _re
+
+    from .originality import tokens
+
+    low = last.lower().strip()
+    teasers = ("we have to ask", "the question remains", "makes you wonder",
+               "what happens next", "and that is the question", "so the question")
+    if any(t in low for t in teasers) or low.endswith("..."):
+        return True
+    if _re.search(r"\d", last):
+        return False                       # a concrete number is information
+    stop = {"and", "that", "the", "a", "an", "is", "was", "are", "were", "to", "of",
+            "in", "on", "at", "for", "with", "so", "it", "its", "this", "but", "why",
+            "how", "we", "you", "they", "he", "she", "just", "still", "even", "all",
+            "exactly", "have", "has", "had", "be", "been", "as", "by", "from", "not"}
+    hook_t = set(tokens(hook))
+    fresh = [t for t in tokens(last) if t not in stop and t not in hook_t]
+    return len(fresh) < 2
+
+
 def echoes_hook(first: str, last: str) -> float:
     """How much of the closing line is just the hook again, 0..1.
 
@@ -372,7 +405,9 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                 "the first spends the most important seconds of the video saying nothing. "
                 "Good: hook 'a waterfall that runs blood red' → last line 'so the ice down there is still bleeding'. "
                 "Bad: hook 'a plane punched a hole in the sky' → last line 'a plane just punched a hole in the sky'. "
-                "No 'follow for more', no goodbye.")
+                "The last line must contain a FACT - a number, a name or an outcome, never a "
+                "rhetorical lead-in like 'and that is exactly why we have to ask...', which ends "
+                "the video on nothing. No 'follow for more', no goodbye.")
         else:
             loop_rule = "answer the hook's question with the final surprising fact + a natural 'Follow for more.'"
         persona = self.cfg.get("persona") or {}
@@ -497,6 +532,10 @@ Return JSON:
                 "document the video is about, not the landscape around it")
             if len(segs) >= 3:
                 echo = echoes_hook(spoken_text(segs[0]), spoken_text(segs[-1]))
+                assert not payoff_is_empty(spoken_text(segs[0]), spoken_text(segs[-1])), (
+                    "the last line delivers no information - it trails off instead of paying off. "
+                    "End on the strongest FACT the viewer has not heard: a number, a name, an "
+                    "outcome. Never 'and that is exactly why we have to ask...'")
                 assert echo < 0.6, (
                     f"the last line just restates the hook ({echo:.0%} of its words are from it) — "
                     "end on the strongest fact the viewer has NOT heard yet, something the hook "
