@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-05T19:20:46.064898+00:00",
-  "videos_total": 31,
-  "videos_7d": 15,
-  "views_7d": 6025,
-  "learned_this_run": 1,
+  "updated": "2026-10-06T01:02:25.367599+00:00",
+  "videos_total": 33,
+  "videos_7d": 17,
+  "views_7d": 6391,
+  "learned_this_run": 0,
   "strategy": {
     "category": {
       "status": "learning",
@@ -301,20 +301,20 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1410,
+      "views": 1419,
       "avg_view_pct": 92.56
     },
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
-      "views": 1386,
+      "views": 1393,
       "avg_view_pct": 63.36999999999999
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
       "views": 1280,
-      "avg_view_pct": 51.97999999999999
+      "avg_view_pct": 52.05
     },
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
@@ -344,7 +344,7 @@
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
       "views": 1176,
-      "avg_view_pct": 50.29
+      "avg_view_pct": 50.25999999999999
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
@@ -356,70 +356,70 @@
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
       "views": 1157,
-      "avg_view_pct": 59.31000000000001
+      "avg_view_pct": 59.43000000000001
     }
   ],
   "rejected": [],
   "retention": {
-    "videos": 18,
+    "videos": 19,
     "where": "ending",
-    "verdict": "ENDING is the leak: 19% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
+    "verdict": "ENDING is the leak: 21% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
     "avg_curve": [
-      1.224,
-      1.146,
-      0.758,
-      0.589,
-      0.497,
-      0.444,
-      0.398,
-      0.369,
-      0.343,
-      0.32,
-      0.245
+      1.223,
+      1.142,
+      0.765,
+      0.594,
+      0.5,
+      0.445,
+      0.396,
+      0.366,
+      0.34,
+      0.317,
+      0.244
     ],
-    "median_hook_retention": 1.003,
-    "median_completion": 0.188,
-    "median_swipe_point": 0.39,
+    "median_hook_retention": 1.004,
+    "median_completion": 0.215,
+    "median_swipe_point": 0.4,
     "worst_drop": {
-      "size": 0.388,
+      "size": 0.377,
       "from_pct": 10,
       "to_pct": 20
     }
   },
   "distribution": {
-    "n": 18,
+    "n": 19,
     "gate": 0.7,
     "passing": 0,
     "pass_rate": 0.0,
-    "median_completion": 0.1885,
-    "verdict": "NO video clears the 70% completion gate (median 19%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
+    "median_completion": 0.2146,
+    "verdict": "NO video clears the 70% completion gate (median 21%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
   },
   "subscribers": {
     "net_90d": 20,
-    "views_90d": 18540,
-    "per_1k_views": 1.08,
-    "videos": 23,
+    "views_90d": 18906,
+    "per_1k_views": 1.06,
+    "videos": 25,
     "days_to_500": 2250.0,
     "days_to_1000": 4500.0
   },
   "originality": {
-    "episodes_examined": 2,
+    "episodes_examined": 4,
     "window": 25,
     "mean_pairwise_similarity": 0.0,
     "max_pairwise_similarity": 0.0,
     "pairs_over_similarity_limit": 0,
     "most_common_format": {
-      "name": "would_you_survive",
-      "share": 0.5
+      "name": "plot_twist",
+      "share": 0.25
     },
     "most_common_category": {
-      "name": "space",
+      "name": "mysteries",
       "share": 0.5
     },
-    "share_with_narrator_commentary": 0.5,
+    "share_with_narrator_commentary": 0.75,
     "flags": [
-      "only 50% of episodes have any narrator commentary"
+      "only 75% of episodes have any narrator commentary"
     ],
-    "verdict": "drifting toward a template: only 50% of episodes have any narrator commentary"
+    "verdict": "drifting toward a template: only 75% of episodes have any narrator commentary"
   }
 }
