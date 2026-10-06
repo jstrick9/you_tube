@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-06T23:53:25.181369+00:00",
+  "video": {
+    "title": "FIELD #004 — Why the brain has three definitions #shorts",
+    "video_id": "YBTo7-MaCDc",
+    "series": "field",
+    "episode": 4,
+    "duration": 19.6340589569161,
+    "file": "20261006-2317-01-prefrontal-cortex.mp4",
+    "published_at": "2026-10-07T16:04:00+00:00"
+  },
+  "selection": {
+    "topic": ": The prefrontal cortex being fully developed at age 25 is a myth.",
+    "category": "science",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "why_trending": "Trending viral discussion on reddit_todayilearned today.",
+    "viral_score": 8.8,
+    "evidence": [
+      "TIL: The prefrontal cortex being fully developed at age 25 is a myth."
+    ],
+    "format": "sounds_fake",
+    "hook_style": "bold_claim"
+  },
+  "grounding": {
+    "primary": {
+      "title": "Prefrontal cortex",
+      "url": "https://en.wikipedia.org/wiki/Prefrontal_cortex"
+    },
+    "corroboration": [
+      {
+        "title": "arXiv — The whole prefrontal cortex is premotor cortex",
+        "url": "http://arxiv.org/abs/2106.04651v1"
+      }
+    ],
+    "claims": [
+      {
+        "says": "Scientists defined the human prefrontal cortex in three wildly different ways.",
+        "evidence": "There are three possible ways to define the prefrontal cortex"
+      },
+      {
+        "says": "Some researchers used the cortical granular layer four.",
+        "evidence": "defined based on cytoarchitectonics by the presence of a cortical granular layer IV"
+      },
+      {
+        "says": "Others tracked projections from the thalamus entirely.",
+        "evidence": "projection zone of the medial dorsal nucleus of the thalamus"
+      },
+      {
+        "says": "And one definition just checked where electrical shocks caused no physical movement.",
+        "evidence": "part of the frontal cortex whose electrical stimulation does not evoke movements"
+      }
+    ]
+  },
+  "script": {
+    "title": "Why the brain has three definitions",
+    "segments": [
+      "Scientists defined the human prefrontal cortex in three wildly different ways.",
+      "Some researchers used the cortical granular layer four.",
+      "Others tracked projections from the thalamus entirely.",
+      "And one definition just checked where electrical shocks caused no physical movement."
+    ],
+    "asides": [
+      "A layer solves everything.",
+      "Just zap it and see."
+    ],
+    "commentary_ratio": 0.191
+  },
+  "review": {
+    "score": 7,
+    "reviewer": "nvidia:google/gemma-4-31b-it",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:meta/llama-3.2-90b-vision-instruct:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261006-2317"
+  },
+  "originality": {
+    "sketch": [
+      "08ffeec4f98baefb",
+      "09ca93810de0c78e",
+      "34706180488c7463",
+      "3abc5cf26c1a380e",
+      "3c10d4908c62c3f1",
+      "3fc404956e7dea78",
+      "3ff10dbb67227bc5",
+      "4345ed36ab52d3ca",
+      "435ccb528c808741",
+      "50b40b2b273a7a61",
+      "5278bb7883ac1e0c",
+      "5570c9b96b10382c",
+      "56691c85b73b594d",
+      "569205e36ad856e7",
+      "56ed607de03aa8a5",
+      "5fdca0b33c3bc8a9",
+      "60f13074969a52de",
+      "645e3de77fb49bf4",
+      "6d164d1685975319",
+      "704ab59bcf52dba8",
+      "994728b1ea2f9f68",
+      "a7db24fd5a39ad5a",
+      "ae11d219202c3178",
+      "b9ee07bba00004a2",
+      "ba3a0314d3679b29",
+      "c8961fc21cac245b",
+      "c8e20bb4c1a7a736",
+      "e1b7681af6572b4b",
+      "e848a6849cf2f283",
+      "edbcc03df24bb21c",
+      "f21b4e6a33d64422",
+      "f94e536927d18017"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}

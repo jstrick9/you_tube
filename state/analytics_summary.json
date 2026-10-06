@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-06T19:06:24.578518+00:00",
+  "updated": "2026-10-06T23:17:09.901231+00:00",
   "videos_total": 35,
   "videos_7d": 15,
-  "views_7d": 6757,
+  "views_7d": 7121,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -16,7 +16,7 @@
         },
         {
           "arm": "space",
-          "mean": 0.542,
+          "mean": 0.541,
           "n": 1
         },
         {
@@ -87,7 +87,7 @@
         },
         {
           "arm": "would_you_survive",
-          "mean": 0.542,
+          "mean": 0.541,
           "n": 1
         },
         {
@@ -396,8 +396,8 @@
   },
   "subscribers": {
     "net_90d": 20,
-    "views_90d": 19600,
-    "per_1k_views": 1.02,
+    "views_90d": 19964,
+    "per_1k_views": 1.0,
     "videos": 27,
     "days_to_500": 2250.0,
     "days_to_1000": 4500.0
@@ -409,7 +409,7 @@
     "max_pairwise_similarity": 0.0,
     "pairs_over_similarity_limit": 0,
     "most_common_format": {
-      "name": "sounds_fake",
+      "name": "would_you_survive",
       "share": 0.167
     },
     "most_common_category": {
