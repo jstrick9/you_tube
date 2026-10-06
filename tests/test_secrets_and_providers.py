@@ -1100,3 +1100,48 @@ def test_ground_uses_the_narrowing_resolver():
     src = (ROOT / "autotube" / "research.py").read_text()
     body = src.split("def ground(topic:")[1].split("\ndef ")[0]
     assert "narrow_title(q, lang)" in body, "ground() must resolve through the narrowing path"
+
+
+# ── narrative coherence ────────────────────────────────────────────────────
+def test_the_writer_is_told_to_build_one_chain_not_a_list():
+    """The gap no regex can close.
+
+    Two published scripts passed every mechanical gate - echo, payoff, subject, asides
+    - and differed entirely in structure. Antiochus is one story where each line is
+    caused by the last; Integral is four facts that merely share a subject. The test
+    for the difference is whether the lines can be reordered without breaking.
+    """
+    p = _capture_prompt("history")
+    assert "ONE STORY, not a list" in p
+    assert "reorder your lines" in p
+    # Both worked examples come from this channel's own output.
+    assert "five children" in p, "the Antiochus chain is the GOOD example"
+    assert "peace treaty" in p, "the Egypt fact-list is the BAD example"
+
+
+def test_the_reviewer_scores_coherence():
+    src = (ROOT / "autotube" / "scriptwriter.py").read_text()
+    assert '"coherence": 0-10' in src, "coherence must be in the review schema"
+    assert "A list of true facts is accurate and still unwatchable" in src, \
+        "the reviewer must be told to score structure, not truth"
+
+
+def test_coherence_is_recorded_always_and_gated_by_config():
+    """Recorded on every script so the distribution is knowable before tightening.
+
+    Same discipline as require_loop: a new criterion set strictly, before anyone has
+    seen its false-positive rate, would abandon topics for a reason nobody has
+    measured. Abandonment is already high.
+    """
+    import yaml as _y
+
+    src = (ROOT / "autotube" / "scriptwriter.py").read_text()
+    assert 'review["coherence"] = coh' in src, "every script's score must be recorded"
+    assert 'self.cfg["content"].get("min_coherence", 0)' in src, "threshold must be config-driven"
+    assert 'get("coherence", 10)' in src, "a missing score must not fail the script"
+
+    cfg = _y.safe_load((ROOT / "config.yaml").read_text())
+    thr = cfg["content"]["min_coherence"]
+    assert 0 < thr <= 5, (
+        f"min_coherence {thr} is too strict for an unmeasured criterion: it should reject "
+        "disconnected fact-lists, not merely workmanlike scripts")

@@ -171,6 +171,11 @@ content:
                                          # Was 8, set when the "reviewer" was the writer grading itself. An
                                          # independent reviewer scores a full point lower: measured 7/10 x12,
                                          # 6/10 x7, 5/10 x1 over one run, so 8 rejected every script ever written.
+  min_coherence: 4                       # reviewer's "is this one story or a list?" score (0-10).
+                                         # Set low on purpose: it rejects genuinely disconnected fact-lists
+                                         # (Egypt: pyramids / Nile floods / peace treaty) and leaves merely
+                                         # workmanlike scripts alone. Every script's score is recorded, so
+                                         # the real distribution can be read off history before raising it.
   min_entertainment: 6                   # reviewer's (harsh) entertainment score; flat fact-lists are rewritten
                                          # Was 7. Same recalibration: independent scores ran 5/10 x24, 6/10 x19,
                                          # 4/10 x9, 3/10 x2. 6 keeps a real floor (3-5/10 still rejected) and

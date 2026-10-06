@@ -600,6 +600,15 @@ Write the script as 4-5 segments. Each beat has a DIFFERENT job — do not write
     physics", no "experts say it was only a raccoon" this early. Deepen the puzzle or raise the stakes;
     the answer belongs in the payoff. Resolving it here ends the video at three seconds.
   - order the body so each line is more surprising than the last. The best fact goes LAST, never mid-script.
+  - ONE STORY, not a list of facts about a subject. Each line must follow from the one before it - because of
+    it, despite it, or revealing what it really meant. A viewer should never be able to reorder your lines
+    without the script breaking. If the only thing your lines share is the topic, you have written an
+    encyclopedia entry and people leave at line two.
+    GOOD (each line caused by the last): a prince is dying of a mystery illness / his pulse betrays him when
+    one person enters / she is his stepmother / his father divorces her to save him / they went on to have
+    five children.
+    BAD (same subject, no chain): Egypt built pyramids without modern tools / they used the Nile's flooding /
+    they signed the first peace treaty.
   - last segment = PAYOFF, 6-9 words: {loop_rule}
 Leave ONE question deliberately open from the hook until the payoff — the viewer should be unable to stop
 watching without learning the answer. Never answer it in segment 2.
@@ -797,12 +806,18 @@ SCRIPT NARRATION (lines marked ASIDE are the narrator's jokes, spoken right afte
 
 Evaluate. Return JSON: {{"factual_errors": ["..."], "misleading_title": true|false, "advertiser_friendly": true|false,
 "policy_concerns": ["..."], "value_add": "<what the viewer learns>", "hook_strength": 0-10, "entertainment": 0-10,
-"score": 0-10, "loops": true|false, "fixes": ["..."]}}
+"score": 0-10, "loops": true|false, "coherence": 0-10, "fixes": ["..."]}}
 Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; <7 = do not publish.
 "loops": does the LAST line flow naturally back into the FIRST when the Short replays? Judge it by meaning,
 not by shared words - "so the ice keeps bleeding" loops cleanly into "a waterfall that runs blood red".
 A replay counts as a view and pushes average view percentage past 100%, which is one of the strongest
 satisfaction signals Shorts has. If it does not loop, say so in "fixes" and give the re-worded last line.
+coherence — is this ONE story or a list of facts that happen to share a subject? Ask whether the lines could be
+reordered without the script breaking: if they could, it is a list. 8-10 = each line follows from the one before
+(a prince is dying / his pulse betrays him / she is his stepmother / his father divorces her). 4-6 = loosely
+themed, some connective tissue. 0-3 = unrelated facts in a row (Egypt built pyramids / used Nile flooding /
+signed a peace treaty). A list of true facts is accurate and still unwatchable, so score it on structure, not
+truth, and put the re-ordering or the missing causal link in "fixes".
 Read EVERY sentence literally, word by word: if its literal meaning is false or garbled (e.g. the wrong subject doing
 the action — "rivers carved warnings" when people carved them; a date or place attached to the wrong thing), list
 it in factual_errors even if the gist is right.
@@ -867,6 +882,24 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
         # is a new criterion, and turning it into a hard gate before we know its false-positive rate
         # would start abandoning topics for a reason nobody is watching yet. The verdict is recorded
         # either way, so the rate can be read off history before anyone flips the switch.
+        # Narrative coherence. Recorded on every script so the distribution can be read
+        # off history later, and gated at a deliberately low bar: this rejects scripts
+        # that are a list of unrelated facts, not ones that are merely workmanlike.
+        # Abandonment is already high, and a new criterion set strictly would stall
+        # production for a reason nobody has measured yet - the same reasoning that
+        # keeps require_loop off by default. Raise min_coherence once the scores in
+        # history show what a normal one looks like.
+        try:
+            coh = float(r.get("coherence", 10))
+        except (TypeError, ValueError):
+            coh = 10.0
+        review["coherence"] = coh
+        min_coh = float(self.cfg["content"].get("min_coherence", 0))
+        if coh < min_coh:
+            review["issues"].append(
+                f"this is a list of facts, not a story ({coh:.0f}/10, need {min_coh:.0f}) — "
+                "make each line follow from the one before it: because of it, despite it, or "
+                "revealing what it really meant")
         loops = r.get("loops")
         review["loops"] = loops
         if loops is False and self.cfg["content"].get("require_loop", False):
