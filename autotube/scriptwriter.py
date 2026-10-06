@@ -225,6 +225,31 @@ def aside_is_generic(aside: str) -> bool:
     return norm in GENERIC_ASIDES
 
 
+def subject_is_depictable(subject: str, cfg: dict) -> bool:
+    """Is there a free image of this subject at all, before we write about it?
+
+    The subject gate rejects a finished script whose shots are all ambient scenery.
+    That is the right outcome but the wrong moment: one run spent five full
+    write-and-review cycles discovering, each time, that the thing could not be
+    pictured. Checking the archive first turns five wasted drafts into five cheap
+    lookups.
+
+    Deliberately permissive. A lookup failure returns True rather than False, because
+    a flaky network must never silently empty the schedule, and the real subject gate
+    still runs on the finished script. This only skips topics that are provably
+    unillustratable.
+    """
+    from .media import commons_search
+
+    if not subject:
+        return True
+    try:
+        hits = commons_search(subject, cfg["media"].get("licenses_allowed") or [], 400, limit=4)
+    except Exception:  # noqa: BLE001
+        return True
+    return bool(hits)
+
+
 def payoff_is_empty(hook: str, last: str) -> bool:
     """Does the closing line actually say anything new?
 
@@ -801,6 +826,11 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
         if not source:
             return None
         topic["wiki_title"] = source["title"]
+        # Ask the archive before asking the model. A subject with no free image will
+        # fail the shot gate after a full draft-and-review cycle, every time.
+        if not subject_is_depictable(source["title"], self.cfg):
+            log.info("  ✗ no free image of %r exists — skipping before writing", source["title"])
+            return None
         feedback = ""
         max_attempts = max_attempts or int(self.cfg["content"].get("max_drafts", 4))
         for attempt in range(max_attempts):

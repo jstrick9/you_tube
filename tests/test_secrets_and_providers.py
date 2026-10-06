@@ -893,3 +893,71 @@ def test_the_prompt_states_one_hook_instruction_not_two():
     assert "Never open with a question" in hist
     assert "most absurd number" in sci
     assert hist != sci
+
+
+# ── check the archive before writing ────────────────────────────────────────
+def test_undepictable_subjects_are_skipped_before_a_draft_is_written(monkeypatch):
+    """The shot gate is right but late.
+
+    One run spent five full write-and-review cycles each discovering the subject could
+    not be pictured. Checking the archive first turns five wasted drafts into five
+    cheap lookups. Verified live against the real failure: "Montauk Monster" has no
+    usable free image, which is why that episode shipped six stock beaches.
+    """
+    import autotube.scriptwriter as SW
+
+    cfg = {"media": {"licenses_allowed": []}}
+
+    import autotube.media as M
+
+    monkeypatch.setattr(M, "commons_search", lambda *a, **k: [])
+    assert not SW.subject_is_depictable("Montauk Monster", cfg)
+
+    monkeypatch.setattr(M, "commons_search", lambda *a, **k: [{"url": "u"}])
+    assert SW.subject_is_depictable("Himalayas", cfg)
+
+
+def test_a_lookup_failure_never_empties_the_schedule(monkeypatch):
+    """Permissive on error, on purpose.
+
+    A flaky network must not silently stop the channel publishing. The real shot gate
+    still runs on the finished script, so this only skips the provably unillustratable.
+    """
+    import autotube.media as M
+    import autotube.scriptwriter as SW
+
+    def boom(*a, **k):
+        raise RuntimeError("network down")
+
+    monkeypatch.setattr(M, "commons_search", boom)
+    assert SW.subject_is_depictable("Anything", {"media": {}}) is True
+    assert SW.subject_is_depictable("", {"media": {}}) is True
+
+
+def test_produce_never_drafts_for_an_undepictable_subject(monkeypatch):
+    """Behavioural, because the grep version passed against a disabled check.
+
+    Writing `if False and subject_is_depictable(...)` left the identifier in the
+    source, so a source-reading test could not tell the difference. This one asserts
+    the writer is never reached.
+    """
+    import yaml as _y
+    import autotube.scriptwriter as SW
+
+    cfg = _y.safe_load((ROOT / "config.yaml").read_text())
+    monkeypatch.setattr(SW, "ground", lambda *a, **k: {"title": "Montauk Monster",
+                                                       "url": "u", "text": "t", "summary": "s"})
+    monkeypatch.setattr(SW, "subject_is_depictable", lambda *a, **k: False)
+
+    drafted = []
+
+    class FakeLLM:
+        lite = False
+        last_used = "f"
+
+    w = SW.ScriptWriter(cfg, FakeLLM(), type("S", (), {"fit": lambda *a, **k: {}})())
+    monkeypatch.setattr(w, "write", lambda *a, **k: drafted.append(1) or {})
+
+    assert w.produce({"topic": "x", "category": "history"},
+                     {"format": "sounds_fake", "hook_style": "bold_claim", "voice": "v"}) is None
+    assert drafted == [], "a draft was written for a subject that cannot be pictured"
