@@ -173,6 +173,48 @@ def ground_news(topic: str, search_query: str | None, lang: str = "en",
     }
 
 
+def _words(x: str) -> list:
+    import re as _re
+    return [w for w in _re.findall(r"[\w\u00c0-\u024f]+", (x or "").lower()) if len(w) > 2]
+
+
+def widened(query: str, title: str) -> bool:
+    """Did Wikipedia search drop the distinguishing part of the request?
+
+    Search returns the best *broad* match, so a descriptive query collapses onto its
+    category: "Bou Craa conveyor belt" resolves to "Conveyor belt" even though the
+    article "Bou Craa" exists and is the thing that actually trended. The writer may
+    only cite the article it is given, so the detail that made the topic worth
+    watching is deleted before a word is drafted.
+
+    Detected structurally rather than lexically: the resolved title is a strict subset
+    of the words asked for. That is precisely the shape of a generalisation, and it
+    does not fire on a near-miss like "Caliga" -> "Caligae", which shares no whole word.
+    """
+    q, t = set(_words(query)), set(_words(title))
+    return bool(t) and t < q
+
+
+def narrow_title(query: str, lang: str = "en"):
+    """Resolve a query, and if search widened it, try again on the distinctive part.
+
+    Returns the most specific article that still answers the request, or the widened
+    one when nothing better exists - a general article is worse than a specific one
+    but better than no video.
+    """
+    title = search_title(query, lang)
+    if not title or not widened(query, title):
+        return title
+    extra = [w for w in _words(query) if w not in set(_words(title))]
+    if not extra:
+        return title
+    retry = search_title(" ".join(extra), lang)
+    if retry and not widened(" ".join(extra), retry):
+        log.info("narrowed %r: %r -> %r", query[:48], title, retry)
+        return retry
+    return title
+
+
 def ground(topic: str, search_query: str | None, lang: str = "en", allow_living: bool = False,
            blocked: list[str] | None = None, cfg: dict | None = None, llm=None) -> dict | None:
     """Return {'title','url','summary','text','images'} or None if unusable.
@@ -183,7 +225,7 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
     title = None
     for q in [search_query, topic]:
         if q:
-            title = search_title(q, lang)
+            title = narrow_title(q, lang)
             if title:
                 break
     if not title:

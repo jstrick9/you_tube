@@ -1050,3 +1050,53 @@ def test_an_empty_wiki_query_drops_the_topic_instead_of_widening_it():
     i_drop = body.index("no specific article")
     i_fallback = body.index('p.get("wiki_query") or c["topic"]')
     assert i_drop < i_fallback, "the refusal must be handled before the fallback widens it"
+
+
+# ── grounding: don't let search widen past the claim ───────────────────────
+def test_widened_detects_generalisation_not_near_misses():
+    """Wikipedia search returns the best broad match, which swaps the claim for its
+    category: "Bou Craa conveyor belt" resolves to "Conveyor belt" even though the
+    article "Bou Craa" exists and is the thing that trended.
+
+    Detected structurally - the resolved title is a strict subset of the words asked
+    for - rather than lexically. An earlier lexical attempt compared the headline to
+    the article and could not separate good from bad groundings at any threshold.
+    """
+    from autotube.research import widened
+
+    assert widened("Bou Craa conveyor belt", "Conveyor belt")
+    assert widened("longest conveyor belt", "Conveyor belt")
+
+    # Near-misses and exact hits share no *whole word* subset, so they must not fire.
+    assert not widened("Caliga", "Caligae")
+    assert not widened("Las Médulas", "Las Médulas")
+    assert not widened("Wow! signal", "Wow! signal")
+
+
+def test_narrow_title_retries_on_the_distinctive_words(monkeypatch):
+    """And falls back to the widened article rather than returning nothing.
+
+    A general article is worse than a specific one but better than no video.
+    """
+    import autotube.research as R
+
+    calls = []
+
+    def fake_search(q, lang="en"):
+        calls.append(q)
+        return {"bou craa conveyor belt": "Conveyor belt", "bou craa": "Bou Craa"}.get(q.lower())
+
+    monkeypatch.setattr(R, "search_title", fake_search)
+    assert R.narrow_title("Bou Craa conveyor belt", "en") == "Bou Craa"
+    assert len(calls) == 2, "should retry once on the dropped words"
+
+    # Nothing better available -> keep what we have.
+    monkeypatch.setattr(R, "search_title",
+                        lambda q, lang="en": "Conveyor belt" if "conveyor" in q.lower() else None)
+    assert R.narrow_title("Bou Craa conveyor belt", "en") == "Conveyor belt"
+
+
+def test_ground_uses_the_narrowing_resolver():
+    src = (ROOT / "autotube" / "research.py").read_text()
+    body = src.split("def ground(topic:")[1].split("\ndef ")[0]
+    assert "narrow_title(q, lang)" in body, "ground() must resolve through the narrowing path"
