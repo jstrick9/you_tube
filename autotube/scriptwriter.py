@@ -168,6 +168,41 @@ def tidy(script: dict, fmt: str = "", max_asides: int = 2) -> dict:
     return script
 
 
+def names_subject(script: dict, subject: str) -> bool:
+    """Does any shot actually depict the thing the video is about?
+
+    The Montauk Monster episode asked for "beach in Montauk New York with waves",
+    "shoreline with driftwood and seaweed" and "waves washing onto sandy beach". The
+    vision gate scored those 8, 10 and 10 - correctly, because they were delivered
+    exactly. The viewer saw six interchangeable stock beaches and two photographs of
+    healthy living raccoons, and never once saw the carcass the hook promised.
+
+    Nothing in the system penalised that: easy requests score highest, so a writer
+    optimising for a passing grade learns to ask for ambient scenery. This requires at
+    least one shot to name the subject, which also means a topic with no free image of
+    its own subject is abandoned rather than illustrated with filler - the right
+    outcome, because a video that cannot show its subject has no reason to be made.
+    """
+    from .originality import tokens
+
+    stop = {"the", "a", "an", "of", "and", "in", "on", "at", "for", "with", "to",
+            "incident", "mystery", "case", "story", "effect", "phenomenon", "signal"}
+    key = {t for t in tokens(subject) if len(t) > 3 and t not in stop}
+    if not key:
+        return True          # nothing distinctive to require; do not block the video
+    # Every distinctive word, not any one of them. "Montauk Monster" reduced to a
+    # match on "montauk" alone was satisfied by "beach in Montauk New York with
+    # waves" - a shared place name is the setting, not the subject, and that single
+    # token is what let an entire episode run without showing its own creature.
+    need = len(key) if len(key) <= 3 else max(2, round(len(key) * 0.6))
+    for seg in script.get("segments", []):
+        vis = seg.get("visual") or {}
+        blob = " ".join([str(vis.get("shows", ""))] + [str(q) for q in (vis.get("queries") or [])])
+        if len(key & set(tokens(blob))) >= need:
+            return True
+    return False
+
+
 def echoes_hook(first: str, last: str) -> float:
     """How much of the closing line is just the hook again, 0..1.
 
@@ -403,6 +438,10 @@ Write the script as 4-5 segments. Each beat has a DIFFERENT job — do not write
     The viewer already decided the premise was interesting; explaining it to them is why they leave;
   - segments 3..N-1 = ESCALATION, each 9-11 words, one concrete new fact each, every line raising the stakes
     above the line before it. Use contrast and consequence ("so", "which meant", "except"). No filler, no repetition;
+  - AT LEAST ONE segment's "visual" must show the SUBJECT ITSELF, named explicitly — the object,
+    creature, person, document or place the video is about. Ambient scenery ("waves on a beach",
+    "a sunset", "a forest") is backdrop, not evidence: a viewer who is promised a nightmare and
+    shown a sunset leaves. If the subject genuinely cannot be pictured, this is the wrong topic.
   - segment 1 (after the hook) must NOT resolve or deflate the hook. No "it's not aliens, it's just
     physics", no "experts say it was only a raccoon" this early. Deepen the puzzle or raise the stakes;
     the answer belongs in the payoff. Resolving it here ends the video at three seconds.
@@ -438,6 +477,8 @@ Return JSON:
  "segments": [{{"text": "...", "aside": "", "emphasis": ["..."], "reveal": false,
                "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "..."}}]}}"""
 
+        subject_for_visuals = source["title"]
+
         def validate(o):
             segs = o.get("segments")
             assert isinstance(segs, list) and 4 <= len(segs) <= 8, "need 5-6 segments"
@@ -450,6 +491,10 @@ Return JSON:
             # A closing line that is the hook again is the single most common defect in
             # this channel's published output, and asking the model not to do it has a
             # 0-for-3 record. Reject it where rejection actually costs the model a retry.
+            assert names_subject(o, subject_for_visuals), (
+                f"no shot shows {subject_for_visuals!r} itself — every visual is ambient scenery. "
+                "Name the subject in at least one \"visual\": the object, creature, person or "
+                "document the video is about, not the landscape around it")
             if len(segs) >= 3:
                 echo = echoes_hook(spoken_text(segs[0]), spoken_text(segs[-1]))
                 assert echo < 0.6, (

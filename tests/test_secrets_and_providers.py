@@ -677,3 +677,90 @@ def test_the_writer_rejects_an_echoed_ending_end_to_end():
     # and the prompt must no longer teach the failure
     assert "'...and that is why' before a hook" not in src, "the bad worked example is back"
     assert "STRONGEST REMAINING FACT" in src
+
+
+# ── the video must show its own subject ─────────────────────────────────────
+def test_rejects_the_all_ambient_shotlist_actually_published():
+    """Corpus is the real Montauk Monster episode's visual requests.
+
+    It asked for "beach in Montauk New York with waves", "shoreline with driftwood and
+    seaweed" and "waves washing onto sandy beach". The vision gate scored those 8, 10
+    and 10 — correctly, because they were delivered exactly. The viewer was promised a
+    nightmare and shown six stock beaches and two living raccoons.
+
+    Easy requests score highest, so nothing penalised asking for scenery. This is the
+    thing that penalises it.
+    """
+    from autotube.scriptwriter import names_subject
+
+    published = {"segments": [
+        {"visual": {"shows": "beach in Montauk New York with waves", "queries": ["montauk beach waves"]}},
+        {"visual": {"shows": "raccoon sitting outdoors on grass", "queries": ["raccoon grass"]}},
+        {"visual": {"shows": "shoreline with driftwood and seaweed", "queries": ["driftwood"]}},
+        {"visual": {"shows": "waves washing onto sandy beach", "queries": ["waves beach"]}},
+    ]}
+    assert not names_subject(published, "Montauk Monster"), \
+        "a shared place name is the setting, not the subject"
+
+    shown = {"segments": [
+        {"visual": {"shows": "the Montauk Monster carcass on the sand",
+                    "queries": ["montauk monster carcass"]}}]}
+    assert names_subject(shown, "Montauk Monster")
+
+    # Must never block a video whose subject has no distinctive word to require.
+    assert names_subject(published, "The Mystery")
+
+
+def _grab_validator():
+    """Capture the real validate() the writer hands to the LLM, and call it ourselves."""
+    import yaml as _y
+    from autotube.scriptwriter import ScriptWriter
+
+    cfg = _y.safe_load((ROOT / "config.yaml").read_text())
+    box = {}
+
+    class FakeLLM:
+        lite = False
+        last_used = "fake:model"
+
+        def json(self, system, user, validate=None, **kw):
+            box["v"] = validate
+            raise RuntimeError("captured")
+
+    class FakeStrat:
+        def fit(self, *a, **k):
+            return {}
+
+    w = ScriptWriter(cfg, FakeLLM(), FakeStrat())
+    try:
+        w.write({"topic": "t", "category": "history"},
+                {"format": "sounds_fake", "hook_style": "bold_claim", "voice": "v"},
+                {"title": "Montauk Monster", "url": "u", "text": "Sourced.", "summary": "s"})
+    except Exception:
+        pass
+    return box.get("v")
+
+
+def test_validator_actually_rejects_an_all_ambient_script():
+    """Run the validator rather than grep for it.
+
+    Disabling the assert in validate() left the word "names_subject" in the source, so
+    a grep-based version of this test passed against deliberately broken code.
+    """
+    import pytest
+
+    v = _grab_validator()
+    assert v is not None, "could not capture the script validator"
+
+    ambient = {"title": "T", "segments": [
+        {"text": "In 2008 a nightmare washed up on a New York beach.",
+         "visual": {"shows": "beach in Montauk with waves", "queries": ["montauk beach"]}},
+        {"text": "Experts argued about it for weeks on end.",
+         "visual": {"shows": "shoreline with driftwood", "queries": ["driftwood"]}},
+        {"text": "Nobody agreed what the creature actually was.",
+         "visual": {"shows": "waves washing onto sandy beach", "queries": ["waves"]}},
+        {"text": "The carcass vanished before anyone could test it.",
+         "visual": {"shows": "sunset over the ocean", "queries": ["sunset"]}},
+    ]}
+    with pytest.raises(AssertionError, match="no shot shows"):
+        v(ambient)
