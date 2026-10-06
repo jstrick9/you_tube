@@ -344,7 +344,7 @@ def test_the_two_lanes_do_not_sound_like_one_channel():
     assert hist and sci, "both lanes should carry a profile"
     assert hist != sci, "the two lanes must not produce the same writer guidance"
     for rule in (hist, sci):
-        assert "VOICE:" in rule and "HOOK SHAPE:" in rule and "PACING:" in rule
+        assert "VOICE:" in rule and "PACING:" in rule
 
 
 def test_lane_resolves_from_category_when_not_stated():
@@ -625,8 +625,13 @@ def test_lane_voice_actually_reaches_the_prompt():
     assert "cool, documentary" in hist, "history lane voice missing from the real prompt"
     assert "bright, fast, delighted" in sci, "science lane voice missing from the real prompt"
     assert hist != sci, "the two lanes must produce different prompts"
-    for probe in ("VOICE:", "HOOK SHAPE:", "PACING:"):
+    # The hook is stated once, as a single authoritative HOOK line: emitting it from
+    # both the lane and the bandit produced "HOOK STYLE: question" directly above
+    # "never open with a question", and the model obeyed the wrong one.
+    for probe in ("VOICE:", "PACING:", "HOOK:"):
         assert probe in hist
+    assert "HOOK STYLE:" not in hist, "the generic hook line must not coexist with the lane's"
+    assert "Never open with a question" in hist
 
 
 def test_length_budget_actually_reaches_the_prompt():
@@ -867,3 +872,24 @@ def test_canned_aside_is_rejected_by_the_real_validator():
     ]}
     with pytest.raises(AssertionError, match="canned filler"):
         v(script)
+
+
+def test_the_prompt_states_one_hook_instruction_not_two():
+    """A CASE episode was told "HOOK STYLE: question" and "never open with a question".
+
+    Both lines were injected - the bandit's hook_style and the lane's hook shape - and
+    the model obeyed the first. Every CASE episode therefore opened with a question:
+    the weakest form for faceless shorts, and identical across uploads, which is the
+    template similarity that gets channels demonetised. hook_style is also frozen in
+    the bandit, so it never varied on its own.
+    """
+    hist = _capture_prompt("history")
+    sci = _capture_prompt("space")
+
+    for prompt in (hist, sci):
+        assert "HOOK STYLE:" not in prompt, "the generic hook line must not be emitted too"
+        assert sum(1 for ln in prompt.splitlines() if ln.startswith("HOOK:")) == 1
+
+    assert "Never open with a question" in hist
+    assert "most absurd number" in sci
+    assert hist != sci

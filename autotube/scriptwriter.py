@@ -460,6 +460,20 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
         # professional angle. The writer has to be told what that angle is, or the model will drift
         # back to whatever made the person trend — which is usually the thing we just refused.
         lane_rule = lanes.writer_rule(topic, self.cfg)
+        # One hook instruction, not two. The prompt used to state the bandit's
+        # hook_style AND the lane's hook shape, which for a history episode read
+        # "HOOK STYLE: question" immediately followed by "never open with a question".
+        # The model obeyed the first and every CASE episode opened with a question -
+        # the weakest form for faceless shorts, and identical across every upload,
+        # which is the template similarity that gets channels demonetised.
+        #
+        # The lane is the more specific instruction and the one tied to the research,
+        # so when a lane defines a hook shape it replaces the generic line entirely.
+        _lane_hook = lanes.profile_for(topic, self.cfg).get("hook_style", "")
+        if _lane_hook:
+            hook_line = f"HOOK: {_lane_hook.strip()}"
+        else:
+            hook_line = f"HOOK STYLE: {plan['hook_style']} — {HOOK_GUIDE[plan['hook_style']]}"
         person_rule = ""
         if source.get("person"):
             person_rule = (
@@ -481,7 +495,7 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
 WHY IT'S TRENDING: {topic.get('why_trending') or ', '.join(topic.get('sources', []))}
 ANGLE: {topic.get('angle') or 'most surprising educational angle'}
 FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
-HOOK STYLE: {plan['hook_style']} — {HOOK_GUIDE[plan['hook_style']]}
+{hook_line}
 {comment_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
 CHANNEL: {self.cfg['channel']['name']}
 {persona_line}

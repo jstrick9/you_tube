@@ -69,8 +69,9 @@ def writer_rule(topic: dict, cfg: dict) -> str:
     bits = []
     if p.get("tone"):
         bits.append(f"VOICE: {p['tone']}")
-    if p.get("hook_style"):
-        bits.append(f"HOOK SHAPE: {p['hook_style']}")
+    # Deliberately not emitted here: the hook is stated once, by the writer, as the
+    # single HOOK line. Emitting it from both places is what produced a prompt saying
+    # "HOOK STYLE: question" and "never open with a question" in consecutive lines.
     if p.get("pacing"):
         bits.append(f"PACING: {p['pacing']}")
     if not bits:
