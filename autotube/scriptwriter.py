@@ -168,6 +168,33 @@ def tidy(script: dict, fmt: str = "", max_asides: int = 2) -> dict:
     return script
 
 
+def echoes_hook(first: str, last: str) -> float:
+    """How much of the closing line is just the hook again, 0..1.
+
+    Prompting alone did not fix this. Three consecutive published scripts ended by
+    restating their own first line - "a plane punched a hole in the sky" closing with
+    "a plane just punched a hole in the sky" - which spends the final fifth of the
+    runtime, the exact moment a viewer decides to replay or leave, delivering nothing.
+    The prompt even offered "...and that is why" as a worked example, so the model was
+    obeying it.
+
+    Measured as containment of the closing line's meaningful words in the hook, not
+    Jaccard: a short echo inside a longer hook should still score high. Stop-words and
+    the connectives these endings lean on are ignored so "so yes, he is 193 years old"
+    is judged on "193 years old".
+    """
+    from .originality import tokens
+
+    drop = {"and", "that", "is", "why", "so", "the", "a", "an", "it", "its", "this",
+            "was", "were", "just", "yes", "how", "of", "in", "on", "to", "still", "he",
+            "she", "they", "then", "now", "at", "for", "with", "by", "from", "as"}
+    f = {t for t in tokens(first) if t not in drop}
+    l = [t for t in tokens(last) if t not in drop]
+    if not l:
+        return 1.0
+    return sum(1 for t in l if t in f) / len(l)
+
+
 class ScriptWriter:
     def __init__(self, cfg: dict, llm: LLM, strategy: Strategy):
         self.cfg = cfg
@@ -302,9 +329,15 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
         per_seg = max(1, round((words_lo + words_hi) / 2 / 5.5))
         ev_len = "5-9" if self.llm.lite else "8-15"
         if self.cfg["content"].get("loop_ending", True):
-            loop_rule = ("answer the hook's open question with the final surprising fact, and end on words that flow "
-                         "naturally back into the FIRST line when the Short replays (a seamless loop — e.g. ending "
-                         "'...and that is why' before a hook that is the reason). No 'follow for more', no goodbye.")
+            loop_rule = (
+                "deliver the STRONGEST REMAINING FACT — new information the viewer has not heard yet. "
+                "It must leave a thought the hook then completes on replay. "
+                "NEVER restate, paraphrase or echo the hook: do not begin 'And that is why', 'So yes', "
+                "'So that is how', and do not reuse the hook's subject and verb. A last line that repeats "
+                "the first spends the most important seconds of the video saying nothing. "
+                "Good: hook 'a waterfall that runs blood red' → last line 'so the ice down there is still bleeding'. "
+                "Bad: hook 'a plane punched a hole in the sky' → last line 'a plane just punched a hole in the sky'. "
+                "No 'follow for more', no goodbye.")
         else:
             loop_rule = "answer the hook's question with the final surprising fact + a natural 'Follow for more.'"
         persona = self.cfg.get("persona") or {}
@@ -370,6 +403,10 @@ Write the script as 4-5 segments. Each beat has a DIFFERENT job — do not write
     The viewer already decided the premise was interesting; explaining it to them is why they leave;
   - segments 3..N-1 = ESCALATION, each 9-11 words, one concrete new fact each, every line raising the stakes
     above the line before it. Use contrast and consequence ("so", "which meant", "except"). No filler, no repetition;
+  - segment 1 (after the hook) must NOT resolve or deflate the hook. No "it's not aliens, it's just
+    physics", no "experts say it was only a raccoon" this early. Deepen the puzzle or raise the stakes;
+    the answer belongs in the payoff. Resolving it here ends the video at three seconds.
+  - order the body so each line is more surprising than the last. The best fact goes LAST, never mid-script.
   - last segment = PAYOFF, 6-9 words: {loop_rule}
 Leave ONE question deliberately open from the hook until the payoff — the viewer should be unable to stop
 watching without learning the answer. Never answer it in segment 2.
@@ -410,6 +447,15 @@ Return JSON:
             bad = [i + 1 for i, v in enumerate(vis) if not (isinstance(v, dict) and str(v.get("shows", "")).strip()
                                                              and isinstance(v.get("queries"), list) and v["queries"])]
             assert len(bad) <= 1, f"segments {bad} are missing \"visual\": {{\"shows\": ..., \"queries\": [...]}}"
+            # A closing line that is the hook again is the single most common defect in
+            # this channel's published output, and asking the model not to do it has a
+            # 0-for-3 record. Reject it where rejection actually costs the model a retry.
+            if len(segs) >= 3:
+                echo = echoes_hook(spoken_text(segs[0]), spoken_text(segs[-1]))
+                assert echo < 0.6, (
+                    f"the last line just restates the hook ({echo:.0%} of its words are from it) — "
+                    "end on the strongest fact the viewer has NOT heard yet, something the hook "
+                    "completes on replay; never 'and that is why' or 'so yes'")
             words = sum(len(spoken_text(s).split()) for s in segs)
             # The upper tolerance used to be 1.3x, which accepted 120 words against a 93-word
             # target. At the measured ~3 words/second that is a 40-second narration before pauses

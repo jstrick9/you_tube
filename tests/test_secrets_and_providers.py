@@ -633,3 +633,47 @@ def test_length_budget_actually_reaches_the_prompt():
     p = _capture_prompt("history")
     assert "words per segment" in p, "per-segment budget missing"
     assert "Both ends are rejected" in p, "one-sided length instruction is back"
+
+
+# ── closing line must not be the hook again ─────────────────────────────────
+def test_rejects_the_echoed_endings_actually_published():
+    """Corpus is three real scripts this channel published, not invented examples.
+
+    Each spent its final line restating its first — the moment a viewer decides to
+    replay or leave, used to deliver nothing. The prompt had offered "...and that is
+    why" as a worked example, so the model was obeying it.
+    """
+    from autotube.scriptwriter import echoes_hook
+
+    published_failures = [
+        ("In 2008, a nightmare washed up on a New York beach.",
+         "And that is why in 2008, a nightmare washed up on a New York beach."),
+        ("A plane punched a hole in the sky.",
+         "A plane just punched a hole in the sky."),
+        ("193 years old. This tortoise is still walking.",
+         "So yes, he is 193 years old."),
+    ]
+    for hook, last in published_failures:
+        assert echoes_hook(hook, last) >= 0.6, f"should be caught: {last!r}"
+
+    # A real loop shares meaning, not words, and must still pass.
+    good = [
+        ("A waterfall that runs blood red.", "So the ice down there is still bleeding."),
+        ("193 years old. This tortoise is still walking.", "He has outlived thirty-one governors."),
+    ]
+    for hook, last in good:
+        assert echoes_hook(hook, last) < 0.6, f"false positive on a good loop: {last!r}"
+
+
+def test_the_writer_rejects_an_echoed_ending_end_to_end():
+    """The check must fire inside validate(), where it costs the model a retry."""
+    src = (ROOT / "autotube" / "scriptwriter.py").read_text()
+    # Several functions define a local validate(); pick the script one by the word-count
+    # assertion that only it carries.
+    bodies = [b for b in src.split("def validate(")[1:] if "narration is" in b]
+    assert bodies, "could not locate the script validator"
+    assert "echoes_hook" in bodies[0], "the gate must run during validation, not as advice"
+
+    # and the prompt must no longer teach the failure
+    assert "'...and that is why' before a hook" not in src, "the bad worked example is back"
+    assert "STRONGEST REMAINING FACT" in src
