@@ -250,6 +250,43 @@ def subject_is_depictable(subject: str, cfg: dict) -> bool:
     return bool(hits)
 
 
+BANNED_OPENERS = (
+    "did you know", "ever wonder", "have you ever", "here are", "here is",
+    "in this video", "today we", "let's talk about", "lets talk about",
+    "what if i told you", "you won't believe", "you wont believe",
+    "imagine if", "this is the story of", "welcome back",
+)
+
+
+def banned_opener(hook: str) -> str | None:
+    """Which banned opener this hook uses, if any.
+
+    The prompt already lists these, and a hook still shipped as "Ever wonder why
+    airplane toilets make that loud WHOOSH sound?" - the ban said "have you ever
+    wondered" and the model wrote a variant. Enumerating variants in a prompt is a
+    losing game; matching a prefix is not.
+    """
+    import re as _re
+
+    norm = _re.sub(r"[^a-z' ]", " ", (hook or "").lower())
+    norm = _re.sub(r"\s+", " ", norm).strip()
+    for b in BANNED_OPENERS:
+        if norm.startswith(b):
+            return b
+    return None
+
+
+def payoff_is_a_question(last: str) -> bool:
+    """A question is not a payoff.
+
+    One script closed "The Hittite Empire or the Nile's floods - which won?", which
+    passes an emptiness check because it carries content words, yet answers nothing
+    and leaves the viewer with homework instead of a reason to replay. The hook asks;
+    the last line answers.
+    """
+    return (last or "").strip().endswith("?")
+
+
 def payoff_is_empty(hook: str, last: str) -> bool:
     """Does the closing line actually say anything new?
 
@@ -604,6 +641,13 @@ Return JSON:
                     f"the last line just restates the hook ({echo:.0%} of its words are from it) — "
                     "end on the strongest fact the viewer has NOT heard yet, something the hook "
                     "completes on replay; never 'and that is why' or 'so yes'")
+            _b = banned_opener(spoken_text(segs[0]))
+            assert not _b, (
+                f"the hook opens with {_b!r}, which is filler every channel uses. Open on the "
+                "surprising fact itself - the detail, the number, the contradiction")
+            assert not payoff_is_a_question(spoken_text(segs[-1])), (
+                "the last line asks a question instead of answering one. The hook asks; the "
+                "payoff answers. End on the fact, not on homework for the viewer")
             canned = [a for sg in segs if (a := sg.get("aside")) and aside_is_generic(a)]
             assert not canned, (
                 f"aside {canned[0]!r} is canned filler that would fit any video. React to "

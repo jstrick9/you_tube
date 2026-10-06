@@ -961,3 +961,60 @@ def test_produce_never_drafts_for_an_undepictable_subject(monkeypatch):
     assert w.produce({"topic": "x", "category": "history"},
                      {"format": "sounds_fake", "hook_style": "bold_claim", "voice": "v"}) is None
     assert drafted == [], "a draft was written for a subject that cannot be pictured"
+
+
+# ── hook openers and question endings ──────────────────────────────────────
+def test_catches_banned_opener_variants_the_prompt_missed():
+    """The prompt banned "have you ever wondered"; the model wrote "Ever wonder why".
+
+    Enumerating variants in a prompt is a losing game - this is the fourth defect
+    where the model complied with the letter of an instruction. Matching a prefix is
+    not a losing game.
+    """
+    from autotube.scriptwriter import banned_opener
+
+    assert banned_opener("Ever wonder why airplane toilets make that WHOOSH?") == "ever wonder"
+    assert banned_opener("Did you know the Romans ate barley?") == "did you know"
+    assert banned_opener("You won't believe what happened next.") == "you won't believe"
+
+    for good in ("A raspy cricket has the strongest bite of any insect.",
+                 "A prince was literally dying from a forbidden crush.",
+                 "Roman soldiers were sometimes forced to eat barley."):
+        assert banned_opener(good) is None, f"false positive: {good!r}"
+
+
+def test_a_question_is_not_a_payoff():
+    """One script closed "The Hittite Empire or the Nile's floods - which won?"
+
+    It passes an emptiness check because it carries content words, yet answers
+    nothing. The hook asks; the last line answers.
+    """
+    from autotube.scriptwriter import payoff_is_a_question
+
+    assert payoff_is_a_question("The Hittite Empire or the Nile's floods—which won?")
+    assert not payoff_is_a_question("They eventually had 5 children together.")
+
+
+def test_both_are_enforced_by_the_real_validator():
+    import pytest
+
+    v = _grab_validator()
+    assert v is not None
+    base = [
+        {"text": "Ever wonder why airplane toilets make that loud whoosh sound?",
+         "visual": {"shows": "the Montauk Monster carcass", "queries": ["montauk monster"]}},
+        {"text": "A vacuum pulls the waste away using very little water.",
+         "visual": {"shows": "toilet", "queries": ["toilet"]}},
+        {"text": "Some systems flush with a bright disinfectant instead.",
+         "visual": {"shows": "blue", "queries": ["blue"]}},
+        {"text": "The tank stores everything until the aircraft lands again.",
+         "visual": {"shows": "tank", "queries": ["tank"]}},
+    ]
+    with pytest.raises(AssertionError, match="filler every channel uses"):
+        v({"title": "T", "segments": base})
+
+    asking = [dict(x) for x in base]
+    asking[0]["text"] = "Airplane toilets pull waste away with a sudden vacuum."
+    asking[-1]["text"] = "The Hittite Empire or the Nile's floods—which won?"
+    with pytest.raises(AssertionError, match="asks a question"):
+        v({"title": "T", "segments": asking})
