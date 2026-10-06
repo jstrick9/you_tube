@@ -19,6 +19,12 @@ from pathlib import Path
 
 log = logging.getLogger("autotube.youtube")
 
+# Deleting or re-privatising an existing video needs a broader scope than uploading a
+# new one: youtube.upload is write-only for fresh uploads and cannot touch anything
+# already on the channel. Listed here so a re-consent mints a token that can prune; an
+# existing token keeps working unchanged for upload-only operation.
+DELETE_SCOPE = "https://www.googleapis.com/auth/youtube.force-ssl"
+
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube.readonly",
@@ -210,3 +216,49 @@ def summarize_curve(rows: list[tuple[float, float]]) -> dict:
         # 11-point resample: small enough to commit to the repo every night, detailed enough to plot
         "curve": [round(at(i / 10), 4) for i in range(11)],
     }
+
+
+def can_delete() -> bool:
+    """Does the stored refresh token actually carry delete permission?
+
+    Checked rather than assumed: a token minted for youtube.upload will fail a delete
+    with a 403 that reads like a permissions bug in our code. Better to say plainly
+    that the scope is missing.
+    """
+    try:
+        c = credentials()
+    except Exception:  # noqa: BLE001
+        return False
+    granted = set(getattr(c, "scopes", None) or [])
+    return bool(granted & {DELETE_SCOPE, "https://www.googleapis.com/auth/youtube"})
+
+
+def delete(video_ids: list[str], dry_run: bool = True) -> dict:
+    """Delete videos from the channel. Defaults to dry run - this is irreversible.
+
+    Returns a per-id result rather than raising on the first failure, so one bad id
+    does not strand the rest half-done.
+    """
+    import logging
+
+    log = logging.getLogger("autotube.youtube")
+    out: dict[str, str] = {}
+    if dry_run:
+        for v in video_ids:
+            out[v] = "dry-run"
+        log.info("prune dry run: %d video(s) would be deleted", len(video_ids))
+        return out
+    if not can_delete():
+        raise RuntimeError(
+            "the stored YouTube token cannot delete: it holds youtube.upload only. "
+            f"Re-authorise including {DELETE_SCOPE} and refresh YT_REFRESH_TOKEN.")
+    svc = service()
+    for v in video_ids:
+        try:
+            svc.videos().delete(id=v).execute()
+            out[v] = "deleted"
+            log.info("deleted %s", v)
+        except Exception as e:  # noqa: BLE001
+            out[v] = f"failed: {str(e)[:120]}"
+            log.error("delete %s failed: %s", v, e)
+    return out

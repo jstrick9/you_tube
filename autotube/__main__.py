@@ -36,6 +36,29 @@ def notify(cfg: dict, title: str, msg: str, ok: bool = True) -> None:
         log.warning("notify failed: %s", e)
 
 
+def cmd_prune(cfg: dict, ids: list[str], execute: bool = False) -> int:
+    """Delete videos from the channel. Dry run unless --execute is passed."""
+    from . import youtube
+    if not ids:
+        print("no video ids given")
+        return 1
+    if not execute:
+        print(f"DRY RUN — {len(ids)} video(s) would be deleted. Re-run with --execute.")
+        for v in ids:
+            print(f"  https://youtu.be/{v}")
+        return 0
+    if not youtube.can_delete():
+        print("CANNOT DELETE: the stored token holds youtube.upload only, which cannot")
+        print("touch existing videos. Re-authorise including")
+        print(f"  {youtube.DELETE_SCOPE}")
+        print("and update YT_REFRESH_TOKEN, or delete them in YouTube Studio.")
+        return 1
+    res = youtube.delete(ids, dry_run=False)
+    for v, r in res.items():
+        print(f"  {v}: {r}")
+    return 0 if all(r == "deleted" for r in res.values()) else 1
+
+
 def cmd_doctor(cfg: dict) -> int:
     ok = True
     from .common import ffmpeg_bin

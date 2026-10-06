@@ -203,6 +203,28 @@ def names_subject(script: dict, subject: str) -> bool:
     return False
 
 
+GENERIC_ASIDES = {
+    "nature please", "rude", "which is frankly rude", "bold plan", "bold plan terrible plan",
+    "no airbags", "office politics are brutal", "okay this one is unhinged",
+    "internet zoology at its finest", "science is wild", "nature is metal",
+}
+
+
+def aside_is_generic(aside: str) -> bool:
+    """Would this reaction fit any video on the channel?
+
+    The prompt used to offer "Nature, please." as a worked example and the model
+    returned it verbatim in two different scripts. Canned asides fail twice over: they
+    spend words from a 39-52 word budget saying nothing, and repeated across uploads
+    they are exactly the template similarity that triggers bulk demonetisation.
+    """
+    import re as _re
+
+    norm = _re.sub(r"[^a-z ]", "", (aside or "").lower()).strip()
+    norm = _re.sub(r"\s+", " ", norm)
+    return norm in GENERIC_ASIDES
+
+
 def payoff_is_empty(hook: str, last: str) -> bool:
     """Does the closing line actually say anything new?
 
@@ -425,8 +447,11 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                        'a beat of silence, a riser and a flash right before it). Never the hook; usually the last BODY line.\n')
         aside_rule = (
             f'  "aside" (REQUIRED: at least 1, at most {max_asides} in the whole script, never on the hook): a 2-8 word deadpan\n'
-            '     reaction the narrator says right AFTER that line — e.g. "Which is, frankly, rude.", "Nature, please.",\n'
-            '     "Bold plan. Terrible plan." It is a JOKE/OPINION ONLY: no facts, numbers, names, dates or claims; never\n'
+            '     reaction the narrator says right AFTER that line. It MUST react to something specific in THAT\n'
+            '     line - name the thing, the number or the absurdity it just described. A reaction that would fit\n'
+            '     any video at all ("Nature, please.", "Rude.", "Bold plan.", "No airbags.") is filler: it spends\n'
+            '     words from a tight budget, and reused across videos it is the template-similarity signal that\n'
+            '     gets channels demonetised. It is a JOKE/OPINION ONLY: no facts, numbers, names, dates or claims; never\n'
             '     mean about real people, groups or victims; family-friendly. A script with no aside anywhere is\n'
             '     rejected: narration that only recites sourced facts has no voice of its own, and a channel of\n'
             '     those reads as bulk-produced rather than as a show. Make it actually funny.\n'
@@ -540,6 +565,11 @@ Return JSON:
                     f"the last line just restates the hook ({echo:.0%} of its words are from it) — "
                     "end on the strongest fact the viewer has NOT heard yet, something the hook "
                     "completes on replay; never 'and that is why' or 'so yes'")
+            canned = [a for sg in segs if (a := sg.get("aside")) and aside_is_generic(a)]
+            assert not canned, (
+                f"aside {canned[0]!r} is canned filler that would fit any video. React to "
+                "something specific in that line - the thing, the number, the absurdity it "
+                "just described")
             words = sum(len(spoken_text(s).split()) for s in segs)
             # The upper tolerance used to be 1.3x, which accepted 120 words against a 93-word
             # target. At the measured ~3 words/second that is a 40-second narration before pauses

@@ -807,3 +807,63 @@ def test_empty_payoff_is_enforced_in_validation():
     ]}
     with pytest.raises(AssertionError, match="trails off"):
         v(trailing)
+
+
+# ── pruning the channel ─────────────────────────────────────────────────────
+def test_delete_is_dry_run_by_default_and_checks_scope(monkeypatch):
+    """Deleting a published video is irreversible, so it defaults to doing nothing.
+
+    And it must say the scope is missing rather than surface a raw 403: the stored
+    token holds youtube.upload, which is write-only for new uploads and cannot touch
+    anything already on the channel.
+    """
+    import pytest
+    import autotube.youtube as Y
+
+    assert Y.delete(["abc", "def"]) == {"abc": "dry-run", "def": "dry-run"}
+
+    monkeypatch.setattr(Y, "can_delete", lambda: False)
+    with pytest.raises(RuntimeError, match="youtube.upload only"):
+        Y.delete(["abc"], dry_run=False)
+
+    assert "force-ssl" in Y.DELETE_SCOPE
+
+
+def test_rejects_the_canned_asides_actually_produced():
+    """The prompt offered "Nature, please." as an example; the model returned it verbatim
+    in two different scripts.
+
+    Same failure as the echo ending and the trailing payoff: the worked example became
+    the output. Canned asides spend words from a 39-52 word budget saying nothing, and
+    repeated across uploads they are the template similarity that triggers bulk
+    demonetisation.
+    """
+    from autotube.scriptwriter import aside_is_generic
+
+    for produced in ("Nature, please.", "Rude.", "No airbags.",
+                     "Office politics are brutal.", "Okay, this one is unhinged."):
+        assert aside_is_generic(produced), f"should be caught: {produced!r}"
+
+    for specific in ("A ghost story with tentacles.", "Twenty-five feet of elbow.",
+                     "Cake, at one hundred and ninety."):
+        assert not aside_is_generic(specific), f"false positive: {specific!r}"
+
+
+def test_canned_aside_is_rejected_by_the_real_validator():
+    import pytest
+
+    v = _grab_validator()
+    assert v is not None
+    script = {"title": "T", "segments": [
+        {"text": "A nightmare washed up on a New York beach in 2008.",
+         "visual": {"shows": "the Montauk Monster carcass", "queries": ["montauk monster"]}},
+        {"text": "Biologists argued for weeks about what it actually was.",
+         "aside": "Nature, please.",
+         "visual": {"shows": "sand", "queries": ["sand"]}},
+        {"text": "The carcass vanished before anyone ran a single test.",
+         "visual": {"shows": "beach", "queries": ["beach"]}},
+        {"text": "Nobody has identified it in eighteen years since.",
+         "visual": {"shows": "shore", "queries": ["shore"]}},
+    ]}
+    with pytest.raises(AssertionError, match="canned filler"):
+        v(script)
