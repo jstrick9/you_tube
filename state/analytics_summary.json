@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-06T23:17:09.901231+00:00",
-  "videos_total": 35,
-  "videos_7d": 15,
-  "views_7d": 7121,
+  "updated": "2026-10-07T07:42:33.446737+00:00",
+  "videos_total": 36,
+  "videos_7d": 16,
+  "views_7d": 8467,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -301,7 +301,7 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1436,
+      "views": 1439,
       "avg_view_pct": 92.08
     },
     {
@@ -396,27 +396,27 @@
   },
   "subscribers": {
     "net_90d": 20,
-    "views_90d": 19964,
-    "per_1k_views": 1.0,
-    "videos": 27,
+    "views_90d": 21313,
+    "per_1k_views": 0.94,
+    "videos": 28,
     "days_to_500": 2250.0,
     "days_to_1000": 4500.0
   },
   "originality": {
-    "episodes_examined": 6,
+    "episodes_examined": 7,
     "window": 25,
     "mean_pairwise_similarity": 0.0,
     "max_pairwise_similarity": 0.0,
     "pairs_over_similarity_limit": 0,
     "most_common_format": {
-      "name": "would_you_survive",
-      "share": 0.167
+      "name": "sounds_fake",
+      "share": 0.286
     },
     "most_common_category": {
       "name": "mysteries",
-      "share": 0.333
+      "share": 0.286
     },
-    "share_with_narrator_commentary": 0.833,
+    "share_with_narrator_commentary": 0.857,
     "flags": [],
     "verdict": "looks like a show"
   }
