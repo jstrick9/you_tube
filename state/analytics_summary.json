@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-07T07:42:33.446737+00:00",
+  "updated": "2026-10-07T17:28:51.383892+00:00",
   "videos_total": 36,
-  "videos_7d": 16,
-  "views_7d": 8467,
+  "videos_7d": 13,
+  "views_7d": 8979,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -66,7 +66,7 @@
         },
         {
           "arm": "culture",
-          "mean": 0.463,
+          "mean": 0.464,
           "n": 3
         }
       ]
@@ -77,7 +77,7 @@
       "arms": [
         {
           "arm": "sounds_fake",
-          "mean": 0.568,
+          "mean": 0.567,
           "n": 2
         },
         {
@@ -142,12 +142,12 @@
         },
         {
           "arm": "myth_vs_fact",
-          "mean": 0.465,
+          "mean": 0.466,
           "n": 2
         },
         {
           "arm": "myth_buster",
-          "mean": 0.454,
+          "mean": 0.455,
           "n": 1
         }
       ]
@@ -301,7 +301,7 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1439,
+      "views": 1441,
       "avg_view_pct": 92.08
     },
     {
@@ -313,7 +313,7 @@
     {
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
-      "views": 1280,
+      "views": 1281,
       "avg_view_pct": 52.05
     },
     {
@@ -331,7 +331,7 @@
     {
       "title": "How the Largest Animal Ever Eats Tiny Prey #shorts",
       "id": "1ed_FohPwqs",
-      "views": 1200,
+      "views": 1201,
       "avg_view_pct": 54.59
     },
     {
@@ -396,8 +396,8 @@
   },
   "subscribers": {
     "net_90d": 20,
-    "views_90d": 21313,
-    "per_1k_views": 0.94,
+    "views_90d": 21834,
+    "per_1k_views": 0.92,
     "videos": 28,
     "days_to_500": 2250.0,
     "days_to_1000": 4500.0

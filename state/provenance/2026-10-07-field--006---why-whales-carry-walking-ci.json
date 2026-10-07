@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-07T18:55:43.767517+00:00",
+  "video": {
+    "title": "FIELD #006 — Why Whales Carry Walking Cities of Barnacles #shorts",
+    "video_id": "6Yw_K6HiMas",
+    "series": "field",
+    "episode": 6,
+    "duration": 16.490022675736963,
+    "file": "20261007-1728-02-barnacle.mp4",
+    "published_at": "2026-10-07T23:52:00+00:00"
+  },
+  "selection": {
+    "topic": "Why Do Barnacles Stick to Whales?",
+    "category": "nature",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "why_trending": "Viral Short 'Why Do Barnacles Stick to Whales?' has 124,342 views in 77h (124x channel avg). Spooky season favors 'unsettling creatures' and 'eerie-but-true' biology.",
+    "viral_score": 9.0,
+    "evidence": [
+      "viral Short now: 124,342 views in 77h, 124x its channel's subscribers",
+      "Why Do Barnacles Stick to Whales? Have you ever wondered why whales often have hundreds of tiny barnacles attached to their skin? The answer"
+    ],
+    "format": "creepy_true",
+    "hook_style": "bold_claim"
+  },
+  "grounding": {
+    "primary": {
+      "title": "Barnacle",
+      "url": "https://en.wikipedia.org/wiki/Barnacle"
+    },
+    "corroboration": [
+      {
+        "title": "arXiv — Barnacles -- A Novel Channel for Vacuum Decay",
+        "url": "http://arxiv.org/abs/1112.1638v1"
+      }
+    ],
+    "claims": [
+      {
+        "says": "A whale carries a massive crustacean city on its skin.",
+        "evidence": ""
+      },
+      {
+        "says": "Except the whale is just their permanent anchor.",
+        "evidence": "Most barnacles are encrusters, attaching themselves to a hard substrate... or to an animal such as a whale"
+      },
+      {
+        "says": "They cement themselves upside down permanently.",
+        "evidence": "the animal is fixed upside down by means of its forehead"
+      },
+      {
+        "says": "And they possess the largest penis ratio of any animal.",
+        "evidence": "Barnacles possess the largest penis-to-body size ratio of any known animal, up to eight times their body length"
+      }
+    ]
+  },
+  "script": {
+    "title": "Why Whales Carry Walking Cities of Barnacles",
+    "segments": [
+      "A whale carries a massive crustacean city on its skin.",
+      "Except the whale is just their permanent anchor.",
+      "They cement themselves upside down permanently.",
+      "And they possess the largest penis ratio of any animal."
+    ],
+    "asides": [
+      "And they brought friends.",
+      "Eight times their body length."
+    ],
+    "commentary_ratio": 0.209
+  },
+  "review": {
+    "score": 8,
+    "reviewer": "nvidia:google/gemma-4-31b-it",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:meta/llama-3.2-90b-vision-instruct:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261007-1728"
+  },
+  "originality": {
+    "sketch": [
+      "023de4ec03233b29",
+      "23b103889e7283c7",
+      "3ad09df5c6f777d6",
+      "6755f0e3ef5968ea",
+      "6ba90a945514de5c",
+      "757e43d286a8c3bd",
+      "75f71b5ca5084ec6",
+      "77e62ea06e00f82a",
+      "88b21ffe4ba124ff",
+      "8e3e28710c137b23",
+      "9782324d06f687b8",
+      "a3da06d1af19f202",
+      "a893af7e793dcbe4",
+      "a8b8061c4a8be5e1",
+      "b586295e6ed07f3a",
+      "b9304b7eb9fc70cd",
+      "bbedc10be101ff4d",
+      "c3ba7d511557e3f9",
+      "c705b47b95538881",
+      "e6a0c7add86a3c58",
+      "e80d692b55c980c1",
+      "ee73e10d9a47b54a",
+      "efb1cb93fd092315",
+      "feb068575ba6b7f9"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-07T18:55:41.303269+00:00",
+  "video": {
+    "title": "FIELD #005 — Why the Himalayas Look Like a Giant Scar #shorts",
+    "video_id": "5oGTx98pfOQ",
+    "series": "field",
+    "episode": 5,
+    "duration": 18.626031746031746,
+    "file": "20261007-1728-01-himalayas.mp4",
+    "published_at": "2026-10-07T21:40:00+00:00"
+  },
+  "selection": {
+    "topic": "Earth Looks SPLIT Into Two Worlds Himalayas From Space",
+    "category": "nature",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "why_trending": "Viral Short 'Earth Looks SPLIT Into Two Worlds Himalayas From Space' has 76,934 views in 76h (77x channel avg).",
+    "viral_score": 9.0,
+    "evidence": [
+      "viral Short now: 76,934 views in 76h, 77x its channel's subscribers",
+      "From the ISS, the Himalayas look like a massive natural barrier separating the Tibetan Plateau from the Indian subcontinent. If this view am"
+    ],
+    "format": "scale_shock",
+    "hook_style": "you_statement"
+  },
+  "grounding": {
+    "primary": {
+      "title": "Himalayas",
+      "url": "https://en.wikipedia.org/wiki/Himalayas"
+    },
+    "corroboration": [
+      {
+        "title": "Wikidata — Wikidata: Himalayas",
+        "url": "https://www.wikidata.org/wiki/Q5451"
+      },
+      {
+        "title": "NASA — Himalayas",
+        "url": "https://images.nasa.gov/details/GSFC_20171208_Archive_e002141"
+      }
+    ],
+    "claims": [
+      {
+        "says": "Over one hundred peaks pierce the sky above twenty three thousand feet.",
+        "evidence": ""
+      },
+      {
+        "says": "Which meant two ancient landmasses collided with enough force to fold stone.",
+        "evidence": "The Himalayas were uplifted after the collision of the Indian tectonic plate with the Eurasian plate"
+      },
+      {
+        "says": "Creating a jagged wall spanning fifteen hundred miles across Asia.",
+        "evidence": "The Himalayan mountain range runs west-northwest to east-southeast in an arc 2,400 km long."
+      },
+      {
+        "says": "And the entire massive range is still actively growing today.",
+        "evidence": "add thickness to its plateau"
+      }
+    ]
+  },
+  "script": {
+    "title": "Why the Himalayas Look Like a Giant Scar",
+    "segments": [
+      "Over one hundred peaks pierce the sky above twenty three thousand feet.",
+      "Which meant two ancient landmasses collided with enough force to fold stone.",
+      "Creating a jagged wall spanning fifteen hundred miles across Asia.",
+      "And the entire massive range is still actively growing today."
+    ],
+    "asides": [
+      "Subtle."
+    ],
+    "commentary_ratio": 0.022
+  },
+  "review": {
+    "score": 7,
+    "reviewer": "groq:openai/gpt-oss-120b",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:meta/llama-3.2-90b-vision-instruct:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261007-1728"
+  },
+  "originality": {
+    "sketch": [
+      "115467a3b4a3d235",
+      "1270c5c6061752b2",
+      "1759a73f92d5933a",
+      "1f09534cc2e88bd5",
+      "28e00db222aabced",
+      "30d793feb100a96c",
+      "37ad3d3581227d5f",
+      "37ef196eaefa443c",
+      "4d64dc65bacc8b26",
+      "568dc11fd852255b",
+      "5e97b6bcb839afb5",
+      "7073fc5df1b45a45",
+      "70c4ea73df71a3ba",
+      "727d484db36f62f1",
+      "81d4ec55fdacffd3",
+      "88eb6eadf49ba0a6",
+      "8e401a60f65b208c",
+      "8ed8bef5dd995955",
+      "949cd0bf236a6b73",
+      "99cc64055b103466",
+      "a94ecf13fef03324",
+      "b41be77f147956bf",
+      "b862b4a2fd4edf09",
+      "bc2cc3486730fe2b",
+      "bed1c8daec1fcd35",
+      "c04dba1c97d29e39",
+      "d5c8ac9703a13f5f",
+      "d7df9d53efc99e13",
+      "da7eeaac47645082",
+      "daba3030de547029",
+      "e0a4b4cfe64b8962",
+      "e8d00af9e9670d99",
+      "f19051489186d1b0"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}
