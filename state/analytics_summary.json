@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-08T07:58:48.117111+00:00",
+  "updated": "2026-10-08T17:27:22.166717+00:00",
   "videos_total": 38,
-  "videos_7d": 15,
-  "views_7d": 10563,
-  "learned_this_run": 2,
+  "videos_7d": 12,
+  "views_7d": 7898,
+  "learned_this_run": 0,
   "strategy": {
     "category": {
       "status": "learning",
@@ -21,7 +21,7 @@
         },
         {
           "arm": "animals",
-          "mean": 0.538,
+          "mean": 0.537,
           "n": 1
         },
         {
@@ -361,42 +361,42 @@
   ],
   "rejected": [],
   "retention": {
-    "videos": 19,
+    "videos": 21,
     "where": "ending",
-    "verdict": "ENDING is the leak: 21% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
+    "verdict": "ENDING is the leak: 24% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
     "avg_curve": [
-      1.223,
-      1.142,
-      0.765,
-      0.594,
-      0.5,
-      0.445,
-      0.396,
-      0.366,
-      0.34,
-      0.317,
-      0.244
+      1.235,
+      1.152,
+      0.806,
+      0.628,
+      0.526,
+      0.465,
+      0.413,
+      0.381,
+      0.352,
+      0.328,
+      0.259
     ],
-    "median_hook_retention": 1.004,
-    "median_completion": 0.215,
-    "median_swipe_point": 0.4,
+    "median_hook_retention": 1.006,
+    "median_completion": 0.235,
+    "median_swipe_point": 0.43,
     "worst_drop": {
-      "size": 0.377,
+      "size": 0.346,
       "from_pct": 10,
       "to_pct": 20
     }
   },
   "distribution": {
-    "n": 19,
+    "n": 21,
     "gate": 0.7,
     "passing": 0,
     "pass_rate": 0.0,
-    "median_completion": 0.2146,
-    "verdict": "NO video clears the 70% completion gate (median 21%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
+    "median_completion": 0.2353,
+    "verdict": "NO video clears the 70% completion gate (median 24%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
   },
   "subscribers": {
     "net_90d": 20,
-    "views_90d": 23423,
+    "views_90d": 23646,
     "per_1k_views": 0.85,
     "videos": 30,
     "days_to_500": 2250.0,

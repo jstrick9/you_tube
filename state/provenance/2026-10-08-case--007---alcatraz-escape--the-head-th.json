@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-08T19:36:25.683836+00:00",
+  "video": {
+    "title": "CASE #007 — Alcatraz Escape: The Head That Wasn't Real #shorts",
+    "video_id": "SlY7iKy1K3o",
+    "series": "unsolved",
+    "episode": 7,
+    "duration": 19.68201814058957,
+    "file": "20261008-1727-03-june-1962-alcatraz-escape.mp4",
+    "published_at": "2026-10-09T16:40:00+00:00"
+  },
+  "selection": {
+    "topic": "DUNIA ki Sabse Badi Mystery",
+    "category": "mysteries",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "why_trending": "Viral Short now: 361,552 views in 52h, 33x its channel's subscribers",
+    "viral_score": 7.0,
+    "evidence": [
+      "viral Short now: 361,552 views in 52h, 33x its channel's subscribers",
+      "In 1962, three prisoners disappeared from Alcatraz, the supposedly escape-proof island prison surrounded by freezing water. What makes the s"
+    ],
+    "format": "ranked_escalation",
+    "hook_style": "you_statement"
+  },
+  "grounding": {
+    "primary": {
+      "title": "June 1962 Alcatraz escape",
+      "url": "https://en.wikipedia.org/wiki/June_1962_Alcatraz_escape"
+    },
+    "corroboration": [],
+    "claims": [
+      {
+        "says": "Three men left Alcatraz with papier-mâché heads in their beds.",
+        "evidence": "the three men tucked papier-mâché model heads resembling their own likenesses into their beds"
+      },
+      {
+        "says": "Weird: they dug six months through hidden ventilation ducts.",
+        "evidence": "broke out of the main prison building via ventilation ducts and an unguarded utility corridor"
+      },
+      {
+        "says": "Weirder: they floated away on an improvised inflatable raft.",
+        "evidence": "departed the island aboard an improvised inflatable raft to an uncertain fate"
+      },
+      {
+        "says": "Completely unhinged: the FBI still has their case open.",
+        "evidence": "The U.S. Marshals Service case file remains open and active"
+      }
+    ]
+  },
+  "script": {
+    "title": "Alcatraz Escape: The Head That Wasn't Real",
+    "segments": [
+      "Three men left Alcatraz with papier-mâché heads in their beds.",
+      "Weird: they dug six months through hidden ventilation ducts.",
+      "Weirder: they floated away on an improvised inflatable raft.",
+      "Completely unhinged: the FBI still has their case open."
+    ],
+    "asides": [
+      "Patience is a fatal flaw.",
+      "Alcatraz, but make it camping."
+    ],
+    "commentary_ratio": 0.213
+  },
+  "review": {
+    "score": 8,
+    "reviewer": "nvidia:google/gemma-4-31b-it",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:meta/llama-3.2-90b-vision-instruct:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261008-1727"
+  },
+  "originality": {
+    "sketch": [
+      "0366d527eca10021",
+      "052fef4a652c9479",
+      "1056915a654995c4",
+      "124edbfb33dad6e4",
+      "17e03ca893092c62",
+      "188237ee3e591449",
+      "1c92eb754ac02c53",
+      "39e1145ca274d36b",
+      "42e8bb6b0f3c5fae",
+      "467700531d3bb3a1",
+      "5e72b1688dbaafbf",
+      "5e9633c669d48306",
+      "6ee836f3d152841b",
+      "7d369b5861514d5f",
+      "892070281194dc26",
+      "90ad2bc9d2bdc847",
+      "95b416009197bcf1",
+      "99df4b22fd42ccb8",
+      "9aaa1785000c9c56",
+      "a86756f6ae841fec",
+      "a95469a9e0ff088b",
+      "ad8604f97eebf3a4",
+      "ada91f16e1a6e7bc",
+      "b5003fb0d4fcd081",
+      "bcb98eee849ad9df",
+      "de4dc4f3b4e7adb4",
+      "e10497dc6da12e5f",
+      "e5090d6e800a0fef",
+      "e86d4810996e28bc",
+      "ec08b189461fa0dd",
+      "ecbf18b661a17f41",
+      "f16ee007ffcf9830",
+      "f57199e835dfc5ae"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}

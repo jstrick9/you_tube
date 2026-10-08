@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-08T19:36:21.275495+00:00",
+  "video": {
+    "title": "FIELD #008 — A 33-Foot Flying Monster Walked Like A Giraffe #shorts",
+    "video_id": "4XPhO0WFVbo",
+    "series": "field",
+    "episode": 8,
+    "duration": 17.858049886621316,
+    "file": "20261008-1727-01-quetzalcoatlus.mp4",
+    "published_at": "2026-10-08T20:53:00+00:00"
+  },
+  "selection": {
+    "topic": "The Quetzalcoatlus was TERRIFYING",
+    "category": "nature",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "why_trending": "youtube_outliers: viral Short now with 130,341 views in 32h / The Quetzalcoatlus was TERRIFYING",
+    "viral_score": 7.9,
+    "evidence": [
+      "viral Short now: 130,341 views in 32h, 11x its channel's subscribers",
+      "The Quetzalcoatlus was TERRIFYING quetzalcoatlus quetzalcoatlus explained quetzalcoatlus facts quetzalcoatlus flight how did quetzalcoatlus "
+    ],
+    "format": "creepy_true",
+    "hook_style": "bold_claim"
+  },
+  "grounding": {
+    "primary": {
+      "title": "Quetzalcoatlus",
+      "url": "https://en.wikipedia.org/wiki/Quetzalcoatlus"
+    },
+    "corroboration": [
+      {
+        "title": "Wikidata — Wikidata: Quetzalcoatlus",
+        "url": "https://www.wikidata.org/wiki/Q131205"
+      }
+    ],
+    "claims": [
+      {
+        "says": "Imagine a creature with a 33-foot wingspan.",
+        "evidence": "\"over 10 m (33 ft) in wingspan\""
+      },
+      {
+        "says": "Except this giant didn't just soar through the sky.",
+        "evidence": "\"even the largest were nonetheless capable of flight\""
+      },
+      {
+        "says": "It hunted small prey entirely on the ground.",
+        "evidence": "\"most likely hunted small prey on the ground\""
+      },
+      {
+        "says": "And launched itself using powerful forelimb muscles.",
+        "evidence": "\"launched quadrupedally using the powerful muscles of their forelimbs\""
+      }
+    ]
+  },
+  "script": {
+    "title": "A 33-Foot Flying Monster Walked Like A Giraffe",
+    "segments": [
+      "Imagine a creature with a 33-foot wingspan.",
+      "Except this giant didn't just soar through the sky.",
+      "It hunted small prey entirely on the ground.",
+      "And launched itself using powerful forelimb muscles."
+    ],
+    "asides": [
+      "Always read the fine print on giants.",
+      "Ground rules for apex flyers."
+    ],
+    "commentary_ratio": 0.279
+  },
+  "review": {
+    "score": 7,
+    "reviewer": "groq:openai/gpt-oss-120b",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:meta/llama-3.2-90b-vision-instruct:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261008-1727"
+  },
+  "originality": {
+    "sketch": [
+      "085125428ed3ab35",
+      "1dfa9fb8c089b594",
+      "20b273ad0949e8ad",
+      "34b1aefb1260038d",
+      "40068031b54aad7f",
+      "41b1dac9f482e393",
+      "49c50aba5d0b6954",
+      "4fbca80945b001e8",
+      "5042280beab7dc71",
+      "5117b28be4b11f97",
+      "5153925db8f75946",
+      "56adf51e43023112",
+      "5ba5d1e76315170c",
+      "5c73a5e063087862",
+      "600d8577928327de",
+      "604d29114225346e",
+      "6254c7222414fe24",
+      "870dae0fb7f8b00a",
+      "91ef242968e83303",
+      "9cecd3eadcfeb1a4",
+      "a1a287cf174a0a87",
+      "b02385d3a3a47fe9",
+      "b20b7a51ff7c337c",
+      "c0dca04248c2ea6e",
+      "cd5871e34456c434",
+      "d5625763ddc444ec",
+      "dba4865ea602f095",
+      "f1a94912ff5f03d7",
+      "ff822ca5aa3d7939"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}

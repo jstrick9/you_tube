@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-08T19:36:23.676218+00:00",
+  "video": {
+    "title": "FIELD #011 — The fish that lives on land #shorts",
+    "video_id": "321JPi9-2RY",
+    "series": "field",
+    "episode": 11,
+    "duration": 17.118049886621314,
+    "file": "20261008-1727-02-mudskipper.mp4",
+    "published_at": "2026-10-08T23:53:00+00:00"
+  },
+  "selection": {
+    "topic": "Paani se bahar chalti hai ye machhli! Mudskipper!",
+    "category": "nature",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "why_trending": "Viral Short now: 113,824 views in 26h, 24x its channel's subscribers",
+    "viral_score": 8.0,
+    "evidence": [
+      "viral Short now: 113,824 views in 26h, 24x its channel's subscribers",
+      "Paani ke bahar chalne wali machhli? Haan, ye sach hai! Mudskipper paani se bahar aakar chal sakti hai aur kichad ke andar gaddha banakar and"
+    ],
+    "format": "guess_reveal",
+    "hook_style": "disbelief"
+  },
+  "grounding": {
+    "primary": {
+      "title": "Mudskipper",
+      "url": "https://en.wikipedia.org/wiki/Mudskipper"
+    },
+    "corroboration": [
+      {
+        "title": "Europe PMC — Heavy metal contamination in coastal waters of the southeastern Bay of Bengal: Spatial distribution, potential source patterns, and human health risk assessment",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/42585687/"
+      }
+    ],
+    "claims": [
+      {
+        "says": "Some fish spend three quarters of life on land.",
+        "evidence": "they spend up to three quarters of their life on land"
+      },
+      {
+        "says": "They use jointed pectoral fins to crawl and skip.",
+        "evidence": "pectoral fins allow the mudskipper to actively \"skip\" across muddy surfaces"
+      },
+      {
+        "says": "They survive by breathing through their skin and throat.",
+        "evidence": "ability to breathe through their skin and the lining of their mouth"
+      },
+      {
+        "says": "They leap distances up to 61 centimetres.",
+        "evidence": "Mudskippers can leap distances of up to 61 centimetres"
+      }
+    ]
+  },
+  "script": {
+    "title": "The fish that lives on land",
+    "segments": [
+      "Some fish spend three quarters of life on land.",
+      "They use jointed pectoral fins to crawl and skip.",
+      "They survive by breathing through their skin and throat.",
+      "They leap distances up to 61 centimetres."
+    ],
+    "asides": [
+      "basically fish legs.",
+      "absolutely unhinged."
+    ],
+    "commentary_ratio": 0.128
+  },
+  "review": {
+    "score": 7,
+    "reviewer": "groq:qwen/qwen3.8-27b",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:meta/llama-3.2-90b-vision-instruct:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261008-1727"
+  },
+  "originality": {
+    "sketch": [
+      "016e2d7811c7b180",
+      "06a62cbfa5069f2a",
+      "10a5d7472469f271",
+      "10eff3eb0663ff20",
+      "14b7df5377cbdda9",
+      "29c622b04688513e",
+      "2e223fd43b367ff7",
+      "3ee265a81c2fbb92",
+      "4bf318cebc2c198e",
+      "5b809c450ae19640",
+      "6006b0496c8cead8",
+      "6cb36a711e527d1a",
+      "7a8d927a172000f0",
+      "8653d7eaadc6961e",
+      "8d3809a84d93936d",
+      "a46d0c57a0db4c03",
+      "a62b0dac391871cb",
+      "c4c1a8dccb52b718",
+      "c54ff107fcf16a7a",
+      "c94ef728c913a127",
+      "ce8384920ddf959d",
+      "d04fc32f7472ca56",
+      "ea3fba16b4f6a778",
+      "f294e2c8338755ca",
+      "fadee60972fdb2b7"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}

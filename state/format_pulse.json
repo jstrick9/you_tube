@@ -1,18 +1,18 @@
 {
-  "updated": "2026-10-07T17:28:57+00:00",
-  "sample": 133,
+  "updated": "2026-10-08T17:27:28+00:00",
+  "sample": 134,
   "hook_style": {
-    "bold_claim": 0.4694,
-    "question": 0.3955,
-    "you_statement": 0.1136,
-    "disbelief": 0.0119,
-    "number_first": 0.0096
+    "bold_claim": 0.4247,
+    "question": 0.3371,
+    "number_first": 0.1128,
+    "you_statement": 0.0877,
+    "disbelief": 0.0376
   },
   "videos": {
-    "bold_claim": 73,
-    "question": 43,
-    "you_statement": 7,
-    "number_first": 3,
-    "disbelief": 7
+    "question": 47,
+    "number_first": 6,
+    "disbelief": 5,
+    "bold_claim": 71,
+    "you_statement": 5
   }
 }

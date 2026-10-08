@@ -1,40 +1,58 @@
 {
-  "yt_outliers_date": "2026-10-07",
+  "yt_outliers_date": "2026-10-08",
   "yt_outliers": [
-    {
-      "topic": "Most Confusing Watch Ever",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 1.0,
-      "context": [
-        "viral Short now: 1,276,598 views in 76h, 517x its channel's subscribers",
-        "Look closely at this watch dial. Designed by Franck Muller, the numbers are placed in total chaos. While the minute hand rotates normally, t"
-      ],
-      "evidence": {
-        "views": 1276598,
-        "hours": 76.0,
-        "vph": 16803,
-        "breakout": 516.8
-      }
-    },
     {
       "topic": "Why Do So Few Baby Turtles Reach the Ocean?",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.9971,
+      "score": 1.0,
       "context": [
-        "viral Short now: 1,723,425 views in 57h, 87x its channel's subscribers",
+        "viral Short now: 2,213,539 views in 81h, 109x its channel's subscribers",
         "Why Do So Few Baby Turtles Reach the Ocean?"
       ],
       "evidence": {
-        "views": 1723425,
-        "hours": 57.3,
-        "vph": 30071,
-        "breakout": 87.5
+        "views": 2213539,
+        "hours": 81.3,
+        "vph": 27231,
+        "breakout": 108.5
+      }
+    },
+    {
+      "topic": "5 TWO HEADED Animals That Look UNREAL!",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "number_first",
+      "score": 0.9972,
+      "context": [
+        "viral Short now: 2,849,876 views in 52h, 22x its channel's subscribers",
+        "5 TWO HEADED Animals That Look UNREAL! दसत, य ह दनय क 5 ऐस जनवर, ज एक नह... बलक द सर क सथ पद ह सकत ह! 5 Two-Headed Bearded Dragon 4 Two-Head"
+      ],
+      "evidence": {
+        "views": 2849876,
+        "hours": 52.1,
+        "vph": 54659,
+        "breakout": 21.6
+      }
+    },
+    {
+      "topic": "They Actually Came Back to Apologize",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "disbelief",
+      "score": 0.9943,
+      "context": [
+        "viral Short now: 339,840 views in 43h, 87x its channel's subscribers",
+        "Security footage from Salutare in San Miguel de Tucumán, Argentina, showed three young men passing the restaurant as one knocked over a plan"
+      ],
+      "evidence": {
+        "views": 339840,
+        "hours": 43.4,
+        "vph": 7826,
+        "breakout": 87.1
       }
     },
     {
@@ -43,88 +61,52 @@
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9942,
+      "score": 0.9915,
       "context": [
-        "viral Short now: 401,336 views in 67h, 79x its channel's subscribers",
+        "viral Short now: 414,520 views in 91h, 80x its channel's subscribers",
         "Christa Pike was 18 when she participated in the 1995 murder of 19-year-old Colleen Slemmer and 20 when she was sentenced to death. Courtroo"
       ],
       "evidence": {
-        "views": 401336,
-        "hours": 66.8,
-        "vph": 6010,
-        "breakout": 78.8
+        "views": 414520,
+        "hours": 90.8,
+        "vph": 4567,
+        "breakout": 80.5
       }
     },
     {
-      "topic": "Bisa memiliki tulang yang lentur",
+      "topic": "Weird history facts no one knows",
       "source": "youtube_outliers",
       "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9914,
+      "lane": "history_mystery",
+      "hook": "disbelief",
+      "score": 0.9886,
       "context": [
-        "viral Short now: 304,250 views in 79h, 139x its channel's subscribers",
-        "Bisa memiliki tulang yang lentur sczackdfilms"
+        "viral Short now: 166,743 views in 17h, 21x its channel's subscribers",
+        ""
       ],
       "evidence": {
-        "views": 304250,
-        "hours": 79.5,
-        "vph": 3828,
-        "breakout": 138.9
+        "views": 166743,
+        "hours": 17.3,
+        "vph": 9613,
+        "breakout": 21.2
       }
     },
     {
-      "topic": "చమల మనషల కట తలవనవ?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9885,
-      "context": [
-        "viral Short now: 173,660 views in 7h, 4x its channel's subscribers",
-        "సటసటల చమల, మనషలన ఒక రకమన చకకదరల టసట చశర. ఇదదరక T షపల ఉనన ఒక వసతవన ఆ దరల కదలసత మదక తసకళలల. కన మనషల ఒకరత ఒకర మటలడకడద. చమల మతర ఒక లకషయత కలస పనచ"
-      ],
-      "evidence": {
-        "views": 173660,
-        "hours": 7.0,
-        "vph": 24879,
-        "breakout": 4.3
-      }
-    },
-    {
-      "topic": "Mi-24’s Mountain Takeoff Trick",
+      "topic": "DUNIA ki Sabse Badi Mystery",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9856,
+      "score": 0.9857,
       "context": [
-        "viral Short now: 159,502 views in 62h, 160x its channel's subscribers",
-        "Welcome to Moment Decoded! Discover hidden facts, untold history, mysterious events and true stories from around the world. We bring fascina"
+        "viral Short now: 361,552 views in 52h, 33x its channel's subscribers",
+        "In 1962, three prisoners disappeared from Alcatraz, the supposedly escape-proof island prison surrounded by freezing water. What makes the s"
       ],
       "evidence": {
-        "views": 159502,
-        "hours": 61.6,
-        "vph": 2591,
-        "breakout": 159.5
-      }
-    },
-    {
-      "topic": "why this humpback whale approaching the boat ?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9828,
-      "context": [
-        "viral Short now: 179,208 views in 34h, 49x its channel's subscribers",
-        ""
-      ],
-      "evidence": {
-        "views": 179208,
-        "hours": 34.5,
-        "vph": 5202,
-        "breakout": 49.0
+        "views": 361552,
+        "hours": 52.4,
+        "vph": 6894,
+        "breakout": 33.2
       }
     },
     {
@@ -133,394 +115,106 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.9799,
+      "score": 0.9829,
       "context": [
-        "viral Short now: 316,250 views in 63h, 51x its channel's subscribers",
+        "viral Short now: 420,914 views in 87h, 58x its channel's subscribers",
         "বড়ল ক তর জবনর শষ সময় অদভত আচরণ কর? Cat’s Last Signs! আপনর পরয় বড়লট হঠৎ বশ আদর করছ, এক থকত চইছ, কব ঘরর নরজন কণ চপচপ বস থকছ? এই আচরণগলর পছন ক "
       ],
       "evidence": {
-        "views": 316250,
-        "hours": 63.2,
-        "vph": 5002,
-        "breakout": 51.0
+        "views": 420914,
+        "hours": 87.2,
+        "vph": 4827,
+        "breakout": 57.7
       }
     },
     {
-      "topic": "An Entire Planet Can Look Like a Tiny Dot Against the Sun",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.977,
-      "context": [
-        "viral Short now: 110,735 views in 37h, 111x its channel's subscribers",
-        "What looks like a tiny black dot against the Sun is a powerful reminder of just how enormous our star really is. A planet can be thousands o"
-      ],
-      "evidence": {
-        "views": 110735,
-        "hours": 37.0,
-        "vph": 2995,
-        "breakout": 110.7
-      }
-    },
-    {
-      "topic": "Healthy Habits by Vedant Sir",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9741,
-      "context": [
-        "viral Short now: 283,624 views in 26h, 11x its channel's subscribers",
-        "Healthy Habits by Vedant Sir"
-      ],
-      "evidence": {
-        "views": 283624,
-        "hours": 26.2,
-        "vph": 10813,
-        "breakout": 11.4
-      }
-    },
-    {
-      "topic": "నలకద ఇత పదద పరపచమ?! Prairie Dog Life Cycle Telugu Animal Facts",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9712,
-      "context": [
-        "viral Short now: 131,232 views in 53h, 131x its channel's subscribers",
-        "నలకద ఇత పదద పరపచమ?! Prairie Dog Life Cycle Telugu Animal Facts నలకద ఈ చనన జతవ ఏకగ ఒక నగరలట పరపచనన ఎల నరమచకటద తలస? Prairie Dog ఉతతర అమరకలన Gr"
-      ],
-      "evidence": {
-        "views": 131232,
-        "hours": 53.0,
-        "vph": 2477,
-        "breakout": 131.2
-      }
-    },
-    {
-      "topic": "This Mom Didn't Deserve This",
+      "topic": "Daniil Medvedev disqualified against Novak Djokovic! (Beijing 2026)",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9684,
+      "score": 0.98,
       "context": [
-        "viral Short now: 169,395 views in 44h, 49x its channel's subscribers",
-        "A mother took her son to buy a new phone, hoping to make him happy. When the device did not meet his expectations, he smashed it onto the fl"
+        "viral Short now: 1,328,542 views in 74h, 5x its channel's subscribers",
+        "Daniil Medvedev was disqualified against Novak Djokovic at 5-7, 3-5, 15-15 while Nole was serving for the match in semi-finals of the China "
       ],
       "evidence": {
-        "views": 169395,
-        "hours": 43.6,
-        "vph": 3883,
-        "breakout": 48.7
+        "views": 1328542,
+        "hours": 73.9,
+        "vph": 17987,
+        "breakout": 5.3
       }
     },
     {
-      "topic": "PETTING A TIGER SHARK",
+      "topic": "చమల మనషల కట తలవనవ?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9772,
+      "context": [
+        "viral Short now: 386,417 views in 31h, 10x its channel's subscribers",
+        "సటసటల చమల, మనషలన ఒక రకమన చకకదరల టసట చశర. ఇదదరక T షపల ఉనన ఒక వసతవన ఆ దరల కదలసత మదక తసకళలల. కన మనషల ఒకరత ఒకర మటలడకడద. చమల మతర ఒక లకషయత కలస పనచ"
+      ],
+      "evidence": {
+        "views": 386417,
+        "hours": 31.0,
+        "vph": 12483,
+        "breakout": 9.5
+      }
+    },
+    {
+      "topic": "This Animal Has One of the Strangest Faces!",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9655,
+      "score": 0.9743,
       "context": [
-        "viral Short now: 493,932 views in 71h, 15x its channel's subscribers",
-        "Tiger sharks eat almost anything, from fish and turtles to seabirds, and investigate unfamiliar objects up close. Dive guides often use a ge"
+        "viral Short now: 137,377 views in 52h, 137x its channel's subscribers",
+        "Kya aapko pata hai ki duniya mein ek aisa janwar bhi hai jiske daant nahi hote, lekin iski 2 foot lambi jeebh hoti hai? Is amazing animal ka"
       ],
       "evidence": {
-        "views": 493932,
-        "hours": 71.0,
-        "vph": 6959,
-        "breakout": 15.4
+        "views": 137377,
+        "hours": 51.9,
+        "vph": 2648,
+        "breakout": 137.4
       }
     },
     {
-      "topic": "He Saw Something That Wasn’t Supposed to Exist...",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9626,
-      "context": [
-        "viral Short now: 135,309 views in 73h, 135x its channel's subscribers",
-        "He Saw Something That Wasn’t Supposed to Exist... Disclaimer: This story is intended for entertainment purposes only. The characters, events"
-      ],
-      "evidence": {
-        "views": 135309,
-        "hours": 73.5,
-        "vph": 1841,
-        "breakout": 135.3
-      }
-    },
-    {
-      "topic": "WHY Does This Fish Stick to Sharks and Even Humans?",
+      "topic": "3 Weird Animal Secrets Nature Kept Hidden",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9597,
+      "hook": "number_first",
+      "score": 0.9715,
       "context": [
-        "viral Short now: 825,521 views in 77h, 6x its channel's subscribers",
-        "WHY Does This Fish Stick to Sharks and Even Humans? Remora fish have a special suction disc on their heads that works like a suction cup. Th"
+        "viral Short now: 163,375 views in 26h, 28x its channel's subscribers",
+        "Disclaimer: All credit goes to the original creators. The images, music, and videos used in this content belong to their rightful owners. If"
       ],
       "evidence": {
-        "views": 825521,
-        "hours": 76.5,
-        "vph": 10787,
-        "breakout": 5.8
+        "views": 163375,
+        "hours": 25.7,
+        "vph": 6346,
+        "breakout": 27.8
       }
     },
     {
-      "topic": "What happens if a snake enters your tooth",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9568,
-      "context": [
-        "viral Short now: 379,865 views in 13h, 0x its channel's subscribers",
-        "Kya daant ke andar sach mein saap ghus sakta hai Janiye iska sabse khatarnak aur ajeeb sach! Video Reaction & Commentary: Presented by FACTS"
-      ],
-      "evidence": {
-        "views": 379865,
-        "hours": 12.9,
-        "vph": 29355,
-        "breakout": 0.2
-      }
-    },
-    {
-      "topic": "190 Years Old?! This Turtle Is STILL Alive!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.954,
-      "context": [
-        "viral Short now: 1,024,623 views in 77h, 3x its channel's subscribers",
-        "190 Years Old?! This Turtle Is STILL Alive! 190 years old, facts shorts, 190 years old tortoise, 100 years old turtle, turtle facts, 190 yea"
-      ],
-      "evidence": {
-        "views": 1024623,
-        "hours": 77.2,
-        "vph": 13268,
-        "breakout": 3.0
-      }
-    },
-    {
-      "topic": "How Israel became a Nuclear State?",
+      "topic": "ഷഫമരട തപപ ഇതരയ ഉയരമളളത എനതകണട?",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "question",
-      "score": 0.9511,
+      "score": 0.9686,
       "context": [
-        "viral Short now: 139,302 views in 53h, 59x its channel's subscribers",
-        "Did you know that Israel secretly built an atomic arsenal by the end of the 1960s, but faced an impossible hurdle: how to test a nuclear bom"
-      ],
-      "evidence": {
-        "views": 139302,
-        "hours": 53.5,
-        "vph": 2605,
-        "breakout": 59.3
-      }
-    },
-    {
-      "topic": "Why Do Barnacles Stick to Whales?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9483,
-      "context": [
-        "viral Short now: 124,342 views in 77h, 124x its channel's subscribers",
-        "Why Do Barnacles Stick to Whales? Have you ever wondered why whales often have hundreds of tiny barnacles attached to their skin? The answer"
-      ],
-      "evidence": {
-        "views": 124342,
-        "hours": 76.5,
-        "vph": 1624,
-        "breakout": 124.3
-      }
-    },
-    {
-      "topic": "तम Insan नह हत pt80 Find Your Animal Name Facts Shorts",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "you_statement",
-      "score": 0.9454,
-      "context": [
-        "viral Short now: 848,492 views in 34h, 0x its channel's subscribers",
-        "तम Insan नह हत pt80 Find Your Animal Name Facts Shorts AnimalPersonalityTest GuessYourAnimal AnimalQuiz PersonalityTest SpiritAnimal AnimalP"
-      ],
-      "evidence": {
-        "views": 848492,
-        "hours": 34.0,
-        "vph": 24924,
-        "breakout": 0.3
-      }
-    },
-    {
-      "topic": "The Owner Let Him Live the Dream",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9425,
-      "context": [
-        "viral Short now: 174,144 views in 66h, 50x its channel's subscribers",
-        "A delivery worker stopped to photograph an orange McLaren, but the moment changed when the car’s owner noticed him. Instead of sending him a"
-      ],
-      "evidence": {
-        "views": 174144,
-        "hours": 65.9,
-        "vph": 2643,
-        "breakout": 50.0
-      }
-    },
-    {
-      "topic": "His Brain Is Next Level",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9396,
-      "context": [
-        "viral Short now: 406,912 views in 41h, 4x its channel's subscribers",
-        "His Brain Is Next Level facts in telugu, vr facts in telugu, 10 facts in telugu, 100 facts in telugu, facts in telugu 100, facts in telugu n"
-      ],
-      "evidence": {
-        "views": 406912,
-        "hours": 41.0,
-        "vph": 9930,
-        "breakout": 4.3
-      }
-    },
-    {
-      "topic": "they say praise the fool btw.",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9367,
-      "context": [
-        "viral Short now: 206,254 views in 15h, 2x its channel's subscribers",
-        "they say praise the fool btw."
-      ],
-      "evidence": {
-        "views": 206254,
-        "hours": 15.1,
-        "vph": 13671,
-        "breakout": 2.1
-      }
-    },
-    {
-      "topic": "Can this hamster still be saved?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9339,
-      "context": [
-        "viral Short now: 184,411 views in 49h, 25x its channel's subscribers",
+        "viral Short now: 576,886 views in 30h, 3x its channel's subscribers",
         ""
       ],
       "evidence": {
-        "views": 184411,
-        "hours": 49.2,
-        "vph": 3747,
-        "breakout": 24.9
-      }
-    },
-    {
-      "topic": "Where Airplane Toilet Waste REALLY Goes! Vacuum Toilet Facts All Facts Tamil",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.931,
-      "context": [
-        "viral Short now: 399,635 views in 80h, 13x its channel's subscribers",
-        "Have you ever wondered where airplane toilet waste actually goes? Discover the powerful vacuum suction technology inside commercial aircraft"
-      ],
-      "evidence": {
-        "views": 399635,
-        "hours": 79.8,
-        "vph": 5005,
-        "breakout": 13.5
-      }
-    },
-    {
-      "topic": "35 Minutes Before the Wedding... and the Groom Disappeared Without a Trace!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "number_first",
-      "score": 0.9281,
-      "context": [
-        "viral Short now: 109,106 views in 47h, 47x its channel's subscribers",
-        "35 Minutes Before the Wedding... and the Groom Disappeared Without a Trace! The tension in the room was unbearable. The dress was ready, the"
-      ],
-      "evidence": {
-        "views": 109106,
-        "hours": 47.0,
-        "vph": 2320,
-        "breakout": 47.2
-      }
-    },
-    {
-      "topic": "इतन बड Machine यकन करन मशकल ह!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9252,
-      "context": [
-        "viral Short now: 115,375 views in 74h, 89x its channel's subscribers",
-        "इतन बड Machine यकन करन मशकल ह! Hashtags : Keywords : Liebherr R 13000 Liebherr Excavator Giant Excavator Mining Excavator Giant Mining Machi"
-      ],
-      "evidence": {
-        "views": 115375,
-        "hours": 74.0,
-        "vph": 1560,
-        "breakout": 89.4
-      }
-    },
-    {
-      "topic": "This Ancient Temple Is Hundreds of Years Old An Unsolved Mystery",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9223,
-      "context": [
-        "viral Short now: 81,166 views in 56h, 81x its channel's subscribers",
-        "An ancient temple hiding a mystery that still remains unsolved. As the sacred sound of Om Namah Shivaya echoes here, devotees feel a deep sp"
-      ],
-      "evidence": {
-        "views": 81166,
-        "hours": 56.0,
-        "vph": 1450,
-        "breakout": 81.2
-      }
-    },
-    {
-      "topic": "How He Survived 438 Days Adrift",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.9195,
-      "context": [
-        "viral Short now: 93,137 views in 71h, 93x its channel's subscribers",
-        "Did you know a fisherman survived 438 days adrift in the Pacific after a storm broke his engine? A Mexican fisherman survived 438 days lost "
-      ],
-      "evidence": {
-        "views": 93137,
-        "hours": 71.3,
-        "vph": 1305,
-        "breakout": 93.1
+        "views": 576886,
+        "hours": 30.5,
+        "vph": 18941,
+        "breakout": 3.2
       }
     },
     {
@@ -529,52 +223,340 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "you_statement",
-      "score": 0.9166,
+      "score": 0.9658,
       "context": [
-        "viral Short now: 52,543 views in 29h, 53x its channel's subscribers",
+        "viral Short now: 137,425 views in 53h, 113x its channel's subscribers",
         "How small is Earth compared to the vast universe? Earth may feel enormous to us, but on a cosmic scale, our planet is just a tiny part of an"
       ],
       "evidence": {
-        "views": 52543,
-        "hours": 29.0,
-        "vph": 1813,
-        "breakout": 52.5
+        "views": 137425,
+        "hours": 53.0,
+        "vph": 2595,
+        "breakout": 112.6
       }
     },
     {
-      "topic": "How Long Would It Take to Reach the Sun?",
+      "topic": "Why Did Plague Doctors Wear Those Terrifying Masks?",
       "source": "youtube_outliers",
       "is_fact": true,
-      "lane": "science_nature",
+      "lane": "history_mystery",
       "hook": "question",
-      "score": 0.9137,
+      "score": 0.9629,
       "context": [
-        "viral Short now: 188,316 views in 86h, 38x its channel's subscribers",
-        "How Long Would It Take to Reach the Sun? Have you ever wondered how long it would actually take to travel the 150 million kilometers from Ea"
+        "viral Short now: 466,766 views in 15h, 1x its channel's subscribers",
+        "During the plague outbreaks of the 17th century, plague doctors wore distinctive masks and protective clothing because they believed disease"
       ],
       "evidence": {
-        "views": 188316,
-        "hours": 85.9,
-        "vph": 2192,
-        "breakout": 37.9
+        "views": 466766,
+        "hours": 15.0,
+        "vph": 31207,
+        "breakout": 0.7
       }
     },
     {
-      "topic": "The Secret Rule Behind Medieval Ugly Babies",
+      "topic": "The Cow Came Back for One Last Hug",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9109,
+      "score": 0.96,
       "context": [
-        "viral Short now: 98,182 views in 73h, 76x its channel's subscribers",
-        "Ever wondered why every baby in medieval paintings looks like a stressed 45-year-old man? It wasn't poor artistry. For over 500 years, the C"
+        "viral Short now: 168,634 views in 42h, 43x its channel's subscribers",
+        "A viral video shows a cow being led away from the farmer who had cared for her, only for her to turn back and return to him for one final em"
       ],
       "evidence": {
-        "views": 98182,
-        "hours": 73.4,
-        "vph": 1338,
-        "breakout": 76.1
+        "views": 168634,
+        "hours": 41.8,
+        "vph": 4030,
+        "breakout": 43.2
+      }
+    },
+    {
+      "topic": "How Israel became a Nuclear State?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.9572,
+      "context": [
+        "viral Short now: 197,125 views in 77h, 81x its channel's subscribers",
+        "Did you know that Israel secretly built an atomic arsenal by the end of the 1960s, but faced an impossible hurdle: how to test a nuclear bom"
+      ],
+      "evidence": {
+        "views": 197125,
+        "hours": 77.5,
+        "vph": 2545,
+        "breakout": 81.5
+      }
+    },
+    {
+      "topic": "MOSCAS GIGANTES?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9543,
+      "context": [
+        "viral Short now: 265,136 views in 27h, 7x its channel's subscribers",
+        ""
+      ],
+      "evidence": {
+        "views": 265136,
+        "hours": 26.9,
+        "vph": 9839,
+        "breakout": 7.1
+      }
+    },
+    {
+      "topic": "An Entire Planet Can Look Like a Tiny Dot Against the Sun",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9515,
+      "context": [
+        "viral Short now: 117,406 views in 61h, 117x its channel's subscribers",
+        "What looks like a tiny black dot against the Sun is a powerful reminder of just how enormous our star really is. A planet can be thousands o"
+      ],
+      "evidence": {
+        "views": 117406,
+        "hours": 60.9,
+        "vph": 1926,
+        "breakout": 117.4
+      }
+    },
+    {
+      "topic": "PETTING A TIGER SHARK",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9486,
+      "context": [
+        "viral Short now: 555,938 views in 95h, 17x its channel's subscribers",
+        "Tiger sharks eat almost anything, from fish and turtles to seabirds, and investigate unfamiliar objects up close. Dive guides often use a ge"
+      ],
+      "evidence": {
+        "views": 555938,
+        "hours": 95.0,
+        "vph": 5855,
+        "breakout": 17.3
+      }
+    },
+    {
+      "topic": "నలకద ఇత పదద పరపచమ?! Prairie Dog Life Cycle Telugu Animal Facts",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9458,
+      "context": [
+        "viral Short now: 132,869 views in 77h, 133x its channel's subscribers",
+        "నలకద ఇత పదద పరపచమ?! Prairie Dog Life Cycle Telugu Animal Facts నలకద ఈ చనన జతవ ఏకగ ఒక నగరలట పరపచనన ఎల నరమచకటద తలస? Prairie Dog ఉతతర అమరకలన Gr"
+      ],
+      "evidence": {
+        "views": 132869,
+        "hours": 77.0,
+        "vph": 1727,
+        "breakout": 132.9
+      }
+    },
+    {
+      "topic": "African Lungfish: How Does This Fish Survive Years Buried in Mud?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9429,
+      "context": [
+        "viral Short now: 596,407 views in 52h, 4x its channel's subscribers",
+        "African Lungfish Facts Did you know this incredible fish can survive long droughts by burrowing deep into drying mud and forming a protectiv"
+      ],
+      "evidence": {
+        "views": 596407,
+        "hours": 52.3,
+        "vph": 11396,
+        "breakout": 4.2
+      }
+    },
+    {
+      "topic": "Healthy Habits by Vedant Sir",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9401,
+      "context": [
+        "viral Short now: 313,418 views in 50h, 13x its channel's subscribers",
+        "Healthy Habits by Vedant Sir"
+      ],
+      "evidence": {
+        "views": 313418,
+        "hours": 50.2,
+        "vph": 6243,
+        "breakout": 12.6
+      }
+    },
+    {
+      "topic": "Paani se bahar chalti hai ye machhli! Mudskipper!",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9372,
+      "context": [
+        "viral Short now: 113,824 views in 26h, 24x its channel's subscribers",
+        "Paani ke bahar chalne wali machhli? Haan, ye sach hai! Mudskipper paani se bahar aakar chal sakti hai aur kichad ke andar gaddha banakar and"
+      ],
+      "evidence": {
+        "views": 113824,
+        "hours": 26.4,
+        "vph": 4312,
+        "breakout": 23.9
+      }
+    },
+    {
+      "topic": "This Mom Didn't Deserve This",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.9343,
+      "context": [
+        "viral Short now: 187,883 views in 68h, 48x its channel's subscribers",
+        "A mother took her son to buy a new phone, hoping to make him happy. When the device did not meet his expectations, he smashed it onto the fl"
+      ],
+      "evidence": {
+        "views": 187883,
+        "hours": 67.6,
+        "vph": 2779,
+        "breakout": 48.2
+      }
+    },
+    {
+      "topic": "they say praise the fool btw.",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.9315,
+      "context": [
+        "viral Short now: 405,432 views in 39h, 4x its channel's subscribers",
+        "they say praise the fool btw."
+      ],
+      "evidence": {
+        "views": 405432,
+        "hours": 39.1,
+        "vph": 10379,
+        "breakout": 4.1
+      }
+    },
+    {
+      "topic": "What happens if a snake enters your tooth",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9286,
+      "context": [
+        "viral Short now: 782,018 views in 37h, 0x its channel's subscribers",
+        "Kya daant ke andar sach mein saap ghus sakta hai Janiye iska sabse khatarnak aur ajeeb sach! Video Reaction & Commentary: Presented by FACTS"
+      ],
+      "evidence": {
+        "views": 782018,
+        "hours": 36.9,
+        "vph": 21184,
+        "breakout": 0.5
+      }
+    },
+    {
+      "topic": "This Is the Biggest Ocean on Earth But That’s Not the Crazy Part",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "disbelief",
+      "score": 0.9258,
+      "context": [
+        "viral Short now: 66,607 views in 32h, 67x its channel's subscribers",
+        "The Pacific Ocean is so enormous that imagining its true size is almost impossible. It stretches more than 12,000 miles from Asia toward Sou"
+      ],
+      "evidence": {
+        "views": 66607,
+        "hours": 31.7,
+        "vph": 2099,
+        "breakout": 66.6
+      }
+    },
+    {
+      "topic": "পরণর লকষণ বলব কন বপদ আসছ !",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9229,
+      "context": [
+        "viral Short now: 766,704 views in 62h, 3x its channel's subscribers",
+        "পরণদর আচরণ দখ তম ও বলত পরব কন বপদ আসত পর এই ভডওত য জনব : 1 Animals silent 2 Animals Warning 3 Sea 4 Ant 5 Bee 6 Frog 7 Fish 8 Birds 9 Elepha"
+      ],
+      "evidence": {
+        "views": 766704,
+        "hours": 62.5,
+        "vph": 12275,
+        "breakout": 2.6
+      }
+    },
+    {
+      "topic": "His Brain Is Next Level",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9201,
+      "context": [
+        "viral Short now: 517,146 views in 65h, 5x its channel's subscribers",
+        "His Brain Is Next Level facts in telugu, vr facts in telugu, 10 facts in telugu, 100 facts in telugu, facts in telugu 100, facts in telugu n"
+      ],
+      "evidence": {
+        "views": 517146,
+        "hours": 65.0,
+        "vph": 7962,
+        "breakout": 5.5
+      }
+    },
+    {
+      "topic": "ВОТ КАК УГОРЬ ВЫБИРАЕТСЯ ИЗ ЖИВОТА РЫБЫ",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9172,
+      "context": [
+        "viral Short now: 285,337 views in 21h, 1x its channel's subscribers",
+        "У некоторых видов морских угрей есть удивительная способность выбираться из пищеварительного тракта рыбы после того, как хищник их проглатыв"
+      ],
+      "evidence": {
+        "views": 285337,
+        "hours": 21.1,
+        "vph": 13510,
+        "breakout": 1.4
+      }
+    },
+    {
+      "topic": "The descendants of the Ottoman Dynasty still exist today",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.9144,
+      "context": [
+        "viral Short now: 200,755 views in 94h, 51x its channel's subscribers",
+        "The Ottoman Empire was one of the most powerful superpowers in human history, ruling over millions of people for more than 600 years. But wh"
+      ],
+      "evidence": {
+        "views": 200755,
+        "hours": 93.7,
+        "vph": 2142,
+        "breakout": 51.1
       }
     },
     {
@@ -583,124 +565,70 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "you_statement",
-      "score": 0.908,
+      "score": 0.9115,
       "context": [
-        "viral Short now: 861,443 views in 58h, 0x its channel's subscribers",
+        "viral Short now: 682,930 views in 34h, 0x its channel's subscribers",
         "आप इसन नह हत Find Your Animal Name Facts Shorts AnimalPersonalityTest GuessYourAnimal AnimalQuiz PersonalityTest SpiritAnimal AnimalPersonal"
       ],
       "evidence": {
-        "views": 861443,
-        "hours": 58.0,
-        "vph": 14842,
-        "breakout": 0.3
+        "views": 682930,
+        "hours": 34.0,
+        "vph": 20080,
+        "breakout": 0.2
       }
     },
     {
-      "topic": "Albert Einstein Married His Cousin",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9051,
-      "context": [
-        "viral Short now: 109,067 views in 69h, 50x its channel's subscribers",
-        "Albert Einstein married Elsa Einstein in 1919and their relationship had a surprising family connection. Here’s the story behind the famous s"
-      ],
-      "evidence": {
-        "views": 109067,
-        "hours": 69.5,
-        "vph": 1570,
-        "breakout": 49.8
-      }
-    },
-    {
-      "topic": "31 CUTS TO AN ATOM",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "number_first",
-      "score": 0.9022,
-      "context": [
-        "viral Short now: 77,434 views in 48h, 43x its channel's subscribers",
-        "Description: What would happen if you kept cutting something in half 31 TIMES? You'd go from something you can see all the way down to the t"
-      ],
-      "evidence": {
-        "views": 77434,
-        "hours": 48.0,
-        "vph": 1612,
-        "breakout": 42.5
-      }
-    },
-    {
-      "topic": "గరర నళల తగడనక Farmers ఈ Trick ఏట తలస?",
+      "topic": "How does Tiranga Buckle make",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.8993,
+      "score": 0.9087,
       "context": [
-        "viral Short now: 111,193 views in 53h, 24x its channel's subscribers",
-        "కతత పరదశల కనన గరరల వటన నళల తగవ. అదక వటర టబల ఆపల వస, గరర నళల తగల చస ఈ interesting trickన ఉపయగసతర. This video is for educational and informati"
+        "viral Short now: 34,418 views in 13h, 34x its channel's subscribers",
+        ""
       ],
       "evidence": {
-        "views": 111193,
-        "hours": 53.0,
-        "vph": 2099,
-        "breakout": 23.7
+        "views": 34418,
+        "hours": 13.0,
+        "vph": 2657,
+        "breakout": 34.4
       }
     },
     {
-      "topic": "Earth Looks SPLIT Into Two Worlds Himalayas From Space",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.8965,
-      "context": [
-        "viral Short now: 76,934 views in 76h, 77x its channel's subscribers",
-        "From the ISS, the Himalayas look like a massive natural barrier separating the Tibetan Plateau from the Indian subcontinent. If this view am"
-      ],
-      "evidence": {
-        "views": 76934,
-        "hours": 76.0,
-        "vph": 1013,
-        "breakout": 76.9
-      }
-    },
-    {
-      "topic": "The Place in the Universe Where Almost Nothing Exists",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.8936,
-      "context": [
-        "viral Short now: 170,509 views in 61h, 13x its channel's subscribers",
-        "This is the Boötes Void one of the largest known cosmic voids. Stretching roughly 330 million light-years across, this enormous region conta"
-      ],
-      "evidence": {
-        "views": 170509,
-        "hours": 61.1,
-        "vph": 2792,
-        "breakout": 13.3
-      }
-    },
-    {
-      "topic": "근황을 알 수 없는 유튜버",
+      "topic": "The Owner Let Him Live the Dream",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.8907,
+      "score": 0.9058,
       "context": [
-        "viral Short now: 360,120 views in 51h, 2x its channel's subscribers",
-        ""
+        "viral Short now: 185,980 views in 90h, 48x its channel's subscribers",
+        "A delivery worker stopped to photograph an orange McLaren, but the moment changed when the car’s owner noticed him. Instead of sending him a"
       ],
       "evidence": {
-        "views": 360120,
-        "hours": 50.6,
-        "vph": 7116,
-        "breakout": 2.0
+        "views": 185980,
+        "hours": 89.9,
+        "vph": 2070,
+        "breakout": 47.7
+      }
+    },
+    {
+      "topic": "He Thought WRESTLING Was FAKE",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.9029,
+      "context": [
+        "viral Short now: 233,371 views in 27h, 3x its channel's subscribers",
+        "On January 30, 1980, live on British television, sports anchor Jackie Fullerton learned the most painful lesson of his life. He looked 6-foo"
+      ],
+      "evidence": {
+        "views": 233371,
+        "hours": 27.4,
+        "vph": 8514,
+        "breakout": 2.9
       }
     },
     {
@@ -709,16 +637,88 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.8879,
+      "score": 0.9001,
       "context": [
-        "viral Short now: 501,949 views in 59h, 1x its channel's subscribers",
+        "viral Short now: 821,956 views in 83h, 2x its channel's subscribers",
         "In this video I have explained for the most unexpected animal moments caught on camera part 72"
       ],
       "evidence": {
-        "views": 501949,
-        "hours": 59.0,
-        "vph": 8511,
-        "breakout": 1.2
+        "views": 821956,
+        "hours": 82.9,
+        "vph": 9909,
+        "breakout": 2.0
+      }
+    },
+    {
+      "topic": "This Ancient Temple Is Hundreds of Years Old An Unsolved Mystery",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.8972,
+      "context": [
+        "viral Short now: 97,460 views in 80h, 96x its channel's subscribers",
+        "An ancient temple hiding a mystery that still remains unsolved. As the sacred sound of Om Namah Shivaya echoes here, devotees feel a deep sp"
+      ],
+      "evidence": {
+        "views": 97460,
+        "hours": 80.0,
+        "vph": 1219,
+        "breakout": 95.5
+      }
+    },
+    {
+      "topic": "Can this hamster still be saved?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.8944,
+      "context": [
+        "viral Short now: 191,913 views in 73h, 26x its channel's subscribers",
+        ""
+      ],
+      "evidence": {
+        "views": 191913,
+        "hours": 73.2,
+        "vph": 2622,
+        "breakout": 25.8
+      }
+    },
+    {
+      "topic": "గరర నళల తగడనక Farmers ఈ Trick ఏట తలస?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.8916,
+      "context": [
+        "viral Short now: 167,409 views in 77h, 35x its channel's subscribers",
+        "కతత పరదశల కనన గరరల వటన నళల తగవ. అదక వటర టబల ఆపల వస, గరర నళల తగల చస ఈ interesting trickన ఉపయగసతర. This video is for educational and informati"
+      ],
+      "evidence": {
+        "views": 167409,
+        "hours": 77.0,
+        "vph": 2175,
+        "breakout": 35.5
+      }
+    },
+    {
+      "topic": "The Quetzalcoatlus was TERRIFYING",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.8887,
+      "context": [
+        "viral Short now: 130,341 views in 32h, 11x its channel's subscribers",
+        "The Quetzalcoatlus was TERRIFYING quetzalcoatlus quetzalcoatlus explained quetzalcoatlus facts quetzalcoatlus flight how did quetzalcoatlus "
+      ],
+      "evidence": {
+        "views": 130341,
+        "hours": 31.7,
+        "vph": 4111,
+        "breakout": 10.6
       }
     }
   ]
