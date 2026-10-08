@@ -862,7 +862,7 @@ def test_canned_aside_is_rejected_by_the_real_validator():
     script = {"title": "T", "segments": [
         {"text": "A nightmare washed up on a New York beach in 2008.",
          "visual": {"shows": "the Montauk Monster carcass", "queries": ["montauk monster"]}},
-        {"text": "Biologists argued for weeks about what it actually was.",
+        {"text": "Biologists argued for weeks about the Montauk Monster carcass.",
          "aside": "Nature, please.",
          "visual": {"shows": "sand", "queries": ["sand"]}},
         {"text": "The carcass vanished before anyone ran a single test.",
@@ -1001,7 +1001,7 @@ def test_both_are_enforced_by_the_real_validator():
     v = _grab_validator()
     assert v is not None
     base = [
-        {"text": "Ever wonder why airplane toilets make that loud whoosh sound?",
+        {"text": "Ever wonder why the Montauk Monster washed up on that beach?",
          "visual": {"shows": "the Montauk Monster carcass", "queries": ["montauk monster"]}},
         {"text": "A vacuum pulls the waste away using very little water.",
          "visual": {"shows": "toilet", "queries": ["toilet"]}},
@@ -1014,7 +1014,7 @@ def test_both_are_enforced_by_the_real_validator():
         v({"title": "T", "segments": base})
 
     asking = [dict(x) for x in base]
-    asking[0]["text"] = "Airplane toilets pull waste away with a sudden vacuum."
+    asking[0]["text"] = "The Montauk Monster washed up with no clear explanation."
     asking[-1]["text"] = "The Hittite Empire or the Nile's floods—which won?"
     with pytest.raises(AssertionError, match="asks a question"):
         v({"title": "T", "segments": asking})
@@ -1142,6 +1142,90 @@ def test_coherence_is_recorded_always_and_gated_by_config():
 
     cfg = _y.safe_load((ROOT / "config.yaml").read_text())
     thr = cfg["content"]["min_coherence"]
-    assert 0 < thr <= 5, (
-        f"min_coherence {thr} is too strict for an unmeasured criterion: it should reject "
-        "disconnected fact-lists, not merely workmanlike scripts")
+    assert 0 < thr <= 7, (
+        f"min_coherence {thr} is too strict: observed scores on published scripts were "
+        "5, 6 and 8, so a bar above 7 would reject nearly everything")
+    assert thr >= 5, (
+        f"min_coherence {thr} is too loose: a pure fact-list scored 5 and passed")
+
+
+# ── naming the subject, and the escalation ladder ──────────────────────────
+def test_script_must_say_what_it_is_about():
+    """Two published scripts never named their own subject.
+
+    "Some fish spend three quarters of life on land" (the mudskipper) and "Imagine a
+    creature with a 33-foot wingspan" (a pterosaur). Coyness is not suspense - a
+    viewer cannot search, recognise or remember "some fish", and the specific noun is
+    what makes a fact feel real rather than like filler.
+    """
+    from autotube.scriptwriter import narration_names_subject
+
+    vague = {"segments": [
+        {"text": "Some fish spend three quarters of life on land."},
+        {"text": "They use jointed pectoral fins to crawl and skip."},
+        {"text": "They leap distances up to 61 centimetres."}]}
+    assert not narration_names_subject(vague, "Mudskipper")
+
+    named = {"segments": [
+        {"text": "The mudskipper spends three quarters of its life on land."},
+        {"text": "It crawls on jointed pectoral fins."}]}
+    assert narration_names_subject(named, "Mudskipper")
+
+    # Parenthetical qualifiers must not make the requirement impossible.
+    assert narration_names_subject({"segments": [{"text": "Jonathan is 193 years old."}]},
+                                   "Jonathan (tortoise)")
+
+
+def test_rejects_the_escalation_ladder_reused_across_videos():
+    """"Weird: / Weirder: / Completely unhinged:" shipped in a cricket script and an
+    Alcatraz script days apart.
+
+    It is a list wearing the costume of a story - the labels assert escalation instead
+    of the facts earning it - and near-identical structure across uploads is exactly
+    what the repetitious-content policy targets.
+    """
+    from autotube.scriptwriter import uses_escalation_template
+
+    ladder = {"segments": [
+        {"text": "Three men left Alcatraz with fake heads."},
+        {"text": "Weird: they dug six months through ducts."},
+        {"text": "Weirder: they floated away on a raft."},
+        {"text": "Completely unhinged: the case is still open."}]}
+    assert uses_escalation_template(ladder) >= 2
+
+    clean = {"segments": [
+        {"text": "Three men left Alcatraz with fake heads."},
+        {"text": "They had dug for six months through the ducts."}]}
+    assert uses_escalation_template(clean) == 0
+
+
+def test_imagine_a_is_treated_as_filler():
+    from autotube.scriptwriter import banned_opener
+
+    assert banned_opener("Imagine a creature with a 33-foot wingspan.") == "imagine a"
+    assert banned_opener("Picture this: a fish that walks.") == "picture this"
+    assert banned_opener("Three men left Alcatraz with fake heads.") is None
+
+
+def test_all_three_are_enforced_by_the_real_validator():
+    import pytest
+
+    v = _grab_validator()
+    assert v is not None
+
+    def script(lines, asides=None):
+        return {"title": "T", "segments": [
+            {"text": t, "visual": {"shows": "the Montauk Monster carcass",
+                                   "queries": ["montauk monster"]}} for t in lines]}
+
+    with pytest.raises(AssertionError, match="never says"):
+        v(script(["Some fish spend three quarters of their life on land.",
+                  "They crawl using jointed pectoral fins each day.",
+                  "They breathe through their skin and throat lining.",
+                  "They leap up to sixty one centimetres at once."]))
+
+    with pytest.raises(AssertionError, match="Weird"):
+        v(script(["The Montauk Monster washed up on a beach in 2008.",
+                  "Weird: biologists argued for weeks about the carcass.",
+                  "Weirder: the body vanished before any testing happened.",
+                  "Completely unhinged: nobody has identified it since then."]))

@@ -255,6 +255,10 @@ BANNED_OPENERS = (
     "in this video", "today we", "let's talk about", "lets talk about",
     "what if i told you", "you won't believe", "you wont believe",
     "imagine if", "this is the story of", "welcome back",
+    # Seen in production: "Imagine a creature with a 33-foot wingspan." An instruction
+    # to the viewer is not a fact, and it delays the specific by three words.
+    "imagine a", "imagine the", "imagine you", "picture this", "picture a",
+    "meet the", "let me tell you", "here's why", "heres why",
 )
 
 
@@ -285,6 +289,57 @@ def payoff_is_a_question(last: str) -> bool:
     the last line answers.
     """
     return (last or "").strip().endswith("?")
+
+
+def narration_names_subject(script: dict, subject: str) -> bool:
+    """Does the script ever say what it is about?
+
+    Two scripts shipped as "Some fish spend three quarters of life on land" and
+    "Imagine a creature with a 33-foot wingspan" - neither ever names the mudskipper
+    or the pterosaur. Coyness is not suspense: a viewer cannot search, recognise or
+    remember "some fish", and the specific noun is the thing that makes a fact feel
+    real rather than like filler.
+
+    The visual gate already requires the subject on screen; this requires it in the
+    words. Parenthetical qualifiers are stripped, so "Jonathan (tortoise)" is
+    satisfied by either word.
+    """
+    import re as _re
+
+    from .originality import tokens
+
+    stop = {"the", "a", "an", "of", "and", "in", "on", "at", "for", "with", "to",
+            "incident", "mystery", "case", "story", "effect", "phenomenon", "signal",
+            "accident", "escape", "project", "experiment"}
+    base = _re.sub(r"\(.*?\)", " ", subject or "")
+    key = {t for t in tokens(base) if len(t) > 3 and t not in stop}
+    if not key:
+        return True
+    said = set()
+    for seg in script.get("segments", []):
+        said |= set(tokens(spoken_text(seg)))
+    return bool(key & said)
+
+
+ESCALATION_TEMPLATE = ("weird:", "weirder:", "weirdest:", "completely unhinged:",
+                       "but wait:", "it gets worse:", "it gets better:", "plot twist:")
+
+
+def uses_escalation_template(script: dict) -> int:
+    """Count lines opening with the canned escalation ladder.
+
+    "Weird: ... Weirder: ... Completely unhinged: ..." appeared in a cricket script and
+    an Alcatraz script days apart. It is a list wearing the costume of a story - the
+    labels assert escalation instead of the facts earning it - and repeated across
+    uploads it is the near-identical structure that YouTube's repetitious-content
+    policy is written about.
+    """
+    n = 0
+    for seg in script.get("segments", []):
+        low = spoken_text(seg).strip().lower()
+        if any(low.startswith(t) for t in ESCALATION_TEMPLATE):
+            n += 1
+    return n
 
 
 def payoff_is_empty(hook: str, last: str) -> bool:
@@ -668,6 +723,16 @@ Return JSON:
                     f"the last line just restates the hook ({echo:.0%} of its words are from it) — "
                     "end on the strongest fact the viewer has NOT heard yet, something the hook "
                     "completes on replay; never 'and that is why' or 'so yes'")
+            assert narration_names_subject(o, subject_for_visuals), (
+                f"the script never says {subject_for_visuals!r} out loud — it hides behind "
+                "'some fish' or 'a creature'. Name it: the specific noun is what makes a "
+                "fact land instead of sounding like filler")
+            _esc = uses_escalation_template(o)
+            assert _esc < 2, (
+                "stop using the 'Weird: / Weirder: / Completely unhinged:' ladder — it is a "
+                "list pretending to be a story, it has appeared in several videos already, "
+                "and near-identical structure across uploads is what gets a channel "
+                "flagged as repetitious. Make the facts escalate without announcing it")
             _b = banned_opener(spoken_text(segs[0]))
             assert not _b, (
                 f"the hook opens with {_b!r}, which is filler every channel uses. Open on the "
