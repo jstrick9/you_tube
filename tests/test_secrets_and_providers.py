@@ -1229,3 +1229,20 @@ def test_all_three_are_enforced_by_the_real_validator():
                   "Weird: biologists argued for weeks about the carcass.",
                   "Weirder: the body vanished before any testing happened.",
                   "Completely unhinged: nobody has identified it since then."]))
+
+
+# ── every video must ride a live trend ─────────────────────────────────────
+def test_no_source_of_untrending_topics_is_enabled():
+    """The channel's premise is that every video rides something happening now.
+
+    Three ways a stale topic could get in: the evergreen seed list, on-this-day
+    anniversaries, and an outlier window wide enough to catch last week. An
+    anniversary is a calendar entry every scheduler already has, not a trend.
+    """
+    import yaml as _y
+
+    cfg = _y.safe_load((ROOT / "config.yaml").read_text())
+    assert cfg["content"]["allow_evergreen"] is False
+    assert cfg["trends"]["on_this_day"] is False
+    assert cfg["trends"]["outlier_window_hours"] <= 72, "a four-day-old breakout is not trending"
+    assert cfg["content"]["min_viral_score"] >= 7

@@ -239,10 +239,17 @@ trends:
   max_queries_per_run: 14
   youtube_outlier_queries: []            # legacy flat list; the lanes above supersede it
   format_pulse: true                     # learn which hook shapes are winning on YouTube right now
-  outlier_window_hours: 96
+  # 72h, not 96. "Trending" has a shelf life: a video that broke out four days ago is
+  # already being covered by everyone who saw it break out. Not tightened further
+  # because candidate supply is the binding constraint - abandonment already runs high
+  # and starving the queue would just mean fewer videos, not fresher ones.
+  outlier_window_hours: 72
   outlier_min_views: 30000
   wikipedia_spike_check: 40              # top-N Wikipedia pages compared with their own 30-day normal
-  on_this_day: true                      # same-day / next-day anniversaries (round numbers boosted)
+  # Off: an anniversary is a calendar entry, not a trend. Nothing is happening right
+  # now because something happened on this date in 1847, and every channel with a
+  # scheduler has the same list. Trend sources must be things actually moving today.
+  on_this_day: false
 
 compliance:
   made_for_kids: false
