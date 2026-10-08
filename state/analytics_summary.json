@@ -1,18 +1,18 @@
 {
-  "updated": "2026-10-07T17:28:51.383892+00:00",
-  "videos_total": 36,
-  "videos_7d": 13,
-  "views_7d": 8979,
-  "learned_this_run": 0,
+  "updated": "2026-10-08T07:58:48.117111+00:00",
+  "videos_total": 38,
+  "videos_7d": 15,
+  "views_7d": 10563,
+  "learned_this_run": 2,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 19,
+      "observations": 21,
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.59,
-          "n": 1
+          "mean": 0.56,
+          "n": 2
         },
         {
           "arm": "space",
@@ -31,7 +31,12 @@
         },
         {
           "arm": "entertainment",
-          "mean": 0.528,
+          "mean": 0.527,
+          "n": 1
+        },
+        {
+          "arm": "mysteries",
+          "mean": 0.505,
           "n": 1
         },
         {
@@ -50,13 +55,8 @@
           "n": 0
         },
         {
-          "arm": "mysteries",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
           "arm": "science",
-          "mean": 0.495,
+          "mean": 0.496,
           "n": 5
         },
         {
@@ -73,7 +73,7 @@
     },
     "format": {
       "status": "learning",
-      "observations": 19,
+      "observations": 21,
       "arms": [
         {
           "arm": "sounds_fake",
@@ -97,13 +97,18 @@
         },
         {
           "arm": "backstory",
-          "mean": 0.512,
+          "mean": 0.511,
           "n": 5
         },
         {
           "arm": "facts3",
           "mean": 0.506,
           "n": 2
+        },
+        {
+          "arm": "plot_twist",
+          "mean": 0.505,
+          "n": 1
         },
         {
           "arm": "what_if",
@@ -121,17 +126,7 @@
           "n": 0
         },
         {
-          "arm": "plot_twist",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
           "arm": "dumbest_decision",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
-          "arm": "creepy_true",
           "mean": 0.5,
           "n": 0
         },
@@ -139,6 +134,11 @@
           "arm": "timeline",
           "mean": 0.496,
           "n": 2
+        },
+        {
+          "arm": "creepy_true",
+          "mean": 0.492,
+          "n": 1
         },
         {
           "arm": "myth_vs_fact",
@@ -261,9 +261,14 @@
       ]
     },
     "comment_device": {
-      "status": "exploring (0/8)",
-      "observations": 0,
+      "status": "exploring (2/8)",
+      "observations": 2,
       "arms": [
+        {
+          "arm": "correction_bait",
+          "mean": 0.505,
+          "n": 1
+        },
         {
           "arm": "none",
           "mean": 0.5,
@@ -286,13 +291,8 @@
         },
         {
           "arm": "challenge",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
-          "arm": "correction_bait",
-          "mean": 0.5,
-          "n": 0
+          "mean": 0.492,
+          "n": 1
         }
       ]
     }
@@ -301,25 +301,25 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1441,
-      "avg_view_pct": 92.08
+      "views": 1442,
+      "avg_view_pct": 90.86
     },
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
       "views": 1394,
-      "avg_view_pct": 63.190000000000005
+      "avg_view_pct": 63.27
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
-      "views": 1281,
+      "views": 1282,
       "avg_view_pct": 52.05
     },
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1225,
+      "views": 1228,
       "avg_view_pct": 79.99
     },
     {
@@ -396,27 +396,27 @@
   },
   "subscribers": {
     "net_90d": 20,
-    "views_90d": 21834,
-    "per_1k_views": 0.92,
-    "videos": 28,
+    "views_90d": 23423,
+    "per_1k_views": 0.85,
+    "videos": 30,
     "days_to_500": 2250.0,
     "days_to_1000": 4500.0
   },
   "originality": {
-    "episodes_examined": 7,
+    "episodes_examined": 9,
     "window": 25,
     "mean_pairwise_similarity": 0.0,
     "max_pairwise_similarity": 0.0,
     "pairs_over_similarity_limit": 0,
     "most_common_format": {
-      "name": "sounds_fake",
-      "share": 0.286
+      "name": "creepy_true",
+      "share": 0.222
     },
     "most_common_category": {
-      "name": "mysteries",
-      "share": 0.286
+      "name": "nature",
+      "share": 0.333
     },
-    "share_with_narrator_commentary": 0.857,
+    "share_with_narrator_commentary": 0.889,
     "flags": [],
     "verdict": "looks like a show"
   }
