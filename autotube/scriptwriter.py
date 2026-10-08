@@ -225,26 +225,30 @@ def aside_is_generic(aside: str) -> bool:
     return norm in GENERIC_ASIDES
 
 
-def subject_is_depictable(subject: str, cfg: dict) -> bool:
-    """Is there a free image of this subject at all, before we write about it?
+def subject_is_depictable(subject: str, cfg: dict, source: dict | None = None) -> bool:
+    """Is there a free image of this subject before we write about it?
 
-    The subject gate rejects a finished script whose shots are all ambient scenery.
-    That is the right outcome but the wrong moment: one run spent five full
-    write-and-review cycles discovering, each time, that the thing could not be
-    pictured. Checking the archive first turns five wasted drafts into five cheap
-    lookups.
+    First version asked commons_search for four results and treated an empty list as
+    "cannot be pictured". It rejected Sea turtle, Tiger shark, Göbekli Tepe, Proboscis
+    monkey and Mimic octopus - subjects with thousands of free photographs - because a
+    four-result sample survives licence and width filtering only sometimes. Fifteen
+    topics were discarded in one run and the run shipped nothing. A check that is wrong
+    in the safe direction still stops the channel.
 
-    Deliberately permissive. A lookup failure returns True rather than False, because
-    a flaky network must never silently empty the schedule, and the real subject gate
-    still runs on the finished script. This only skips topics that are provably
-    unillustratable.
+    The grounded article already carries its own image list, fetched during grounding,
+    and it is both free and accurate: Sea turtle has 19, Göbekli Tepe 15, Mudskipper 6.
+    Use that when it exists, and fall back to a deliberately generous search only when
+    the article is bare.
     """
+    if source is not None and (source.get("images") or []):
+        return True
     from .media import commons_search
 
     if not subject:
         return True
     try:
-        hits = commons_search(subject, cfg["media"].get("licenses_allowed") or [], 400, limit=4)
+        hits = commons_search(subject, cfg.get("media", {}).get("licenses_allowed") or [],
+                              200, limit=20)
     except Exception:  # noqa: BLE001
         return True
     return bool(hits)
@@ -988,7 +992,7 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
         topic["wiki_title"] = source["title"]
         # Ask the archive before asking the model. A subject with no free image will
         # fail the shot gate after a full draft-and-review cycle, every time.
-        if not subject_is_depictable(source["title"], self.cfg):
+        if not subject_is_depictable(source["title"], self.cfg, source):
             log.info("  ✗ no free image of %r exists — skipping before writing", source["title"])
             return None
         feedback = ""

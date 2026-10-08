@@ -1246,3 +1246,35 @@ def test_no_source_of_untrending_topics_is_enabled():
     assert cfg["trends"]["on_this_day"] is False
     assert cfg["trends"]["outlier_window_hours"] <= 72, "a four-day-old breakout is not trending"
     assert cfg["content"]["min_viral_score"] >= 7
+
+
+def test_depictability_uses_the_articles_own_images(monkeypatch):
+    """A check that is wrong in the safe direction still stops the channel.
+
+    The first version asked commons_search for four results and called an empty list
+    "cannot be pictured". It rejected Sea turtle, Tiger shark, Göbekli Tepe, Proboscis
+    monkey and Mimic octopus - subjects with thousands of free photographs - because a
+    four-result sample survives licence and width filtering only sometimes. Fifteen
+    topics went in one run and that run produced nothing.
+
+    The grounded article already carries its image list, fetched during grounding.
+    """
+    import autotube.media as M
+    import autotube.scriptwriter as SW
+
+    # Article has images: decided without any search at all.
+    monkeypatch.setattr(M, "commons_search", lambda *a, **k: (_ for _ in ()).throw(
+        AssertionError("must not search when the article already has images")))
+    assert SW.subject_is_depictable("Sea turtle", {"media": {}}, {"images": ["a", "b"]})
+
+    # Bare article: fall back to a generous search.
+    seen = {}
+
+    def fake(q, lic, min_w, limit=4):
+        seen["min_w"], seen["limit"] = min_w, limit
+        return []
+
+    monkeypatch.setattr(M, "commons_search", fake)
+    assert not SW.subject_is_depictable("Zzqq Nonexistent", {"media": {}}, {"images": []})
+    assert seen["limit"] >= 20, "the sample must be large enough to survive filtering"
+    assert seen["min_w"] <= 200
