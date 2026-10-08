@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-08T17:27:22.166717+00:00",
-  "videos_total": 38,
-  "videos_7d": 12,
-  "views_7d": 7898,
+  "updated": "2026-10-08T21:41:59.489713+00:00",
+  "videos_total": 41,
+  "videos_7d": 15,
+  "views_7d": 8028,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -302,7 +302,7 @@
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
       "views": 1442,
-      "avg_view_pct": 90.86
+      "avg_view_pct": 90.78
     },
     {
       "title": "Why you are falling through space right now #shorts",
@@ -331,7 +331,7 @@
     {
       "title": "How the Largest Animal Ever Eats Tiny Prey #shorts",
       "id": "1ed_FohPwqs",
-      "views": 1201,
+      "views": 1203,
       "avg_view_pct": 54.59
     },
     {
@@ -395,28 +395,28 @@
     "verdict": "NO video clears the 70% completion gate (median 24%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
   },
   "subscribers": {
-    "net_90d": 20,
-    "views_90d": 23646,
-    "per_1k_views": 0.85,
-    "videos": 30,
-    "days_to_500": 2250.0,
-    "days_to_1000": 4500.0
+    "net_90d": 23,
+    "views_90d": 23779,
+    "per_1k_views": 0.97,
+    "videos": 33,
+    "days_to_500": 1956.5,
+    "days_to_1000": 3913.0
   },
   "originality": {
-    "episodes_examined": 9,
+    "episodes_examined": 12,
     "window": 25,
     "mean_pairwise_similarity": 0.0,
     "max_pairwise_similarity": 0.0,
     "pairs_over_similarity_limit": 0,
     "most_common_format": {
       "name": "creepy_true",
-      "share": 0.222
+      "share": 0.25
     },
     "most_common_category": {
       "name": "nature",
-      "share": 0.333
+      "share": 0.417
     },
-    "share_with_narrator_commentary": 0.889,
+    "share_with_narrator_commentary": 0.917,
     "flags": [],
     "verdict": "looks like a show"
   }
