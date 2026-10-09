@@ -319,7 +319,20 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0, "legible
         for i, c in enumerate(cands, 1):
             it = by_n.get(i)
             if it:
-                c["vscore"] = max(0.0, min(10.0, float(it["score"])))
+                score = max(0.0, min(10.0, float(it["score"])))
+                # An illegible frame is capped, not merely noted. The prompt has asked
+                # for this flag and nothing read it, so a shot the judge itself
+                # described as "Diagram labeling flying squirrel patagium membrane"
+                # was selected and shown: a labelled line drawing, on a phone, for two
+                # seconds. Relevance and readability are different questions and a
+                # chart can score well on the first while failing the second
+                # completely, which is the case that keeps reaching the screen.
+                if it.get("legible") is False:
+                    if score > 3.0:
+                        log.info("    illegible on a phone, capping %.0f→3: %s",
+                                 score, str(it.get("shows", ""))[:60])
+                    score = min(score, 3.0)
+                c["vscore"] = score
                 c["vshows"] = str(it.get("shows", ""))[:120]
                 c["vjudge"] = self.llm.last_used
         return True

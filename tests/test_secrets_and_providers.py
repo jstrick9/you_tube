@@ -1488,3 +1488,17 @@ def test_a_discarded_video_does_not_burn_an_episode_number():
     assert call in package, "the number should be issued once QA has passed"
     assert package.index('if not report["passed"]') < package.index(call), \
         "a rejected video must return before taking a number"
+
+
+def test_illegible_flag_actually_lowers_the_score():
+    """The prompt asked for "legible" and nothing read it.
+
+    A shot the judge itself described as "Diagram labeling flying squirrel patagium
+    membrane" was selected and put on screen - a labelled line drawing, on a phone,
+    for two seconds. Relevance and readability are different questions, and a diagram
+    can score well on the first while failing the second completely.
+    """
+    src = (ROOT / "autotube" / "vision.py").read_text()
+    body = src.split("by_n = {int(it")[1]
+    assert 'it.get("legible") is False' in body, "the flag must be read, not just requested"
+    assert "min(score, 3.0)" in body, "an illegible frame must be pushed below selection"
