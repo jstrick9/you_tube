@@ -1,13 +1,13 @@
 {
-  "updated": "2026-10-08T21:41:59.489713+00:00",
+  "updated": "2026-10-08T22:52:42.976224+00:00",
   "videos_total": 41,
   "videos_7d": 15,
-  "views_7d": 8028,
-  "learned_this_run": 0,
+  "views_7d": 8058,
+  "learned_this_run": 1,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 21,
+      "observations": 22,
       "arms": [
         {
           "arm": "nature",
@@ -20,11 +20,6 @@
           "n": 1
         },
         {
-          "arm": "animals",
-          "mean": 0.537,
-          "n": 1
-        },
-        {
           "arm": "history",
           "mean": 0.529,
           "n": 4
@@ -33,6 +28,11 @@
           "arm": "entertainment",
           "mean": 0.527,
           "n": 1
+        },
+        {
+          "arm": "animals",
+          "mean": 0.506,
+          "n": 2
         },
         {
           "arm": "mysteries",
@@ -73,7 +73,7 @@
     },
     "format": {
       "status": "learning",
-      "observations": 21,
+      "observations": 22,
       "arms": [
         {
           "arm": "sounds_fake",
@@ -116,11 +116,6 @@
           "n": 0
         },
         {
-          "arm": "ranked_escalation",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
           "arm": "guess_reveal",
           "mean": 0.5,
           "n": 0
@@ -138,6 +133,11 @@
         {
           "arm": "creepy_true",
           "mean": 0.492,
+          "n": 1
+        },
+        {
+          "arm": "ranked_escalation",
+          "mean": 0.472,
           "n": 1
         },
         {
@@ -261,8 +261,8 @@
       ]
     },
     "comment_device": {
-      "status": "exploring (2/8)",
-      "observations": 2,
+      "status": "exploring (3/8)",
+      "observations": 3,
       "arms": [
         {
           "arm": "correction_bait",
@@ -271,11 +271,6 @@
         },
         {
           "arm": "none",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
-          "arm": "poll",
           "mean": 0.5,
           "n": 0
         },
@@ -292,6 +287,11 @@
         {
           "arm": "challenge",
           "mean": 0.492,
+          "n": 1
+        },
+        {
+          "arm": "poll",
+          "mean": 0.472,
           "n": 1
         }
       ]
@@ -396,7 +396,7 @@
   },
   "subscribers": {
     "net_90d": 23,
-    "views_90d": 23779,
+    "views_90d": 23809,
     "per_1k_views": 0.97,
     "videos": 33,
     "days_to_500": 1956.5,
