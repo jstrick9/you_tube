@@ -1,13 +1,13 @@
 {
-  "updated": "2026-10-09T07:59:18.593671+00:00",
+  "updated": "2026-10-09T17:22:45.958249+00:00",
   "videos_total": 41,
-  "videos_7d": 15,
-  "views_7d": 8443,
+  "videos_7d": 13,
+  "views_7d": 7398,
   "learned_this_run": 1,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 23,
+      "observations": 24,
       "arms": [
         {
           "arm": "nature",
@@ -55,31 +55,26 @@
           "n": 0
         },
         {
-          "arm": "science",
-          "mean": 0.496,
-          "n": 5
-        },
-        {
           "arm": "geography",
-          "mean": 0.487,
+          "mean": 0.488,
           "n": 2
         },
         {
           "arm": "culture",
           "mean": 0.464,
           "n": 3
+        },
+        {
+          "arm": "science",
+          "mean": 0.452,
+          "n": 6
         }
       ]
     },
     "format": {
       "status": "learning",
-      "observations": 23,
+      "observations": 24,
       "arms": [
-        {
-          "arm": "sounds_fake",
-          "mean": 0.567,
-          "n": 2
-        },
         {
           "arm": "dumbest_decision",
           "mean": 0.558,
@@ -134,6 +129,11 @@
           "arm": "creepy_true",
           "mean": 0.492,
           "n": 1
+        },
+        {
+          "arm": "sounds_fake",
+          "mean": 0.485,
+          "n": 3
         },
         {
           "arm": "ranked_escalation",
@@ -261,14 +261,9 @@
       ]
     },
     "comment_device": {
-      "status": "exploring (4/8)",
-      "observations": 4,
+      "status": "exploring (5/8)",
+      "observations": 5,
       "arms": [
-        {
-          "arm": "correction_bait",
-          "mean": 0.548,
-          "n": 2
-        },
         {
           "arm": "none",
           "mean": 0.5,
@@ -293,6 +288,11 @@
           "arm": "poll",
           "mean": 0.472,
           "n": 1
+        },
+        {
+          "arm": "correction_bait",
+          "mean": 0.471,
+          "n": 3
         }
       ]
     }
@@ -307,7 +307,7 @@
     {
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
-      "views": 1394,
+      "views": 1397,
       "avg_view_pct": 63.27
     },
     {
@@ -315,6 +315,12 @@
       "id": "jnlRW0Ca1o8",
       "views": 1282,
       "avg_view_pct": 52.05
+    },
+    {
+      "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
+      "id": "iEXe-QyrmkY",
+      "views": 1250,
+      "avg_view_pct": 141.9
     },
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
@@ -333,12 +339,6 @@
       "id": "1ed_FohPwqs",
       "views": 1203,
       "avg_view_pct": 54.59
-    },
-    {
-      "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
-      "id": "iEXe-QyrmkY",
-      "views": 1189,
-      "avg_view_pct": 141.9
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
@@ -361,43 +361,43 @@
   ],
   "rejected": [],
   "retention": {
-    "videos": 22,
+    "videos": 23,
     "where": "ending",
-    "verdict": "ENDING is the leak: 22% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
+    "verdict": "ENDING is the leak: 24% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
     "avg_curve": [
-      1.232,
-      1.15,
-      0.818,
-      0.635,
-      0.529,
-      0.466,
-      0.41,
-      0.377,
-      0.348,
-      0.323,
-      0.256
+      1.272,
+      1.18,
+      0.859,
+      0.678,
+      0.569,
+      0.505,
+      0.449,
+      0.416,
+      0.386,
+      0.361,
+      0.296
     ],
-    "median_hook_retention": 1.017,
-    "median_completion": 0.225,
+    "median_hook_retention": 1.028,
+    "median_completion": 0.235,
     "median_swipe_point": 0.45,
     "worst_drop": {
-      "size": 0.332,
+      "size": 0.321,
       "from_pct": 10,
       "to_pct": 20
     }
   },
   "distribution": {
-    "n": 22,
+    "n": 23,
     "gate": 0.7,
-    "passing": 0,
-    "pass_rate": 0.0,
-    "median_completion": 0.225,
-    "verdict": "NO video clears the 70% completion gate (median 22%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
+    "passing": 1,
+    "pass_rate": 0.043,
+    "median_completion": 0.2353,
+    "verdict": "only 1/23 videos clear the 70% completion gate (median 24%) - most uploads are being throttled before they reach anyone"
   },
   "subscribers": {
     "net_90d": 23,
-    "views_90d": 24196,
-    "per_1k_views": 0.95,
+    "views_90d": 24596,
+    "per_1k_views": 0.94,
     "videos": 33,
     "days_to_500": 1956.5,
     "days_to_1000": 3913.0
