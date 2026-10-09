@@ -1,18 +1,18 @@
 {
-  "updated": "2026-10-09T21:11:44.320718+00:00",
+  "updated": "2026-10-09T23:04:23.038068+00:00",
   "videos_total": 41,
-  "videos_7d": 13,
-  "views_7d": 7542,
-  "learned_this_run": 0,
+  "videos_7d": 12,
+  "views_7d": 6176,
+  "learned_this_run": 1,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 24,
+      "observations": 25,
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.559,
-          "n": 2
+          "mean": 0.583,
+          "n": 3
         },
         {
           "arm": "history",
@@ -73,17 +73,17 @@
     },
     "format": {
       "status": "learning",
-      "observations": 24,
+      "observations": 25,
       "arms": [
+        {
+          "arm": "scale_shock",
+          "mean": 0.573,
+          "n": 3
+        },
         {
           "arm": "dumbest_decision",
           "mean": 0.558,
           "n": 1
-        },
-        {
-          "arm": "scale_shock",
-          "mean": 0.546,
-          "n": 2
         },
         {
           "arm": "would_you_survive",
@@ -261,9 +261,14 @@
       ]
     },
     "comment_device": {
-      "status": "exploring (5/8)",
-      "observations": 5,
+      "status": "exploring (6/8)",
+      "observations": 6,
       "arms": [
+        {
+          "arm": "correction_bait",
+          "mean": 0.505,
+          "n": 4
+        },
         {
           "arm": "none",
           "mean": 0.5,
@@ -288,11 +293,6 @@
           "arm": "poll",
           "mean": 0.472,
           "n": 1
-        },
-        {
-          "arm": "correction_bait",
-          "mean": 0.471,
-          "n": 3
         }
       ]
     }
@@ -311,16 +311,16 @@
       "avg_view_pct": 63.27
     },
     {
+      "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
+      "id": "iEXe-QyrmkY",
+      "views": 1298,
+      "avg_view_pct": 132.14
+    },
+    {
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
       "views": 1282,
       "avg_view_pct": 51.93
-    },
-    {
-      "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
-      "id": "iEXe-QyrmkY",
-      "views": 1268,
-      "avg_view_pct": 132.14
     },
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
@@ -396,7 +396,7 @@
   },
   "subscribers": {
     "net_90d": 26,
-    "views_90d": 24740,
+    "views_90d": 24817,
     "per_1k_views": 1.05,
     "videos": 33,
     "days_to_500": 1730.8,
