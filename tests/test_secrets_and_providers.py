@@ -551,7 +551,9 @@ def test_package_returns_series_and_episode(monkeypatch, tmp_path):
     """
     import types
     import autotube.pipeline as P
+    from autotube.series import reset
 
+    reset()
     monkeypatch.setattr(P, "render", types.SimpleNamespace(thumbnail=lambda *a, **k: "t.jpg"))
     monkeypatch.setattr(P, "_shots_sheet", lambda *a, **k: None)
     monkeypatch.setattr(P, "build_description", lambda *a, **k: "desc")
@@ -561,25 +563,39 @@ def test_package_returns_series_and_episode(monkeypatch, tmp_path):
     a = {"script": {"segments": [{"text": "a b c"}], "tags": ["t"]},
          "source": {"title": "T", "url": "u"}, "visuals": {"shots": []}, "out": out,
          "review": {"score": 8}, "plan": {"format": "f"}, "tts": {"engine": "e"},
-         "hook_card": "h", "title": "FIELD #003 — X", "topic": {"topic": "x"},
-         "series": "field", "episode": 3}
+         # Undecorated on purpose: produce_assets no longer prefixes the series,
+         # because the number is not known until the video survives QA.
+         "hook_card": "h", "title": "A fish that walks on land", "topic": {"topic": "x"},
+         "series": "field", "episode": 0}
     r = {"first_frame": "f", "theme": "th", "duration": 18.5, "timeline": [], "archetype": "arch"}
     rep = {"passed": True, "attempt": 1, "issues": [], "frames": 5, "meta": {}}
 
-    res = P.package(a, r, rep, {"video": {}})
+    import yaml as _y
+    real_cfg = _y.safe_load((ROOT / "config.yaml").read_text())
+    res = P.package(a, r, rep, real_cfg)
     assert res is not None
     assert res.get("series") == "field", "run() reads this dict to write history"
-    assert res.get("episode") == 3
+    # package() now issues the number itself, after QA, rather than echoing one
+    # reserved earlier - a number spent on a video that is later discarded is a gap
+    # the viewer can see. So assert it allocated a real one, not the input.
+    assert isinstance(res.get("episode"), int) and res["episode"] >= 1
+    assert f"#{res['episode']:03d}" in res["meta"]["title"], \
+        "the issued number must appear in the published title"
 
 
 def test_episode_numbers_advance_once_history_records_them():
-    from autotube.series import episode_number
+    from autotube.series import episode_number, reset
+
+    reset()   # _ISSUED is a module global; a run resets it, so a test must too
 
     assert episode_number("unsolved", []) == 1
+    reset()
     hist = [{"series": "unsolved", "episode": 1}, {"series": "unsolved", "episode": 2}]
     assert episode_number("unsolved", hist) == 3, "must continue, not restart"
+    reset()
     # max+1, not len+1: pruning history must never reissue a live number
     assert episode_number("unsolved", [{"series": "unsolved", "episode": 9}]) == 10
+    reset()
     assert episode_number("field", hist) == 1, "series are numbered independently"
 
 
@@ -1450,3 +1466,24 @@ def test_distinctness_counts_appearance_not_filenames():
     assert 'len({s["path"] for s in shots})' not in src, "path-based distinctness is back"
     assert "ahash(s[\"path\"])" in src
     assert "visually distinct images" in src
+
+
+def test_a_discarded_video_does_not_burn_an_episode_number():
+    """The channel published FIELD #001, #002, #004, #005, #006, #008, #011.
+
+    Four numbers missing, each reserved by a video that failed render or QA minutes
+    later. Numbering was done when the script was produced, so every attempt spent a
+    number whether or not it became an episode. An archive that skips episodes tells
+    a viewer the archive is a prop, which is the opposite of why it is numbered.
+    """
+    src = (ROOT / "autotube" / "pipeline.py").read_text()
+
+    produce = src.split("def produce_assets(")[1].split("\ndef ")[0]
+    assert "episode_number" not in produce, \
+        "numbering must not happen before the video has survived QA"
+
+    package = src.split("def package(")[1].split("\ndef ")[0]
+    assert "episode_number" in package, "the number should be issued once QA has passed"
+    # and only after the rejection path has returned
+    assert package.index('if not report["passed"]') < package.index("episode_number"), \
+        "a rejected video must return before taking a number"

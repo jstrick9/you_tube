@@ -286,19 +286,19 @@ def produce_assets(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict,
     mus = music.generate(tts["duration"] + 1, work / "music.wav", seed) if cfg["video"]["background_music"] else None
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     title = script["title"].strip()
-    # Series label first, #shorts last: decorate_title measures against the 100-char
-    # limit, and appending the tag afterwards would silently blow past it.
+    # Which series this belongs to is known now; which episode number it gets is not.
+    # Numbering is deferred to package(), after final QA, because a number reserved
+    # here is spent even when the video is thrown away minutes later. That is how the
+    # channel published FIELD #001, #002, #004, #005, #006, #008, #011 - four missing
+    # numbers, each burned by a video that never existed. An archive that skips
+    # episodes tells a viewer the archive is a prop, which is the opposite of the
+    # point of numbering it.
     s_key = series_mod.assign(topic.get("category"), cfg)
-    s_num = series_mod.episode_number(s_key, read_json("history.json", [])) if s_key else 0
-    if s_key:
-        title = series_mod.decorate_title(title, s_key, s_num, cfg, limit=90)
-    if "#shorts" not in title.lower() and len(title) <= 90:
-        title = f"{title} #shorts"
     return {"script": script, "source": source, "review": review, "plan": plan, "topic": topic,
             "work": work, "seed": seed, "tts": tts, "visuals": visuals, "music": mus,
             "out": OUTPUT_DIR / f"{run_id}-{idx:02d}-{slug}.mp4",
             "hook_card": script.get("thumbnail_text") or "", "title": title,
-            "series": s_key, "episode": s_num,
+            "series": s_key, "episode": 0,
             "subject": source["title"], "fx": effects_plan(script, plan, source, cfg)}
 
 
@@ -381,6 +381,15 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
         rejected.with_suffix(".json").write_text(json.dumps(record, indent=2, default=str))
         log.info("  ✗ NOT publishing %r — final QA failed", source["title"])
         return None
+    # Survived final QA, so it is a real episode and may take the next number.
+    s_key = a.get("series")
+    s_num = 0
+    if s_key:
+        s_num = series_mod.episode_number(s_key, read_json("history.json", []))
+        meta["title"] = series_mod.decorate_title(meta["title"], s_key, s_num, cfg, limit=90)
+    if "#shorts" not in meta["title"].lower() and len(meta["title"]) <= 90:
+        meta["title"] = f"{meta['title']} #shorts"
+    record["meta"] = meta
     out.with_suffix(".json").write_text(json.dumps(record, indent=2, default=str))
     log.info("  ✓ rendered %s (%.1fs, review=%s)", out.name, r["duration"], a["review"].get("score"))
     return {"file": out, "thumb": thumb, "meta": meta, "script": script, "source": source,
@@ -391,7 +400,7 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
             # reads to build the history entry. Series and episode were added to the
             # first and not the second, so the artifact looked correct while history
             # kept recording None and the episode counter kept resetting.
-            "series": a.get("series"), "episode": a.get("episode"),
+            "series": s_key, "episode": s_num,
             "qa": report}
 
 
