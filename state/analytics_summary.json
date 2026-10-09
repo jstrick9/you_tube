@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-09T17:22:45.958249+00:00",
+  "updated": "2026-10-09T21:11:44.320718+00:00",
   "videos_total": 41,
   "videos_7d": 13,
-  "views_7d": 7398,
-  "learned_this_run": 1,
+  "views_7d": 7542,
+  "learned_this_run": 0,
   "strategy": {
     "category": {
       "status": "learning",
@@ -11,7 +11,7 @@
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.56,
+          "mean": 0.559,
           "n": 2
         },
         {
@@ -147,7 +147,7 @@
         },
         {
           "arm": "myth_buster",
-          "mean": 0.455,
+          "mean": 0.456,
           "n": 1
         }
       ]
@@ -302,7 +302,7 @@
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
       "views": 1442,
-      "avg_view_pct": 90.78
+      "avg_view_pct": 90.69
     },
     {
       "title": "Why you are falling through space right now #shorts",
@@ -314,19 +314,19 @@
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
       "views": 1282,
-      "avg_view_pct": 52.05
+      "avg_view_pct": 51.93
     },
     {
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
-      "views": 1250,
-      "avg_view_pct": 141.9
+      "views": 1268,
+      "avg_view_pct": 132.14
     },
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1230,
-      "avg_view_pct": 79.99
+      "avg_view_pct": 80.03
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -361,46 +361,46 @@
   ],
   "rejected": [],
   "retention": {
-    "videos": 23,
+    "videos": 24,
     "where": "ending",
-    "verdict": "ENDING is the leak: 24% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
+    "verdict": "ENDING is the leak: 22% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
     "avg_curve": [
-      1.272,
-      1.18,
-      0.859,
-      0.678,
-      0.569,
-      0.505,
-      0.449,
-      0.416,
-      0.386,
-      0.361,
-      0.296
+      1.268,
+      1.177,
+      0.869,
+      0.679,
+      0.567,
+      0.5,
+      0.444,
+      0.41,
+      0.38,
+      0.354,
+      0.291
     ],
-    "median_hook_retention": 1.028,
-    "median_completion": 0.235,
-    "median_swipe_point": 0.45,
+    "median_hook_retention": 1.033,
+    "median_completion": 0.225,
+    "median_swipe_point": 0.44,
     "worst_drop": {
-      "size": 0.321,
+      "size": 0.308,
       "from_pct": 10,
       "to_pct": 20
     }
   },
   "distribution": {
-    "n": 23,
+    "n": 24,
     "gate": 0.7,
     "passing": 1,
-    "pass_rate": 0.043,
-    "median_completion": 0.2353,
-    "verdict": "only 1/23 videos clear the 70% completion gate (median 24%) - most uploads are being throttled before they reach anyone"
+    "pass_rate": 0.042,
+    "median_completion": 0.225,
+    "verdict": "only 1/24 videos clear the 70% completion gate (median 22%) - most uploads are being throttled before they reach anyone"
   },
   "subscribers": {
-    "net_90d": 23,
-    "views_90d": 24596,
-    "per_1k_views": 0.94,
+    "net_90d": 26,
+    "views_90d": 24740,
+    "per_1k_views": 1.05,
     "videos": 33,
-    "days_to_500": 1956.5,
-    "days_to_1000": 3913.0
+    "days_to_500": 1730.8,
+    "days_to_1000": 3461.5
   },
   "originality": {
     "episodes_examined": 12,
