@@ -1,13 +1,13 @@
 {
-  "updated": "2026-10-08T22:52:42.976224+00:00",
+  "updated": "2026-10-09T07:59:18.593671+00:00",
   "videos_total": 41,
   "videos_7d": 15,
-  "views_7d": 8058,
+  "views_7d": 8443,
   "learned_this_run": 1,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 22,
+      "observations": 23,
       "arms": [
         {
           "arm": "nature",
@@ -15,14 +15,14 @@
           "n": 2
         },
         {
-          "arm": "space",
-          "mean": 0.541,
-          "n": 1
+          "arm": "history",
+          "mean": 0.551,
+          "n": 5
         },
         {
-          "arm": "history",
-          "mean": 0.529,
-          "n": 4
+          "arm": "space",
+          "mean": 0.54,
+          "n": 1
         },
         {
           "arm": "entertainment",
@@ -73,7 +73,7 @@
     },
     "format": {
       "status": "learning",
-      "observations": 22,
+      "observations": 23,
       "arms": [
         {
           "arm": "sounds_fake",
@@ -81,13 +81,18 @@
           "n": 2
         },
         {
+          "arm": "dumbest_decision",
+          "mean": 0.558,
+          "n": 1
+        },
+        {
           "arm": "scale_shock",
-          "mean": 0.547,
+          "mean": 0.546,
           "n": 2
         },
         {
           "arm": "would_you_survive",
-          "mean": 0.541,
+          "mean": 0.54,
           "n": 1
         },
         {
@@ -117,11 +122,6 @@
         },
         {
           "arm": "guess_reveal",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
-          "arm": "dumbest_decision",
           "mean": 0.5,
           "n": 0
         },
@@ -261,13 +261,13 @@
       ]
     },
     "comment_device": {
-      "status": "exploring (3/8)",
-      "observations": 3,
+      "status": "exploring (4/8)",
+      "observations": 4,
       "arms": [
         {
           "arm": "correction_bait",
-          "mean": 0.505,
-          "n": 1
+          "mean": 0.548,
+          "n": 2
         },
         {
           "arm": "none",
@@ -319,7 +319,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1228,
+      "views": 1230,
       "avg_view_pct": 79.99
     },
     {
@@ -333,6 +333,12 @@
       "id": "1ed_FohPwqs",
       "views": 1203,
       "avg_view_pct": 54.59
+    },
+    {
+      "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
+      "id": "iEXe-QyrmkY",
+      "views": 1189,
+      "avg_view_pct": 141.9
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
@@ -351,53 +357,47 @@
       "id": "OyHMkwqEOKo",
       "views": 1160,
       "avg_view_pct": 41.37
-    },
-    {
-      "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
-      "id": "M1QR18R35Bc",
-      "views": 1157,
-      "avg_view_pct": 59.43000000000001
     }
   ],
   "rejected": [],
   "retention": {
-    "videos": 21,
+    "videos": 22,
     "where": "ending",
-    "verdict": "ENDING is the leak: 24% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
+    "verdict": "ENDING is the leak: 22% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
     "avg_curve": [
-      1.235,
-      1.152,
-      0.806,
-      0.628,
-      0.526,
-      0.465,
-      0.413,
-      0.381,
-      0.352,
-      0.328,
-      0.259
+      1.232,
+      1.15,
+      0.818,
+      0.635,
+      0.529,
+      0.466,
+      0.41,
+      0.377,
+      0.348,
+      0.323,
+      0.256
     ],
-    "median_hook_retention": 1.006,
-    "median_completion": 0.235,
-    "median_swipe_point": 0.43,
+    "median_hook_retention": 1.017,
+    "median_completion": 0.225,
+    "median_swipe_point": 0.45,
     "worst_drop": {
-      "size": 0.346,
+      "size": 0.332,
       "from_pct": 10,
       "to_pct": 20
     }
   },
   "distribution": {
-    "n": 21,
+    "n": 22,
     "gate": 0.7,
     "passing": 0,
     "pass_rate": 0.0,
-    "median_completion": 0.2353,
-    "verdict": "NO video clears the 70% completion gate (median 24%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
+    "median_completion": 0.225,
+    "verdict": "NO video clears the 70% completion gate (median 22%). Distribution is being pulled on effectively every upload; topic and reward tuning cannot fix this - the videos are too long for the retention they hold"
   },
   "subscribers": {
     "net_90d": 23,
-    "views_90d": 23809,
-    "per_1k_views": 0.97,
+    "views_90d": 24196,
+    "per_1k_views": 0.95,
     "videos": 33,
     "days_to_500": 1956.5,
     "days_to_1000": 3913.0
