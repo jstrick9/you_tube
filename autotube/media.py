@@ -712,6 +712,39 @@ Return JSON: {{"shows": "...", "queries": ["3 short searches, 2-4 words, each co
     return str(o["shows"]), [str(q) for q in o["queries"]][:3]
 
 
+def ahash(path: Path) -> int | None:
+    """64-bit average hash of an image: what the viewer sees, not what it is called.
+
+    Distinctness was counted by file path, so two different files showing the same
+    thing both counted. In one render frames 3 and 4 were the same underwater shot and
+    frames 7 and 8 the same flat horizon; in another, three of eight frames were
+    near-identical grey satellite views. The viewer experiences that as one picture
+    held for five seconds, which is the opposite of the every-one-to-two-seconds
+    change that keeps people watching.
+    """
+    try:
+        with Image.open(path) as im:
+            g = im.convert("L").resize((8, 8))
+            px = list(g.getdata())
+    except Exception:  # noqa: BLE001
+        return None
+    avg = sum(px) / len(px)
+    bits = 0
+    for i, v in enumerate(px):
+        if v > avg:
+            bits |= 1 << i
+    return bits
+
+
+def too_similar(a: int | None, b: int | None, max_distance: int = 8) -> bool:
+    """Hamming distance on the hashes. 8 of 64 bits is a deliberately loose bar:
+    it catches "the same photo again" and crops of one frame, while leaving two
+    genuinely different pictures of the same subject alone."""
+    if a is None or b is None:
+        return False
+    return bin(a ^ b).count("1") <= max_distance
+
+
 def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
            seg_durs: list[float] | None = None) -> dict:
     """Pick visually VERIFIED shots for every narration line.
@@ -879,10 +912,29 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
             raise NoVisualMatch(f"line {i + 1} has no image that shows it (best: {best}): {seg['text'][:80]!r}")
         alts[i] = spare
 
-    distinct = len({s["path"] for s in shots})
+    # Count what the viewer sees. Distinctness used to be len(set of file paths), so two
+    # different files showing the same thing both counted and a video could hold one
+    # picture across several segments without tripping it.
+    hashes = [ahash(s["path"]) for s in shots]
+    seen: list[int] = []
+    for h in hashes:
+        if h is None or not any(too_similar(h, k) for k in seen):
+            seen.append(h if h is not None else -len(seen))
+    distinct = len(seen)
     need = int(mcfg.get("min_distinct_images", 3))
     if distinct < need:
-        raise NoVisualMatch(f"only {distinct} distinct verified images for {subject!r} (need {need})")
+        raise NoVisualMatch(
+            f"only {distinct} visually distinct images for {subject!r} (need {need}) — "
+            f"{len(shots)} shots collapsed to {distinct} once near-duplicates were merged")
+    # Consecutive repeats are worse than a low total: the picture simply stops changing.
+    for i in range(1, len(shots)):
+        if too_similar(hashes[i], hashes[i - 1]):
+            log.info("  visuals: shots %d and %d look identical, reordering", i - 1, i)
+            for j in range(i + 1, len(shots)):
+                if not too_similar(hashes[j], hashes[i - 1]):
+                    shots[i], shots[j] = shots[j], shots[i]
+                    hashes[i], hashes[j] = hashes[j], hashes[i]
+                    break
     shots.sort(key=lambda s: (s["seg"], s.get("reused", False)))
     n_vid = sum(1 for s in shots if s.get("kind") == "video")
     # How many shots actually fill the 9:16 frame at native resolution. Since every shot became

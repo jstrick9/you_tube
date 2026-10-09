@@ -1413,3 +1413,40 @@ def test_unreadable_shot_is_enforced_by_the_real_validator():
              "visual": {"shows": "the Montauk Monster beach", "queries": ["montauk"]}},
             {"text": "Nobody has identified the Montauk Monster since then.",
              "visual": {"shows": "the Montauk Monster shoreline", "queries": ["montauk"]}}]})
+
+
+# ── visual variety ─────────────────────────────────────────────────────────
+def test_near_duplicate_shots_are_detected_by_what_they_look_like(tmp_path):
+    """Distinctness was counted by file path, so two files of the same thing both counted.
+
+    Measured on a shipped video: frames 2->3 and 6->7 scored a Hamming distance of 2
+    (the same underwater shot, then the same flat horizon) while genuinely different
+    frames scored 19 to 45. The viewer experiences a repeat as one picture held for
+    five seconds, which is the opposite of the change-every-one-to-two-seconds that
+    keeps people watching.
+    """
+    from PIL import Image
+    from autotube.media import ahash, too_similar
+
+    a = tmp_path / "a.png"
+    b = tmp_path / "b.png"
+    c = tmp_path / "c.png"
+    Image.new("RGB", (64, 64), (10, 40, 120)).save(a)
+    Image.new("RGB", (64, 64), (11, 41, 121)).save(b)      # imperceptibly different
+    img = Image.new("RGB", (64, 64), (10, 40, 120))
+    for x in range(32):
+        for y in range(64):
+            img.putpixel((x, y), (240, 230, 90))           # genuinely different
+    img.save(c)
+
+    ha, hb, hc = ahash(a), ahash(b), ahash(c)
+    assert too_similar(ha, hb), "a repeat of the same picture must be caught"
+    assert not too_similar(ha, hc), "two different pictures must not be merged"
+    assert not too_similar(ha, None), "a failed hash must never merge shots"
+
+
+def test_distinctness_counts_appearance_not_filenames():
+    src = (ROOT / "autotube" / "media.py").read_text()
+    assert 'len({s["path"] for s in shots})' not in src, "path-based distinctness is back"
+    assert "ahash(s[\"path\"])" in src
+    assert "visually distinct images" in src
