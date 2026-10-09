@@ -1483,7 +1483,8 @@ def test_a_discarded_video_does_not_burn_an_episode_number():
         "numbering must not happen before the video has survived QA"
 
     package = src.split("def package(")[1].split("\ndef ")[0]
-    assert "episode_number" in package, "the number should be issued once QA has passed"
-    # and only after the rejection path has returned
-    assert package.index('if not report["passed"]') < package.index("episode_number"), \
+    # Match the call, not the word: the surrounding comments mention episode_number too.
+    call = "series_mod.episode_number("
+    assert call in package, "the number should be issued once QA has passed"
+    assert package.index('if not report["passed"]') < package.index(call), \
         "a rejected video must return before taking a number"
