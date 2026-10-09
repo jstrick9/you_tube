@@ -346,6 +346,44 @@ def uses_escalation_template(script: dict) -> int:
     return n
 
 
+def delivers_angle(script: dict, angle: str, subject: str = "") -> bool:
+    """Does the script actually tell the story that made the topic trend?
+
+    The trend said "the Nintendo DS wasn't powerful enough to..." - a specific
+    surprise. The script that shipped opened "Nintendo DS sold one hundred fifty four
+    million units" and went on to sales figures and a screen-repair programme. Correct,
+    grounded, and not the thing anyone was interested in.
+
+    Grounding fixes which article we read; this fixes which story we tell out of it.
+    Without it the writer drifts to whatever the article leads with, which is usually
+    the encyclopedic summary - the least surprising paragraph on the page.
+
+    Deliberately loose: one distinctive word from the angle appearing anywhere in the
+    narration is enough. The angle is a sentence written by another model and demanding
+    close paraphrase would reject good scripts for word choice.
+    """
+    from .originality import tokens
+
+    stop = {"the", "a", "an", "of", "and", "in", "on", "at", "for", "with", "to", "is",
+            "was", "were", "that", "this", "it", "its", "but", "not", "they", "their",
+            "from", "about", "into", "than", "then", "when", "how", "why", "what",
+            "most", "more", "very", "just", "even", "only", "also", "some", "one",
+            "first", "actually", "really", "still", "because", "which", "who", "been",
+            "have", "has", "had", "are", "can", "could", "would", "will", "did", "does"}
+    key = {t for t in tokens(angle or "") if len(t) > 3 and t not in stop}
+    # Drop the subject's own name. It appears in the angle and in every script about
+    # that subject, so leaving it in makes the test pass automatically: a Nintendo DS
+    # sales-figures script "matched" the angle "the DS wasn't powerful enough to render
+    # the 3D" purely on the word Nintendo. What must survive is the surprise itself.
+    key -= {t for t in tokens(subject or "") if len(t) > 3}
+    if not key:
+        return True                      # no distinctive angle; nothing to enforce
+    said = set()
+    for seg in script.get("segments", []):
+        said |= set(tokens(spoken_text(seg)))
+    return bool(key & said)
+
+
 def payoff_is_empty(hook: str, last: str) -> bool:
     """Does the closing line actually say anything new?
 
@@ -632,7 +670,9 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                         f"any call to action, and do not change a single fact to make it land.\n") if _cg else ""
         user = f"""TOPIC: {topic['topic']}
 WHY IT'S TRENDING: {topic.get('why_trending') or ', '.join(topic.get('sources', []))}
-ANGLE: {topic.get('angle') or 'most surprising educational angle'}
+ANGLE (this is the story to tell — not the article's summary, not the subject's general
+history. If the angle names a specific surprise, that surprise IS the video):
+{topic.get('angle') or 'most surprising educational angle'}
 FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
 {hook_line}
 {comment_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
@@ -727,6 +767,11 @@ Return JSON:
                     f"the last line just restates the hook ({echo:.0%} of its words are from it) — "
                     "end on the strongest fact the viewer has NOT heard yet, something the hook "
                     "completes on replay; never 'and that is why' or 'so yes'")
+            assert delivers_angle(o, topic.get("angle") or "", subject_for_visuals), (
+                f"this is not the story that trended. The angle was: "
+                f"{(topic.get('angle') or '')[:160]!r} — tell THAT. The article's own "
+                "summary is the least surprising paragraph on the page, and leading with "
+                "it throws away the reason anyone clicked")
             assert narration_names_subject(o, subject_for_visuals), (
                 f"the script never says {subject_for_visuals!r} out loud — it hides behind "
                 "'some fish' or 'a creature'. Name it: the specific noun is what makes a "

@@ -1278,3 +1278,82 @@ def test_depictability_uses_the_articles_own_images(monkeypatch):
     assert not SW.subject_is_depictable("Zzqq Nonexistent", {"media": {}}, {"images": []})
     assert seen["limit"] >= 20, "the sample must be large enough to survive filtering"
     assert seen["min_w"] <= 200
+
+
+# ── the script must tell the story that trended ────────────────────────────
+def test_script_must_deliver_the_trending_angle():
+    """Grounding fixes which article we read; this fixes which story we tell from it.
+
+    The trend was "the Nintendo DS wasn't powerful enough to render the 3D, so they
+    faked it". The script that shipped opened "Nintendo DS sold one hundred fifty four
+    million units" and continued into sales figures and a screen-repair programme -
+    accurate, grounded, and not the thing anyone was interested in. Left alone the
+    writer drifts to the article's own summary, which is the least surprising
+    paragraph on the page.
+    """
+    from autotube.scriptwriter import delivers_angle
+
+    angle = "the Nintendo DS wasn't powerful enough to render the 3D, so they faked it"
+    shipped = {"segments": [
+        {"text": "Nintendo DS sold one hundred fifty four million units."},
+        {"text": "Which meant beating expectations so badly they added capacity."},
+        {"text": "Except some early units had stuck pixels on displays."}]}
+    assert not delivers_angle(shipped, angle, "Nintendo DS")
+
+    on_angle = {"segments": [
+        {"text": "The Nintendo DS was too weak to render the game in 3D."},
+        {"text": "So the developers faked the whole effect with flat sprites."}]}
+    assert delivers_angle(on_angle, angle, "Nintendo DS")
+
+
+def test_the_subject_name_cannot_satisfy_the_angle_on_its_own():
+    """The first version passed the drifted script purely on the word "Nintendo".
+
+    The subject appears in the angle and in every script about that subject, so
+    leaving it in the comparison makes the test self-satisfying. What has to survive
+    is the surprise, not the topic.
+    """
+    from autotube.scriptwriter import delivers_angle
+
+    assert delivers_angle({"segments": [{"text": "Nintendo DS sold millions."}]},
+                          "Nintendo DS", "Nintendo DS"), "no distinctive angle must never block"
+
+
+def test_angle_delivery_is_enforced_by_the_real_validator(monkeypatch):
+    import pytest
+    import yaml as _y
+    from autotube.scriptwriter import ScriptWriter
+
+    cfg = _y.safe_load((ROOT / "config.yaml").read_text())
+    box = {}
+
+    class FakeLLM:
+        lite = False
+        last_used = "f"
+
+        def json(self, system, user, validate=None, **kw):
+            box["v"] = validate
+            raise RuntimeError("captured")
+
+    w = ScriptWriter(cfg, FakeLLM(), type("S", (), {"fit": lambda *a, **k: {}})())
+    try:
+        w.write({"topic": "t", "category": "history",
+                 "angle": "the DS was too weak to render the 3D so they faked it"},
+                {"format": "sounds_fake", "hook_style": "bold_claim", "voice": "v"},
+                {"title": "Nintendo DS", "url": "u", "text": "x", "summary": "s"})
+    except Exception:
+        pass
+
+    v = box.get("v")
+    assert v is not None
+    drifted = {"title": "T", "segments": [
+        {"text": "Nintendo DS sold one hundred fifty four million units worldwide.",
+         "visual": {"shows": "a Nintendo DS console", "queries": ["nintendo ds"]}},
+        {"text": "It beat every internal sales expectation that year.",
+         "visual": {"shows": "a Nintendo DS console", "queries": ["nintendo ds"]}},
+        {"text": "Some early units shipped with stuck pixels on screen.",
+         "visual": {"shows": "a Nintendo DS screen", "queries": ["nintendo ds screen"]}},
+        {"text": "Nintendo later repaired those panels for owners free.",
+         "visual": {"shows": "a Nintendo DS repair", "queries": ["nintendo ds"]}}]}
+    with pytest.raises(AssertionError, match="not the story that trended"):
+        v(drifted)
