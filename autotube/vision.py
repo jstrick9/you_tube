@@ -268,13 +268,27 @@ For EACH image: say what it literally shows, then score 0-10 how well it works a
   2    = MAXIMUM for identifiable people who are not the subject (never pair strangers with facts about someone)
   3-0  = wrong thing: a building, bar, street, sign, shop, logo, product, person or place that merely SHARES THE NAME;
          mostly text, a map, diagram, chart, document or screenshot; heavy watermark; very blurry; graphic or disturbing
-Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0}}]}} with one entry per image."""
+ALSO judge legibility, separately from relevance. "legible" is false when a phone viewer could not grasp the
+image in under two seconds without reading anything in it: charts, graphs, bathymetric or contour maps, sonar
+plots, infographics, diagrams with axis labels or legends, tables, screenshots, scanned pages, or any frame whose
+meaning depends on small print or telemetry overlays. A chart can be perfectly relevant and still be unusable -
+it is correct and unreadable, which is the worst combination on a Short.
+CALIBRATION: scores are badly inflated when every image looks acceptable. Most stock-library images deserve 5-7.
+Reserve 9-10 for a frame that unmistakably shows this exact subject and would stop a thumb mid-scroll. If you are
+about to give every image the same score, you are not judging - re-read the bands and separate them.
+Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0, "legible": true}}]}} with one entry per image."""
 
         def validate(o):
             items = o.get("images")
             assert isinstance(items, list) and len(items) >= max(1, n - 1), f"need {n} entries in 'images'"
             for it in items:
                 int(it["n"]), float(it["score"])
+            # A judge that returns one score for everything is not judging. Seen in
+            # production: 21 of 26 shots scored exactly 10.0, including a bathymetric
+            # sonar map, against a rubric that puts charts at 3-0.
+            if len(items) >= 4 and len({round(float(i["score"])) for i in items}) == 1:
+                raise AssertionError(
+                    "every image got the same score - separate them using the bands")
 
         sheet = contact_sheet([c["_img"] for c in cands])
         out, err = None, None

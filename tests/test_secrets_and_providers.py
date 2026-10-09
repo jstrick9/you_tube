@@ -1357,3 +1357,59 @@ def test_angle_delivery_is_enforced_by_the_real_validator(monkeypatch):
          "visual": {"shows": "a Nintendo DS repair", "queries": ["nintendo ds"]}}]}
     with pytest.raises(AssertionError, match="not the story that trended"):
         v(drifted)
+
+
+# ── visual legibility ──────────────────────────────────────────────────────
+def test_rejects_shot_requests_no_phone_viewer_can_read():
+    """A shipped script asked for "Mariana Trench depth infographic" and got one.
+
+    The rendered video shows a bathymetric contour chart with axis labels and a depth
+    profile reading -10100, plus an ROV still with a telemetry overlay. The vision
+    judge scored both 10/10 because a bathymetric chart genuinely does show the
+    trench. Correct and unreadable is the worst combination on a Short.
+    """
+    from autotube.scriptwriter import unreadable_shot_request
+
+    shipped = {"segments": [
+        {"visual": {"shows": "The Pacific Ocean on a spinning globe", "queries": ["pacific ocean"]}},
+        {"visual": {"shows": "Mariana Trench depth infographic", "queries": ["mariana trench depth"]}}]}
+    assert unreadable_shot_request(shipped) == "infographic"
+
+    for bad in ("sonar map of the seafloor", "a bathymetric survey", "a bar chart of sales"):
+        assert unreadable_shot_request({"segments": [{"visual": {"shows": bad, "queries": []}}]})
+
+    clean = {"segments": [
+        {"visual": {"shows": "a Nintendo DS console held open", "queries": ["nintendo ds"]}},
+        {"visual": {"shows": "deep sea submersible descending", "queries": ["submersible"]}}]}
+    assert unreadable_shot_request(clean) is None
+
+
+def test_vision_judge_must_separate_its_scores():
+    """21 of 26 shots in one run scored exactly 10.0, nothing below 7.
+
+    The rubric has detailed bands for symbolic imagery, generic stand-ins and charts
+    and the judge never used them. A uniform score is not a judgement, so the
+    validator now rejects it and the prompt asks for a legibility boolean, which is
+    harder to rubber-stamp than a number.
+    """
+    src = (ROOT / "autotube" / "vision.py").read_text()
+    assert '"legible"' in src, "legibility must be judged separately from relevance"
+    assert "every image got the same score" in src, "uniform scores must be rejected"
+    assert "CALIBRATION" in src
+
+
+def test_unreadable_shot_is_enforced_by_the_real_validator():
+    import pytest
+
+    v = _grab_validator()
+    assert v is not None
+    with pytest.raises(AssertionError, match="nobody reads a chart"):
+        v({"title": "T", "segments": [
+            {"text": "The Montauk Monster washed up on a New York beach.",
+             "visual": {"shows": "the Montauk Monster carcass", "queries": ["montauk monster"]}},
+            {"text": "Biologists could not agree on what it really was.",
+             "visual": {"shows": "a depth infographic of the site", "queries": ["infographic"]}},
+            {"text": "The carcass vanished before any testing could happen.",
+             "visual": {"shows": "the Montauk Monster beach", "queries": ["montauk"]}},
+            {"text": "Nobody has identified the Montauk Monster since then.",
+             "visual": {"shows": "the Montauk Monster shoreline", "queries": ["montauk"]}}]})

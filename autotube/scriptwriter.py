@@ -384,6 +384,30 @@ def delivers_angle(script: dict, angle: str, subject: str = "") -> bool:
     return bool(key & said)
 
 
+UNREADABLE_SHOTS = ("infographic", "chart", "graph", "diagram", "schematic", "timeline",
+                    "bar chart", "pie chart", "screenshot", "table of", "map showing",
+                    "contour map", "sonar map", "bathymetry", "bathymetric", "plot of",
+                    "statistics", "data visualisation", "data visualization")
+
+
+def unreadable_shot_request(script: dict) -> str | None:
+    """Is the writer asking for something no phone viewer can read?
+
+    A shipped script requested "Mariana Trench depth infographic" and got exactly that:
+    a bathymetric contour chart with axis labels and a depth profile reading -10100.
+    The vision judge scored it 10/10 because the chart genuinely does show the trench.
+    Correct and unreadable is the worst combination on a Short - the viewer sees noise
+    and leaves - and the cheapest place to stop it is before the search runs.
+    """
+    for seg in script.get("segments", []):
+        vis = seg.get("visual") or {}
+        blob = " ".join([str(vis.get("shows", ""))] + [str(q) for q in (vis.get("queries") or [])]).lower()
+        for bad in UNREADABLE_SHOTS:
+            if bad in blob:
+                return bad
+    return None
+
+
 def payoff_is_empty(hook: str, last: str) -> bool:
     """Does the closing line actually say anything new?
 
@@ -767,6 +791,11 @@ Return JSON:
                     f"the last line just restates the hook ({echo:.0%} of its words are from it) — "
                     "end on the strongest fact the viewer has NOT heard yet, something the hook "
                     "completes on replay; never 'and that is why' or 'so yes'")
+            _bad_shot = unreadable_shot_request(o)
+            assert not _bad_shot, (
+                f"a shot asks for a {_bad_shot!r} — nobody reads a chart on a phone in two "
+                "seconds. Ask for the THING itself: the creature, the place, the object, the "
+                "person. If the fact is a number, show what the number is about")
             assert delivers_angle(o, topic.get("angle") or "", subject_for_visuals), (
                 f"this is not the story that trended. The angle was: "
                 f"{(topic.get('angle') or '')[:160]!r} — tell THAT. The article's own "
