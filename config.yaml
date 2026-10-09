@@ -394,7 +394,13 @@ llm:
   groq_review_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b, openai/gpt-oss-20b]
   gemini_review_models: [gemini-flash-latest, gemini-flash-lite-latest]
   # image-checking models (keyless Pollinations can't see images, so it's never used for this)
-  vision_providers: [nvidia, cloudflare, gemini]
+  # Fast model first. Vision is called once per segment per attempted video, and on the
+  # 90B model each call was taking 3-5 minutes - runs reached 217 minutes and started
+  # overlapping the schedule. Cloudflare's scout is 17B and proven working against a
+  # real image; the 90B stays as the fallback for when scout is rate limited. Quality
+  # difference matters less than it looks because both models were score-inflating
+  # anyway, which the calibration in vision.py addresses directly.
+  vision_providers: [cloudflare, nvidia, gemini]
   gemini_vision_models: [gemini-flash-lite-latest, gemini-flash-latest]   # gemini-2.5-* now return 404
   groq_vision_models: []
   temperature: 0.8
