@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-10T03:50:39.720896+00:00",
+  "video": {
+    "title": "CASE #009 — The Sitting US President Who Won a Nobel Prize #shorts",
+    "video_id": "x2TjpFDDxUA",
+    "series": "unsolved",
+    "episode": 9,
+    "duration": 17.426031746031747,
+    "file": "20261010-0247-02-theodore-roosevelt.mp4",
+    "published_at": "2026-10-10T20:54:00+00:00"
+  },
+  "selection": {
+    "topic": "the first American to win a Nobel Prize was President Teddy Roosevelt for negotiating an end to the Russo-Japanese War",
+    "category": "history",
+    "trend_sources": [
+      "reddit_todayilearned"
+    ],
+    "why_trending": "Featured on Reddit TodayILearned today.",
+    "viral_score": 7.0,
+    "evidence": [
+      "TIL that the first American to win a Nobel Prize was President Teddy Roosevelt for negotiating an end to the Russo-Japanese War"
+    ],
+    "format": "plot_twist",
+    "hook_style": "disbelief"
+  },
+  "grounding": {
+    "primary": {
+      "title": "Theodore Roosevelt",
+      "url": "https://en.wikipedia.org/wiki/Theodore_Roosevelt"
+    },
+    "corroboration": [
+      {
+        "title": "Wikidata — Wikidata: Theodore Roosevelt",
+        "url": "https://www.wikidata.org/wiki/Q33866"
+      }
+    ],
+    "claims": [
+      {
+        "says": "The first American to win a Nobel Prize was a sitting president.",
+        "evidence": ""
+      },
+      {
+        "says": "He did not discover physics or write a bestselling novel.",
+        "evidence": "His book The Naval War of 1812 established his reputation as a historian and popular writer."
+      },
+      {
+        "says": "Instead, Theodore Roosevelt won the 1906 Nobel Peace Prize.",
+        "evidence": "His successful efforts to end the Russo-Japanese War won him the 1906 Nobel Peace Prize"
+      },
+      {
+        "says": "He got it for negotiating an end to the Russo-Japanese War.",
+        "evidence": "His successful efforts to end the Russo-Japanese War won him the 1906 Nobel Peace Prize"
+      }
+    ]
+  },
+  "script": {
+    "title": "The Sitting US President Who Won a Nobel Prize",
+    "segments": [
+      "The first American to win a Nobel Prize was a sitting president.",
+      "He did not discover physics or write a bestselling novel.",
+      "Instead, Theodore Roosevelt won the 1906 Nobel Peace Prize.",
+      "He got it for negotiating an end to the Russo-Japanese War."
+    ],
+    "asides": [
+      "Overachiever much?"
+    ],
+    "commentary_ratio": 0.045
+  },
+  "review": {
+    "score": 7,
+    "reviewer": "nvidia:google/gemma-4-31b-it",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "nvidia:meta/llama-3.2-90b-vision-instruct:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261010-0247"
+  },
+  "originality": {
+    "sketch": [
+      "00ed7f20636ee0f5",
+      "05290157ad733820",
+      "21e92e4176ef4503",
+      "23c58f8b48215700",
+      "2a4647602b5385f0",
+      "2a9cd02065f56cf9",
+      "3ac15da97fe20ad9",
+      "4509294c5a87ac20",
+      "55298b1736e4cefb",
+      "5e11deea2124a893",
+      "61cce463e20dd8be",
+      "6303da4ed313c00a",
+      "66a2f257c9183c29",
+      "82e37c38c8d2fb84",
+      "91d32683c1054c17",
+      "a21f21d933d882d5",
+      "a3000e5e6a96f0e8",
+      "b083c4472a0db1a9",
+      "b5dcd1eb6a9693dc",
+      "cbed4d61def5fff6",
+      "d8fa9704ac5b7104",
+      "d9c8de1c39a7ef72",
+      "e6cc3af353ae0808",
+      "ede51746b1ed5584",
+      "eff67a241ee3c996",
+      "f38b9735b26fd0be"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}

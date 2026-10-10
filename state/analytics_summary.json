@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-10T01:08:16.106239+00:00",
+  "updated": "2026-10-10T02:47:03.831338+00:00",
   "videos_total": 41,
   "videos_7d": 12,
-  "views_7d": 6254,
-  "learned_this_run": 1,
+  "views_7d": 6260,
+  "learned_this_run": 0,
   "strategy": {
     "category": {
       "status": "learning",
@@ -313,7 +313,7 @@
     {
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
-      "views": 1325,
+      "views": 1328,
       "avg_view_pct": 132.14
     },
     {
@@ -361,42 +361,42 @@
   ],
   "rejected": [],
   "retention": {
-    "videos": 25,
+    "videos": 26,
     "where": "ending",
     "verdict": "ENDING is the leak: 24% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
     "avg_curve": [
-      1.286,
-      1.195,
-      0.896,
-      0.703,
-      0.59,
-      0.522,
-      0.464,
-      0.426,
-      0.395,
-      0.37,
-      0.307
+      1.291,
+      1.197,
+      0.906,
+      0.718,
+      0.598,
+      0.53,
+      0.471,
+      0.431,
+      0.398,
+      0.372,
+      0.312
     ],
-    "median_hook_retention": 1.038,
-    "median_completion": 0.235,
-    "median_swipe_point": 0.44,
+    "median_hook_retention": 1.04,
+    "median_completion": 0.237,
+    "median_swipe_point": 0.45,
     "worst_drop": {
-      "size": 0.299,
+      "size": 0.291,
       "from_pct": 10,
       "to_pct": 20
     }
   },
   "distribution": {
-    "n": 25,
+    "n": 26,
     "gate": 0.7,
     "passing": 1,
-    "pass_rate": 0.04,
-    "median_completion": 0.2353,
-    "verdict": "only 1/25 videos clear the 70% completion gate (median 24%) - most uploads are being throttled before they reach anyone"
+    "pass_rate": 0.038,
+    "median_completion": 0.2366,
+    "verdict": "only 1/26 videos clear the 70% completion gate (median 24%) - most uploads are being throttled before they reach anyone"
   },
   "subscribers": {
     "net_90d": 26,
-    "views_90d": 24895,
+    "views_90d": 24901,
     "per_1k_views": 1.04,
     "videos": 33,
     "days_to_500": 1730.8,
