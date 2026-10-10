@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-10T07:43:51.935237+00:00",
+  "updated": "2026-10-10T15:55:04.563806+00:00",
   "videos_total": 43,
   "videos_7d": 14,
-  "views_7d": 6364,
+  "views_7d": 6518,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -82,7 +82,7 @@
         },
         {
           "arm": "dumbest_decision",
-          "mean": 0.558,
+          "mean": 0.557,
           "n": 1
         },
         {
@@ -92,7 +92,7 @@
         },
         {
           "arm": "by_the_numbers",
-          "mean": 0.527,
+          "mean": 0.526,
           "n": 2
         },
         {
@@ -299,9 +299,15 @@
   },
   "top_videos": [
     {
+      "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
+      "id": "iEXe-QyrmkY",
+      "views": 1467,
+      "avg_view_pct": 132.14
+    },
+    {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1442,
+      "views": 1443,
       "avg_view_pct": 90.69
     },
     {
@@ -309,12 +315,6 @@
       "id": "UvqHvc4mOXM",
       "views": 1397,
       "avg_view_pct": 63.27
-    },
-    {
-      "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
-      "id": "iEXe-QyrmkY",
-      "views": 1396,
-      "avg_view_pct": 132.14
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -325,7 +325,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1230,
+      "views": 1231,
       "avg_view_pct": 80.03
     },
     {
@@ -396,8 +396,8 @@
   },
   "subscribers": {
     "net_90d": 26,
-    "views_90d": 25006,
-    "per_1k_views": 1.04,
+    "views_90d": 25162,
+    "per_1k_views": 1.03,
     "videos": 35,
     "days_to_500": 1730.8,
     "days_to_1000": 3461.5
