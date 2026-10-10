@@ -1,18 +1,18 @@
 {
-  "updated": "2026-10-09T23:04:23.038068+00:00",
+  "updated": "2026-10-10T01:08:16.106239+00:00",
   "videos_total": 41,
   "videos_7d": 12,
-  "views_7d": 6176,
+  "views_7d": 6254,
   "learned_this_run": 1,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 25,
+      "observations": 26,
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.583,
-          "n": 3
+          "mean": 0.587,
+          "n": 4
         },
         {
           "arm": "history",
@@ -73,7 +73,7 @@
     },
     "format": {
       "status": "learning",
-      "observations": 25,
+      "observations": 26,
       "arms": [
         {
           "arm": "scale_shock",
@@ -93,6 +93,11 @@
         {
           "arm": "by_the_numbers",
           "mean": 0.527,
+          "n": 2
+        },
+        {
+          "arm": "creepy_true",
+          "mean": 0.521,
           "n": 2
         },
         {
@@ -124,11 +129,6 @@
           "arm": "timeline",
           "mean": 0.496,
           "n": 2
-        },
-        {
-          "arm": "creepy_true",
-          "mean": 0.492,
-          "n": 1
         },
         {
           "arm": "sounds_fake",
@@ -261,9 +261,14 @@
       ]
     },
     "comment_device": {
-      "status": "exploring (6/8)",
-      "observations": 6,
+      "status": "exploring (7/8)",
+      "observations": 7,
       "arms": [
+        {
+          "arm": "poll",
+          "mean": 0.506,
+          "n": 2
+        },
         {
           "arm": "correction_bait",
           "mean": 0.505,
@@ -288,11 +293,6 @@
           "arm": "challenge",
           "mean": 0.492,
           "n": 1
-        },
-        {
-          "arm": "poll",
-          "mean": 0.472,
-          "n": 1
         }
       ]
     }
@@ -313,7 +313,7 @@
     {
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
-      "views": 1298,
+      "views": 1325,
       "avg_view_pct": 132.14
     },
     {
@@ -361,43 +361,43 @@
   ],
   "rejected": [],
   "retention": {
-    "videos": 24,
+    "videos": 25,
     "where": "ending",
-    "verdict": "ENDING is the leak: 22% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
+    "verdict": "ENDING is the leak: 24% reach the end (target 55%). Tighten the back half and make the last line loop into the first.",
     "avg_curve": [
-      1.268,
-      1.177,
-      0.869,
-      0.679,
-      0.567,
-      0.5,
-      0.444,
-      0.41,
-      0.38,
-      0.354,
-      0.291
+      1.286,
+      1.195,
+      0.896,
+      0.703,
+      0.59,
+      0.522,
+      0.464,
+      0.426,
+      0.395,
+      0.37,
+      0.307
     ],
-    "median_hook_retention": 1.033,
-    "median_completion": 0.225,
+    "median_hook_retention": 1.038,
+    "median_completion": 0.235,
     "median_swipe_point": 0.44,
     "worst_drop": {
-      "size": 0.308,
+      "size": 0.299,
       "from_pct": 10,
       "to_pct": 20
     }
   },
   "distribution": {
-    "n": 24,
+    "n": 25,
     "gate": 0.7,
     "passing": 1,
-    "pass_rate": 0.042,
-    "median_completion": 0.225,
-    "verdict": "only 1/24 videos clear the 70% completion gate (median 22%) - most uploads are being throttled before they reach anyone"
+    "pass_rate": 0.04,
+    "median_completion": 0.2353,
+    "verdict": "only 1/25 videos clear the 70% completion gate (median 24%) - most uploads are being throttled before they reach anyone"
   },
   "subscribers": {
     "net_90d": 26,
-    "views_90d": 24817,
-    "per_1k_views": 1.05,
+    "views_90d": 24895,
+    "per_1k_views": 1.04,
     "videos": 33,
     "days_to_500": 1730.8,
     "days_to_1000": 3461.5
