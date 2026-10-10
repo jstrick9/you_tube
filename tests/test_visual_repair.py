@@ -161,3 +161,40 @@ def test_render_qa_attempts_every_failed_shot_without_short_circuit(monkeypatch,
     assert [seg for seg, _ in repairs] == [0, 1, 2]
     assert all(feedback for _, feedback in repairs)
     assert len(renders) == 2 and report["passed"]
+
+
+def test_render_qa_does_not_repair_after_final_failed_attempt(monkeypatch, tmp_path):
+    from autotube import pipeline
+
+    renders, repairs, verify_calls = [], [], []
+    monkeypatch.setattr(
+        pipeline.render, "render",
+        lambda *a, **k: (renders.append(1), {"timeline": []})[1],
+    )
+    failed = {
+        "passed": False, "repairable": True, "issues": ["mismatched frames"],
+        "failed": [(0, "bad-0")],
+        "frames": [{"seg": 0, "path": "bad-0", "shows": "wrong image",
+                    "intended_shot": "intended image", "issue": "mismatch"}],
+    }
+    monkeypatch.setattr(pipeline.qa, "verify", lambda *a, **k: (verify_calls.append(1), failed)[1])
+    monkeypatch.setattr(
+        pipeline.media, "use_alternative",
+        lambda *a, **k: (repairs.append(1), True)[1],
+    )
+    assets = {
+        "tts": {}, "visuals": {"shots": []}, "music": None, "hook_card": "hook",
+        "work": tmp_path, "out": tmp_path / "out.mp4", "seed": 1, "fx": [],
+        "script": {"segments": [{"text": "line"}]}, "source": {"title": "Topic"},
+        "title": "Title", "subject": "Topic",
+    }
+    writer = type("Writer", (), {"llm": object()})()
+
+    _, report = pipeline.render_with_qa(
+        assets, {"qa": {"max_repairs": 1}, "channel": {"name": "Archive 13"}}, writer)
+
+    assert len(renders) == 2
+    assert len(verify_calls) == 2
+    assert len(repairs) == 1  # repair after attempt 1 was re-rendered and checked on attempt 2
+    assert report["attempt"] == 2
+    assert not report["passed"]

@@ -342,7 +342,7 @@ def _repair_failed_shots(a: dict, cfg: dict, writer: ScriptWriter, report: dict)
 
 
 def render_with_qa(a: dict, cfg: dict, writer: ScriptWriter) -> tuple[dict, dict]:
-    """Render, verify the finished MP4 against the narration, repair a bad shot, repeat."""
+    """Render and verify the finished MP4; repair only when another QA pass remains."""
     # Clamped at zero so the loop always runs at least once: `r` is bound inside it and used
     # afterwards, so a negative max_repairs in config would not disable repairs — it would raise
     # NameError after a perfectly successful render.
@@ -363,6 +363,9 @@ def render_with_qa(a: dict, cfg: dict, writer: ScriptWriter) -> tuple[dict, dict
         log.info("  ✗ final QA attempt %d: %s", attempt + 1, "; ".join(report["issues"])[:500])
         if not report.get("repairable"):
             break                    # narration/title/hook or structural problems cannot be fixed by swapping shots
+        if attempt >= repairs:
+            log.warning("  final QA attempt failed; leaving the rendered frames unchanged and unverified")
+            break                    # every replacement must get a fresh render and QA pass
         if not _repair_failed_shots(a, cfg, writer, report):
             break
     return r, report
