@@ -1,147 +1,42 @@
-# YouTube monetization & AI faceless channels — research brief
+# Monetization and audience metrics
 
-Researched October 2026. Everything here is measured against **this channel's actual numbers**, not
-generic benchmarks. Sources listed at the bottom.
+**Status checked: 10 October 2026.** Official eligibility is determined by YouTube Studio and the policies for the channel's country; this document is a tracking guide, not an eligibility guarantee.
 
----
+## YouTube Partner Program thresholds
 
-## 1. The single most important finding
+YouTube currently describes two YPP entry levels for eligible regions:
 
-Shorts distribution is gated on completion rate. The thresholds are well documented, and the channel
-is nowhere near them.
+| Level | Subscriber / activity requirements | Shorts route | Watch-hours route |
+|---|---|---:|---:|
+| Expanded YPP (fan funding and selected Shopping features) | 500 subscribers and 3 valid public uploads in the prior 90 days | 3 million qualified Shorts views in 90 days | 3,000 qualified watch hours in 12 months |
+| Standard YPP (ad-revenue sharing) through 31 January 2027 | 1,000 subscribers | 10 million qualified public Shorts views in 90 days | 4,000 qualified watch hours in 12 months |
+| Standard YPP for new applicants from 1 February 2027 | 1,000 subscribers | 20 million qualified Shorts views in 90 days | 8,000 qualified watch hours in 12 months |
 
-| Metric | Benchmark | This channel | Verdict |
-|---|---|---|---|
-| Completion rate | **70%+ → ~30% more distribution**; 80–90% = top performers | **median 15.9%**, best 49.4% | **0 of 12 videos clear the bar** |
-| Viewed-vs-Swiped-Away | 70–90% healthy; **<60% = distribution collapse** | implied well under 60% | below the collapse line |
-| Avg view % | 70%+ | 50.8% | below |
-| Engagement rate | ~5.91% average on Shorts | **1.57%** | 3.8× below |
+The expanded-tier requirements are not part of the announced February 2027 change. Other requirements still apply, including country availability, eligible public content, account security, and policy compliance. Confirm current eligibility in YouTube Studio rather than relying on this repo's estimate.
 
-Paddy Galloway's study of 3.3 billion Shorts found that below 60% VVSA, "distribution is pulled and
-the video is buried." The algorithm seeds every Short to a small test audience and decides almost
-instantly. **This channel is failing that test on essentially every upload.** That is the whole
-explanation for the 1.36× max/median view ratio — it is not bad luck or topic selection, it is a
-measurable, specific gate that the videos do not pass.
+**Shorts progress must use engaged/qualified views, not the newer public `views` count.** Since 31 March 2025, a public Shorts view can count when a Short starts or replays. YouTube says YPP eligibility and Shorts ad-revenue sharing continue to use engaged Shorts views. AutoTube keeps raw public views for reporting and queries YouTube Analytics `engagedViews` for its rolling-window progress proxy. That API value is only complete when the summary reports 100% coverage; the Studio eligibility panel remains authoritative.
 
-Median completion of 15.9% on a 33.8-second video means the average viewer watches **about five
-seconds**. That is the exact cliff found independently in the retention curves (112% → 71.5% between
-the 10% and 20% marks). Two different measurements, same conclusion.
+## What AutoTube measures
 
-## 2. Video length is in the known dead zone
+- **`averageViewPercentage`** — average percentage of the video watched per playback. This is AutoTube's *average-view target* metric. It is not the percentage of unique viewers who completed the Short.
+- **`audienceWatchRatio`** — relative watch activity at portions of the video, stored as `audience_watch_ratio_curve`. It helps locate relative changes along a video. Replays can make a value exceed 1.0; the final point is **not** a viewer-completion rate.
+- **`engagedViews`** — the Shorts-view measure used for the YPP progress proxy when Analytics returns it. Raw `views` remains a separate reporting value.
+- **Internal average-view target: 70%.** This is an AutoTube goal for `averageViewPercentage`, not an official YouTube threshold, published distribution gate, or promise of reach. Each video's result must be measured from channel analytics after it has had time to mature.
+- **Length and format tests are hypotheses.** The configured 15–20 second duration is an internal experiment for this channel. There is no verified official 25–40 second “dead zone,” universal winning length bracket, or loop-length sweet spot in this repo's evidence.
 
-Research across viral Shorts converges on two performing brackets — **15–20s** for single-concept
-content and **45–58s** for story-based — with **25–40s consistently underperforming both**. Loopable
-Shorts peak at **15–25s**.
+Older history stored `audienceWatchRatio` curve values under names such as `completion` and `hook_retention`. Those fields have been renamed to watch-ratio telemetry and are no longer used as completion percentages or reward inputs. Rewards are rebuilt against the corrected metrics. A stale dashboard/history snapshot should not be treated as a viewer-completion study.
 
-```
-20-25s                1  #
-25-40s (dead zone)   27  ###########################
-40+s                  2  ##
-```
+## Monetization-safe editorial standard
 
-**27 of 30 videos sit in the dead zone.** The band tightening already shipped (`b2e965e`, 22–30s,
-median 26.3s) moved the channel from the middle of the dead zone to its lower edge. The evidence
-says go further: **15–20 seconds**. Single-concept content, which is exactly what this channel makes.
+Eligibility is not just a view-count problem. AutoTube is intended to make original, advertiser-friendly Archive 13 Shorts in the `history_mystery` and `science_nature` lanes. Every upload needs a current trend/viral signal and an original angle; a Wikipedia article can support facts but does not by itself prove that a subject is trending. Do not copy or lightly repackage another creator's Short. A repeatable format is acceptable; repeated substance or low-value, mass-produced variations are not.
 
-This also compounds with completion. Five seconds of a 34s video is 15% completion; the same five
-seconds of an 18s video is 28%. Shortening raises the metric that gates distribution, and shorter
-videos are easier to hold to the end.
+Reviewers and automated checks should prioritize factual accuracy, meaningful commentary/value-add, distinct scripts and visuals, and advertiser-friendly treatment. YouTube's policy describes categories of inauthentic or reused content, but AutoTube does **not** claim unverified numerical triggers such as a fixed script-variation percentage, daily upload count, commentary share, or retention cutoff. Realistic altered or synthetic content must be disclosed when YouTube's disclosure rules require it; disclosure is not a substitute for originality or policy compliance.
 
-## 3. The monetization arithmetic, honestly
+## Sources
 
-**Two tiers, two separate doors. Watch hours and Shorts views never combine.**
-
-| | Tier 1 — fan funding | Tier 2 — ad revenue |
-|---|---|---|
-| Subscribers | 500 | 1,000 |
-| Shorts path | **3M views / 90 days** | 10M views / 90 days |
-| Long-form path | 3,000 watch hours | 4,000 watch hours |
-| Unlocks | Super Thanks, memberships, Shopping, Creator Partnerships | all of Tier 1 + ad revenue + Premium share |
-
-**Shorts ad revenue is not a business.** Consensus RPM across every 2026 source is **$0.01–$0.07 per
-1,000 views** (creators keep 45% of a pooled allocation). Hitting the full 10M-view Tier 2 threshold
-pays roughly **$100–700 per quarter**. One source puts it plainly: a channel built purely on Shorts ad
-payouts "is fighting physics."
-
-### The deadline that actually matters
-
-**On 1 February 2027 the Tier 2 bar doubles** — to 8,000 watch hours or **20 million Shorts views /
-90 days**. Channels already in the programme are grandfathered. That is roughly four months away.
-
-At 939 median views × 2 uploads/day, this channel produces ~171,000 views per 90 days. Reaching 10M
-before the deadline would require a **58× improvement sustained for the whole period**. That is not
-going to happen, so the realistic plan is to assume the channel applies *after* the change, at 20M.
-
-**Tier 1 thresholds are not changing.** 500 subscribers + 3M Shorts views in 90 days is stable, and at
-33,000 views/day it is a 17× gap rather than a 58× one. It unlocks Super Thanks, memberships and
-YouTube Shopping — and YouTube has announced new milestone incentives aimed specifically at channels
-*below* 10M views (Shopping bonuses, brand deal rewards, trend boosts).
-
-**Tier 1 is the target. Ad revenue is not the prize — the audience is.**
-
-One more trap: monetization counts **engaged views**, a stricter metric than the view count on the
-dashboard. A channel showing 12M views can sit under the 10M line where it counts.
-
-## 4. What the policy actually says about AI
-
-The research is unambiguous and more permissive than the panic suggests. The policy was renamed
-"inauthentic content" (July 2025), then split in July 2026 into **Generic or Repetitive Content**,
-**Unsatisfying or Off-putting Content**, and **AI Personas Related to Sensitive Topics**.
-
-**Explicitly allowed:** AI tools of every kind, AI-written scripts, synthetic voiceover, faceless
-narration over stock footage, the same intro/outro on every video, fixed-format series, recurring
-characters. AI-labelled videos are not penalised in recommendations. AI-assisted scripts need **no
-disclosure label** — disclosure is only for *realistic* synthetic media depicting real people or events.
-
-**The line is: format can repeat, substance cannot.** YouTube's own wording — "if the average viewer
-can clearly tell that content on your channel differs from video to video, it is fine to monetize."
-
-**Concrete review triggers found in the research:**
-
-- Videos where commentary is **<30% of runtime** trigger review.
-- **5+ videos with the same visual template and <20% script variation** can be bulk-demonetized.
-- **10+ structurally similar Shorts per day** attracts suppression.
-- Named enforcement target: *"generic TTS narration over stock footage with AI-written scripts, no
-  commentary, insight or opinion."*
-- Reviewers assess **channel theme, most-viewed and newest videos, watch-time distribution, and
-  metadata** — not every video.
-- Enforcement is **channel-wide and retroactive**, not per-video.
-
-Against those triggers, this channel is now reasonably well positioned: three visual archetypes,
-jittered cadence at ~2/day (far under the 10/day suppression zone), per-topic format selection, and
-genuine research grounding. The two remaining exposures are the **generic TTS voice** — which is
-named almost verbatim as a target — and **thin commentary**, since fact-recitation with two asides is
-close to the "<30% commentary" line.
-
-One uncomfortable data point: *The Hollywood Reporter* (June 2026) reported that YouTube's
-recommendations now favour videos with a real human face, and some faceless creators are hiring
-on-camera hosts purely to satisfy it. Other analyses dispute that the algorithm treats faceless
-content differently at all. Unresolved, but worth knowing.
-
-## 5. What this means for the channel, in priority order
-
-1. **Cut to 15–20 seconds.** Directly attacks the gating metric, exits the dead zone, and makes
-   looping viable. Biggest single lever available.
-2. **Engineer the loop properly.** A clean loop pushes avg view % past 100%, which is read as a strong
-   satisfaction signal. The closer gate exists but isn't yet verified to actually produce seamless loops.
-3. **Instrument VVSA / completion as the primary metric.** The reward function currently weights
-   retention via `avg_view_pct` and completion, but nothing tracks the channel against the 70% gate or
-   alerts when a video lands under 60%.
-4. **Pattern interrupt inside the first 5 seconds** — worth ~23% retention per the research. On-screen
-   text during the hook is worth ~18% watch time; the hook card already does this.
-5. **Fix the voice.** It is the single most direct match to the named enforcement target, and it
-   suppresses engagement.
-6. **Target Tier 1 (500 subs + 3M/90d), not Tier 2.** Different goal, different content decisions —
-   subscribers and repeat viewers matter more than raw view count.
-
----
-
-### Sources
-
-- air.io — YPP requirements 2026, tier structure, Feb 2027 change, engaged views
-- TechCrunch (10 Aug 2026), CineD, AndroidHeadlines — threshold doubling, Shorts 10M floor, milestone incentives
-- vidIQ, Shopify, CreatiCalc, fluxnote, makeviral, korpi.ai, reelpilot — Shorts RPM consensus $0.01–$0.07
-- virvid.ai — faceless retention/hook research, VVSA, completion thresholds, Paddy Galloway 3.3B Shorts study
-- taletok.io, conbersa.ai, growthos.in — length brackets, dead zone, loop structure, 4-beat spine
-- miraflow.ai, ytgrowth.io, creatorblade, viddar.io, newmoneymatrix, aituber.app — Generic or Repetitive
-  Content policy, review triggers, enforcement cases, AI disclosure scope
+- [YouTube Partner Program overview and eligibility](https://support.google.com/youtube/answer/13429240)
+- [YPP eligibility threshold changes](https://support.google.com/youtube/answer/12843009)
+- [How Shorts views are counted](https://support.google.com/youtube/answer/10059070)
+- [YouTube Analytics API metrics](https://developers.google.com/youtube/analytics/metrics)
+- [YouTube Analytics API revision history](https://developers.google.com/youtube/analytics/revision_history)
+- [YouTube channel monetization policies](https://support.google.com/youtube/answer/1311392)

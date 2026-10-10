@@ -7,9 +7,9 @@ state anything that only a single outlet is claiming.
 
 A deliberate limitation drives the design. Google News RSS returns a headline, an outlet and a date
 — its <description> is just the headline wrapped in a link, not a snippet — and fetching and
-reproducing publishers' article bodies would be both a copyright problem and exactly the "reused
-content" that stops monetization. So headlines are used for what they are genuinely good evidence
-of: the existence of an event, and the framing that many independent newsrooms agree on. The depth
+reproducing publishers' article bodies would create copyright and originality concerns and would
+not meet AutoTube's value-add goal. So headlines are used for a narrow purpose: evidence that an event
+is receiving current coverage, not as a substitute for original scripting. The depth
 of the script has to come from somewhere safer, which is why `backbone()` hands back a related
 encyclopedic subject (Sora 2 → OpenAI, text-to-video) for the explainer half of the video.
 

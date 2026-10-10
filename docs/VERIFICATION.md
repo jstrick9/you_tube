@@ -1,5 +1,7 @@
 # Verification Audit — 2026-10-03
 
+> Historical snapshot only: test counts, environment findings, and residual-risk statements below describe 3 Oct 2026 and are not current status. The former recommendation to inspect a dry-run output by eye is not a required human approval step; the active pipeline uses automated QA and runs unattended.
+
 Post-implementation audit of everything shipped in the Shorts-quality, monetization and
 demonetization-risk work. Scope: is it tested, is it wired, and does it do what the
 commit messages claim.

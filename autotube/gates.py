@@ -104,7 +104,7 @@ def _words(text: str) -> list[str]:
 
 
 def check_hook(hook: str, lo: int = 6, hi: int = 12) -> list[str]:
-    """The first line decides whether 70%+ of viewers stay. It gets the strictest rules in the system."""
+    """A specific opening can help earn attention; no fixed viewer-retention cutoff is assumed."""
     issues = []
     hook = (hook or "").strip()
     if not hook:

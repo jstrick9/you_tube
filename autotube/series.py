@@ -1,21 +1,14 @@
-"""Recurring, numbered series.
+"""Recurring, numbered Archive 13 series.
 
-A standalone fact video is optimised for a view and nothing else. It is watched,
-it is believed, it is forgotten, and the viewer has no reason to subscribe because
-nothing about it promises a specific next thing. That is fatal here: the Partner
-Programme gates on 1,000 subscribers *in addition to* the view threshold, so a
-channel can accumulate views indefinitely and never qualify.
+CASE and FIELD provide a recognizable editorial structure and make the two approved
+content lanes legible to viewers. Numbering is a branding convention; it does not
+promise subscriber growth or affect a YouTube monetization decision. The YPP subscriber
+requirement is tracked separately in ``docs/MONETIZATION.md``.
 
-A series fixes the one thing a standalone video cannot. "File #047" tells a viewer
-there are forty-six behind it and a forty-eighth coming, and that is the whole
-mechanism by which a scroll becomes a follow.
-
-It is also the cheapest available defence against the Generic / Repetitive Content
-criteria. Reviewers assess channel theme and coherence; a numbered show with a
-stated remit reads as a programme, whereas the same videos unlabelled read as a
-feed. Note the direction of the rule: format may repeat, substance may not. The
-numbering is format. The episodes still have to be different from each other, which
-is enforced elsewhere (grounding floor, topic dedupe, the reviewer rubric).
+Format may repeat; substance may not. Each episode still needs a distinct trend-backed
+topic, grounded claims, original explanation, and its own visual treatment. Series
+membership must never block a video, and episode numbers are derived from history to
+avoid accidental reuse or gaps.
 """
 from __future__ import annotations
 

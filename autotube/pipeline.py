@@ -193,14 +193,12 @@ def shown_duration(tts: dict) -> float:
 def fit_length(script: dict, plan: dict, cfg: dict, work, synth) -> tuple[dict | None, list[float]]:
     """Synthesize the narration and bring it inside the configured band.
 
-    Completion rate is the dominant Shorts ranking input and it falls off fast with length, so the
-    band is held in three escalating steps:
+    The configured duration is an internal creative experiment, not an asserted YouTube ranking rule.
+    This function holds it as a production target with three escalating steps:
 
       1. Drop the least load-bearing body line and re-synthesize (never the hook, reveal or payoff).
-      2. If nothing is safe to drop - a 5-segment script protects three of them, so this runs out
-         quickly - add a bounded amount of pace. Previously the only backstop was the 59-second
-         Shorts cliff, which is how 44 and 46 second videos shipped against a 36 second target.
-      3. Past 59s the Short loses its classification, so give up on the topic.
+      2. If nothing is safe to drop, add a bounded amount of pace while preserving natural narration.
+      3. Skip only if it exceeds the internal 179-second Shorts ceiling; the configured target is much shorter.
 
     The speed-up is capped because past roughly ten percent the voice sounds robotic, and that
     costs more retention than the seconds it saves.
@@ -231,8 +229,8 @@ def fit_length(script: dict, plan: dict, cfg: dict, work, synth) -> tuple[dict |
                      shown_duration(tts), float(hi), faster)
             tts = synth([spoken_text(s) for s in script["segments"]], plan["voice"], faster, work, gaps=gaps)
 
-    if shown_duration(tts) > 59.0:          # Shorts must stay < 60 s for safest classification
-        log.info("  ✗ still too long (%.1fs), skipping", shown_duration(tts))
+    if shown_duration(tts) > 179.0:         # upload ceiling leaves margin below YouTube's 3-minute Shorts maximum
+        log.info("  ✗ exceeds the internal Shorts ceiling (%.1fs), skipping", shown_duration(tts))
         return None, gaps
     if shown_duration(tts) > hi:
         log.info("  note: %.1fs is over the %.0fs target but within the Shorts limit — keeping",
@@ -343,6 +341,27 @@ def _shots_sheet(visuals: dict, out) -> None:
         log.debug("shots sheet failed: %s", e)
 
 
+def _trend_provenance(topic: dict) -> dict:
+    return {"sources": list(topic.get("sources") or []),
+            "score": topic.get("score"), "viral_score": topic.get("viral_score"),
+            "wikipedia_spike": topic.get("spike"), "why_trending": topic.get("why_trending"),
+            "evidence": (topic.get("context") or [])[:4]}
+
+
+def _history_trend(topic: dict) -> dict:
+    return {"trend_sources": list(topic.get("sources") or []), "trend_score": topic.get("score"),
+            "wikipedia_spike": topic.get("spike"), "why_trending": topic.get("why_trending"),
+            "viral_score": topic.get("viral_score"), "trend_evidence": (topic.get("context") or [])[:2]}
+
+
+def _shot_provenance(shots: list[dict]) -> list[dict]:
+    return [{"seg": v["seg"], "kind": v.get("kind", "image"), "window": v.get("window"),
+             "score": v.get("score"), "judge": v.get("judge"), "shows": v.get("shows"),
+             "want": v.get("want"), "reused": v.get("reused", False),
+             "image": v["credit"].get("title"), "page": v["credit"].get("page")}
+            for v in shots]
+
+
 def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
     """Thumbnail, metadata and the run artifact. None if final QA failed — never hand that upstream."""
     script, source, visuals, out = a["script"], a["source"], a["visuals"], a["out"]
@@ -356,24 +375,13 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
         "tags": list(dict.fromkeys([t.strip("#") for t in script.get("tags", [])] + ["shorts", "facts"]))[:25],
     }
     record = {"meta": meta, "script": script, "review": a["review"],
-              # Carried explicitly. These are set during assembly and were dropped here,
-              # so every history entry recorded series=None - and episode_number()
-              # derives the next number from exactly that field. The counter therefore
-              # reset on every run, which is why a channel with a recurring numbered
-              # series published CASE #002 with no CASE #001 before it and would have
-              # reissued the same numbers indefinitely. Derived numbering cannot drift,
-              # but only if the thing it derives from is actually written down.
               "series": a.get("series"), "episode": a.get("episode"),
               "source": {k: source[k] for k in ("title", "url")},
+              "trend": _trend_provenance(a["topic"]),
               "plan": a["plan"], "tts_engine": a["tts"]["engine"], "duration": r["duration"],
               "archetype": r.get("archetype"), "words": words,
               "qa": {k: report.get(k) for k in ("passed", "attempt", "issues", "frames", "meta")},
-              "shots": [{"seg": v["seg"], "kind": v.get("kind", "image"), "window": v.get("window"),
-                         "score": v.get("score"), "judge": v.get("judge"), "shows": v.get("shows"),
-                         "want": v.get("want"), "reused": v.get("reused", False),
-                         "image": v["credit"].get("title"), "page": v["credit"].get("page")}
-                        for v in visuals["shots"]],
-              "timeline": r["timeline"]}
+              "shots": _shot_provenance(visuals["shots"]), "timeline": r["timeline"]}
     if not report["passed"]:
         # keep the evidence in the run artifact, clearly marked, and never hand it to the uploader
         rejected = out.with_name(out.stem + "-REJECTED.mp4")
@@ -389,22 +397,33 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
         meta["title"] = series_mod.decorate_title(meta["title"], s_key, s_num, cfg, limit=90)
     if "#shorts" not in meta["title"].lower() and len(meta["title"]) <= 90:
         meta["title"] = f"{meta['title']} #shorts"
+    record["series"] = s_key
+    record["episode"] = s_num
     record["meta"] = meta
     out.with_suffix(".json").write_text(json.dumps(record, indent=2, default=str))
     log.info("  ✓ rendered %s (%.1fs, review=%s)", out.name, r["duration"], a["review"].get("score"))
     return {"file": out, "thumb": thumb, "meta": meta, "script": script, "source": source,
             "review": a["review"], "topic": a["topic"], "plan": a["plan"], "duration": r["duration"],
             "archetype": r.get("archetype"), "tts_engine": a["tts"]["engine"], "words": words,
-            # package() builds two dicts: `record` above, which is written beside the
-            # video as the run artifact, and this one, which is what run() actually
-            # reads to build the history entry. Series and episode were added to the
-            # first and not the second, so the artifact looked correct while history
-            # kept recording None and the episode counter kept resetting.
             "series": s_key, "episode": s_num,
             "qa": report}
 
 
 def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int, run_id: str) -> dict | None:
+    trend_cfg = cfg.get("trends") or {}
+    min_wiki_spike = float(trend_cfg.get("min_wikipedia_spike", 3.0))
+    min_viral = float(cfg.get("content", {}).get("min_viral_score", 7))
+    try:
+        viral_score = float(topic.get("viral_score", 0))
+    except (TypeError, ValueError):
+        viral_score = 0.0
+    if not trends.has_current_trend_evidence(topic, min_wiki_spike):
+        log.info("  ✗ refusing topic %r without a qualifying live trend signal", topic.get("topic"))
+        return None
+    if viral_score < min_viral:
+        log.info("  ✗ refusing topic %r below the viral-potential floor (%.1f/%.1f)",
+                 topic.get("topic"), viral_score, min_viral)
+        return None
     log.info("▶ [%d] topic=%r format=%s hook=%s voice=%s", idx, topic["topic"], plan["format"],
              plan["hook_style"], plan["voice"])
     assets = produce_assets(cfg, writer, topic, plan, idx, run_id)
@@ -428,8 +447,6 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     picks = writer.select_topics(cands, n, recent) if cands else []
     tried: set[str] = set()
     rounds = 1
-    if cfg["content"].get("allow_evergreen", False):
-        picks += writer.evergreen(recent)     # optional safety net (off by default: every video rides a live trend)
     plans = strat.plan(n)
     log.info("topic queue: %s", [p["topic"][:40] for p in picks[: n + 4]])
 
@@ -492,11 +509,10 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
         entry = {
             "created_at": now_utc().isoformat(), "run_id": run_id, "title": res["meta"]["title"],
             "topic": res["topic"]["topic"], "topic_key": res["topic"].get("topic_key", res["topic"]["topic"].lower()),
-            "wiki_title": res["source"]["title"], "trend_sources": res["topic"].get("sources", []),
+            "wiki_title": res["source"]["title"],
             "choice": {"category": res["topic"].get("category"), **res["plan"],
                        "source": trends.primary_source(res["topic"].get("sources", []))},
-            "viral_score": res["topic"].get("viral_score"), "why_trending": res["topic"].get("why_trending"),
-            "trend_evidence": (res["topic"].get("context") or [])[:2],
+            **_history_trend(res["topic"]),
             "review_score": res["review"].get("score"),
             "reviewer": res["review"].get("reviewer"),
             "review_independent": res["review"].get("independent"),

@@ -33,7 +33,8 @@ def _res(**over):
         "source": {"title": "Flannan Isles", "url": "https://en.wikipedia.org/wiki/Flannan_Isles",
                    "also": [{"title": "BBC", "url": "https://bbc.co.uk/x"}]},
         "topic": {"topic": "Flannan Isles", "category": "mysteries", "sources": ["wikipedia"],
-                  "why_trending": "anniversary", "viral_score": 0.8, "context": ["spike"]},
+                  "score": 0.91, "spike": 3.5, "why_trending": "Wikipedia pageviews reached 3.5x baseline",
+                  "viral_score": 8, "context": ["3.5x its 30-day pageview baseline"]},
         "plan": {"format": "creepy_true", "hook_style": "bold_claim"},
         "review": {"score": 8, "reviewer": "anthropic:claude", "independent": True, "issues": []},
     }
@@ -80,8 +81,10 @@ def test_the_record_shows_why_this_topic_was_chosen(tmp_archive):
     """Editorial selection is the difference between a show and bulk enumeration."""
     provenance.record(_res(), _entry(), CFG)
     sel = _written(tmp_archive)["selection"]
-    assert sel["why_trending"] == "anniversary" and sel["trend_sources"] == ["wikipedia"]
-    assert sel["format"] == "creepy_true"
+    assert sel["why_trending"] == "Wikipedia pageviews reached 3.5x baseline"
+    assert sel["trend_sources"] == ["wikipedia"] and sel["trend_score"] == 0.91
+    assert sel["wikipedia_spike"] == 3.5
+    assert sel["viral_score"] == 8 and sel["format"] == "creepy_true"
 
 
 def test_the_record_pins_the_models_used(tmp_archive):

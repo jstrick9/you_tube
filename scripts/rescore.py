@@ -1,13 +1,9 @@
-"""One-time migration: rebuild the bandit from corrected rewards.
+"""One-time utility: rebuild the bandit from the current analytics reward schema.
 
-The original reward was `0.6*percentile(views/hour) + 0.4*percentile(avg view %)`, ranked against the
-channel's own videos. On a flat view distribution (ours: 20 videos all between 460 and 1,280 views)
-percentile ranking turns noise into confident-looking rewards. Measured against the 13 videos we had
-real data for, that reward correlated **-0.18** with average view percentage — the bandit was being
-taught, mildly, to prefer the videos people watched least.
-
-This script discards every stored reward, recomputes it with `analytics.compute_reward`, and rebuilds
-the Beta posteriors from scratch. Run once:
+The former pipeline mislabeled the final ``audienceWatchRatio`` point as viewer completion. This
+utility recomputes rewards from ``averageViewPercentage`` and engaged-view velocity when available;
+curve telemetry is never scored as completion. The normal analytics pass now performs this migration
+automatically, so use this script only when explicitly rebuilding a local state snapshot. Run:
 
     python scripts/rescore.py            # show what would change
     python scripts/rescore.py --apply    # write state/
@@ -19,7 +15,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from autotube.analytics import clean_view_pct, compute_reward, learnable, retention_diagnosis  # noqa: E402
+from autotube.analytics import (REWARD_SCHEMA_VERSION, clean_view_pct, compute_reward, learnable,
+                                migrate_legacy_retention_metrics, retention_diagnosis)  # noqa: E402
 from autotube.common import load_config, read_json, write_json  # noqa: E402
 from autotube.strategy import PRIOR, Strategy  # noqa: E402
 
@@ -28,6 +25,7 @@ def main(apply: bool = False) -> None:
     cfg = load_config()
     acfg = cfg["analytics"]
     hist = read_json("history.json", [])
+    migrate_legacy_retention_metrics(hist)
     min_h = acfg["evaluate_after_hours"]
 
     matured = [h for h in hist if h.get("video_id")
@@ -35,9 +33,9 @@ def main(apply: bool = False) -> None:
                and h.get("status") not in ("withdrawn", "missing")]
     pool_src = [h for h in matured if learnable(h, acfg)]
     pools = {
-        "vph": [h["metrics"]["vph"] for h in pool_src],
+        "vph": [h["metrics"]["vph"] for h in pool_src
+                if h["metrics"].get("vph_basis") == "engaged_views"],
         "avg_pct": [p for h in pool_src if (p := clean_view_pct(h["metrics"].get("avg_view_pct"))) is not None],
-        "completion": [h["metrics"]["completion"] for h in pool_src if h["metrics"].get("completion") is not None],
     }
 
     strat = Strategy(cfg)
@@ -62,6 +60,7 @@ def main(apply: bool = False) -> None:
         r, parts = (0.0, {"mode": "rejected"}) if h.get("status") == "rejected" else compute_reward(
             h["metrics"], pools, acfg)
         h["reward"], h["reward_parts"] = r, parts
+        h["reward_version"] = REWARD_SCHEMA_VERSION
         strat.update(h["choice"], r)
         n += 1
         print(f"{h['title'][:44]:<44} {h['metrics'].get('views', 0):>6} "
@@ -74,6 +73,7 @@ def main(apply: bool = False) -> None:
         top = ", ".join(f"{a['arm']}={a['mean']:.2f}(n={a['n']})" for a in d["arms"][:3])
         print(f"  {dim:<12} {d['status']:<18} {top}")
 
+    strat.state["reward_schema_version"] = REWARD_SCHEMA_VERSION
     if apply:
         write_json("history.json", hist)
         strat.save()

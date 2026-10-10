@@ -32,24 +32,34 @@ class LLMPicks:
 
 
 def cands():
-    rows = [("Hunger stone", "wikipedia", 0.9, ["Wikipedia: 111,489 views/day, 1496.5x its normal"]),
-            ("Willie Mays", "wikipedia", 0.8, []),
-            ("Octopus can taste with its arms", "youtube_outliers", 0.8, ["viral Short now: 2,000,000 views in 20h"]),
-            ("Dry policy news", "google_trends", 0.7, [])]
-    return [{"topic": t, "topic_key": t.lower(), "source": s, "sources": [s], "score": sc, "context": ctx}
-            for t, s, sc, ctx in rows]
+    rows = [("Hunger stone", "wikipedia", 0.9, ["Wikipedia: 111,489 views/day, 1496.5x its normal"], 1496.5),
+            ("Willie Mays", "wikipedia", 0.8, [], None),
+            ("Octopus can taste with its arms", "youtube_outliers", 0.8,
+             ["viral Short now: 2,000,000 views in 20h"], None),
+            ("Dry policy news", "google_trends", 0.7, [], None)]
+    return [{"topic": t, "topic_key": t.lower(), "source": s, "sources": [s], "score": sc,
+             "context": ctx, "spike": spike}
+            for t, s, sc, ctx, spike in rows]
 
 
 def test_select_keeps_only_viral_topics_and_ranks_them():
-    llm = LLMPicks([{"index": 1, "viral_score": 5, "category": "sports", "wiki_query": "Willie Mays"},
-                    {"index": 0, "viral_score": 9, "category": "history", "wiki_query": "Hunger stone"},
-                    {"index": 2, "viral_score": 9, "category": "nature", "wiki_query": "Octopus"},
-                    {"index": 3, "viral_score": 8, "category": "culture", "risk": "high"}])
+    llm = LLMPicks([{"index": 0, "viral_score": 9, "category": "history", "wiki_query": "Hunger stone"},
+                    {"index": 1, "viral_score": 9, "category": "nature", "wiki_query": "Octopus"},
+                    {"index": 2, "viral_score": 8, "category": "culture", "risk": "high"}])
     w = ScriptWriter(CFG, llm, Strat())
     picks = w.select_topics(cands(), 2, set())
     assert [p["topic"] for p in picks] == ["Octopus can taste with its arms", "Hunger stone"]   # source weight breaks tie
     assert all(p["viral_score"] >= CFG["content"]["min_viral_score"] for p in picks)
     assert "1496.5x its normal" in llm.prompt and "2,000,000 views" in llm.prompt          # judged WITH evidence
+    assert "Willie Mays" not in llm.prompt                                               # no Wikipedia-only fallback
+
+
+def test_wikipedia_listing_without_spike_never_reaches_topic_selector():
+    llm = LLMPicks([{"index": 0, "viral_score": 10, "category": "nature", "wiki_query": "Honey"}])
+    w = ScriptWriter(CFG, llm, Strat())
+    wiki_only = [{"topic": "Honey", "topic_key": "honey", "sources": ["wikipedia"], "score": 1.0}]
+    assert w.select_topics(wiki_only, 1, set()) == []
+    assert llm.prompt == ""
 
 
 def test_selection_outage_returns_nothing_not_guesses():
@@ -60,6 +70,37 @@ def test_selection_outage_returns_nothing_not_guesses():
             raise LLMError("down")
 
     assert ScriptWriter(CFG, Down([]), Strat()).select_topics(cands(), 2, set()) == []
+
+
+def test_wikipedia_only_requires_a_verified_pageview_spike():
+    wiki = {"sources": ["wikipedia"], "spike": 2.99}
+    assert not trends.has_current_trend_evidence(wiki, 3.0)
+    assert not trends.has_current_trend_evidence({"sources": ["wikipedia"]}, 3.0)
+    assert trends.has_current_trend_evidence({"sources": ["wikipedia"], "spike": 3.0}, 3.0)
+    assert not trends.has_current_trend_evidence({"sources": ["evergreen"]}, 3.0)
+    assert not trends.has_current_trend_evidence({"sources": ["on_this_day"]}, 3.0)
+    assert trends.has_current_trend_evidence({"sources": ["google_trends"]}, 3.0)
+    assert trends.has_current_trend_evidence({"source": "reddit_science"}, 3.0)
+
+
+def test_make_one_fails_closed_without_live_trend_evidence(monkeypatch):
+    from autotube import pipeline
+
+    def should_not_produce(*args, **kwargs):
+        raise AssertionError("topic without current trend evidence must not be produced")
+
+    monkeypatch.setattr(pipeline, "produce_assets", should_not_produce)
+    topic = {"topic": "Honey", "sources": ["evergreen"], "score": 1.0}
+    assert pipeline.make_one(CFG, object(), topic, {}, 1, "test-run") is None
+
+
+def test_make_one_rejects_below_floor_viral_score_even_with_live_source(monkeypatch):
+    from autotube import pipeline
+
+    monkeypatch.setattr(pipeline, "produce_assets", lambda *a, **k: (_ for _ in ()).throw(
+        AssertionError("weak viral score must be rejected before production")))
+    topic = {"topic": "Current Google trend", "sources": ["google_trends"], "score": 0.9, "viral_score": 6}
+    assert pipeline.make_one(CFG, object(), topic, {}, 1, "test-run") is None
 
 
 def test_primary_source():
@@ -86,7 +127,7 @@ def test_weak_hook_is_rejected_and_rewritten():
         lite = False
 
         def json(self, system, user, **kw):
-            return {"score": 9, "hook_strength": 6, "factual_errors": [], "misleading_title": False,
+            return {"score": 9, "hook_strength": 6, "coherence": 8, "factual_errors": [], "misleading_title": False,
                     "advertiser_friendly": True, "policy_concerns": []}
 
     w = ScriptWriter.__new__(ScriptWriter)
@@ -110,7 +151,7 @@ def test_titles_are_screened_for_shock_bait_not_vocabulary():
         lite = False
 
         def json(self, system, user, **kw):
-            return {"score": 9, "hook_strength": 9}
+            return {"score": 9, "hook_strength": 9, "coherence": 8}
 
     w = ScriptWriter.__new__(ScriptWriter)
     w.llm, w.src_chars = Rev(), 4000

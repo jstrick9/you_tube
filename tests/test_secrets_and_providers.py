@@ -1142,27 +1142,17 @@ def test_the_reviewer_scores_coherence():
         "the reviewer must be told to score structure, not truth"
 
 
-def test_coherence_is_recorded_always_and_gated_by_config():
-    """Recorded on every script so the distribution is knowable before tightening.
-
-    Same discipline as require_loop: a new criterion set strictly, before anyone has
-    seen its false-positive rate, would abandon topics for a reason nobody has
-    measured. Abandonment is already high.
-    """
+def test_coherence_is_recorded_and_part_of_the_approval_boolean():
     import yaml as _y
 
     src = (ROOT / "autotube" / "scriptwriter.py").read_text()
     assert 'review["coherence"] = coh' in src, "every script's score must be recorded"
     assert 'self.cfg["content"].get("min_coherence", 0)' in src, "threshold must be config-driven"
-    assert 'get("coherence", 10)' in src, "a missing score must not fail the script"
+    assert "coh >= min_coh" in src, "the configured coherence score must participate in final approval"
+    assert 'get("coherence", 0)' in src, "a missing coherence score must fail closed"
 
     cfg = _y.safe_load((ROOT / "config.yaml").read_text())
-    thr = cfg["content"]["min_coherence"]
-    assert 0 < thr <= 7, (
-        f"min_coherence {thr} is too strict: observed scores on published scripts were "
-        "5, 6 and 8, so a bar above 7 would reject nearly everything")
-    assert thr >= 5, (
-        f"min_coherence {thr} is too loose: a pure fact-list scored 5 and passed")
+    assert cfg["content"]["min_coherence"] == 6
 
 
 # ── naming the subject, and the escalation ladder ──────────────────────────
@@ -1251,16 +1241,19 @@ def test_all_three_are_enforced_by_the_real_validator():
 def test_no_source_of_untrending_topics_is_enabled():
     """The channel's premise is that every video rides something happening now.
 
-    Three ways a stale topic could get in: the evergreen seed list, on-this-day
-    anniversaries, and an outlier window wide enough to catch last week. An
-    anniversary is a calendar entry every scheduler already has, not a trend.
+    Evergreen fallback seeds are removed, anniversaries are disabled and do not
+    qualify on their own, and a Wikipedia-only candidate must show a real spike
+    against its own 30-day baseline. An anniversary is a calendar entry every
+    scheduler already has, not proof of a trend.
     """
     import yaml as _y
 
     cfg = _y.safe_load((ROOT / "config.yaml").read_text())
-    assert cfg["content"]["allow_evergreen"] is False
+    assert "evergreen_seeds" not in cfg["channel"]
+    assert "allow_evergreen" not in cfg["content"]
     assert cfg["trends"]["on_this_day"] is False
     assert cfg["trends"]["outlier_window_hours"] <= 72, "a four-day-old breakout is not trending"
+    assert cfg["trends"]["min_wikipedia_spike"] >= 3.0
     assert cfg["content"]["min_viral_score"] >= 7
 
 

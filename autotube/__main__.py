@@ -202,9 +202,8 @@ def main(argv=None) -> int:
             print(f"{c['score']:.2f}  {c['topic'][:70]:70s} {','.join(sorted(set(c['sources'])))}")
         return 0
     if a.command == "dossier":
-        # The originality evidence an appeal opens with. Appeals against automated
-        # faceless-channel enforcement succeed on documentation, and enforcement is
-        # retroactive, so this has to be answerable on the day it is asked for.
+        # Export the provenance record for transparency and internal review; documentation can help explain
+        # production but does not guarantee any policy-review or appeal outcome.
         from . import provenance
         print(json.dumps(provenance.dossier(a.count or 0), indent=2))
         return 0

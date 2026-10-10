@@ -21,27 +21,7 @@ channel:
   # Trimmed to exactly the two lanes. A category the lanes never serve is an arm the
   # bandit must still spend videos measuring, for a topic that is then off-theme.
   categories: [history, mysteries, culture, science, space, nature, animals, geography]
-  # Evergreen seeds: only used when content.allow_evergreen is true (off by default — every video must ride a
-  # live trend signal: a viral Short, a Wikipedia spike, Google Trends, Reddit, HN or a same-day anniversary).
-  evergreen_seeds:
-    - Octopus
-    - Great Pyramid of Giza
-    - Black hole
-    - Tardigrade
-    - Mariana Trench
-    - Voyager 1
-    - Honey
-    - Northern lights
-    - Roman concrete
-    - Bioluminescence
-    - Titanic
-    - Mount Everest
-    - Venus flytrap
-    - Saturn's rings
-    - Easter Island
-
-# ── Channel identity ── (a recognisable narrator + promise is what separates a channel YouTube keeps monetized
-# from "generic AI facts over stock photos"; see README → Entertainment & identity)
+# ── Channel identity ── Archive 13's creative direction; branding and recurring voice do not guarantee monetization.
 persona:
   # "Every file is real" carries the same load the old "it's proven" did - it is the
   # stated reason the speculation ban in safety.py exists. What changed is the second
@@ -55,19 +35,16 @@ persona:
   max_asides: 2
   proof_stamp: true                # end card: "PROVEN ✓" rubber stamp + the source, with a stamp sound
   stamp_seconds: 2.0
-  # A recognisable channel needs ONE narrator. Rotating 5 voices also split the bandit's evidence 5 ways
-  # for no benefit. Pinned to our best performer so far (Andrew, posterior mean 0.637 over 2 videos).
+  # Creative identity choice: keep one primary narrator. This is not a platform requirement or performance guarantee.
   voice: en-US-AndrewNeural        # null = learned by the bandit (not recommended below ~500 videos)
 
 schedule:
-  # A range, not a fixed number: a channel that publishes exactly N videos at exactly the same
-  # clock times every day is showing a machine fingerprint, and cadence is one of the signals a
-  # channel-level review weighs. Resolved once per day from the date so top-up runs agree.
-  # Lowered from 3 — two good videos beat three adequate ones on reach, retention and policy risk.
-  videos_per_day: [1, 3]                      # keep modest: quality > quantity (see README → Compliance)
+  # Internal operations setting; no platform-level cadence threshold or recommendation effect is assumed.
+  # A range and deterministic jitter keep automated top-up runs consistent while varying scheduled slots.
+  videos_per_day: [1, 3]
   jitter_minutes: 40                     # deterministic +/- offset applied to each slot
   publish_times: ["12:00", "17:30", "20:30"]   # local time slots (channel.timezone)
-  notify_subscribers: false              # 2-3 notifications a day drives unsubs and 'don't recommend'
+  notify_subscribers: false              # local notification-volume preference; no recommendation effect is assumed
   max_run_minutes: 120                   # stop producing after this (GitHub job timeout is 150)
   # How much of that budget to hold back. The deadline is only testable between topics,
   # and one topic costs 20-40 minutes of drafting, vision and rendering, so starting a
@@ -78,16 +55,10 @@ schedule:
 
 video:
   kind: short                            # 1080x1920 vertical YouTube Short
-  # Tightened from [24, 36]. Completion rate is the dominant Shorts ranking input, it falls off
-  # with length, and it is this channel's weakest metric. The script structure rules in
-  # scriptwriter.py (segment count, body and payoff word ranges) are sized to this band and
-  # tests/test_length.py asserts they stay consistent — change them together.
-  # 15-20s, deliberately. Shorts distribution is gated on completion rate (~70% is the threshold for
-  # expanded distribution; under 60% viewed-vs-swiped-away the algorithm pulls distribution entirely),
-  # and the channel's median completion was 15.9% with 27 of 30 videos sitting in the 25-40s bracket
-  # that the 2026 research identifies as the dead zone. The performing brackets are 15-20s for
-  # single-concept content and 45-58s for story; 15-25s is also the loop sweet spot. We make
-  # single-concept videos, so: 15-20. See docs/MONETIZATION.md.
+  # Internal length experiment: 15-20s keeps scripts focused, but this is not an official YouTube
+  # distribution rule and no universal winning length or "dead zone" has been established for this channel.
+  # Evaluate against mature averageViewPercentage and engaged-view analytics; change this with the
+  # script-structure rules and tests/test_length.py together. See docs/MONETIZATION.md.
   target_seconds: [15, 20]
   fps: 30
   width: 1080
@@ -108,30 +79,24 @@ video:
   loudness_lufs: -14
 
 content:
-  # Script formats — rotated and learned. Different formats = genuinely
-  # different videos, which matters for YouTube's "inauthentic content" policy.
+  # Script formats — rotated and learned as an editorial variety experiment. A recurring format is fine;
+  # the factual substance and value-add still need to be original. Format variation alone is no policy safe harbor.
   # Entertainment-first formats (each is a genuinely different kind of video). The topic selector says which
-  # formats each topic can honestly support, and the bandit learns which ones our audience watches to the end.
+  # formats each topic can honestly support; analytics compares averageViewPercentage and engaged-view outcomes.
   formats: [sounds_fake, ranked_escalation, guess_reveal, plot_twist, myth_buster, would_you_survive,
             dumbest_decision, scale_shock, backstory, what_if, creepy_true]
   # Formats only used in certain months (1-12). In season, one video per run uses it whenever a topic fits.
   seasonal_formats:
     creepy_true: [10]              # October: "creepy but true" (eerie, never gory)
   hook_styles: [question, bold_claim, number_first, you_statement, disbelief]
-  # Across the channel's first 22 measured videos: 233 likes and FIVE comments. Comments are a heavy
-  # ranking signal and the strongest "worth replying to" proxy the algorithm has, and the scripts were
-  # giving nobody a reason to leave one - they were closed, complete and correct. Each device is one
-  # concrete way to leave the viewer with something to say. Learned as a bandit dimension so the
-  # channel finds out which actually works rather than guessing.
-  # ── Anti-bulk-production defences ──
-  # The named demonetization pattern for faceless channels is "generic TTS narration
-  # over stock footage with AI-written scripts, no commentary or insight", and the
-  # repetition rule under it treats 5+ videos with under 20% script variation as bulk
-  # production - demonetized as a batch, retroactively, channel-wide. Format may repeat;
-  # substance may not. Both numbers below are calibrated, not guessed: on real 4-segment
-  # scripts a deliberate rewrite of the same episode scores 0.31 phrase overlap while a
-  # genuinely different episode in the same series scores 0.00, so 0.25 sits in a very
-  # wide empty gap. Set to 1.0 to disable.
+  # Across one early sample, comments were rare relative to likes. These devices offer a genuine prompt
+  # for viewer participation; no claim is made that comments are a fixed or dominant ranking signal.
+  # Keep the question relevant to the story, not engagement bait.
+  # ── Local originality checks ──
+  # YouTube may treat repetitive or mass-produced content as inauthentic, but it does not publish a
+  # fixed script-similarity percentage or video-count trigger. AutoTube uses this configurable lexical
+  # similarity check as a conservative internal warning/block, not as a representation of policy.
+  # Format may repeat; the substance and value-add must not. Set to 1.0 to disable this local check.
   max_script_similarity: 0.25
   similarity_window: 25       # how many recent episodes a new draft is compared against
   audit_window: 25            # how many recent episodes the channel-level audit looks at
@@ -143,11 +108,8 @@ content:
   min_asides: 1
 
   # ── Recurring series ──
-  # A standalone fact video earns a view and gives no reason to subscribe; "CASE #047"
-  # says there are forty-six behind it and a forty-eighth coming. That is the whole
-  # mechanism by which a scroll becomes a follow, and subscribers - not views - are
-  # what the Partner Programme gates on separately. Set to {} to publish unbranded.
-  # Numbering is derived from history, never from a stored counter, so it cannot drift.
+  # CASE and FIELD are Archive 13 editorial series; numbering is a creative convention, not a subscriber-growth claim.
+  # Episode numbers are derived from history rather than a stored counter to avoid accidental reuse or gaps.
   series:
     unsolved:
       tag: "CASE"
@@ -189,36 +151,27 @@ content:
                                          # restores roughly the pass rate the gates were tuned for.
   hook_words_min: 6                      # deterministic gate (autotube/gates.py) — not left to the LLM
   hook_words_max: 12
-  allow_evergreen: false                 # never fall back to un-trending evergreen topics
   max_drafts: 4                          # script rewrites allowed (feedback from the fact-checker/hook gate)
   selection_rounds: 3                    # if every pick fails the checks, pick again from the remaining trends
   # Reviewer judges whether the payoff loops back into the hook (semantic, not lexical).
   # Recorded on every script; off as a hard gate until its false-positive rate is known.
   require_loop: false
-  loop_ending: true                      # last line flows back into the first line (replays count as watch time)
+  loop_ending: true                      # stylistic goal: last line flows back to the first; no view-count effect is assumed
   reveal_pause: 0.55                     # beat of silence before the reveal line (riser SFX + flash fill it)
   countdown_pause: 1.25                  # guess_reveal format: on-screen 3-2-1 before the answer
 
 trends:
-  # Proven-viral signal: fact/explainer Shorts that took off in the last N hours (YouTube search, uses the
-  # channel's own OAuth token: 100 quota units per query, cached once per day → ~600 units/day of the 10,000).
-  # Four lanes. Each is a recognisable kind of video with its own queries, so the channel still reads
-  # as a deliberate publication rather than a grab-bag — which is what YouTube's holistic channel
-  # review rewards — while covering roughly four times the trend surface of the old single lane.
-  # Two lanes, not four. Four lanes is four audiences, each of whom sees roughly one
-  # relevant video in four - which is a good way to be watched and a bad way to be
-  # followed, and subscribers are the binding constraint on monetization. Both
-  # survivors share one promise: the real world is stranger and darker than the
-  # record admits. Dropping tech_ai and pop_culture also sheds the two lanes with the
-  # highest living-people and AI-policy exposure.
+  # YouTube outliers are direct evidence of recent topic demand; additional feeds broaden discovery.
+  # Every production candidate must also pass the live-evidence filter in autotube/trends.py and
+  # the viral-potential review in autotube/scriptwriter.py. Source availability is not guaranteed.
+  # Editorial scope is intentionally limited to the two approved lanes below; this is a channel choice,
+  # not a claim about recommendation or monetization outcomes.
   lanes:
     history_mystery:
       queries: ["unsolved mystery", "history facts", "disappeared without a trace", "declassified", "did you know history"]
       categories: [history, mysteries, culture]
-      # The profile is what stops the two lanes sounding like one channel. A single
-      # house voice across every upload is measurable template similarity, which is the
-      # "generic or repetitive content" rejection category - so this is a compliance
-      # setting as much as an editorial one.
+      # Distinct lane profiles guide editorial treatment. They are creative constraints, not a representation
+      # of YouTube's monetization review criteria; the underlying facts and story remain topic-specific.
       profile:
         tone: >-
           cool, documentary, a little conspiratorial. You are reading from a file nobody
@@ -252,6 +205,7 @@ trends:
   outlier_window_hours: 72
   outlier_min_views: 30000
   wikipedia_spike_check: 40              # top-N Wikipedia pages compared with their own 30-day normal
+  min_wikipedia_spike: 3.0               # Wikipedia qualifies alone only at >=3x its own 30-day baseline
   # Off: an anniversary is a calendar entry, not a trend. Nothing is happening right
   # now because something happened on this date in 1847, and every channel with a
   # scheduler has the same list. Trend sources must be things actually moving today.
@@ -438,10 +392,10 @@ media:
   clip_pretrained: laion2b_s34b_b79k
 
 qa:
-  # Final gate on the FINISHED video, right before upload (autotube/qa.py): one frame from every shot is
-  # checked by a vision model against the words being spoken at that moment, plus the title and hook text,
-  # and the speech is checked word-for-word against the script. Fail → swap in a verified spare and re-check;
-  # still failing → the video is NOT uploaded (kept as *-REJECTED.mp4 in the run artifact for inspection).
+  # Final gate on the FINISHED video, right before upload (autotube/qa.py): every shot is checked against
+  # the narration, intended-shot request, selected asset description and provenance; positive matches get a
+  # blind adversarial second look. Speech is also checked against the script. Fail → swap in a verified spare
+  # and re-check; still failing → do not upload (keep a *-REJECTED artifact for inspection).
   min_frame_score: 7
   max_repairs: 2
   frames_per_sheet: 8
@@ -465,40 +419,22 @@ analytics:
   refresh_videos: 300
   history_keep: 2000                      # entries kept in state/history.json (also the topic-repeat memory)
 
-  # ── reward ──
-  # Weighted toward RETENTION, not views. Views/hour is downstream of how much traffic the algorithm
-  # chose to send; retention is the upstream signal we control and the one that decides whether a Short
-  # escapes its seed audience at all.
-  # Retention is upstream of everything (it decides distribution), so it keeps the largest share.
-  # The remaining weight is split between the two things YPP actually gates on: views (reach) and
-  # SUBSCRIBERS. A channel can accumulate views forever and never cross 1,000 subs, and until
-  # subscribersGained was fetched nothing here could tell those two outcomes apart.
+  # Reward weights and targets are internal optimization settings, not claims about YouTube's ranking formula.
+  # AverageViewPercentage is the watch-quality input; audienceWatchRatio remains curve-shape telemetry only.
   w_retention: 0.50
   w_reach: 0.20
   w_subs: 0.20
   w_engagement: 0.10
-  target_subs_per_1k: 2.0                 # net new subscribers per 1,000 views scoring a full 1.0
-  # Every component above is clamped at 1.0, so without this a 300x video and a 1x video score the
-  # same and the bandit cannot see virality at all. This term does not saturate at the target, so an
-  # arm that occasionally breaks out beats one that is reliably average. Growth is a power law; the
-  # optimiser has to be pointed at the tail or it will keep selecting for the middle.
-  w_breakout: 0.15
-  # Shorts distribution gate: ~70% completion earns wider distribution, under ~60% viewed-vs-swiped-away
-  # it is pulled. Reported separately in analytics_summary.json because reward can look fine while every
-  # video sits under the gate. See docs/MONETIZATION.md.
-  completion_gate: 0.70
-  breakout_multiple: 5.0                  # views/hour, as a multiple of target_vph, that counts as a full breakout
-  # Absolute targets. A video scoring exactly the target gets 1.0 on that component. These are what the
-  # reward is measured against until the channel has enough SPREAD for percentile ranking to mean
-  # something — with every video landing in a narrow band, ranking noise is not a learning signal.
-  target_avg_view_pct: 75.0               # 2026 Shorts: ~70%+ viewed-not-swiped is the escape threshold
-  target_completion: 0.55                 # share of viewers still there at the end (drives replays)
-  target_hook_retention: 0.80             # share still there at 15% elapsed — the hook's verdict
-  target_vph: 40.0                        # views/hour; raise this as the channel grows
-  target_engagement: 0.06                 # (likes + 3*comments) / views
-  rank_min_videos: 40                     # below this many matured videos, score absolutely
-  rank_min_spread: 0.35                   # ...and below this coefficient of variation, keep scoring absolutely
-  min_views_to_learn: 50                  # a video with fewer views is noise, not evidence — don't learn from it
+  target_subs_per_1k: 2.0                 # internal net-subscriber target per 1,000 engaged views when available
+  w_breakout: 0.15                        # internal preference for unusually strong engaged-view velocity
+  breakout_multiple: 5.0                  # multiple of target_engaged_vph used by the internal reward
+  target_avg_view_pct: 70.0               # internal average-view target, measured with averageViewPercentage
+  average_view_gate_pct: 70.0             # reporting threshold only; not a YouTube distribution gate
+  target_engaged_vph: 40.0                # internal engaged Shorts views/hour target
+  target_engagement: 0.06                 # internal (likes + 3*comments) / raw public views target
+  rank_min_videos: 40                     # below this many mature videos, score against absolute targets
+  rank_min_spread: 0.35                   # otherwise blend with within-channel percentile rank
+  min_views_to_learn: 50                  # minimum engaged views for a video to contribute evidence
 
   # ── what the bandit spends its evidence on ──
   # Frozen dimensions rotate for variety but are not learned. With thousands of possible cells and a few

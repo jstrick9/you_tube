@@ -67,8 +67,7 @@ def test_the_hook_reveal_and_payoff_are_never_dropped():
 
 
 def test_speedup_rescues_a_script_with_nothing_safe_to_drop():
-    """A 5-segment script protects three segments, so trimming runs out while still too long.
-    The old code only intervened at the 59s cliff, which is how 44s videos shipped."""
+    """A 5-segment script protects three segments, so bounded speed-up can rescue it."""
     s = script_of(2, words_per_line=60)   # long lines, only 4 segments -> weakest_segment is None
     assert weakest_segment(s["segments"]) is None
     tts, _ = fit_length(s, PLAN, CFG, Path("/tmp"), synth_factory())
@@ -88,12 +87,12 @@ def test_speedup_is_bounded_so_the_voice_never_turns_robotic():
     assert max(rates) <= 8 + MAX_SPEEDUP_PCT, rates
 
 
-def test_a_hopeless_script_is_skipped_rather_than_shipped_over_60s():
+def test_a_hopeless_script_is_skipped_above_the_internal_shorts_ceiling():
     def synth(lines, voice, rate, work, gaps=None):
         return {"duration": 300.0, "engine": "f", "segments": [{"start": 0}]}
 
     tts, _ = fit_length(script_of(2, 60), PLAN, CFG, Path("/tmp"), synth)
-    assert tts is None, "a Short over 59s loses its classification and must not be published"
+    assert tts is None, "a script above the internal 179s ceiling must not be published"
 
 
 def test_something_slightly_over_is_kept_not_thrown_away():

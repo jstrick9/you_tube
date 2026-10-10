@@ -183,10 +183,10 @@ def test_scriptwriter_flags_a_non_independent_review():
         last_used = "gemini:g-1"
 
         def review_json(self, system, user, avoid=None, **kw):
-            return {"score": 9, "hook_strength": 9, "entertainment": 9}
+            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8}
 
         def json(self, *a, **k):
-            return {"score": 9, "hook_strength": 9, "entertainment": 9}
+            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8}
 
     w = ScriptWriter.__new__(ScriptWriter)
     w.llm, w.src_chars = SameModel(), 4000

@@ -177,10 +177,12 @@ class QALLM:
 
     def __init__(self, bad_frames=(), down=False):
         self.bad, self.down = set(bad_frames), down
+        self.prompts = []
 
     def vision_json(self, system, user, images, validate=None):
         if self.down:
             raise RuntimeError("503")
+        self.prompts.append((system, user))
         n = len(re.findall(r"^\s+\d+ \| line", user, re.M))
         out = {"frames": [{"n": i + 1, "shows": "x", "match": (i + 1) not in self.bad,
                            "score": 2 if (i + 1) in self.bad else 9, "issue": ""} for i in range(n)],
@@ -208,12 +210,66 @@ def test_final_qa_passes_and_fails_per_frame(tiny_video):
     assert not bad["passed"] and bad["failed"] == [(1, "b")]
 
 
+def test_final_qa_rejects_false_positive_and_supplies_shot_context(tiny_video):
+    class FirstPassFalsePositive(QALLM):
+        def vision_json(self, system, user, images, validate=None):
+            self.prompts.append((system, user))
+            n = len(re.findall(r"^\s+\d+ \| line", user, re.M))
+            adversarial = "ADVERSARIAL SECOND LOOK" in user
+            out = {"frames": [{"n": i + 1, "shows": "modern climate summit", "match": not adversarial,
+                               "score": 10 if not adversarial else 2,
+                               "issue": "modern meeting, not the historical treaty negotiation" if adversarial else ""}
+                              for i in range(n)],
+                   "hook_text_ok": True, "title_ok": True}
+            validate and validate(out)
+            return out
+
+    line = "The 1905 Treaty of Portsmouth ended the Russo-Japanese War."
+    tts = _tts([line])
+    script = {"segments": [{"text": line}]}
+    timeline = [{"seg": 0, "start": 0.0, "end": 2.0, "path": "modern-meeting.jpg"}]
+    shots = [{"seg": 0, "path": "modern-meeting.jpg", "score": 9, "judge": "gemini",
+              "want": "1905 historic treaty negotiation room",
+              "shows": "modern leaders at a climate summit",
+              "credit": {"title": "Oxford climate change meeting 2024",
+                         "source": "news archive", "page": "https://example.test/2024-meeting"}}]
+    llm = FirstPassFalsePositive()
+
+    result = qa.verify(tiny_video, timeline, shots, tts, script, "The 1905 Treaty", "Treaty of Portsmouth",
+                       "Treaty of Portsmouth", llm, CFG)
+
+    assert len(llm.prompts) == 2, "a positive first-pass verdict must receive a second adversarial look"
+    assert 'intended shot: "1905 historic treaty negotiation room"' in llm.prompts[0][1]
+    assert 'asset title: "Oxford climate change meeting 2024"' in llm.prompts[0][1]
+    assert "ADVERSARIAL SECOND LOOK" in llm.prompts[1][1]
+    assert not result["passed"] and result["failed"] == [(0, "modern-meeting.jpg")]
+    assert "adversarial audit" in result["issues"][0]
+
+
 def test_final_qa_outage_raises(tiny_video, monkeypatch):
     monkeypatch.setattr(qa.time, "sleep", lambda s: None)
     lines = ["Cats have whiskers."]
     with pytest.raises(vision.VisionUnavailable):
         qa.verify(tiny_video, [{"seg": 0, "start": 0, "end": 2, "path": "a"}], [{"seg": 0, "score": 9, "judge": "g"}],
                   _tts(lines), {"segments": [{"text": lines[0]}]}, "T", "H", "S", QALLM(down=True), CFG)
+
+
+def test_adversarial_audit_outage_fails_closed(tiny_video, monkeypatch):
+    monkeypatch.setattr(qa.time, "sleep", lambda s: None)
+
+    class AuditDown(QALLM):
+        def vision_json(self, system, user, images, validate=None):
+            if "ADVERSARIAL SECOND LOOK" in user:
+                raise RuntimeError("audit provider unavailable")
+            return super().vision_json(system, user, images, validate)
+
+    lines = ["Cats have whiskers."]
+    timeline = [{"seg": 0, "start": 0, "end": 2, "path": "cat.jpg"}]
+    shots = [{"seg": 0, "path": "cat.jpg", "score": 9, "judge": "g", "want": "a cat",
+              "shows": "a cat", "credit": {"title": "cat", "source": "archive"}}]
+    with pytest.raises(vision.VisionUnavailable, match="adversarial final-frame audit unavailable"):
+        qa.verify(tiny_video, timeline, shots, _tts(lines), {"segments": [{"text": lines[0]}]},
+                  "Cats", "Cats", "Cats", AuditDown(), CFG)
 
 
 def test_script_fact_check_outage_fails_closed(monkeypatch):

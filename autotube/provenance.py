@@ -1,23 +1,12 @@
-"""The appeal packet.
+"""Transparent records of how each automated episode was produced.
 
-Enforcement against faceless channels is automated, channel-wide and retroactive, and
-honest creators get caught in the sweeps. The thing that distinguishes a successful
-appeal from a terminated channel is documentary evidence of originality: drafts,
-sources, project files - proof that a human-designed process produced each video rather
-than a template emitting variations.
+A provenance record captures the topic's trend evidence, cited sources, review results, script fingerprint,
+and model/provider metadata. It helps the channel audit factual support and originality over time; it does
+not guarantee YPP eligibility or determine the outcome of a policy review.
 
-That evidence has to exist *before* it is needed. After a strike the work directory has
-long since been cleaned up, the model that wrote the script has been deprecated, and the
-only surviving artefact is the video itself, which is precisely the thing under
-suspicion. So every published episode writes a small, permanent record of how it came to
-exist, at the moment it exists.
-
-Deliberately not stored here: the rendered video (it is already on YouTube and would
-dwarf everything else) and the raw source page text (it is reachable from the URL, and
-copying it is the one thing that would make the archive look like scraped content). What
-is stored is the chain of decisions - why this topic, from which trend signal, grounded
-in which sources, scored how, by which model, and how different it was from everything
-published before it.
+The record is written when the episode is produced so the inputs are not lost when temporary work files are
+cleaned up. It stores the decision trail—why this topic was selected, which sources grounded it, how it was
+reviewed, and how its script compares with recent episodes—without copying the full source-page text.
 """
 from __future__ import annotations
 
@@ -60,8 +49,10 @@ def record(res: dict, entry: dict, cfg: dict) -> str:
             # This is what demonstrates editorial selection instead of bulk enumeration.
             "selection": {
                 "topic": topic.get("topic"), "category": topic.get("category"),
-                "trend_sources": topic.get("sources"), "why_trending": topic.get("why_trending"),
-                "viral_score": topic.get("viral_score"), "evidence": (topic.get("context") or [])[:3],
+                "trend_sources": topic.get("sources"), "trend_score": topic.get("score"),
+                "wikipedia_spike": topic.get("spike"),
+                "why_trending": topic.get("why_trending"), "viral_score": topic.get("viral_score"),
+                "evidence": (topic.get("context") or [])[:3],
                 "format": (res.get("plan") or {}).get("format"),
                 "hook_style": (res.get("plan") or {}).get("hook_style"),
             },

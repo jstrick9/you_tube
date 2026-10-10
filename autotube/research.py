@@ -108,8 +108,8 @@ def ground_news(topic: str, search_query: str | None, lang: str = "en",
     Two rules keep this from becoming a rumour mill. First, a story must be carried by at least
     `research.min_outlets` INDEPENDENT publishers before it can be used at all, so one outlet's
     scoop — or one wire story syndicated five times — is not treated as established fact. Second,
-    only headlines are taken: reproducing publishers' article bodies would be both a copyright
-    problem and precisely the reused content that costs monetization.
+    only headlines are taken: reproducing publishers' article bodies creates copyright and originality
+    concerns and would not meet AutoTube's original-value requirement.
 
     Headlines alone cannot carry a 60-second script, so the explainer half is anchored on a related
     encyclopedic subject (Sora 2 → OpenAI). If no such backbone resolves, the topic is dropped

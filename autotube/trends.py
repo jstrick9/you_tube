@@ -379,6 +379,32 @@ def wikipedia_spikes(items: list[dict], lang: str = "en", top: int = 40) -> None
 SOURCE_ARMS = ["youtube_outliers", "wikipedia", "google_trends", "reddit", "hackernews", "on_this_day",
                "youtube_chart", "evergreen"]
 
+LIVE_TREND_SOURCES = {"youtube_outliers", "google_trends", "hackernews", "youtube_chart"}
+
+
+def has_current_trend_evidence(candidate: dict, min_wikipedia_spike: float = 3.0) -> bool:
+    """Require an active signal; a Wikipedia listing or evergreen subject alone is not enough.
+
+    Google Trends is a live search feed; Reddit entries are top posts for today; Hacker News and
+    YouTube chart/outlier rows are current platform signals. Wikipedia can qualify only when the
+    page's recent readership is at least ``min_wikipedia_spike`` times its own 30-day baseline.
+    Anniversaries and evergreen seeds are intentionally not standalone trend evidence.
+    """
+    raw_sources = candidate.get("sources") or ([candidate.get("source")] if candidate.get("source") else [])
+    if isinstance(raw_sources, str):
+        raw_sources = [raw_sources]
+    sources = {str(s) for s in raw_sources if s}
+    if any(s in LIVE_TREND_SOURCES or s == "reddit" or s.startswith("reddit_") for s in sources):
+        return True
+    if "wikipedia" not in sources:
+        return False
+    try:
+        spike = float(candidate.get("spike") or 0.0)
+        threshold = float(min_wikipedia_spike)
+    except (TypeError, ValueError):
+        return False
+    return spike >= threshold > 0
+
 
 def primary_source(sources: list[str]) -> str:
     """The strongest trend source behind a topic (used as a learned 'source' arm)."""
@@ -516,9 +542,12 @@ def collect(cfg: dict) -> list[dict]:
             flagged += 1
         out.append(c)
     out.sort(key=lambda x: -x["score"])
-    log.info("%d candidates after merge + safety triage (%d hard-blocked, %d kept for context review)",
-             len(out), hard, flagged)
-    return out
+    min_wiki_spike = float(tcfg.get("min_wikipedia_spike", 3.0))
+    eligible = [c for c in out if has_current_trend_evidence(c, min_wiki_spike)]
+    log.info("%d candidates after merge + safety triage (%d hard-blocked, %d kept for context review); "
+             "%d have a qualifying current trend signal (%d excluded)",
+             len(out), hard, flagged, len(eligible), len(out) - len(eligible))
+    return eligible
 
 
 def wiki_summary(title: str, lang: str = "en") -> dict | None:

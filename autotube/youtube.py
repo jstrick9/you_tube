@@ -123,12 +123,12 @@ def video_stats(ids: list[str]) -> dict[str, dict]:
 
 
 def retention(ids: list[str], start: str, end: str) -> dict[str, dict]:
-    """Per-video retention, subscriber conversion and shares via the Analytics API (free).
+    """Per-video Shorts analytics for the requested date window.
 
-    subscribersGained rides along on the query we were already making, at no extra quota cost. It
-    matters more than its size suggests: YPP is gated on 1,000 subscribers (500 for fan funding) as
-    well as views, and a channel can accumulate views indefinitely without ever crossing it. Until
-    this was added, nothing in the optimisation loop could see the binding constraint.
+    ``engagedViews`` is the monetization-relevant Shorts count; ``views`` now also counts starts
+    and replays. ``averageViewPercentage`` is average watch percentage, not the share of people who
+    finished. Callers must name those metrics accurately rather than infer a completion rate from
+    the last point of an audience-retention curve.
     """
     if not ids:
         return {}
@@ -137,13 +137,14 @@ def retention(ids: list[str], start: str, end: str) -> dict[str, dict]:
         out = {}
         for i in range(0, len(ids), 200):
             r = ya.reports().query(ids="channel==MINE", startDate=start, endDate=end,
-                                   metrics="views,averageViewPercentage,averageViewDuration,"
+                                   metrics="views,engagedViews,averageViewPercentage,averageViewDuration,"
                                            "subscribersGained,subscribersLost,shares",
                                    dimensions="video", filters="video==" + ",".join(ids[i:i + 200]),
                                    maxResults=200).execute()
             for row in r.get("rows", []):
-                out[row[0]] = {"a_views": row[1], "avg_view_pct": row[2], "avg_view_dur": row[3],
-                               "subs_gained": row[4], "subs_lost": row[5], "shares": row[6]}
+                out[row[0]] = {"a_views": row[1], "engaged_views_90d": row[2],
+                               "avg_view_pct": row[3], "avg_view_dur": row[4],
+                               "subs_gained": row[5], "subs_lost": row[6], "shares": row[7]}
         return out
     except Exception as e:  # noqa: BLE001
         log.warning("analytics API unavailable: %s", str(e)[:200])
@@ -151,17 +152,18 @@ def retention(ids: list[str], start: str, end: str) -> dict[str, dict]:
 
 
 def retention_curves(ids: list[str], start: str, end: str) -> dict[str, dict]:
-    """Per-video RETENTION CURVE: audienceWatchRatio across elapsedVideoTimeRatio.
+    """Per-video audienceWatchRatio curve across elapsedVideoTimeRatio.
 
-    `averageViewPercentage` says *that* people left; the curve says *where*. That is the difference
-    between "this video underperformed" and "we lose 40% of viewers during the hook" — the former is
-    unactionable, the latter tells the bandit and the scriptwriter exactly what to change.
+    The curve helps locate where watch activity drops, but its values are *ratios of segment watches
+    to total video views*, not literal percentages of unique viewers remaining. Rewatches can push a
+    point above 1.0. We therefore store it as a relative watch-ratio curve and never label the final
+    point as a completion rate.
 
     The elapsedVideoTimeRatio dimension only accepts ONE video per query, so this costs one Analytics
-    call per video. The Analytics API has its own quota (separate from the Data API's 10,000 units),
-    and callers pass only videos that don't already have a curve, so a normal day is a handful of calls.
+    call per video. Callers pass only videos that don't already have a curve, so a normal day is a
+    handful of calls.
 
-    Returns per video: {curve, hook_retention, completion, swipe_point, curve_points}.
+    Returns per video: {audience_watch_ratio_curve, watch_ratio_at_15pct, end_watch_ratio, curve_points}.
     """
     if not ids:
         return {}
@@ -188,11 +190,10 @@ def retention_curves(ids: list[str], start: str, end: str) -> dict[str, dict]:
 
 
 def summarize_curve(rows: list[tuple[float, float]]) -> dict:
-    """Condense a retention curve into the few numbers that are actually actionable.
+    """Condense audienceWatchRatio samples without turning them into viewer percentages.
 
-    hook_retention — share still watching at 15% elapsed (the hook's verdict).
-    completion     — share still watching at the very end (drives replays and reach on Shorts).
-    swipe_point    — where the curve first falls below half the audience; the biggest leak.
+    audienceWatchRatio counts views of a segment relative to all video views. A replay can make a
+    point exceed 1.0; the final point is therefore not a literal share of viewers who completed.
     """
     rows = sorted(rows)
 
@@ -207,14 +208,12 @@ def summarize_curve(rows: list[tuple[float, float]]) -> dict:
             prev = (t, v)
         return rows[-1][1]
 
-    swipe = next((t for t, v in rows if v < 0.5), None)
     return {
-        "hook_retention": round(at(0.15), 4),
-        "completion": round(rows[-1][1], 4),
-        "swipe_point": round(swipe, 4) if swipe is not None else None,
+        "watch_ratio_at_15pct": round(at(0.15), 4),
+        "end_watch_ratio": round(rows[-1][1], 4),
         "curve_points": len(rows),
-        # 11-point resample: small enough to commit to the repo every night, detailed enough to plot
-        "curve": [round(at(i / 10), 4) for i in range(11)],
+        # 11-point resample, stored under the metric's actual name for transparent reporting.
+        "audience_watch_ratio_curve": [round(at(i / 10), 4) for i in range(11)],
     }
 
 

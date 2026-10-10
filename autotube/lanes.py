@@ -1,20 +1,12 @@
-"""Per-lane editorial profiles — what makes two lanes sound like two channels.
+"""Per-lane editorial profiles for a more coherent Archive 13 voice.
 
-Lanes already existed, but only for topic discovery: `trends.lanes` decides what we go
-looking for and nothing after that. Every script was then written in one shared voice,
-so a history mystery and a deep-sea fact arrived with the same cadence, the same hook
-shape and the same joke rhythm.
+Lanes already existed for topic discovery. These profiles can also help a history mystery and a
+science/nature story use fitting pacing and emphasis without changing the shared pipeline. Editorial
+variety supports original treatment, but is not a monetization guarantee or a response to any unpublished
+similarity threshold.
 
-That is a monetisation problem, not just a dull one. YouTube's July 2026 rules name
-"generic or repetitive content" as a rejection category, and the enforcement analyses
-put bulk demonetisation at five or more videos sharing a template with under 20% script
-variation. A single house voice across every upload is precisely that measurement.
-Giving each lane its own tone, hook shape and pacing lowers the similarity we are
-measured on while making each lane better at its own job - a history hook and a science
-hook genuinely do want different openings.
-
-Deliberately prompt-level. These profiles steer the writer; they do not fork the
-pipeline, so there is one code path to maintain and no new failure mode.
+Deliberately prompt-level. These profiles steer the writer; they do not fork the pipeline, so there is one
+code path to maintain and no new failure mode.
 """
 from __future__ import annotations
 

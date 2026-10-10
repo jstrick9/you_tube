@@ -1,24 +1,12 @@
-"""Defences against the two enforcement triggers this channel is actually exposed to.
+"""Internal originality safeguards for distinct scripts and meaningful narrator voice.
 
-The 2026 policy language is specific about what gets a faceless channel demonetized,
-and the named pattern is "generic TTS narration over stock footage with AI-written
-scripts, no commentary or insight". Two of those five clauses are permitted outright:
-synthetic narration over stock and AI-written scripts are explicitly allowed, and a
-consistent recurring narrator is an asset rather than a liability. The clauses that
-actually bite are the last one - no commentary or insight - and the repetition rule
-underneath it: five or more videos sharing a template with under twenty percent script
-variation is treated as bulk-produced and demonetized as a batch.
+YouTube's monetization policy describes inauthentic and reused-content categories, but does not publish
+numerical similarity or upload-count enforcement triggers. This module therefore uses local, configurable
+checks to encourage substantive originality; it does not predict a policy decision or guarantee monetization.
 
-So this module measures the two things that distinguish a show from a content farm,
-and it measures them per draft, before publication, because enforcement is channel-wide
-and retroactive. By the time a strike lands, the back catalogue is already the evidence.
-
-The governing principle in the policy is that format may repeat but substance may not.
-A fixed series structure is fine - that is what a programme is. What cannot repeat is
-the actual language and the actual claims. That distinction is exactly what the
-similarity check below is shaped to enforce: it compares what was *said*, not how the
-episode was *built*, so tightening the format costs nothing while recycling a script
-is caught.
+A channel may keep recognizable Archive 13 formats and series, while each episode still needs distinct facts,
+explanation, commentary and visual treatment. The lexical similarity score compares what was said, not the
+creative format, and is only one narrow safeguard—not a substitute for editorial judgment or policy review.
 """
 from __future__ import annotations
 
@@ -112,7 +100,7 @@ def narration_of(script: dict) -> str:
 
 
 def check(script: dict, cfg: dict, history: list[dict] | None = None) -> list[str]:
-    """Issues that would make this draft look bulk-produced. Empty list = passed."""
+    """Issues against local originality standards; this is not a YouTube policy verdict."""
     ccfg = (cfg.get("content") or {})
     issues: list[str] = []
 
@@ -121,19 +109,16 @@ def check(script: dict, cfg: dict, history: list[dict] | None = None) -> list[st
     # two aside words in fifty is 0.04, which is not representable in binary and landed
     # one ULP low. Worse than the bug was what it revealed - a percentage floor also
     # makes the requirement depend on how wordy the rest of the script is, so the same
-    # aside passes in a short episode and fails in a long one. What we actually want is
-    # the thing the policy names: narration that is not purely recited fact. That is
-    # "at least one aside", which is exact, explainable in the rejection message, and
-    # impossible to land on the wrong side of by rounding. The ratio is still computed
-    # and recorded per video, because it is useful telemetry - it is just not a gate.
+    # aside passes in a short episode and fails in a long one. The configured aside count
+    # is an internal voice/value-add choice, not a YouTube policy threshold. The ratio is
+    # still computed and recorded per video as telemetry, but is not used as a policy claim.
     need = int(ccfg.get("min_asides", 0))
     if need > 0:
         have = sum(1 for s_ in (script.get("segments") or []) if (s_.get("aside") or "").strip())
         if have < need:
             issues.append(
-                f"no narrator voice: {have} asides, need {need} — narration that only recites "
-                "sourced facts is the exact 'generic TTS narration, no commentary or insight' "
-                "pattern that gets faceless channels demonetized")
+                f"no narrator voice for this channel's internal target: {have} asides, need {need} — "
+                "add a brief original reaction or revise the channel configuration")
 
     limit = float(ccfg.get("max_script_similarity", 1.0))
     window = int(ccfg.get("similarity_window", 25))
@@ -148,8 +133,7 @@ def check(script: dict, cfg: dict, history: list[dict] | None = None) -> list[st
         if worst > limit:
             issues.append(
                 f"too close to a published episode ({worst:.0%} phrase overlap with {worst_title!r}, "
-                f"limit {limit:.0%}) — five videos with under 20% script variation is treated as "
-                "bulk production and demonetized as a batch")
+                f"internal limit {limit:.0%}) — develop a distinct original treatment, not a near-duplicate")
     return issues
 
 
@@ -157,13 +141,10 @@ def channel_audit(history: list[dict], cfg: dict) -> dict:
     """What a policy reviewer sees when they look at the channel rather than a video.
 
     The per-draft check in check() is pairwise: it refuses a script that is too close to
-    any single predecessor. That is necessary and not sufficient. A channel can pass it
-    on every upload and still drift into exactly the pattern the policy describes,
-    because "5+ videos sharing a template" is an aggregate property - every episode can
-    sit comfortably under the pairwise limit while all of them are the same format, the
-    same shape and the same voice. Reviewers are documented as assessing channel theme,
-    the newest and most-viewed videos, and watch-time distribution. They look at the
-    body of work, so something here has to as well.
+    any single predecessor. That is an internal originality safeguard, not a published
+    YouTube numerical enforcement rule. Pairwise checks alone can miss broad creative
+    sameness, so this report summarizes patterns across the back catalogue without
+    asserting a fixed episode-count trigger or similarity cutoff from YouTube.
 
     Reported, never enforced. These are slow-moving properties of a back catalogue, and
     a run that refuses to publish because the last twenty episodes skewed toward one
@@ -186,8 +167,7 @@ def channel_audit(history: list[dict], cfg: dict) -> dict:
     limit = float(ccfg.get("max_script_similarity", 1.0))
     out["mean_pairwise_similarity"] = round(sum(sims) / len(sims), 3)
     out["max_pairwise_similarity"] = round(max(sims), 3)
-    # The policy number is five, so count how big the largest cluster of mutually
-    # similar episodes is rather than just averaging - an average hides a tight clique.
+    # Count pairs above this repo's internal similarity limit as well as the mean; an average can hide a tight cluster.
     near = sum(1 for s in sims if s > limit)
     out["pairs_over_similarity_limit"] = near
 

@@ -52,7 +52,7 @@ class ReviewLLM:
 
     def json(self, system, user, **kw):
         self.prompts.append(user)
-        o = {"score": 9, "hook_strength": 9, "entertainment": 8, "factual_errors": [], "policy_concerns": [],
+        o = {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "factual_errors": [], "policy_concerns": [],
              "misleading_title": False, "advertiser_friendly": True}
         kw.get("validate") and kw["validate"](o)
         return o
@@ -155,7 +155,9 @@ def test_selector_asks_for_fitting_formats():
             return {"picks": [{"index": 0, "viral_score": 9, "category": "history", "wiki_query": "Hunger stone",
                                "formats": ["creepy_true", "plot_twist", "not_a_format"]}]}
 
-    cands = [{"topic": "Hunger stone", "topic_key": "hunger stone", "sources": ["wikipedia"], "score": 0.9}]
+    cands = [{"topic": "Hunger stone", "topic_key": "hunger stone", "sources": ["wikipedia"],
+              "score": 0.9, "spike": 4.2,
+              "context": ["Wikipedia readership is 4.2x its 30-day baseline"]}]
     picks = ScriptWriter(CFG, LLM(), _strategy()).select_topics(cands, 1, set())
     assert "FORMATS we can make" in LLM.prompt and "ENTERTAINING" in LLM.prompt
     assert "not_a_format" not in picks[0]["formats"] and "plot_twist" in picks[0]["formats"]

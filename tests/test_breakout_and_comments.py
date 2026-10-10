@@ -11,12 +11,13 @@ from pathlib import Path
 from autotube.analytics import compute_reward
 
 ROOT = Path(__file__).resolve().parents[1]
-POOLS = {"vph": [], "avg_pct": [], "completion": []}
-ACFG = {"target_vph": 40.0, "w_breakout": 0.15, "breakout_multiple": 5.0}
+POOLS = {"vph": [], "avg_pct": []}
+ACFG = {"target_engaged_vph": 40.0, "w_breakout": 0.15, "breakout_multiple": 5.0}
 
 
 def reward(vph, **kw):
-    m = {"vph": vph, "views": 1000, "likes": 10, "comments": 0, "avg_view_pct": 50.8}
+    m = {"vph": vph, "vph_basis": "engaged_views", "engaged_views_90d": 1000,
+         "views": 1000, "likes": 10, "comments": 0, "avg_view_pct": 50.8}
     m.update(kw)
     return compute_reward(m, POOLS, ACFG)
 
@@ -55,9 +56,11 @@ def test_reward_stays_in_range_and_degrades_gracefully():
 
 
 def test_breakout_can_be_switched_off_without_changing_anything_else():
-    off = compute_reward({"vph": 120.0, "views": 1000, "likes": 10, "comments": 0, "avg_view_pct": 50.8},
+    off = compute_reward({"vph": 120.0, "vph_basis": "engaged_views", "engaged_views_90d": 1000,
+                          "views": 1000, "likes": 10, "comments": 0, "avg_view_pct": 50.8},
                          POOLS, {**ACFG, "w_breakout": 0.0})
-    on_at_zero = compute_reward({"vph": 10.0, "views": 1000, "likes": 10, "comments": 0, "avg_view_pct": 50.8},
+    on_at_zero = compute_reward({"vph": 10.0, "vph_basis": "engaged_views", "engaged_views_90d": 1000,
+                                 "views": 1000, "likes": 10, "comments": 0, "avg_view_pct": 50.8},
                                 POOLS, {**ACFG, "w_breakout": 0.0})
     assert off[1]["breakout"] > 0 and 0 <= off[0] <= 1 and 0 <= on_at_zero[0] <= 1
 
@@ -118,12 +121,13 @@ def test_real_ctas_are_still_blocked(closer):
 
 
 # ── subscriber conversion: the YPP gate views cannot substitute for ─────────
-SUBCFG = {"target_vph": 40.0, "w_retention": 0.50, "w_reach": 0.20, "w_subs": 0.20,
+SUBCFG = {"target_engaged_vph": 40.0, "w_retention": 0.50, "w_reach": 0.20, "w_subs": 0.20,
           "w_engagement": 0.10, "target_subs_per_1k": 2.0, "w_breakout": 0.15}
 
 
 def _r(subs_gained=0, subs_lost=0, views=1000):
-    m = {"vph": 20, "views": views, "likes": 10, "comments": 0, "avg_view_pct": 50.8,
+    m = {"vph": 20, "vph_basis": "engaged_views", "engaged_views_90d": views,
+         "views": views, "likes": 10, "comments": 0, "avg_view_pct": 50.8,
          "subs_gained": subs_gained, "subs_lost": subs_lost}
     return compute_reward(m, POOLS, SUBCFG)
 

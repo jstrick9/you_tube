@@ -21,7 +21,7 @@ class _Rev:
     lite = False
 
     def json(self, *a, **k):
-        return {"score": 9, "hook_strength": 9}
+        return {"score": 9, "hook_strength": 9, "coherence": 8}
 
 
 def _writer(history=None):

@@ -5,9 +5,9 @@ Runs on the rendered MP4 itself (not on the plan), so it also catches render/tim
   1. Narration  – the synthesized speech's word timings must match the script text (captions come from them).
   2. Coverage   – every narration line has at least one shot on screen, each verified ≥ threshold by a vision
                   model for that line (defensive re-check of the selection step).
-  3. Frames     – one frame from the middle of every shot is pulled from the MP4 and shown to a vision model
-                  together with the exact words being spoken at that moment, the title and the hook text.
-                  Every frame must clearly show what is being said. When unsure → fail.
+  3. Frames     – one frame from the middle of every shot is shown to a vision model with the exact words,
+                  intended-shot request and selected-asset provenance. A blind adversarial second look
+                  challenges positive matches. Every frame must clearly fit the words and intended scene.
 
 `verify()` returns a report; the pipeline only uploads when report["passed"] is True. If no vision model can be
 reached the gate raises vision.VisionUnavailable — an unverified video is never published.
@@ -32,8 +32,14 @@ from .vision import VisionUnavailable
 log = logging.getLogger("autotube.qa")
 
 QA_SYSTEM = ("You are the final quality inspector for an educational short-video channel. A video may only be "
-             "published if EVERY frame's main photo clearly shows what the narrator is saying at that moment. "
+             "published if EVERY frame's main photo clearly matches both the narration and the intended shot. "
+             "Check identifiable people, event, place, era and subject carefully; asset titles are context, not proof. "
              "Be strict: when unsure, fail the frame. Return strict JSON only.")
+QA_AUDIT_SYSTEM = ("You are an adversarial second-look inspector for an educational short-video channel. Your job is to find "
+                   "false-positive image matches. Independently inspect the pixels; do not trust file titles, captions, "
+                   "or a prior positive verdict. Check the exact person, event, era, place and setting against the "
+                   "narration and intended shot. If relevance is not visually defensible, return match=false. "
+                   "Return strict JSON only.")
 
 
 def _norm_tokens(text: str) -> list[str]:
@@ -103,8 +109,28 @@ def _spoken_during(seg: dict, start: float, end: float) -> str:
     return " ".join(words).strip()
 
 
-def frame_check(mp4: Path, timeline: list[dict], tts: dict, script: dict, title: str, hook: str, subject: str,
-                llm, cfg: dict, retry_pauses=(20, 60)) -> tuple[list[dict], dict]:
+def _shot_context(t: dict, shots: list[dict]) -> dict:
+    """Find the approved shot metadata used for this rendered frame."""
+    path = str(t.get("path", ""))
+    candidates = [s for s in shots if s.get("seg") == t.get("seg")]
+    shot = next((s for s in candidates if str(s.get("path", "")) == path), None)
+    if shot is None and candidates:
+        shot = candidates[0]
+    shot = shot or {}
+    credit = shot.get("credit") if isinstance(shot.get("credit"), dict) else {}
+    return {
+        "intended": str(shot.get("want") or ""),
+        "selected_description": str(shot.get("shows") or ""),
+        "asset_title": str(credit.get("title") or ""),
+        "asset_source": str(credit.get("source") or ""),
+        "asset_page": str(credit.get("page") or credit.get("url") or ""),
+        "kind": str(shot.get("kind") or credit.get("kind") or ""),
+    }
+
+
+def frame_check(mp4: Path, timeline: list[dict], shots: list[dict], tts: dict, script: dict,
+                title: str, hook: str, subject: str, llm, cfg: dict,
+                retry_pauses=(20, 60)) -> tuple[list[dict], dict]:
     segs = tts["segments"]
     n_lines = len(segs)
     items = []
@@ -115,7 +141,8 @@ def frame_check(mp4: Path, timeline: list[dict], tts: dict, script: dict, title:
         role = "hook" if t["seg"] == 0 else ("call to action" if t["seg"] == n_lines - 1 else "")
         fact = script["segments"][t["seg"]]["text"] if t["seg"] < len(script["segments"]) else seg["text"]
         items.append({"k": k, "seg": t["seg"], "path": t["path"], "t": round(mid, 2), "line": fact,
-                      "spoken": spoken, "role": role, "img": _frame_at(mp4, mid)})
+                      "spoken": spoken, "role": role, "context": _shot_context(t, shots),
+                      "img": _frame_at(mp4, mid)})
 
     results, meta = [], {"hook_text_ok": True, "title_ok": True, "notes": []}
     per_sheet = int(cfg.get("qa", {}).get("frames_per_sheet", 8))
@@ -124,7 +151,11 @@ def frame_check(mp4: Path, timeline: list[dict], tts: dict, script: dict, title:
         first = b == 0
         rows = "\n".join(
             f'  {j + 1} | line {it["seg"] + 1}/{n_lines}{" (" + it["role"] + ")" if it["role"] else ""} | '
-            f'while on screen the narrator says: "{it["spoken"]}"  (full line: "{it["line"]}")'
+            f'intended shot: "{it["context"]["intended"] or "not recorded"}" | '
+            f'selected image description: "{it["context"]["selected_description"] or "not recorded"}" | '
+            f'asset title: "{it["context"]["asset_title"] or "not recorded"}" | '
+            f'asset source/page: "{(it["context"]["asset_source"] + " " + it["context"]["asset_page"]).strip() or "not recorded"}" | '
+            f'while on screen the narrator says: "{it["spoken"]}" (full factual line: "{it["line"]}")'
             for j, it in enumerate(batch))
         extra = (f'\nFrame 1 also shows the on-screen hook text "{hook}". Is that text accurate for this video, and '
                  f'does the title "{title}" describe what this video actually shows and says?') if first else ""
@@ -137,16 +168,22 @@ progress bar, the hook title box, big animated numbers, a "PROVEN" stamp / sourc
 flash and the blurred background fill — judge the MAIN PHOTO. The narrator sometimes adds a short joke after a line;
 judge the photo against the factual "full line".
 
+For EACH frame, compare the visible main photo against all of: (1) the factual narration, (2) the intended shot request,
+and (3) the selected asset description and provenance shown below. The descriptions and asset metadata are clues, not
+proof: the pixels must actually fit. A historically named asset can still be the wrong battle, person, meeting, era,
+or setting. If the image only shares a broad topic keyword but depicts an irrelevant event or modern substitute for
+a named historical scene, mark it match=false.
+
 {rows}
 
-For each frame: does the main photo clearly show what that narration is about — the specific subject, thing, place,
-species, person, object or event being described? For a hook or call-to-action line, a clear photo of the video's
-subject counts as a match.
+For each frame: does the main photo clearly show what that narration and intended shot are about — the specific subject,
+thing, place, species, person, object or event being described? For a hook or call-to-action line, a clear photo of the
+video's subject counts as a match only if the intended shot is also subject-level and not a conflicting scene.
 FAIL a frame (match=false) if it shows: a different thing that merely shares a name (building, bar, street, sign,
 logo, product, film), a generic stand-in for a named subject, symbolic/mood imagery (an eye, a coffee cup, a crowd,
 a sunset, books) where an ordinary viewer would not immediately see why the picture goes with the words, unrelated
-identifiable people, mostly text/map/diagram/printed pages,
-something that contradicts or could mislead about what is being said, or if you are unsure.{extra}
+identifiable people, a conflicting era/event/location, mostly text/map/diagram/printed pages, something that contradicts
+or could mislead about what is being said, or if you are unsure.{extra}
 Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "score": 0-10, "issue": ""}}],
  "hook_text_ok": true, "title_ok": true, "notes": ""}}"""
 
@@ -167,12 +204,65 @@ Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "scor
                     time.sleep(retry_pauses[attempt])
         if out is None:
             raise VisionUnavailable(f"final QA could not reach a vision model: {str(err)[:300]}")
-        by_n = {int(f["n"]): f for f in out["frames"]}
+        primary = {int(f["n"]): f for f in out["frames"]}
+        audit = {}
+        # Challenge every positive frame individually. A contact sheet can hide the exact person,
+        # event or era mismatch that a batch judge overlooks; the blind second look sees one frame only.
         for j, it in enumerate(batch):
-            f = by_n.get(j + 1, {"match": False, "score": 0, "shows": "", "issue": "no verdict"})
+            if not bool(primary.get(j + 1, {}).get("match")):
+                continue
+            ctx = it["context"]
+            audit_user = f"""ADVERSARIAL SECOND LOOK — INSPECT THIS SINGLE FRAME, NOT A CONTACT SHEET.
+VIDEO SUBJECT: {subject}
+  1 | line {it['seg'] + 1}/{n_lines} | intended shot: "{ctx['intended'] or 'not recorded'}"
+Selected image description: "{ctx['selected_description'] or 'not recorded'}"
+Asset title/source: "{ctx['asset_title'] or 'not recorded'}" / "{ctx['asset_source'] or 'not recorded'} {ctx['asset_page']}"
+Exact narration while this frame is visible: "{it['spoken']}"
+Full factual line: "{it['line']}"
+
+The attached image is the actual rendered frame. Independently try to DISPROVE the match: check whether the pixels
+show the correct named subject, person, event, place and historical era. Do not trust asset titles, the selected-image
+description, or a prior positive decision. A generic meeting is not proof of a specific treaty negotiation; a modern
+photo of unrelated leaders is not a historical scene. Mark match=false if the scene is irrelevant, misleading, or
+not visually defensible. If uncertain, fail it.
+Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "score": 0-10, "issue": ""}}]}}"""
+
+            def validate_single(o):
+                frames = o.get("frames")
+                assert isinstance(frames, list) and len(frames) == 1, "audit must return exactly one frame verdict"
+                assert int(frames[0]["n"]) == 1, "single-frame audit must be numbered 1"
+                float(frames[0]["score"]), bool(frames[0]["match"])
+
+            audit_out, audit_err = None, None
+            for attempt in range(len(retry_pauses) + 1):
+                try:
+                    audit_out = llm.vision_json(QA_AUDIT_SYSTEM, audit_user,
+                                                [_sheet([it["img"]])], validate_single)
+                    break
+                except Exception as e:  # noqa: BLE001
+                    audit_err = e
+                    if attempt < len(retry_pauses):
+                        time.sleep(retry_pauses[attempt])
+            if audit_out is None:
+                raise VisionUnavailable(
+                    f"adversarial final-frame audit unavailable: {str(audit_err)[:250]}") from audit_err
+            audit[j + 1] = audit_out["frames"][0]
+        for j, it in enumerate(batch):
+            f = primary.get(j + 1, {"match": False, "score": 0, "shows": "", "issue": "no verdict"})
+            a = audit.get(j + 1)
+            match = bool(f.get("match")) and (bool(a.get("match")) if a is not None else False)
+            score = min(float(f.get("score") or 0), float(a.get("score") or 0)) if a is not None else float(f.get("score") or 0)
+            issue = str(f.get("issue", ""))
+            if a is not None and (not a.get("match") or float(a.get("score") or 0) < float(cfg.get("qa", {}).get("min_frame_score", 7))):
+                audit_issue = str(a.get("issue") or "adversarial audit could not confirm this image")
+                issue = (issue + "; adversarial audit: " + audit_issue).strip("; ")
             results.append({"seg": it["seg"], "path": it["path"], "t": it["t"], "spoken": it["spoken"][:140],
-                            "shows": str(f.get("shows", ""))[:120], "match": bool(f.get("match")),
-                            "score": float(f.get("score") or 0), "issue": str(f.get("issue", ""))[:160],
+                            "intended_shot": it["context"]["intended"][:160],
+                            "selected_image": it["context"]["selected_description"][:120],
+                            "asset_title": it["context"]["asset_title"][:120],
+                            "shows": str(f.get("shows", ""))[:120],
+                            "audit_shows": str(a.get("shows", ""))[:120] if a else "",
+                            "match": match, "score": score, "issue": issue[:200],
                             "judge": llm.last_used})
         if first:
             meta["hook_text_ok"] = bool(out.get("hook_text_ok", True))
@@ -180,7 +270,6 @@ Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "scor
         if out.get("notes"):
             meta["notes"].append(str(out["notes"])[:200])
     return results, meta
-
 
 def verify(mp4: Path, timeline: list[dict], shots: list[dict], tts: dict, script: dict, title: str, hook: str,
            subject: str, llm, cfg: dict) -> dict:
@@ -191,7 +280,7 @@ def verify(mp4: Path, timeline: list[dict], shots: list[dict], tts: dict, script
     report["issues"] += coverage_check(timeline, shots, len(script["segments"]), min_score)
     if report["issues"]:
         return report                                  # structural problems: don't even spend a vision call
-    frames, meta = frame_check(mp4, timeline, tts, script, title, hook, subject, llm, cfg)
+    frames, meta = frame_check(mp4, timeline, shots, tts, script, title, hook, subject, llm, cfg)
     report["frames"] = frames
     for f in frames:
         if not f["match"] or f["score"] < qa_min:

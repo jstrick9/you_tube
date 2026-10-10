@@ -12,7 +12,7 @@ from .common import now_utc, read_json
 from .llm import LLM, LLMError
 from .research import ground, unsupported_numbers
 from .strategy import Strategy
-from .trends import primary_source
+from .trends import has_current_trend_evidence, primary_source
 
 log = logging.getLogger("autotube.script")
 
@@ -56,11 +56,9 @@ FORMAT_GUIDE = {
 # formats whose structure centres on one big reveal (gets the riser, flash and a beat of silence)
 REVEAL_FORMATS = {"guess_reveal", "plot_twist", "myth_buster", "sounds_fake", "ranked_escalation", "creepy_true",
                   "dumbest_decision", "would_you_survive"}
-# How to leave the viewer with something to say. Across the channel's first 22 measured videos:
-# 233 likes and five comments. Comments are a heavy ranking input and the closest thing the
-# algorithm has to a "worth replying to" signal, and the scripts were earning none of them -
-# they were closed, complete and correct, which is exactly what nobody replies to. Learned as a
-# bandit dimension, so the channel discovers which of these works instead of assuming.
+# How to leave the viewer with something to say. One early sample had 233 likes and five comments;
+# these optional devices invite relevant participation without claiming a fixed ranking benefit. They are
+# learned as a local experiment rather than assumed to help every topic.
 def grounding_floor(n_segments: int, ccfg: dict) -> int:
     """How many segments must carry verifiable evidence, for a script of this length."""
     import math
@@ -96,7 +94,7 @@ HOOK_GUIDE = {
                   "(e.g. '<wild true fact>. Seriously.') — the fact itself comes first, never a vague 'this sounds fake'."),
 }
 HOOK_RULES = (
-    "HOOK RULES (the first line decides if 70%+ of viewers stay): 6-12 words; lead with the most surprising, specific "
+    "HOOK RULES (a specific opening can earn attention; there is no fixed viewer-retention cutoff): 6-12 words; lead with the most surprising, specific "
     "true detail (a number, a contradiction, an impossible-sounding fact); open a question that only the end of the "
     "video answers. BANNED openers: 'Did you know', 'Here are', 'In this video', 'Today we', 'Let's talk about', "
     "'Have you ever wondered', greetings, the channel name, the topic name alone.")
@@ -214,9 +212,9 @@ def aside_is_generic(aside: str) -> bool:
     """Would this reaction fit any video on the channel?
 
     The prompt used to offer "Nature, please." as a worked example and the model
-    returned it verbatim in two different scripts. Canned asides fail twice over: they
-    spend words from a 39-52 word budget saying nothing, and repeated across uploads
-    they are exactly the template similarity that triggers bulk demonetisation.
+    returned it verbatim in two different scripts. Canned asides waste words and weaken
+    the episode's distinct voice. This is a local writing-quality check, not a claim
+    about a fixed YouTube policy threshold.
     """
     import re as _re
 
@@ -491,7 +489,13 @@ class ScriptWriter:
         ccfg = self.cfg["content"]
         exclude = exclude or set()
         min_viral = float(ccfg.get("min_viral_score", 7))
-        pool = [c for c in candidates if c["topic_key"] not in recent and c["topic_key"] not in exclude
+        trend_cfg = self.cfg.get("trends", {}) or {}
+        min_wiki_spike = float(trend_cfg.get("min_wikipedia_spike", 3.0))
+        eligible = [c for c in candidates if has_current_trend_evidence(c, min_wiki_spike)]
+        if len(eligible) < len(candidates):
+            log.info("excluding %d candidate(s) without a qualifying live trend signal",
+                     len(candidates) - len(eligible))
+        pool = [c for c in eligible if c["topic_key"] not in recent and c["topic_key"] not in exclude
                 and c["score"] >= ccfg["min_trend_score"] * 0.5][:80]
         if not pool:
             return []
@@ -520,8 +524,9 @@ RECENTLY COVERED (avoid): {', '.join(list(recent)[:40]) or 'none'}
 
 LIVE TREND CANDIDATES (every one is trending now; evidence shows how strongly):
   youtube_outliers = a fact Short on this topic is going viral right now (proven demand — strongest signal)
-  wikipedia + "Nx its normal" = sudden surge in people reading about it
-  google_trends = search spike; reddit_* = top post today; on_this_day = anniversary today/tomorrow
+  wikipedia only qualifies when recent readership is at least {min_wiki_spike:g}x its own 30-day normal
+  google_trends = live search spike; reddit_* = top post today; HN/YouTube chart = current platform signal
+  Evergreen subjects, a Wikipedia listing without a qualifying spike, and a calendar anniversary alone do NOT prove a trend.
 {listing}
 
 Pick the {want} candidates most likely to make a VIRAL, genuinely ENTERTAINING (not just "interesting") YouTube Short
@@ -603,12 +608,6 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
             log.info("dropped as not viral enough (< %.0f): %s", min_viral, dropped[:10])
         return picks
 
-    def evergreen(self, recent: set[str]) -> list[dict]:
-        seeds = [s for s in self.cfg["channel"]["evergreen_seeds"] if s.lower() not in recent]
-        random.shuffle(seeds)
-        return [{"topic": s, "topic_key": s.lower(), "wiki_query": s, "sources": ["evergreen"], "score": 0.3,
-                 "category": random.choice(self.cfg["channel"]["categories"]), "angle": ""} for s in seeds]
-
     # ── 2. grounded script ───────────────────────────────────────────────────
     def write(self, topic: dict, plan: dict, source: dict) -> dict:
         lo, hi = self.cfg["video"]["target_seconds"]
@@ -650,12 +649,12 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
             f'  "aside" (REQUIRED: at least 1, at most {max_asides} in the whole script, never on the hook): a 2-8 word deadpan\n'
             '     reaction the narrator says right AFTER that line. It MUST react to something specific in THAT\n'
             '     line - name the thing, the number or the absurdity it just described. A reaction that would fit\n'
-            '     any video at all ("Nature, please.", "Rude.", "Bold plan.", "No airbags.") is filler: it spends\n'
-            '     words from a tight budget, and reused across videos it is the template-similarity signal that\n'
-            '     gets channels demonetised. It is a JOKE/OPINION ONLY: no facts, numbers, names, dates or claims; never\n'
-            '     mean about real people, groups or victims; family-friendly. A script with no aside anywhere is\n'
-            '     rejected: narration that only recites sourced facts has no voice of its own, and a channel of\n'
-            '     those reads as bulk-produced rather than as a show. Make it actually funny.\n'
+            '     any video at all ("Nature, please.", "Rude.", "Bold plan.", "No airbags.") is generic filler: it spends\n'
+            '     words without adding a topic-specific reaction. Reusing canned reactions weakens the episode\'s\n'
+            '     distinct voice; this is an internal writing standard, not a fixed YouTube policy threshold. It is a\n'
+            '     JOKE/OPINION ONLY: no facts, numbers, names, dates or claims; never mean about real people, groups or\n'
+            '     victims; family-friendly. Include a specific narrator reaction so the script sounds like Archive 13,\n'
+            '     not a bare list of sourced facts. Make it actually funny.\n'
         ) if max_asides else ""
         # A living person reached this point only because safety.check_person approved one specific
         # professional angle. The writer has to be told what that angle is, or the model will drift
@@ -664,9 +663,8 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
         # One hook instruction, not two. The prompt used to state the bandit's
         # hook_style AND the lane's hook shape, which for a history episode read
         # "HOOK STYLE: question" immediately followed by "never open with a question".
-        # The model obeyed the first and every CASE episode opened with a question -
-        # the weakest form for faceless shorts, and identical across every upload,
-        # which is the template similarity that gets channels demonetised.
+        # The model followed the conflicting generic instruction in that sample, so the lane-specific
+        # direction now takes precedence. This is an editorial consistency fix, not a monetization-policy claim.
         #
         # The lane is the more specific instruction and the one tied to the research,
         # so when a lane defines a hook shape it replaces the generic line entirely.
@@ -894,9 +892,8 @@ Write YouTube metadata for this Short. Return JSON:
         # emoji/hashtags/URLs in speech, verbatim repeats. These are free, reliable and run before a
         # single review token is spent — see autotube/gates.py for why they don't belong to the LLM.
         issues += gates.run_all(script, spoken_text, self.cfg)
-        # Repetition and absence-of-voice are the two things that get a faceless channel
-        # demonetized in bulk, and both are only visible by comparing this draft against
-        # what already shipped - so they cannot live in gates.py, which sees one script.
+        # Similarity and narrator-voice checks need recent channel history; they are internal safeguards
+        # against low-originality output, not published numerical monetization-policy thresholds.
         # History is cached per writer: check() runs once per retry and the file is small,
         # but re-reading it inside a retry loop is pointless IO.
         # getattr rather than self._history: ScriptWriter is constructed without __init__
@@ -953,8 +950,8 @@ Evaluate. Return JSON: {{"factual_errors": ["..."], "misleading_title": true|fal
 Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; <7 = do not publish.
 "loops": does the LAST line flow naturally back into the FIRST when the Short replays? Judge it by meaning,
 not by shared words - "so the ice keeps bleeding" loops cleanly into "a waterfall that runs blood red".
-A replay counts as a view and pushes average view percentage past 100%, which is one of the strongest
-satisfaction signals Shorts has. If it does not loop, say so in "fixes" and give the re-worded last line.
+A natural loop is a creative choice, not a guaranteed increase in views or averageViewPercentage; do not cite a metric
+benefit. If it does not loop, say so in "fixes" and give the re-worded last line.
 coherence — is this ONE story or a list of facts that happen to share a subject? Ask whether the lines could be
 reordered without the script breaking: if they could, it is a list. 8-10 = each line follows from the one before
 (a prince is dying / his pulse betrays him / she is his stepmother / his father divorces her). 4-6 = loosely
@@ -1025,17 +1022,12 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
         # is a new criterion, and turning it into a hard gate before we know its false-positive rate
         # would start abandoning topics for a reason nobody is watching yet. The verdict is recorded
         # either way, so the rate can be read off history before anyone flips the switch.
-        # Narrative coherence. Recorded on every script so the distribution can be read
-        # off history later, and gated at a deliberately low bar: this rejects scripts
-        # that are a list of unrelated facts, not ones that are merely workmanlike.
-        # Abandonment is already high, and a new criterion set strictly would stall
-        # production for a reason nobody has measured yet - the same reasoning that
-        # keeps require_loop off by default. Raise min_coherence once the scores in
-        # history show what a normal one looks like.
+        # Coherence is a real approval criterion, not telemetry only. A missing or malformed reviewer
+        # score fails closed, and the configured min_coherence threshold is checked again in `ok` below.
         try:
-            coh = float(r.get("coherence", 10))
+            coh = float(r.get("coherence", 0))
         except (TypeError, ValueError):
-            coh = 10.0
+            coh = 0.0
         review["coherence"] = coh
         min_coh = float(self.cfg["content"].get("min_coherence", 0))
         if coh < min_coh:
@@ -1046,13 +1038,15 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
         loops = r.get("loops")
         review["loops"] = loops
         if loops is False and self.cfg["content"].get("require_loop", False):
-            review["issues"].append("the last line does not flow back into the first, so the Short will not "
-                                    "loop — re-word the payoff to pick up the hook; a replay counts as a view")
+            review["issues"].append("the last line does not flow back into the first — re-word the payoff to pick up the hook; "
+                                    "this is a stylistic criterion, not a guaranteed analytics gain")
 
-        ok = (ent >= min_ent and hook >= min_hook and score >= self.cfg["compliance"]["quality_gate_min_score"] and not r.get("factual_errors")
+        ok = (ent >= min_ent and hook >= min_hook and coh >= min_coh
+              and score >= self.cfg["compliance"]["quality_gate_min_score"] and not r.get("factual_errors")
               and not r.get("misleading_title") and r.get("advertiser_friendly", True)
               and not r.get("policy_concerns"))
         review.update(r)
+        review["coherence"] = coh
         return ok, review
 
     def produce(self, topic: dict, plan: dict, max_attempts: int | None = None) -> tuple[dict, dict, dict] | None:
