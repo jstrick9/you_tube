@@ -395,9 +395,10 @@ media:
 qa:
   # Final gate on the FINISHED video, right before upload (autotube/qa.py): every shot is checked against
   # the narration, intended-shot request, selected asset description and provenance; positive matches get a
-  # blind adversarial second look. Speech is also checked against the script. Fail → swap in a verified spare
-  # and re-check; still failing → do not upload (keep a *-REJECTED artifact for inspection).
+  # blind adversarial second look. Speech is also checked against the script. Fail → use a verified spare or
+  # re-search using the frame-specific failure, then re-check; never relax the gate or publish a rejected render.
   min_frame_score: 7
+  repair_min_match_score: 8                  # stronger pre-render match required for a QA-triggered replacement
   max_repairs: 2
   frames_per_sheet: 8
 

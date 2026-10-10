@@ -316,6 +316,31 @@ def _trend_qa_evidence(topic: dict) -> list[str]:
     return rows[:4]
 
 
+def _qa_repair_feedback(report: dict, seg: int, path: str) -> str:
+    """Turn final-frame findings into concrete search guidance, not a generic retry."""
+    frames = [f for f in report.get("frames", [])
+              if f.get("seg") == seg and str(f.get("path", "")) == str(path)]
+    details = [
+        f"pixels show {f.get('shows', 'unknown')!r}; intended shot was {f.get('intended_shot', 'unspecified')!r}; "
+        f"QA issue: {f.get('issue', 'mismatch')}"
+        for f in frames[:3]
+    ]
+    return "; ".join(details)[:900]
+
+
+def _repair_failed_shots(a: dict, cfg: dict, writer: ScriptWriter, report: dict) -> bool:
+    """Attempt every failed shot; a missing spare for one segment must not short-circuit the rest."""
+    repaired = False
+    segments = a["script"].get("segments", [])
+    for seg, path in report.get("failed", []):
+        segment = segments[seg] if 0 <= seg < len(segments) else None
+        changed = media.use_alternative(
+            a["visuals"], seg, path, a["work"] / "img", source=a.get("source"), segment=segment,
+            cfg=cfg, llm=writer.llm, feedback=_qa_repair_feedback(report, seg, path))
+        repaired = bool(changed) or repaired
+    return repaired
+
+
 def render_with_qa(a: dict, cfg: dict, writer: ScriptWriter) -> tuple[dict, dict]:
     """Render, verify the finished MP4 against the narration, repair a bad shot, repeat."""
     # Clamped at zero so the loop always runs at least once: `r` is bound inside it and used
@@ -338,8 +363,7 @@ def render_with_qa(a: dict, cfg: dict, writer: ScriptWriter) -> tuple[dict, dict
         log.info("  ✗ final QA attempt %d: %s", attempt + 1, "; ".join(report["issues"])[:500])
         if not report.get("repairable"):
             break                    # narration/title/hook or structural problems cannot be fixed by swapping shots
-        if not all(media.use_alternative(a["visuals"], seg, path, a["work"] / "img")
-                   for seg, path in report["failed"]):
+        if not _repair_failed_shots(a, cfg, writer, report):
             break
     return r, report
 

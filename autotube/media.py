@@ -951,23 +951,158 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
     return {"shots": shots, "alts": alts, "calls": judge.calls, "need": need_by_seg, "max_mb": max_mb}
 
 
-def use_alternative(visuals: dict, seg: int, bad_path: str, work: Path) -> bool:
-    """Replace a shot that failed final QA with the next verified spare for that line."""
-    from . import vision  # noqa: F401
-    for c in list(visuals["alts"].get(seg, [])):
-        visuals["alts"][seg].remove(c)
-        p = _usable(c, work, visuals.get("need", {}).get(seg, 4.0), visuals.get("max_mb", 90))
-        if not p or str(p) == str(bad_path) or any(str(s["path"]) == str(p) for s in visuals["shots"]):
+QA_REQUERY_SYSTEM = (
+    "You repair a failed visual search for a factual educational Short. Keep the narration unchanged. "
+    "Return strict JSON only."
+)
+
+
+def _requery_after_final_qa(llm, subject: str, line: str, want: str, failed_asset: str,
+                            qa_feedback: str) -> tuple[str, list[str]]:
+    """Ask for a genuinely different, evidence-faithful search after rendered pixels fail QA."""
+    user = f"""VIDEO SUBJECT: {subject}
+EXACT NARRATION: "{line}"
+PREVIOUS SHOT REQUEST: {want}
+FAILED ASSET: {failed_asset}
+FINAL RENDERED-FRAME QA: {qa_feedback}
+
+The final pixels were inspected and rejected; do not repeat the failed idea or merely change wording.
+Suggest one physically findable visual that accurately supports this exact narration. Preserve the identity,
+place, object, denomination, species, and historical period. Never substitute a generic look-alike, unrelated
+person/object, fabricated reenactment, or symbolic stock photo. For a past event that cannot be photographed,
+use a documented depiction or a directly relevant real place/object only if it remains honest about what the image
+shows. Do not add unnecessary staging (for example, a hand holding an object) when a clear close-up is better.
+
+Return JSON: {{"shows": "revised, literal shot request", "queries": ["up to 3 short searches, 2-4 words each"]}}.
+If no defensible visual can be suggested, return {{"shows": "", "queries": []}} so this shot can remain rejected."""
+
+    def validate(o):
+        assert isinstance(o.get("shows"), str)
+        assert isinstance(o.get("queries"), list)
+        if o["shows"].strip():
+            assert any(str(q).strip() for q in o["queries"]), "a revised shot needs a search query"
+
+    result = llm.json(QA_REQUERY_SYSTEM, user, temperature=0.25, validate=validate)
+    shows = str(result.get("shows", "")).strip()
+    queries = [str(q).strip() for q in result.get("queries", []) if str(q).strip()][:3]
+    return (shows, queries) if shows and queries else ("", [])
+
+
+def _activate_qa_candidate(visuals: dict, seg: int, bad_path: str, work: Path,
+                           candidate: dict, want: str | None = None) -> bool:
+    """Install one candidate without duplicating another shot or weakening final-frame QA."""
+    shot = next((s for s in visuals["shots"]
+                 if s["seg"] == seg and str(s["path"]) == str(bad_path)), None)
+    if shot is None:
+        return False
+    p = _usable(candidate, work, visuals.get("need", {}).get(seg, 4.0), visuals.get("max_mb", 90))
+    if not p or str(p) == str(bad_path):
+        return False
+    new_hash = ahash(p)
+    for other in visuals["shots"]:
+        if other is shot:
             continue
-        for s in visuals["shots"]:
-            if s["seg"] == seg and str(s["path"]) == str(bad_path):
-                credit = {k: v for k, v in c.items() if not k.startswith("_") and k not in
-                          ("vscore", "vshows", "vjudge", "clip", "clip_cos", "thumb", "variants", "t_ref", "window")}
-                s.update({"path": p, "credit": credit, "score": c["vscore"], "shows": c.get("vshows", ""),
-                          "judge": c.get("vjudge", ""), "reused": False, "kind": c.get("kind", "image"),
-                          "poster": c.get("_poster"), "window": c.get("window")})
-                log.info("    QA repair: seg %d → %s", seg, c.get("vshows", "")[:70])
-                return True
+        if str(other["path"]) == str(p):
+            return False
+        if new_hash is not None and too_similar(new_hash, ahash(other["path"])):
+            return False
+    credit = {k: v for k, v in candidate.items() if not k.startswith("_") and k not in
+              ("vscore", "vshows", "vjudge", "clip", "clip_cos", "thumb", "variants", "t_ref", "window")}
+    shot.update({"path": p, "credit": credit, "score": candidate["vscore"],
+                 "shows": candidate.get("vshows", ""), "judge": candidate.get("vjudge", ""),
+                 "reused": False, "kind": candidate.get("kind", "image"),
+                 "poster": candidate.get("_poster"), "window": candidate.get("window")})
+    if want:
+        shot["want"] = want
+    log.info("    QA repair: seg %d → %s", seg, candidate.get("vshows", "")[:70])
+    return True
+
+
+def _find_final_qa_alternative(visuals: dict, seg: int, bad_path: str, work: Path,
+                               source: dict, segment: dict, cfg: dict, llm, feedback: str) -> bool:
+    """Re-search only after frame QA rejects all pre-verified spares; every new shot is re-judged."""
+    from . import vision
+
+    mcfg = cfg.get("media", {})
+    if not mcfg.get("requery", True) or not llm or not feedback:
+        return False
+    shot = next((s for s in visuals["shots"]
+                 if s["seg"] == seg and str(s["path"]) == str(bad_path)), None)
+    if shot is None:
+        return False
+    credit = shot.get("credit", {})
+    failed_asset = "; ".join(filter(None, (str(credit.get("title", "")), str(shot.get("shows", "")))))
+    line = str(segment.get("text", ""))
+    if not line:
+        return False
+    try:
+        want, queries = _requery_after_final_qa(
+            llm, str(source.get("title", "")), line, str(shot.get("want", "")), failed_asset, feedback)
+    except Exception as e:  # noqa: BLE001 — fail closed; the rendered shot remains rejected
+        log.info("    QA re-search prompt failed for seg %d: %s", seg, str(e)[:120])
+        return False
+    if not want or not queries:
+        log.info("    QA re-search found no defensible new shot for seg %d", seg)
+        return False
+
+    allowed = cfg["compliance"]["allowed_licenses"]
+    min_w = int(mcfg.get("min_image_width", 0))
+    # AI-generated images are deliberately excluded here: factual historical/scientific evidence must not be
+    # replaced by a fabricated scene when a first-party or openly licensed real asset is unavailable.
+    sources = [s for s in mcfg.get("sources", []) if s != "pixazo"]
+    try:
+        candidates = _candidates_for(queries, sources, allowed, min_w)
+    except Exception as e:  # noqa: BLE001 — providers are best-effort, not a reason to publish the old frame
+        log.info("    QA re-search failed for seg %d: %s", seg, str(e)[:120])
+        return False
+    used_urls = {str(s.get("credit", {}).get("url", "")) for s in visuals["shots"]}
+    for pool in visuals.get("alts", {}).values():
+        used_urls.update(str(c.get("url", "")) for c in pool)
+    candidates = [c for c in candidates if c.get("url") and str(c["url"]) not in used_urls]
+    if not candidates:
+        log.info("    QA re-search returned no new assets for seg %d", seg)
+        return False
+
+    judge = vision.Judge(cfg, llm)
+    if not judge.available():
+        raise vision.VisionUnavailable("no vision model available — refusing unverified QA-repair images")
+    subject = str(source.get("title", ""))
+    context = str(source.get("description", ""))
+    judged = judge.score(candidates, want, line, subject, context)
+    floor = max(8.0, float(cfg.get("qa", {}).get("repair_min_match_score", 8)))
+    good = [c for c in judged if float(c.get("vscore", 0)) >= floor]
+    if not good:
+        judged += judge.score(candidates, want, line, subject, context, page=1)
+        good = [c for c in judged if float(c.get("vscore", 0)) >= floor]
+    video_bonus = float(mcfg.get("video_bonus", 1.0)) if mcfg.get("prefer_video", True) else 0.0
+    shape_w = float(mcfg.get("shape_bonus", 1.0))
+    good.sort(key=lambda c: -(float(c.get("vscore", 0)) +
+                             (video_bonus if c.get("kind") == "video" else 0.0) + shape_bonus(c, shape_w)))
+    for candidate in good:
+        if _activate_qa_candidate(visuals, seg, bad_path, work, candidate, want):
+            if isinstance(segment.get("visual"), dict):
+                segment["visual"].update({"shows": want, "queries": queries})
+            pool = visuals.setdefault("alts", {}).setdefault(seg, [])
+            for spare in good:
+                if spare is not candidate and len(pool) < 6:
+                    pool.append(spare)
+            log.info("    QA re-search: seg %d → %s (%.1f/10; %s)",
+                     seg, candidate.get("vshows", "")[:55], float(candidate["vscore"]), ", ".join(queries))
+            return True
+    log.info("    QA re-search had no distinct usable image scoring ≥ %.1f for seg %d", floor, seg)
+    return False
+
+
+def use_alternative(visuals: dict, seg: int, bad_path: str, work: Path, *,
+                    source: dict | None = None, segment: dict | None = None, cfg: dict | None = None,
+                    llm=None, feedback: str = "") -> bool:
+    """Use a verified spare, then re-search from final-frame QA evidence; never waive that final gate."""
+    for candidate in list(visuals["alts"].get(seg, [])):
+        visuals["alts"][seg].remove(candidate)
+        if _activate_qa_candidate(visuals, seg, bad_path, work, candidate):
+            return True
+    if source and segment and cfg:
+        return _find_final_qa_alternative(visuals, seg, bad_path, work, source, segment, cfg, llm, feedback)
     return False
 
 
