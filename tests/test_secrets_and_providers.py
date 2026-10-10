@@ -1502,3 +1502,32 @@ def test_illegible_flag_actually_lowers_the_score():
     body = src.split("by_n = {int(it")[1]
     assert 'it.get("legible") is False' in body, "the flag must be read, not just requested"
     assert "min(score, 3.0)" in body, "an illegible frame must be pushed below selection"
+
+
+# ── run budget ─────────────────────────────────────────────────────────────
+def test_the_run_keeps_a_reserve_so_it_never_starts_work_it_cannot_finish():
+    """Measured run durations: 49, 73, 112, 142, 217 and 220 minutes against a
+    150-minute job cap.
+
+    The budget was only testable between topics, and one topic costs 20-40 minutes of
+    drafting, vision and rendering. A run that passed the check at minute 119 finished
+    past the cap and was killed mid-render, losing the work and the artifact.
+    """
+    import yaml as _y
+
+    cfg = _y.safe_load((ROOT / "config.yaml").read_text())
+    budget = float(cfg["schedule"]["max_run_minutes"])
+    reserve = float(cfg["schedule"]["topic_reserve_minutes"])
+
+    src = (ROOT / "autotube" / "pipeline.py").read_text()
+    assert "topic_reserve_minutes" in src, "the reserve must be applied, not just configured"
+    assert "deadline - reserve" in src, "the check must subtract the reserve"
+
+    # The job cap lives in the workflow; budget plus reserve has to fit inside it.
+    wf = (WF / "daily.yml").read_text()
+    import re as _re
+    cap = int(_re.search(r"timeout-minutes:\s*(\d+)", wf).group(1))
+    assert budget + reserve <= cap, (
+        f"budget {budget} + reserve {reserve} exceeds the {cap} minute job cap, so a "
+        "run can still be killed mid-render")
+    assert reserve >= 20, "a reserve smaller than one topic does not prevent the overshoot"

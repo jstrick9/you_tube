@@ -69,6 +69,12 @@ schedule:
   publish_times: ["12:00", "17:30", "20:30"]   # local time slots (channel.timezone)
   notify_subscribers: false              # 2-3 notifications a day drives unsubs and 'don't recommend'
   max_run_minutes: 120                   # stop producing after this (GitHub job timeout is 150)
+  # How much of that budget to hold back. The deadline is only testable between topics,
+  # and one topic costs 20-40 minutes of drafting, vision and rendering, so starting a
+  # topic at minute 119 means finishing somewhere past the 150-minute job cap - killed
+  # mid-render, losing the work and the artifact. Runs have been measured at 49, 73,
+  # 112, 142, 217 and 220 minutes; the long ones are this.
+  topic_reserve_minutes: 30
 
 video:
   kind: short                            # 1080x1920 vertical YouTube Short

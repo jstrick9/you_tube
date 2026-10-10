@@ -454,8 +454,15 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
                     break
                 log.info("selection round %d: %d more viral picks", rounds, len(more))
                 picks += more
-            if time.time() > deadline:
-                log.warning("time budget reached — stopping with %d videos", len(results))
+            # Do not start what cannot finish. The budget used to be checked only at
+            # the topic boundary, and a single topic costs 20-40 minutes of drafting,
+            # vision and rendering - so a run that passed this test at 119 minutes ran
+            # past the 150-minute job cap and was killed mid-render, losing the work
+            # and the artifact with it. Keep a reserve the size of one topic.
+            reserve = 60 * float(cfg["schedule"].get("topic_reserve_minutes", 30))
+            if time.time() > deadline - reserve:
+                log.warning("time budget reached (within %.0f min reserve) — stopping with %d videos",
+                            reserve / 60, len(results))
                 break
             topic = picks[pi]
             pi += 1
