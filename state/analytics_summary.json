@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-10T02:47:03.831338+00:00",
-  "videos_total": 41,
-  "videos_7d": 12,
-  "views_7d": 6260,
+  "updated": "2026-10-10T07:43:51.935237+00:00",
+  "videos_total": 43,
+  "videos_7d": 14,
+  "views_7d": 6364,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -16,7 +16,7 @@
         },
         {
           "arm": "history",
-          "mean": 0.551,
+          "mean": 0.55,
           "n": 5
         },
         {
@@ -77,7 +77,7 @@
       "arms": [
         {
           "arm": "scale_shock",
-          "mean": 0.573,
+          "mean": 0.572,
           "n": 3
         },
         {
@@ -313,7 +313,7 @@
     {
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
-      "views": 1328,
+      "views": 1396,
       "avg_view_pct": 132.14
     },
     {
@@ -396,27 +396,27 @@
   },
   "subscribers": {
     "net_90d": 26,
-    "views_90d": 24901,
+    "views_90d": 25006,
     "per_1k_views": 1.04,
-    "videos": 33,
+    "videos": 35,
     "days_to_500": 1730.8,
     "days_to_1000": 3461.5
   },
   "originality": {
-    "episodes_examined": 12,
+    "episodes_examined": 14,
     "window": 25,
     "mean_pairwise_similarity": 0.0,
     "max_pairwise_similarity": 0.0,
     "pairs_over_similarity_limit": 0,
     "most_common_format": {
       "name": "creepy_true",
-      "share": 0.25
+      "share": 0.286
     },
     "most_common_category": {
       "name": "nature",
-      "share": 0.417
+      "share": 0.357
     },
-    "share_with_narrator_commentary": 0.917,
+    "share_with_narrator_commentary": 0.929,
     "flags": [],
     "verdict": "looks like a show"
   }
