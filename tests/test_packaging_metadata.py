@@ -20,17 +20,21 @@ def test_sidecar_uses_assigned_episode_and_preserves_trend_evidence(tmp_path, mo
 
     topic = {
         "sources": ["youtube_outliers", "google_trends"],
+        "source_families": ["youtube", "google_trends"],
         "score": 0.91,
         "viral_score": 8,
+        "angle": "the figure doubled after the specific discovery",
         "why_trending": "A related explainer Short is gaining views today.",
         "context": ["views up 4.2x in 12 hours", "Google Trends breakout in US"],
+        "signals": [{"source": "youtube_outliers", "source_url": "https://youtube.test/viral",
+                     "evidence": {"views": 2000000, "hours": 12}}],
     }
     assets = {
         "script": {"title": "The treaty that ended a war", "description": "", "segments": [],
                    "tags": [], "hashtags": []},
         "source": {"title": "Treaty of Portsmouth", "url": "https://example.test/treaty", "also": []},
         "visuals": {"shots": []},
-        "review": {"score": 9},
+        "review": {"score": 9, "trend_alignment": 9, "trend_alignment_reason": "Covers the discovery"},
         "plan": {"format": "backstory"},
         "topic": topic,
         "out": out,
@@ -51,14 +55,21 @@ def test_sidecar_uses_assigned_episode_and_preserves_trend_evidence(tmp_path, mo
     assert sidecar["series"] == "unsolved"
     assert "CASE #001" in sidecar["meta"]["title"]
     assert sidecar["trend"]["sources"] == topic["sources"]
+    assert sidecar["trend"]["source_families"] == topic["source_families"]
     assert sidecar["trend"]["score"] == topic["score"]
+    assert sidecar["trend"]["angle"] == topic["angle"]
+    assert sidecar["trend"]["signals"] == topic["signals"]
+    assert sidecar["review"]["trend_alignment"] == 9
     assert sidecar["trend"]["wikipedia_spike"] is None
     assert sidecar["trend"]["viral_score"] == topic["viral_score"]
     assert sidecar["trend"]["why_trending"] == topic["why_trending"]
     assert sidecar["trend"]["evidence"] == topic["context"]
     history_trend = pipeline._history_trend(topic)
     assert history_trend["trend_sources"] == topic["sources"]
+    assert history_trend["trend_source_families"] == topic["source_families"]
     assert history_trend["trend_score"] == topic["score"]
+    assert history_trend["trend_angle"] == topic["angle"]
+    assert history_trend["trend_signals"] == topic["signals"]
     assert history_trend["wikipedia_spike"] is None
     assert history_trend["viral_score"] == topic["viral_score"]
     assert history_trend["why_trending"] == topic["why_trending"]

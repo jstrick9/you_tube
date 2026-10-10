@@ -37,21 +37,58 @@ def cands():
             ("Octopus can taste with its arms", "youtube_outliers", 0.8,
              ["viral Short now: 2,000,000 views in 20h"], None),
             ("Dry policy news", "google_trends", 0.7, [], None)]
-    return [{"topic": t, "topic_key": t.lower(), "source": s, "sources": [s], "score": sc,
-             "context": ctx, "spike": spike}
-            for t, s, sc, ctx, spike in rows]
+    out = []
+    for t, s, sc, ctx, spike in rows:
+        candidate = {"topic": t, "topic_key": t.lower(), "source": s, "sources": [s], "score": sc,
+                     "context": ctx, "spike": spike}
+        if t.startswith("Octopus"):
+            candidate["signals"] = [{
+                "source": "youtube_outliers", "source_url": "https://youtube.test/short",
+                "evidence": {"views": 2_000_000, "hours": 20, "vph": 100_000, "breakout": 4.2},
+            }]
+        out.append(candidate)
+    return out
 
 
 def test_select_keeps_only_viral_topics_and_ranks_them():
-    llm = LLMPicks([{"index": 0, "viral_score": 9, "category": "history", "wiki_query": "Hunger stone"},
-                    {"index": 1, "viral_score": 9, "category": "nature", "wiki_query": "Octopus"},
+    llm = LLMPicks([{"index": 0, "viral_score": 9, "category": "history", "wiki_query": "Hunger stone",
+                     "angle": "the stone appeared only when drought returned", "formats": ["creepy_true"]},
+                    {"index": 1, "viral_score": 9, "category": "nature", "wiki_query": "Octopus",
+                     "angle": "its arms taste prey before it reaches the mouth", "formats": ["sounds_fake"],
+                     "why_trending": "An unverified claim from the selector."},
                     {"index": 2, "viral_score": 8, "category": "culture", "risk": "high"}])
     w = ScriptWriter(CFG, llm, Strat())
     picks = w.select_topics(cands(), 2, set())
     assert [p["topic"] for p in picks] == ["Octopus can taste with its arms", "Hunger stone"]   # source weight breaks tie
     assert all(p["viral_score"] >= CFG["content"]["min_viral_score"] for p in picks)
     assert "1496.5x its normal" in llm.prompt and "2,000,000 views" in llm.prompt          # judged WITH evidence
+    assert "100,000 views/hour" in llm.prompt
+    assert "An unverified claim" not in picks[0]["why_trending"]
+    assert "2,000,000 views in 20h" in picks[0]["why_trending"]
     assert "Willie Mays" not in llm.prompt                                               # no Wikipedia-only fallback
+
+
+def test_selector_fails_closed_without_a_specific_angle_and_out_of_range_viral_score():
+    llm = LLMPicks([
+        {"index": 0, "viral_score": 9, "category": "history", "wiki_query": "Hunger stone",
+         "angle": "Hunger stone", "formats": ["creepy_true"]},
+        {"index": 1, "viral_score": 9, "category": "nature", "wiki_query": "Octopus",
+         "angle": "octopus can taste with arms", "formats": ["sounds_fake"]},
+        {"index": 2, "viral_score": 11, "category": "culture", "wiki_query": "Dry policy news",
+         "angle": "a surprising policy fact changed everything", "formats": ["backstory"]},
+    ])
+    picks = ScriptWriter(CFG, llm, Strat()).select_topics(cands(), 2, set())
+    assert picks == [], "subject-only angles and out-of-range viral scores must not enter production"
+
+
+def test_selector_rejects_invalid_category_or_no_fitting_format():
+    llm = LLMPicks([
+        {"index": 0, "viral_score": 9, "category": "off_topic", "wiki_query": "Hunger stone",
+         "angle": "the stone appeared only when drought returned", "formats": ["creepy_true"]},
+        {"index": 1, "viral_score": 9, "category": "nature", "wiki_query": "Octopus",
+         "angle": "its arms taste prey before it reaches the mouth", "formats": ["not_a_format"]},
+    ])
+    assert ScriptWriter(CFG, llm, Strat()).select_topics(cands(), 2, set()) == []
 
 
 def test_wikipedia_listing_without_spike_never_reaches_topic_selector():
@@ -103,11 +140,57 @@ def test_make_one_rejects_below_floor_viral_score_even_with_live_source(monkeypa
     assert pipeline.make_one(CFG, object(), topic, {}, 1, "test-run") is None
 
 
+def test_google_trends_traffic_parser_preserves_k_and_magnitude():
+    assert trends._parse_traffic("25K+") == 25_000
+    assert trends._parse_traffic("1.2M+") == 1_200_000
+    assert trends._parse_traffic("50,000+") == 50_000
+    assert trends._parse_traffic(1234) == 1234
+    assert trends._parse_traffic("unknown") == 0
+
+
 def test_primary_source():
-    assert trends.primary_source(["reddit_todayilearned", "wikipedia"]) == "wikipedia"
+    assert trends.primary_source(["reddit_todayilearned", "wikipedia"]) == "reddit"
     assert trends.primary_source(["google_trends", "youtube_outliers"]) == "youtube_outliers"
     assert trends.primary_source(["reddit_science"]) == "reddit"
     assert trends.primary_source([]) == "evergreen"
+
+
+def test_trend_merge_only_rewards_independent_sources_and_keeps_measured_evidence(monkeypatch):
+    cfg = common.load_config()
+    cfg["trends"]["wikipedia_spike_check"] = 0
+    cfg["trends"]["on_this_day"] = False
+    topic = "Octopus tastes with its arms"
+    reddit_rows = {
+        "science": [{"topic": topic, "source": "reddit_science", "score": 0.91,
+                     "source_url": "https://reddit.test/science", "context": ["top post today"]}],
+        "space": [{"topic": topic, "source": "reddit_space", "score": 0.88,
+                   "source_url": "https://reddit.test/space", "context": ["top post today"]}],
+    }
+    monkeypatch.setattr(trends, "youtube_outliers", lambda cfg: [])
+    monkeypatch.setattr(trends, "google_trends", lambda region: [])
+    monkeypatch.setattr(trends, "wikipedia_top", lambda lang: [])
+    monkeypatch.setattr(trends, "reddit_rss", lambda sub, limit=25: reddit_rows.get(sub, []))
+    monkeypatch.setattr(trends, "hackernews", lambda: [])
+    monkeypatch.setattr(trends, "youtube_chart", lambda region: [])
+    monkeypatch.setattr(trends, "on_this_day", lambda lang: [])
+    monkeypatch.setattr("autotube.safety.screen", lambda *a, **k: ("allow", ""))
+
+    merged = trends.collect(cfg)
+    candidate = next(c for c in merged if c["topic"] == topic)
+    assert candidate["score"] == 0.91, "two subreddits are not two independent platforms"
+    assert candidate["source_families"] == ["reddit"]
+    assert {x["source_url"] for x in candidate["signals"]} == {
+        "https://reddit.test/science", "https://reddit.test/space"}
+    assert all(x["captured_at"] and x["context"] for x in candidate["signals"])
+
+    monkeypatch.setattr(trends, "google_trends", lambda region: [
+        {"topic": topic, "source": "google_trends", "score": 0.80, "traffic": 100000,
+         "source_url": "https://trends.test/octopus", "context": ["100,000 searches"]}])
+    merged = trends.collect(cfg)
+    candidate = next(c for c in merged if c["topic"] == topic)
+    assert candidate["score"] == 1.0, "independent Google Trends confirmation should strengthen the signal"
+    assert set(candidate["source_families"]) == {"reddit", "google_trends"}
+    assert any(s["evidence"].get("traffic") == 100000 for s in candidate["signals"])
 
 
 def test_wikipedia_spikes_demote_perennial_pages(monkeypatch):

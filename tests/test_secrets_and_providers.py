@@ -1054,18 +1054,13 @@ def test_selection_demands_the_specific_article_not_the_category():
 
 
 def test_an_empty_wiki_query_drops_the_topic_instead_of_widening_it():
-    """Honour the selector's refusal.
-
-    `p.get("wiki_query") or c["topic"]` silently fell back to the raw headline, which
-    then Wikipedia-searched onto the category page - the exact behaviour the prompt
-    change exists to avoid. Asking the model to say "no specific article" only helps
-    if saying it does something.
-    """
+    """Honour the selector's refusal; never silently ground the raw trend headline."""
     src = (ROOT / "autotube" / "scriptwriter.py").read_text()
     body = src.split("def select_topics(")[1].split("\n    def ")[0]
     i_drop = body.index("no specific article")
-    i_fallback = body.index('p.get("wiki_query") or c["topic"]')
-    assert i_drop < i_fallback, "the refusal must be handled before the fallback widens it"
+    i_query = body.index('wiki_query = str(p.get("wiki_query") or "").strip()')
+    assert i_drop < i_query, "an empty article refusal must be handled before assigning a query"
+    assert 'p.get("wiki_query") or c["topic"]' not in body, "the raw trend title must never widen the grounding"
 
 
 # ── grounding: don't let search widen past the claim ───────────────────────
@@ -1313,6 +1308,10 @@ def test_script_must_deliver_the_trending_angle():
         {"text": "The Nintendo DS was too weak to render the game in 3D."},
         {"text": "So the developers faked the whole effect with flat sprites."}]}
     assert delivers_angle(on_angle, angle, "Nintendo DS")
+    incidental = {"segments": [{"text": "Nintendo DS sales were huge worldwide."},
+                                {"text": "The repair programme fixed stuck displays."}]}
+    assert not delivers_angle(incidental, angle, "Nintendo DS"), \
+        "one coincidental angle keyword must not approve a tangential story"
 
 
 def test_the_subject_name_cannot_satisfy_the_angle_on_its_own():
@@ -1324,8 +1323,8 @@ def test_the_subject_name_cannot_satisfy_the_angle_on_its_own():
     """
     from autotube.scriptwriter import delivers_angle
 
-    assert delivers_angle({"segments": [{"text": "Nintendo DS sold millions."}]},
-                          "Nintendo DS", "Nintendo DS"), "no distinctive angle must never block"
+    assert not delivers_angle({"segments": [{"text": "Nintendo DS sold millions."}]},
+                              "Nintendo DS", "Nintendo DS"), "a subject with no distinctive angle must fail closed"
 
 
 def test_angle_delivery_is_enforced_by_the_real_validator(monkeypatch):

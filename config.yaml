@@ -145,6 +145,7 @@ content:
                                          # the 5 was "Some fish spend three quarters of life on land / they
                                          # crawl / they breathe through skin / they leap 61cm", which is a
                                          # list with no chain. 6 rejects that and leaves the other two.
+  min_trend_alignment: 8                 # independent reviewer must confirm the specific trend angle is actually delivered
   min_entertainment: 6                   # reviewer's (harsh) entertainment score; flat fact-lists are rewritten
                                          # Was 7. Same recalibration: independent scores ran 5/10 x24, 6/10 x19,
                                          # 4/10 x9, 3/10 x2. 6 keeps a real floor (3-5/10 still rejected) and

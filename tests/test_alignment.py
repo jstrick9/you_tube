@@ -210,6 +210,59 @@ def test_final_qa_passes_and_fails_per_frame(tiny_video):
     assert not bad["passed"] and bad["failed"] == [(1, "b")]
 
 
+def test_render_pipeline_passes_trend_angle_and_linked_evidence_to_final_qa(monkeypatch, tmp_path):
+    from types import SimpleNamespace
+    from autotube import pipeline
+
+    captured = {}
+    monkeypatch.setattr(pipeline.render, "render", lambda *args, **kwargs: {"timeline": []})
+
+    def fake_verify(*args, **kwargs):
+        captured.update(kwargs)
+        return {"passed": True, "frames": []}
+
+    monkeypatch.setattr(pipeline.qa, "verify", fake_verify)
+    angle = "the animal uses the reef to ambush prey"
+    url = "https://youtube.test/viral-short"
+    topic = {
+        "angle": angle,
+        "context": ["viral Short now: 2,000,000 views in 20h"],
+        "signals": [{"source": "youtube_outliers", "source_url": url, "captured_at": "2026-10-10T12:00:00Z",
+                     "evidence": {"views": 2_000_000, "hours": 20, "vph": 100_000, "breakout": 4.0}}],
+    }
+    assets = {"tts": {}, "visuals": {"shots": []}, "music": {}, "hook_card": "Seal ambushes its prey",
+              "script": {"segments": []}, "title": "A seal's hunting trick", "subject": "seal",
+              "work": tmp_path, "out": tmp_path / "render.mp4", "seed": 1, "fx": {}, "topic": topic}
+    cfg = {"qa": {"max_repairs": 0}, "channel": {"name": "Archive 13"}}
+
+    pipeline.render_with_qa(assets, cfg, SimpleNamespace(llm=object()))
+
+    assert captured["trend_angle"] == angle
+    assert "2,000,000 views in 20h" in captured["trend_evidence"][0]
+    assert any(url in line for line in captured["trend_evidence"])
+
+
+def test_moving_footage_is_sampled_near_start_middle_and_end(monkeypatch):
+    lines = ["A seal swims past the reef while divers watch."]
+    tts, script = _tts(lines), {"segments": [{"text": lines[0]}]}
+    timeline = [{"seg": 0, "start": 0.0, "end": 3.5, "path": "clip.mp4"}]
+    shots = [{"seg": 0, "path": "clip.mp4", "score": 9, "judge": "gemini", "kind": "video",
+              "want": "a seal swimming over a reef", "shows": "seal underwater",
+              "credit": {"title": "Seal in reef footage", "source": "archive", "page": "https://example.test/clip"}}]
+    samples = []
+    monkeypatch.setattr(qa, "_frame_at", lambda mp4, t: (samples.append(t), Image.new("RGB", (10, 10)))[1])
+
+    llm = QALLM(bad_frames=[2])
+    result = qa.verify(Path("unused.mp4"), timeline, shots, tts, script, "Seal", "Seal reef",
+                       "Seal", llm, CFG, trend_angle="the animal uses the reef to ambush prey")
+
+    assert samples == pytest.approx([0.7, 1.75, 2.8])
+    assert [f["sample"] for f in result["frames"]] == [1, 2, 3]
+    assert not result["passed"] and result["repairable"]
+    assert result["failed"] == [(0, "clip.mp4")], "three failed samples from one clip create one repair request"
+    assert "CURRENT TREND ANGLE" in llm.prompts[0][1]
+
+
 def test_final_qa_rejects_false_positive_and_supplies_shot_context(tiny_video):
     class FirstPassFalsePositive(QALLM):
         def vision_json(self, system, user, images, validate=None):
@@ -236,9 +289,12 @@ def test_final_qa_rejects_false_positive_and_supplies_shot_context(tiny_video):
     llm = FirstPassFalsePositive()
 
     result = qa.verify(tiny_video, timeline, shots, tts, script, "The 1905 Treaty", "Treaty of Portsmouth",
-                       "Treaty of Portsmouth", llm, CFG)
+                       "Treaty of Portsmouth", llm, CFG,
+                       trend_angle="the actual 1905 treaty negotiations, not a modern summit",
+                       trend_evidence=["recent history spike; verified trend record"])
 
     assert len(llm.prompts) == 2, "a positive first-pass verdict must receive a second adversarial look"
+    assert "CURRENT TREND ANGLE" in llm.prompts[0][1]
     assert 'intended shot: "1905 historic treaty negotiation room"' in llm.prompts[0][1]
     assert 'asset title: "Oxford climate change meeting 2024"' in llm.prompts[0][1]
     assert "ADVERSARIAL SECOND LOOK" in llm.prompts[1][1]

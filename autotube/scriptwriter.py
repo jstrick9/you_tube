@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 import logging
-import random
+import math
 import re
 
 from . import gates, originality, safety, series
@@ -121,12 +121,90 @@ WRITER_SYSTEM = (
 REVIEW_SYSTEM = (
     "You are a strict YouTube policy and quality reviewer. You check a Shorts script against its SOURCE TEXT for "
     "factual accuracy, misleading claims, clickbait mismatch, advertiser-friendliness, originality and viewer value. "
+    "When current-trend context is supplied, also judge whether the script tells the specific story/angle that is "
+    "trending, rather than merely mentioning the same broad subject. Trend evidence is not factual source text. "
     "Reply with JSON only."
 )
 
 
 def _clip(s: str, n: int) -> str:
     return s if len(s) <= n else s[:n].rsplit(" ", 1)[0]
+
+
+def trend_evidence_summary(candidate: dict) -> str:
+    """Describe measured, source-linked trend signals without trusting selector prose."""
+    summaries = []
+    for signal in candidate.get("signals") or []:
+        if not isinstance(signal, dict):
+            continue
+        source = str(signal.get("source") or "")
+        evidence = signal.get("evidence") if isinstance(signal.get("evidence"), dict) else {}
+        try:
+            rank = int(evidence.get("source_rank") or 0)
+        except (TypeError, ValueError):
+            rank = 0
+        if source == "youtube_outliers":
+            try:
+                views = int(evidence.get("views") or 0)
+                hours = float(evidence.get("hours") or 0)
+                vph = int(evidence.get("vph") or (views / hours if hours > 0 else 0))
+                breakout = float(evidence.get("breakout") or 0)
+            except (TypeError, ValueError):
+                views, hours, vph, breakout = 0, 0.0, 0, 0.0
+            if views > 0 and hours > 0:
+                detail = f"YouTube Short: {views:,} views in {hours:g}h (~{vph:,} views/hour)"
+                if breakout > 0:
+                    detail += f", {breakout:g}x channel subscribers"
+                summaries.append(detail)
+        elif source == "google_trends":
+            try:
+                traffic = int(evidence.get("traffic") or 0)
+            except (TypeError, ValueError):
+                traffic = 0
+            rank_text = f"rank #{rank}" if rank else "current feed"
+            metric = f", about {traffic:,} searches" if traffic > 0 else ""
+            summaries.append(f"Google Trends {rank_text}{metric}")
+        elif source == "wikipedia":
+            try:
+                spike = float(evidence.get("spike") or 0)
+                views = int(evidence.get("views") or 0)
+            except (TypeError, ValueError):
+                spike, views = 0.0, 0
+            if spike > 0:
+                summaries.append(f"Wikipedia readership {spike:g}x its 30-day baseline"
+                                 + (f" ({views:,} pageviews/day)" if views > 0 else ""))
+        elif source.startswith("reddit_"):
+            community = source.removeprefix("reddit_")
+            summaries.append(f"r/{community} top-of-day post" + (f", rank #{rank}" if rank else ""))
+        elif source == "hackernews":
+            try:
+                points = int(evidence.get("points") or 0)
+            except (TypeError, ValueError):
+                points = 0
+            detail = f"Hacker News front page" + (f", rank #{rank}" if rank else "")
+            if points > 0:
+                detail += f", {points:,} points"
+            summaries.append(detail)
+        elif source == "youtube_chart":
+            try:
+                views = int(evidence.get("view_count") or 0)
+            except (TypeError, ValueError):
+                views = 0
+            detail = "YouTube most-popular chart" + (f", rank #{rank}" if rank else "")
+            if views > 0:
+                detail += f", {views:,} views"
+            summaries.append(detail)
+        if len(summaries) >= 3:
+            break
+    if summaries:
+        return " | ".join(summaries)
+    # Small fixtures and older cached rows can predate structured signals. Preserve their
+    # actual feed context, but never substitute the selector's unsupported narrative.
+    context = [str(x).strip() for x in (candidate.get("context") or []) if str(x).strip()]
+    if context:
+        return " | ".join(context[:3])
+    sources = candidate.get("sources") or ([candidate.get("source")] if candidate.get("source") else [])
+    return "Current feed signal(s): " + ", ".join(str(s) for s in sources if s)
 
 
 ASIDE_BAD = re.compile(r"\d|\b(hundred|thousand|million|billion|trillion|percent|dozen)s?\b", re.I)
@@ -344,22 +422,8 @@ def uses_escalation_template(script: dict) -> int:
     return n
 
 
-def delivers_angle(script: dict, angle: str, subject: str = "") -> bool:
-    """Does the script actually tell the story that made the topic trend?
-
-    The trend said "the Nintendo DS wasn't powerful enough to..." - a specific
-    surprise. The script that shipped opened "Nintendo DS sold one hundred fifty four
-    million units" and went on to sales figures and a screen-repair programme. Correct,
-    grounded, and not the thing anyone was interested in.
-
-    Grounding fixes which article we read; this fixes which story we tell out of it.
-    Without it the writer drifts to whatever the article leads with, which is usually
-    the encyclopedic summary - the least surprising paragraph on the page.
-
-    Deliberately loose: one distinctive word from the angle appearing anywhere in the
-    narration is enough. The angle is a sentence written by another model and demanding
-    close paraphrase would reject good scripts for word choice.
-    """
+def _angle_terms(angle: str, subject: str = "") -> set[str]:
+    """Distinctive angle words after removing the subject name and connective filler."""
     from .originality import tokens
 
     stop = {"the", "a", "an", "of", "and", "in", "on", "at", "for", "with", "to", "is",
@@ -369,18 +433,30 @@ def delivers_angle(script: dict, angle: str, subject: str = "") -> bool:
             "first", "actually", "really", "still", "because", "which", "who", "been",
             "have", "has", "had", "are", "can", "could", "would", "will", "did", "does"}
     key = {t for t in tokens(angle or "") if len(t) > 3 and t not in stop}
-    # Drop the subject's own name. It appears in the angle and in every script about
-    # that subject, so leaving it in makes the test pass automatically: a Nintendo DS
-    # sales-figures script "matched" the angle "the DS wasn't powerful enough to render
-    # the 3D" purely on the word Nintendo. What must survive is the surprise itself.
+    # The subject appears in every script about it; only the words describing the
+    # surprising turn can prove the selected trend angle was delivered.
     key -= {t for t in tokens(subject or "") if len(t) > 3}
-    if not key:
-        return True                      # no distinctive angle; nothing to enforce
-    said = set()
-    for seg in script.get("segments", []):
-        said |= set(tokens(spoken_text(seg)))
-    return bool(key & said)
+    return key
 
+
+def delivers_angle(script: dict, angle: str, subject: str = "") -> bool:
+    """Check that a script carries the distinctive point of the current trend.
+
+    Topic-level matching used to pass when ONE generic word overlapped. That let a
+    sales-figures script pass for a trend about an underpowered console faking 3D.
+    Requiring multiple distinctive terms is still paraphrase-tolerant; the independent
+    reviewer separately judges the meaning, rather than demanding an exact quote.
+    A missing/empty angle fails closed: a current trend without a specific story is not
+    enough reason to make an episode.
+    """
+    from .originality import tokens
+
+    key = _angle_terms(angle, subject)
+    if not key:
+        return False
+    said = {t for seg in script.get("segments", []) for t in tokens(spoken_text(seg))}
+    needed = 1 if len(key) == 1 else max(2, (len(key) + 2) // 3)
+    return len(key & said) >= needed
 
 UNREADABLE_SHOTS = ("infographic", "chart", "graph", "diagram", "schematic", "timeline",
                     "bar chart", "pie chart", "screenshot", "table of", "map showing",
@@ -502,7 +578,10 @@ class ScriptWriter:
 
         def evidence(c):
             bits = [f"sources={','.join(sorted(set(c['sources'])))}", f"trend={c['score']:.2f}"]
-            if c.get("context"):
+            measured = trend_evidence_summary(c)
+            if measured:
+                bits.append("measured trend evidence: " + _clip(measured, 190))
+            elif c.get("context"):
                 bits.append("evidence: " + _clip(" / ".join(str(x) for x in c["context"][:2] if x), 170))
             return " | ".join(bits)
 
@@ -578,22 +657,35 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                     continue
                 vs = float(p.get("viral_score", 0))
                 c = dict(pool[idx])
+                if not math.isfinite(vs) or not 0 <= vs <= 10:
+                    dropped.append(f"{c['topic'][:40]} (invalid viral score)")
+                    continue
                 if vs < min_viral:
                     dropped.append(f"{c['topic'][:40]} ({vs:.0f})")
                     continue
-                # An empty wiki_query is the selector saying "no specific article carries
-                # this claim". Falling back to the raw topic here is what produced the
-                # generic videos: the headline gets Wikipedia-searched, lands on the
-                # category page, and the surprising detail is gone before drafting.
-                # Honour the refusal instead.
-                if "wiki_query" in p and not str(p.get("wiki_query") or "").strip():
+                # A topic must have a specific article and a specific trend angle. Falling
+                # back to the raw headline can resolve to a broad category page and erase
+                # the event/detail that actually made people notice the topic.
+                wiki_query = str(p.get("wiki_query") or "").strip()
+                if not wiki_query:
                     dropped.append(f"{c['topic'][:40]} (no specific article)")
                     continue
-                cat = p.get("category") if p.get("category") in cats else random.choice(cats)
+                angle = str(p.get("angle") or "").strip()
+                if len(_angle_terms(angle, c["topic"])) < 2:
+                    dropped.append(f"{c['topic'][:40]} (no distinctive trend angle)")
+                    continue
+                cat = p.get("category")
+                if cat not in cats:
+                    dropped.append(f"{c['topic'][:40]} (invalid category)")
+                    continue
                 fits = [f for f in (p.get("formats") or []) if isinstance(f, str) and f in formats]
-                c.update({"category": cat, "angle": p.get("angle", ""), "wiki_query": p.get("wiki_query") or c["topic"],
+                if not fits:
+                    dropped.append(f"{c['topic'][:40]} (no fitting format)")
+                    continue
+                c.update({"category": cat, "angle": angle, "wiki_query": wiki_query,
                           "formats": fits,
-                          "why_trending": p.get("why_trending", ""), "viral_score": vs})
+                          # Preserve reproducible observations, not an LLM's potentially invented trend claim.
+                          "why_trending": trend_evidence_summary(c), "viral_score": vs})
                 # blend: LLM viral potential (50%), measured trend strength (25%), and what our own analytics learned
                 # about this category (12.5%) and this kind of trend source (12.5%)
                 src_w = self.strategy.source_weight(primary_source(c.get("sources", [])))
@@ -690,12 +782,14 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
         comment_line = (f"LEAVE THEM SOMETHING TO SAY ({_cd}): {_cg} Work this into the PAYOFF line's "
                         f"wording — do NOT add a segment, do not say \"comment below\", \"let me know\" or "
                         f"any call to action, and do not change a single fact to make it land.\n") if _cg else ""
+        feedback_line = (f"PREVIOUS DRAFT FEEDBACK (fix without changing the facts or trend angle): {str(topic.get('_draft_feedback') or '')[:600]}\n"
+                         if topic.get("_draft_feedback") else "")
         user = f"""TOPIC: {topic['topic']}
 WHY IT'S TRENDING: {topic.get('why_trending') or ', '.join(topic.get('sources', []))}
 ANGLE (this is the story to tell — not the article's summary, not the subject's general
 history. If the angle names a specific surprise, that surprise IS the video):
 {topic.get('angle') or 'most surprising educational angle'}
-FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
+{feedback_line}FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
 {hook_line}
 {comment_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
 CHANNEL: {self.cfg['channel']['name']}
@@ -794,11 +888,12 @@ Return JSON:
                 f"a shot asks for a {_bad_shot!r} — nobody reads a chart on a phone in two "
                 "seconds. Ask for the THING itself: the creature, the place, the object, the "
                 "person. If the fact is a number, show what the number is about")
-            assert delivers_angle(o, topic.get("angle") or "", subject_for_visuals), (
-                f"this is not the story that trended. The angle was: "
-                f"{(topic.get('angle') or '')[:160]!r} — tell THAT. The article's own "
-                "summary is the least surprising paragraph on the page, and leading with "
-                "it throws away the reason anyone clicked")
+            if topic.get("angle"):
+                assert delivers_angle(o, topic["angle"], subject_for_visuals), (
+                    f"this is not the story that trended. The angle was: "
+                    f"{topic['angle'][:160]!r} — tell THAT. The article's own "
+                    "summary is the least surprising paragraph on the page, and leading with "
+                    "it throws away the reason anyone clicked")
             assert narration_names_subject(o, subject_for_visuals), (
                 f"the script never says {subject_for_visuals!r} out loud — it hides behind "
                 "'some fish' or 'a creature'. Name it: the specific noun is what makes a "
@@ -859,7 +954,7 @@ Write YouTube metadata for this Short. Return JSON:
                     "thumbnail_text": " ".join(words[:4])}
 
     # ── 3. programmatic + LLM review ─────────────────────────────────────────
-    def check(self, script: dict, source: dict) -> tuple[bool, dict]:
+    def check(self, script: dict, source: dict, topic: dict | None = None) -> tuple[bool, dict]:
         """Approve or reject a draft, remembering what was approved.
 
         The similarity gate reads history from disk, but history is only written at the
@@ -873,7 +968,7 @@ Write YouTube metadata for this Short. Return JSON:
         on the same topic, and holding it against its own replacement would guarantee
         the retry fails too.
         """
-        ok, review = self._check(script, source)
+        ok, review = self._check(script, source, topic)
         if ok:
             if getattr(self, "_history", None) is None:
                 self._history = read_json("history.json", [])
@@ -884,10 +979,13 @@ Write YouTube metadata for this Short. Return JSON:
             })
         return ok, review
 
-    def _check(self, script: dict, source: dict) -> tuple[bool, dict]:
+    def _check(self, script: dict, source: dict, topic: dict | None = None) -> tuple[bool, dict]:
         # numbers + blocked words are checked on EVERYTHING spoken (asides included); evidence only on facts
         narration = " ".join(spoken_text(s) for s in script["segments"])
         issues = []
+        trend_angle = str((topic or {}).get("angle") or "").strip()
+        if topic is not None and not trend_angle:
+            issues.append("no specific current-trend angle was supplied; do not publish a generic subject video")
         # Deterministic gates first: banned openers, CTA closers, clickbait titles, stage directions,
         # emoji/hashtags/URLs in speech, verbatim repeats. These are free, reliable and run before a
         # single review token is spent — see autotube/gates.py for why they don't belong to the LLM.
@@ -938,7 +1036,35 @@ Write YouTube metadata for this Short. Return JSON:
             if s.get("aside"):
                 rows.append(f"    [ASIDE - joke/opinion, not a factual claim] {s['aside']}")
         narration_list = "\n".join(rows)
-        user = f"""SOURCE TEXT:\n\"\"\"{source['text'][:self.src_chars]}\"\"\"\n
+        trend_context = ""
+        if topic is not None:
+            signals = []
+            for signal in (topic.get("signals") or [])[:4]:
+                if not isinstance(signal, dict):
+                    continue
+                detail = signal.get("evidence") or {}
+                source_name = str(signal.get("source") or "")
+                context_text = "; ".join(str(x) for x in (signal.get("context") or [])[:2] if x)
+                measured = ", ".join(f"{k}={v}" for k, v in detail.items()
+                                     if isinstance(v, (str, int, float)) and k not in {"url", "video_url"})
+                signals.append(" | ".join(x for x in (source_name, context_text, measured) if x))
+            evidence_text = "\n".join(f"- {x[:280]}" for x in signals) or "; ".join(
+                str(x) for x in (topic.get("context") or [])[:3] if x)
+            trend_context = f"""CURRENT TREND CONTEXT (editorial alignment check; NOT factual source material):
+Trend headline: {str(topic.get('topic') or '')[:200]}
+Selected specific angle: {trend_angle[:400]}
+Why this topic is rising: {str(topic.get('why_trending') or '')[:300]}
+Observed live evidence:
+{evidence_text or '- No detail provided'}
+The script must deliver the selected angle, not just repeat the trend headline or discuss the broad subject.
+\n"""
+        trend_schema = ', "trend_alignment": 0-10, "trend_alignment_reason": "brief evidence-based reason"' if topic is not None else ""
+        min_trend_alignment = float(self.cfg.get("content", {}).get("min_trend_alignment", 8))
+        trend_rubric = (f"\ntrend_alignment — score whether the script tells the CURRENT TREND CONTEXT's specific selected angle, not merely its broad topic. "
+                        f"10 = clearly delivers the distinctive viral/trending story; 8-9 = direct, strong coverage; 6-7 = partial or diluted; 0-5 = generic, tangential, or absent. "
+                        f"Need at least {min_trend_alignment:g}/10. Explain the score briefly in trend_alignment_reason. The angle is not proof of facts; SOURCE TEXT remains the only fact source."
+                        if topic is not None else "")
+        user = f"""{trend_context}SOURCE TEXT:\n\"\"\"{source['text'][:self.src_chars]}\"\"\"\n
 SCRIPT TITLE: {script['title']}
 SCRIPT DESCRIPTION: {script.get('description', '')}
 SCRIPT NARRATION (lines marked ASIDE are the narrator's jokes, spoken right after the line above them):
@@ -946,7 +1072,7 @@ SCRIPT NARRATION (lines marked ASIDE are the narrator's jokes, spoken right afte
 
 Evaluate. Return JSON: {{"factual_errors": ["..."], "misleading_title": true|false, "advertiser_friendly": true|false,
 "policy_concerns": ["..."], "value_add": "<what the viewer learns>", "hook_strength": 0-10, "entertainment": 0-10,
-"score": 0-10, "loops": true|false, "coherence": 0-10, "fixes": ["..."]}}
+"score": 0-10, "loops": true|false, "coherence": 0-10{trend_schema}, "fixes": ["..."]}}
 Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; <7 = do not publish.
 "loops": does the LAST line flow naturally back into the FIRST when the Short replays? Judge it by meaning,
 not by shared words - "so the ice keeps bleeding" loops cleanly into "a waterfall that runs blood red".
@@ -970,7 +1096,14 @@ genuinely funny or gasp-out-loud moment. 9-10 = you would send it to a friend. I
 idea in "fixes" (story tension, comic contrast, a sharper aside, a stronger reveal).
 hook_strength: 9-10 = the first line alone would stop a stranger scrolling (specific, surprising, opens a question the
 video answers); 7-8 = decent; <=6 = generic ('Did you know', 'Here are some facts', topic name, slow setup).
-If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
+If hook_strength < 9, put a stronger TRUE first line in "fixes".""" + trend_rubric
+        def validate_review(o):
+            score = float(o["score"])
+            assert math.isfinite(score) and 0 <= score <= 10
+            if topic is not None:
+                alignment = float(o["trend_alignment"])
+                assert math.isfinite(alignment) and 0 <= alignment <= 10
+
         try:
             # A writer grading its own homework agrees with itself. Review runs on a different
             # provider/model wherever one is reachable (llm.review_providers), and never on the exact
@@ -978,9 +1111,9 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
             review_fn = getattr(self.llm, "review_json", None)
             if review_fn is not None:
                 r = review_fn(REVIEW_SYSTEM, user, avoid=script.get("_writer_model"),
-                              temperature=0.2, validate=lambda o: float(o["score"]))
+                              temperature=0.2, validate=validate_review)
             else:                                     # minimal LLM-like object (tests, custom routers)
-                r = self.llm.json(REVIEW_SYSTEM, user, temperature=0.2, validate=lambda o: float(o["score"]))
+                r = self.llm.json(REVIEW_SYSTEM, user, temperature=0.2, validate=validate_review)
             review["reviewer"] = getattr(self.llm, "last_used", "")
             review["independent"] = bool(review["reviewer"]) and review["reviewer"] != script.get("_writer_model")
             if review["reviewer"] and not review["independent"]:
@@ -1017,6 +1150,23 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
         if ent < min_ent:
             review["issues"].append(f"not entertaining enough ({ent:.0f}/10, need {min_ent:.0f}) — tell it as a story "
                                     "with tension and a payoff, add comic contrast or a sharper aside; facts unchanged")
+        alignment_ok = True
+        alignment = None
+        alignment_reason = ""
+        if topic is not None:
+            try:
+                alignment = float(r.get("trend_alignment", 0))
+            except (TypeError, ValueError):
+                alignment = 0.0
+            alignment_reason = str(r.get("trend_alignment_reason") or "")[:300]
+            min_alignment = float(self.cfg.get("content", {}).get("min_trend_alignment", 8))
+            alignment_ok = math.isfinite(alignment) and min_alignment <= alignment <= 10
+            review["trend_alignment"] = alignment
+            review["trend_alignment_reason"] = alignment_reason
+            if not alignment_ok:
+                review["issues"].append(
+                    f"script does not deliver the specific current-trend angle ({alignment:.0f}/10, need {min_alignment:.0f})"
+                    + (f": {alignment_reason}" if alignment_reason else ""))
         # The loop is judged semantically by the reviewer, because a lexical check rejects good loops
         # (see the note in gates.py). Enforced only when require_loop is on, and it defaults off: it
         # is a new criterion, and turning it into a hard gate before we know its false-positive rate
@@ -1041,16 +1191,22 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
             review["issues"].append("the last line does not flow back into the first — re-word the payoff to pick up the hook; "
                                     "this is a stylistic criterion, not a guaranteed analytics gain")
 
-        ok = (ent >= min_ent and hook >= min_hook and coh >= min_coh
+        ok = (ent >= min_ent and hook >= min_hook and coh >= min_coh and alignment_ok
               and score >= self.cfg["compliance"]["quality_gate_min_score"] and not r.get("factual_errors")
               and not r.get("misleading_title") and r.get("advertiser_friendly", True)
               and not r.get("policy_concerns"))
         review.update(r)
         review["coherence"] = coh
+        if topic is not None:
+            review["trend_alignment"] = alignment
+            review["trend_alignment_reason"] = alignment_reason
         return ok, review
 
     def produce(self, topic: dict, plan: dict, max_attempts: int | None = None) -> tuple[dict, dict, dict] | None:
         """Ground → write → check (rewrite with feedback). Returns (script, source, review) or None."""
+        if len(_angle_terms(str(topic.get("angle") or ""), str(topic.get("topic") or ""))) < 2:
+            log.info("skip %r: no specific current-trend angle to deliver", topic.get("topic"))
+            return None
         source = ground(topic["topic"], topic.get("wiki_query"), self.lang,
                         allow_living=self.cfg["content"]["allow_living_people"],
                         blocked=self.cfg["compliance"].get("blocked_topics"),
@@ -1069,12 +1225,14 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes"."""
             try:
                 t = dict(topic)
                 if feedback:
-                    t["angle"] = (t.get("angle") or "") + f" (PREVIOUS DRAFT REJECTED — fix: {feedback})"
+                    # Keep rejection feedback separate: appending it to the trend angle can
+                    # contaminate the phrase-match gate and make an off-angle rewrite pass.
+                    t["_draft_feedback"] = feedback
                 script = self.write(t, plan, source)
             except LLMError as e:
                 log.warning("script generation failed: %s", e)
                 return None
-            ok, review = self.check(script, source)
+            ok, review = self.check(script, source, topic)
             log.info("  draft %d for %r → ok=%s score=%s issues=%s", attempt + 1, source["title"], ok,
                      review.get("score"), (review.get("issues") or review.get("factual_errors") or [])[:2])
             if ok:

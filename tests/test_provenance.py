@@ -34,9 +34,13 @@ def _res(**over):
                    "also": [{"title": "BBC", "url": "https://bbc.co.uk/x"}]},
         "topic": {"topic": "Flannan Isles", "category": "mysteries", "sources": ["wikipedia"],
                   "score": 0.91, "spike": 3.5, "why_trending": "Wikipedia pageviews reached 3.5x baseline",
-                  "viral_score": 8, "context": ["3.5x its 30-day pageview baseline"]},
+                  "angle": "the island lighthouse went silent with no explanation",
+                  "viral_score": 8, "context": ["3.5x its 30-day pageview baseline"],
+                  "signals": [{"source": "wikipedia", "evidence": {"spike": 3.5}}]},
         "plan": {"format": "creepy_true", "hook_style": "bold_claim"},
-        "review": {"score": 8, "reviewer": "anthropic:claude", "independent": True, "issues": []},
+        "review": {"score": 8, "coherence": 8, "trend_alignment": 9,
+                   "trend_alignment_reason": "Covers the recent spike angle",
+                   "reviewer": "anthropic:claude", "independent": True, "issues": []},
     }
     res.update(over)
     return res
@@ -85,6 +89,8 @@ def test_the_record_shows_why_this_topic_was_chosen(tmp_archive):
     assert sel["trend_sources"] == ["wikipedia"] and sel["trend_score"] == 0.91
     assert sel["wikipedia_spike"] == 3.5
     assert sel["viral_score"] == 8 and sel["format"] == "creepy_true"
+    assert sel["angle"] == "the island lighthouse went silent with no explanation"
+    assert sel["signals"] == [{"source": "wikipedia", "evidence": {"spike": 3.5}}]
 
 
 def test_the_record_pins_the_models_used(tmp_archive):
@@ -97,6 +103,8 @@ def test_the_record_pins_the_models_used(tmp_archive):
 def test_the_record_captures_independence_of_review(tmp_archive):
     provenance.record(_res(), _entry(), CFG)
     assert _written(tmp_archive)["review"]["independent"] is True
+    review = _written(tmp_archive)["review"]
+    assert review["trend_alignment"] == 9 and review["coherence"] == 8
 
 
 def test_the_record_does_not_copy_the_source_text(tmp_archive):

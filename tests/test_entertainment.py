@@ -153,6 +153,7 @@ def test_selector_asks_for_fitting_formats():
         def json(self, system, user, **kw):
             LLM.prompt = user
             return {"picks": [{"index": 0, "viral_score": 9, "category": "history", "wiki_query": "Hunger stone",
+                               "angle": "the stone warned people drought had returned",
                                "formats": ["creepy_true", "plot_twist", "not_a_format"]}]}
 
     cands = [{"topic": "Hunger stone", "topic_key": "hunger stone", "sources": ["wikipedia"],

@@ -39,17 +39,28 @@ def _norm_rank(i: int, n: int) -> float:
     return round(1.0 - (i / max(n, 1)) * 0.85, 4)
 
 
+def _parse_traffic(value: str | int | None) -> int:
+    """Parse Google Trends RSS approximate traffic, including 25K+/1.2M+ suffixes."""
+    if isinstance(value, (int, float)):
+        return max(0, int(value))
+    match = re.fullmatch(r"\s*([\d,.]+)\s*([KMB]?)\s*\+?\s*", str(value or "").upper())
+    if not match:
+        return 0
+    try:
+        number = float(match.group(1).replace(",", ""))
+    except ValueError:
+        return 0
+    multiplier = {"": 1, "K": 1_000, "M": 1_000_000, "B": 1_000_000_000}[match.group(2)]
+    return max(0, int(number * multiplier))
+
+
 def google_trends(geo: str) -> list[dict]:
     out = []
     try:
         feed = feedparser.parse(http().get(f"https://trends.google.com/trending/rss?geo={geo}", timeout=20).content)
         n = len(feed.entries)
         for i, e in enumerate(feed.entries):
-            traffic = e.get("ht_approx_traffic", "0").replace("+", "").replace(",", "")
-            try:
-                t = int(traffic)
-            except ValueError:
-                t = 0
+            t = _parse_traffic(e.get("ht_approx_traffic", "0"))
             news = []
             for k in ("ht_news_item_title",):
                 if e.get(k):
@@ -57,7 +68,9 @@ def google_trends(geo: str) -> list[dict]:
             out.append({
                 "topic": e.title.strip(), "source": "google_trends",
                 "score": min(1.0, 0.4 + math.log10(t + 10) / 7) * _norm_rank(i, n) ** 0.3,
-                "context": news, "traffic": t,
+                "context": news, "traffic": t, "source_rank": i + 1,
+                "source_url": e.get("ht_news_item_url") or e.get("link") or "",
+                "published_at": e.get("published") or e.get("updated") or "",
             })
     except Exception as e:  # noqa: BLE001
         log.warning("google trends failed: %s", e)
@@ -78,6 +91,8 @@ def wikipedia_top(lang: str = "en", limit: int = 60) -> list[dict]:
             for i, a in enumerate(arts):
                 out.append({"topic": a["article"].replace("_", " "), "source": "wikipedia",
                             "score": _norm_rank(i, len(arts)), "wiki_title": a["article"],
+                            "source_url": f"https://{lang}.wikipedia.org/wiki/{quote(a['article'].replace(' ', '_'))}",
+                            "source_date": d.date().isoformat(), "source_rank": i + 1,
                             "views": a["views"]})
             break
         except Exception as e:  # noqa: BLE001
@@ -95,7 +110,9 @@ def reddit_rss(sub: str, limit: int = 25) -> list[dict]:
         for i, e in enumerate(feed.entries):
             title = re.sub(r"^(TIL( that)?|TIL:)\s*", "", e.title, flags=re.I).strip()
             out.append({"topic": title, "source": f"reddit_{sub}", "score": _norm_rank(i, n) * 0.9,
-                        "context": [e.title], "is_fact": True})
+                        "context": [e.title], "source_url": e.get("link") or "",
+                        "published_at": e.get("published") or e.get("updated") or "",
+                        "source_rank": i + 1, "is_fact": True})
     except Exception as e:  # noqa: BLE001
         log.warning("reddit %s failed: %s", sub, e)
     return out
@@ -107,8 +124,12 @@ def hackernews(limit: int = 20) -> list[dict]:
         data = get_json("https://hn.algolia.com/api/v1/search", params={"tags": "front_page", "hitsPerPage": limit})
         hits = sorted(data.get("hits", []), key=lambda h: -(h.get("points") or 0))
         for i, h in enumerate(hits):
+            item_url = h.get("url") or (f"https://news.ycombinator.com/item?id={h.get('objectID')}"
+                                         if h.get("objectID") else "")
             out.append({"topic": h["title"], "source": "hackernews", "score": _norm_rank(i, len(hits)) * 0.7,
-                        "context": [h.get("url") or ""], "category_hint": "technology"})
+                        "context": [item_url] if item_url else [], "source_url": item_url,
+                        "points": h.get("points"), "source_rank": i + 1,
+                        "published_at": h.get("created_at") or "", "category_hint": "technology"})
     except Exception as e:  # noqa: BLE001
         log.warning("hackernews failed: %s", e)
     return out
@@ -134,8 +155,13 @@ def youtube_chart(region: str, limit: int = 30) -> list[dict]:
         items = data.get("items", [])
         for i, it in enumerate(items):
             sn = it["snippet"]
+            video_id = it.get("id") or ""
             out.append({"topic": sn["title"], "source": "youtube_chart", "score": _norm_rank(i, len(items)) * 0.8,
-                        "context": sn.get("tags", [])[:8], "yt_category": sn.get("categoryId")})
+                        "context": sn.get("tags", [])[:8], "yt_category": sn.get("categoryId"),
+                        "source_url": f"https://www.youtube.com/watch?v={video_id}" if video_id else "",
+                        "video_id": video_id, "view_count": int(it.get("statistics", {}).get("viewCount") or 0),
+                        "published_at": sn.get("publishedAt") or "", "channel_title": sn.get("channelTitle", ""),
+                        "source_rank": i + 1})
     except Exception as e:  # noqa: BLE001
         log.warning("youtube chart failed: %s", e)
     return out
@@ -308,6 +334,8 @@ def youtube_outliers(cfg: dict) -> list[dict]:
                 continue
             rows.append({"topic": topic, "vph": vph, "ratio": ratio, "views": views, "hours": hours, "subs": s_count,
                          "desc": _clean_title(sn.get("description", ""))[:140],
+                         "video_id": v["id"], "source_url": f"https://www.youtube.com/watch?v={v['id']}",
+                         "published_at": sn.get("publishedAt", ""), "channel_title": sn.get("channelTitle", ""),
                          "query": found.get(v["id"], ("", ""))[0], "lane": found.get(v["id"], ("", ""))[1],
                          "hook": hook_pattern(topic)})
         # rank: speed (views/hour) and breakout (views vs. channel size) both matter
@@ -320,8 +348,12 @@ def youtube_outliers(cfg: dict) -> list[dict]:
                 "score": round(min(1.0, 0.55 + 0.45 * _norm_rank(i, n)), 4),
                 "context": [f"viral Short now: {r['views']:,} views in {r['hours']:.0f}h"
                             + (f", {r['ratio']:.0f}x its channel's subscribers" if r["subs"] else ""), r["desc"]],
+                "source_url": r["source_url"], "video_id": r["video_id"],
+                "published_at": r["published_at"], "channel_title": r["channel_title"],
                 "evidence": {"views": r["views"], "hours": round(r["hours"], 1), "vph": round(r["vph"]),
-                             "breakout": round(r["ratio"], 1)},
+                             "breakout": round(r["ratio"], 1), "video_id": r["video_id"],
+                             "video_url": r["source_url"], "published_at": r["published_at"],
+                             "channel_title": r["channel_title"], "search_query": r["query"]},
             })
         by_lane: dict[str, int] = {}
         for o in out:
@@ -376,10 +408,36 @@ def wikipedia_spikes(items: list[dict], lang: str = "en", top: int = 40) -> None
             it.setdefault("context", []).append(f"Wikipedia: {it.get('views', 0):,} views/day, {ratio:.1f}x its normal")
 
 
-SOURCE_ARMS = ["youtube_outliers", "wikipedia", "google_trends", "reddit", "hackernews", "on_this_day",
-               "youtube_chart", "evergreen"]
+SOURCE_ARMS = ["youtube_outliers", "google_trends", "youtube_chart", "reddit", "hackernews", "wikipedia",
+               "on_this_day", "evergreen"]
 
 LIVE_TREND_SOURCES = {"youtube_outliers", "google_trends", "hackernews", "youtube_chart"}
+
+
+def source_family(source: str) -> str:
+    """Independent trend platform, so repeats within one feed cannot masquerade as consensus."""
+    if str(source).startswith("reddit_"):
+        return "reddit"
+    if source in {"youtube_outliers", "youtube_chart"}:
+        return "youtube"
+    if source in {"wikipedia", "on_this_day"}:
+        return "wikimedia"
+    return str(source or "")
+
+
+def _signal_record(row: dict, captured_at: str) -> dict:
+    """Compact, serializable evidence that can be audited after the temporary run is gone."""
+    evidence = dict(row.get("evidence") or {}) if isinstance(row.get("evidence"), dict) else {}
+    for key in ("traffic", "views", "view_count", "spike", "source_rank", "source_date", "points",
+                "video_id", "published_at", "channel_title"):
+        if row.get(key) not in (None, ""):
+            evidence.setdefault(key, row[key])
+    context = [str(x)[:280] for x in (row.get("context") or [])[:3] if x]
+    return {"source": str(row.get("source") or ""),
+            "source_family": source_family(str(row.get("source") or "")),
+            "topic": str(row.get("topic") or "")[:200],
+            "score": row.get("score"), "source_url": str(row.get("source_url") or ""),
+            "captured_at": captured_at, "context": context, "evidence": evidence}
 
 
 def has_current_trend_evidence(candidate: dict, min_wikipedia_spike: float = 3.0) -> bool:
@@ -511,19 +569,37 @@ def collect(cfg: dict) -> list[dict]:
     raw += youtube_chart(region)
     log.info("collected %d raw trend signals from %d sources", len(raw), len({r['source'] for r in raw}))
 
-    # merge duplicates across sources (cross-source agreement boosts score)
+    # Merge exact-title duplicates, but only award a cross-source bonus for an independent
+    # platform family. Two Reddit feeds or two YouTube feeds are multiple observations, not
+    # independent-platform confirmation. Keep each measured signal for downstream review.
     merged: dict[str, dict] = {}
+    captured_at = now_utc().isoformat(timespec="seconds")
     for r in raw:
         key = re.sub(r"[^a-z0-9 ]", "", r["topic"].lower()).strip()
         if not key or len(key) < 3:
             continue
+        signal = _signal_record(r, captured_at)
         if key in merged:
             m = merged[key]
-            m["score"] = min(1.0, max(m["score"], r["score"]) + 0.15)
-            m["sources"].append(r["source"])
-            m["context"] = (m.get("context") or []) + (r.get("context") or [])
+            family = signal["source_family"]
+            if family not in m["source_families"]:
+                m["score"] = min(1.0, max(m["score"], r["score"]) + 0.15)
+                m["source_families"].append(family)
+            else:
+                m["score"] = max(m["score"], r["score"])
+            if r["source"] not in m["sources"]:
+                m["sources"].append(r["source"])
+            context = m.setdefault("context", [])
+            for item in r.get("context") or []:
+                if item and item not in context:
+                    context.append(item)
+            signature = (signal["source"], signal["source_url"], tuple(signal["context"]))
+            if signature not in {(x["source"], x["source_url"], tuple(x["context"])) for x in m["signals"]}:
+                m["signals"].append(signal)
         else:
-            merged[key] = {**r, "sources": [r["source"]], "topic_key": key}
+            family = signal["source_family"]
+            merged[key] = {**r, "sources": [r["source"]], "source_families": [family],
+                           "signals": [signal], "topic_key": key}
 
     # Safety triage (autotube/safety.py). At the candidate stage we only drop HARD-blocked subjects;
     # merely sensitive words ("war", "crash", "trial", "flood") are kept and judged later, in context,

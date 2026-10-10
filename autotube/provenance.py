@@ -49,10 +49,12 @@ def record(res: dict, entry: dict, cfg: dict) -> str:
             # This is what demonstrates editorial selection instead of bulk enumeration.
             "selection": {
                 "topic": topic.get("topic"), "category": topic.get("category"),
-                "trend_sources": topic.get("sources"), "trend_score": topic.get("score"),
-                "wikipedia_spike": topic.get("spike"),
+                "trend_sources": topic.get("sources"), "source_families": topic.get("source_families"),
+                "trend_score": topic.get("score"),
+                "wikipedia_spike": topic.get("spike"), "angle": topic.get("angle"),
                 "why_trending": topic.get("why_trending"), "viral_score": topic.get("viral_score"),
                 "evidence": (topic.get("context") or [])[:3],
+                "signals": (topic.get("signals") or [])[:8],
                 "format": (res.get("plan") or {}).get("format"),
                 "hook_style": (res.get("plan") or {}).get("hook_style"),
             },
@@ -76,7 +78,10 @@ def record(res: dict, entry: dict, cfg: dict) -> str:
             # Proof that each episode was checked and scored, and that the check was not
             # the same model marking its own homework.
             "review": {
-                "score": review.get("score"), "reviewer": review.get("reviewer"),
+                "score": review.get("score"), "coherence": review.get("coherence"),
+                "trend_alignment": review.get("trend_alignment"),
+                "trend_alignment_reason": review.get("trend_alignment_reason"),
+                "reviewer": review.get("reviewer"),
                 "independent": review.get("independent"), "issues": review.get("issues"),
             },
             # Which models, so a record written today is still interpretable after they

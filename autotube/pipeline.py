@@ -23,7 +23,7 @@ from .vision import VisionUnavailable
 from .target import daily_target
 from .common import OUTPUT_DIR, WORK_DIR, now_utc, read_json, slugify, write_json
 from .llm import LLM
-from .scriptwriter import ScriptWriter, spoken_text
+from .scriptwriter import ScriptWriter, spoken_text, trend_evidence_summary
 from .strategy import Strategy
 from .tts import synthesize
 
@@ -300,6 +300,22 @@ def produce_assets(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict,
             "subject": source["title"], "fx": effects_plan(script, plan, source, cfg)}
 
 
+def _trend_qa_evidence(topic: dict) -> list[str]:
+    """Pass measured trend rationale and auditable source links to final rendered-frame QA."""
+    rows = [trend_evidence_summary(topic)] if topic else []
+    for signal in (topic.get("signals") or []) if topic else []:
+        if not isinstance(signal, dict):
+            continue
+        source = str(signal.get("source") or "trend source")
+        url = str(signal.get("source_url") or "")
+        captured = str(signal.get("captured_at") or "")
+        if url:
+            rows.append(f"{source} source link: {url}" + (f" (captured {captured})" if captured else ""))
+        if len(rows) >= 4:
+            break
+    return rows[:4]
+
+
 def render_with_qa(a: dict, cfg: dict, writer: ScriptWriter) -> tuple[dict, dict]:
     """Render, verify the finished MP4 against the narration, repair a bad shot, repeat."""
     # Clamped at zero so the loop always runs at least once: `r` is bound inside it and used
@@ -312,14 +328,16 @@ def render_with_qa(a: dict, cfg: dict, writer: ScriptWriter) -> tuple[dict, dict
         r = render.render(a["tts"], a["visuals"]["shots"], a["music"], a["hook_card"],
                           cfg["channel"]["name"], cfg, a["work"], a["out"], a["seed"], fx=a["fx"])
         report = qa.verify(a["out"], r["timeline"], a["visuals"]["shots"], a["tts"], a["script"],
-                           a["title"], a["hook_card"], a["subject"], writer.llm, cfg)
+                           a["title"], a["hook_card"], a["subject"], writer.llm, cfg,
+                           trend_angle=(a.get("topic") or {}).get("angle") or "",
+                           trend_evidence=_trend_qa_evidence(a.get("topic") or {}))
         report["attempt"] = attempt + 1
         if report["passed"]:
             log.info("  ✓ final QA passed: %d frames checked against the narration", len(report["frames"]))
             break
         log.info("  ✗ final QA attempt %d: %s", attempt + 1, "; ".join(report["issues"])[:500])
-        if not report["failed"] or len(report["failed"]) < len(report["issues"]):
-            break                    # a non-image problem (narration/title/hook) can't be fixed by swapping photos
+        if not report.get("repairable"):
+            break                    # narration/title/hook or structural problems cannot be fixed by swapping shots
         if not all(media.use_alternative(a["visuals"], seg, path, a["work"] / "img")
                    for seg, path in report["failed"]):
             break
@@ -343,15 +361,21 @@ def _shots_sheet(visuals: dict, out) -> None:
 
 def _trend_provenance(topic: dict) -> dict:
     return {"sources": list(topic.get("sources") or []),
+            "source_families": list(topic.get("source_families") or []),
             "score": topic.get("score"), "viral_score": topic.get("viral_score"),
-            "wikipedia_spike": topic.get("spike"), "why_trending": topic.get("why_trending"),
-            "evidence": (topic.get("context") or [])[:4]}
+            "angle": topic.get("angle"), "wikipedia_spike": topic.get("spike"),
+            "why_trending": topic.get("why_trending"),
+            "evidence": (topic.get("context") or [])[:4],
+            "signals": (topic.get("signals") or [])[:8]}
 
 
 def _history_trend(topic: dict) -> dict:
-    return {"trend_sources": list(topic.get("sources") or []), "trend_score": topic.get("score"),
-            "wikipedia_spike": topic.get("spike"), "why_trending": topic.get("why_trending"),
-            "viral_score": topic.get("viral_score"), "trend_evidence": (topic.get("context") or [])[:2]}
+    return {"trend_sources": list(topic.get("sources") or []),
+            "trend_source_families": list(topic.get("source_families") or []),
+            "trend_score": topic.get("score"), "trend_angle": topic.get("angle"), "wikipedia_spike": topic.get("spike"),
+            "why_trending": topic.get("why_trending"), "viral_score": topic.get("viral_score"),
+            "trend_evidence": (topic.get("context") or [])[:2],
+            "trend_signals": (topic.get("signals") or [])[:6]}
 
 
 def _shot_provenance(shots: list[dict]) -> list[dict]:
@@ -514,6 +538,8 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
                        "source": trends.primary_source(res["topic"].get("sources", []))},
             **_history_trend(res["topic"]),
             "review_score": res["review"].get("score"),
+            "trend_alignment": res["review"].get("trend_alignment"),
+            "trend_alignment_reason": res["review"].get("trend_alignment_reason"),
             "reviewer": res["review"].get("reviewer"),
             "review_independent": res["review"].get("independent"),
             "series": res.get("series"), "episode": res.get("episode"),

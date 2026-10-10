@@ -5,9 +5,10 @@ Runs on the rendered MP4 itself (not on the plan), so it also catches render/tim
   1. Narration  – the synthesized speech's word timings must match the script text (captions come from them).
   2. Coverage   – every narration line has at least one shot on screen, each verified ≥ threshold by a vision
                   model for that line (defensive re-check of the selection step).
-  3. Frames     – one frame from the middle of every shot is shown to a vision model with the exact words,
-                  intended-shot request and selected-asset provenance. A blind adversarial second look
-                  challenges positive matches. Every frame must clearly fit the words and intended scene.
+  3. Frames     – still shots are sampled once; moving clips are sampled near the start, middle and end. Each
+                  rendered frame is shown to a vision model with the exact words, trend angle, intended-shot
+                  request and selected-asset provenance. A blind adversarial second look challenges positive
+                  matches. Every sample must clearly fit the words and intended scene.
 
 `verify()` returns a report; the pipeline only uploads when report["passed"] is True. If no vision model can be
 reached the gate raises vision.VisionUnavailable — an unverified video is never published.
@@ -130,27 +131,40 @@ def _shot_context(t: dict, shots: list[dict]) -> dict:
 
 def frame_check(mp4: Path, timeline: list[dict], shots: list[dict], tts: dict, script: dict,
                 title: str, hook: str, subject: str, llm, cfg: dict,
-                retry_pauses=(20, 60)) -> tuple[list[dict], dict]:
+                retry_pauses=(20, 60), trend_angle: str = "",
+                trend_evidence: list[str] | None = None) -> tuple[list[dict], dict]:
     segs = tts["segments"]
     n_lines = len(segs)
     items = []
     for k, t in enumerate(timeline):
-        mid = t["start"] + 0.55 * (t["end"] - t["start"])
+        context = _shot_context(t, shots)
+        path = str(t.get("path", ""))
+        moving = context["kind"].lower() == "video" or path.lower().endswith((".mp4", ".webm", ".mov", ".mkv"))
+        # A single midpoint can miss a scene change or a misleading insert in moving footage.
+        # Stills get one representative frame; each finished clip is checked near its start,
+        # middle and end (away from the crossfade edges).
+        fractions = (0.2, 0.5, 0.8) if moving and t["end"] - t["start"] >= 1.0 else (0.55,)
         seg = segs[t["seg"]]
         spoken = _spoken_during(seg, t["start"], t["end"]) or seg["text"]
         role = "hook" if t["seg"] == 0 else ("call to action" if t["seg"] == n_lines - 1 else "")
         fact = script["segments"][t["seg"]]["text"] if t["seg"] < len(script["segments"]) else seg["text"]
-        items.append({"k": k, "seg": t["seg"], "path": t["path"], "t": round(mid, 2), "line": fact,
-                      "spoken": spoken, "role": role, "context": _shot_context(t, shots),
-                      "img": _frame_at(mp4, mid)})
+        for sample_idx, fraction in enumerate(fractions, start=1):
+            stamp = t["start"] + fraction * (t["end"] - t["start"])
+            items.append({"k": k, "seg": t["seg"], "path": path, "t": round(stamp, 2), "line": fact,
+                          "spoken": spoken, "role": role, "context": context,
+                          "sample": sample_idx, "samples": len(fractions), "fraction": fraction,
+                          "img": _frame_at(mp4, stamp)})
 
-    results, meta = [], {"hook_text_ok": True, "title_ok": True, "notes": []}
+    trend_evidence = [str(x)[:220] for x in (trend_evidence or []) if x][:4]
+    results, meta = [], {"hook_text_ok": True, "title_ok": True, "notes": [],
+                         "trend_angle": str(trend_angle or "")[:400], "trend_evidence": trend_evidence}
     per_sheet = int(cfg.get("qa", {}).get("frames_per_sheet", 8))
     for b in range(0, len(items), per_sheet):
         batch = items[b:b + per_sheet]
         first = b == 0
         rows = "\n".join(
             f'  {j + 1} | line {it["seg"] + 1}/{n_lines}{" (" + it["role"] + ")" if it["role"] else ""} | '
+            f'sample {it["sample"]}/{it["samples"]} at {it["t"]:.2f}s | '
             f'intended shot: "{it["context"]["intended"] or "not recorded"}" | '
             f'selected image description: "{it["context"]["selected_description"] or "not recorded"}" | '
             f'asset title: "{it["context"]["asset_title"] or "not recorded"}" | '
@@ -159,14 +173,20 @@ def frame_check(mp4: Path, timeline: list[dict], shots: list[dict], tts: dict, s
             for j, it in enumerate(batch))
         extra = (f'\nFrame 1 also shows the on-screen hook text "{hook}". Is that text accurate for this video, and '
                  f'does the title "{title}" describe what this video actually shows and says?') if first else ""
+        evidence_block = "\n".join(f"- {x}" for x in trend_evidence) or "- see the cited trend record"
         user = f"""VIDEO SUBJECT: {subject}
 VIDEO TITLE: {title}
+CURRENT TREND ANGLE: {trend_angle or "not recorded"}
+TREND SIGNAL CONTEXT (discovery evidence, not factual source text):
+{evidence_block}
 
 The attached sheet shows {len(batch)} frames from the finished vertical video, numbered 1-{len(batch)} (number in the
-yellow box at each frame's bottom-left). Ignore the burned-in captions, the small channel name at the top, the
-progress bar, the hook title box, big animated numbers, a "PROVEN" stamp / source card, countdown digits, a white
-flash and the blurred background fill — judge the MAIN PHOTO. The narrator sometimes adds a short joke after a line;
-judge the photo against the factual "full line".
+yellow box at each frame's bottom-left). For video assets, several samples from the same clip are listed separately.
+Ignore the burned-in captions, the small channel name at the top, the progress bar, the hook title box, big animated
+numbers, a "PROVEN" stamp / source card, countdown digits, a white flash and the blurred background fill — judge the
+MAIN PHOTO. The narrator sometimes adds a short joke after a line; judge the photo against the factual "full line".
+The story sequence must preserve the specific trend angle, not merely share the broad subject; each frame must still
+match the exact narration and intended shot, and trend evidence itself never proves a factual claim.
 
 For EACH frame, compare the visible main photo against all of: (1) the factual narration, (2) the intended shot request,
 and (3) the selected asset description and provenance shown below. The descriptions and asset metadata are clues, not
@@ -214,7 +234,8 @@ Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "scor
             ctx = it["context"]
             audit_user = f"""ADVERSARIAL SECOND LOOK — INSPECT THIS SINGLE FRAME, NOT A CONTACT SHEET.
 VIDEO SUBJECT: {subject}
-  1 | line {it['seg'] + 1}/{n_lines} | intended shot: "{ctx['intended'] or 'not recorded'}"
+CURRENT TREND ANGLE: {trend_angle or "not recorded"}
+  1 | line {it['seg'] + 1}/{n_lines}, sample {it['sample']}/{it['samples']} at {it['t']:.2f}s | intended shot: "{ctx['intended'] or 'not recorded'}"
 Selected image description: "{ctx['selected_description'] or 'not recorded'}"
 Asset title/source: "{ctx['asset_title'] or 'not recorded'}" / "{ctx['asset_source'] or 'not recorded'} {ctx['asset_page']}"
 Exact narration while this frame is visible: "{it['spoken']}"
@@ -256,7 +277,8 @@ Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "scor
             if a is not None and (not a.get("match") or float(a.get("score") or 0) < float(cfg.get("qa", {}).get("min_frame_score", 7))):
                 audit_issue = str(a.get("issue") or "adversarial audit could not confirm this image")
                 issue = (issue + "; adversarial audit: " + audit_issue).strip("; ")
-            results.append({"seg": it["seg"], "path": it["path"], "t": it["t"], "spoken": it["spoken"][:140],
+            results.append({"seg": it["seg"], "path": it["path"], "t": it["t"],
+                            "sample": it["sample"], "samples": it["samples"], "spoken": it["spoken"][:140],
                             "intended_shot": it["context"]["intended"][:160],
                             "selected_image": it["context"]["selected_description"][:120],
                             "asset_title": it["context"]["asset_title"][:120],
@@ -272,25 +294,31 @@ Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "scor
     return results, meta
 
 def verify(mp4: Path, timeline: list[dict], shots: list[dict], tts: dict, script: dict, title: str, hook: str,
-           subject: str, llm, cfg: dict) -> dict:
+           subject: str, llm, cfg: dict, trend_angle: str = "",
+           trend_evidence: list[str] | None = None) -> dict:
     min_score = float(cfg["media"].get("min_match_score", 7))
     qa_min = float(cfg.get("qa", {}).get("min_frame_score", 7))
-    report = {"passed": False, "issues": [], "frames": [], "failed": []}
+    report = {"passed": False, "issues": [], "frames": [], "failed": [], "repairable": False}
     report["issues"] += narration_check(tts, script)
     report["issues"] += coverage_check(timeline, shots, len(script["segments"]), min_score)
     if report["issues"]:
         return report                                  # structural problems: don't even spend a vision call
-    frames, meta = frame_check(mp4, timeline, shots, tts, script, title, hook, subject, llm, cfg)
+    frames, meta = frame_check(mp4, timeline, shots, tts, script, title, hook, subject, llm, cfg,
+                               trend_angle=trend_angle, trend_evidence=trend_evidence)
     report["frames"] = frames
+    failed_shots = set()
     for f in frames:
         if not f["match"] or f["score"] < qa_min:
-            report["failed"].append((f["seg"], f["path"]))
-            report["issues"].append(f"line {f['seg'] + 1} @ {f['t']}s shows '{f['shows']}' while saying "
+            failed_shots.add((f["seg"], f["path"]))
+            report["issues"].append(f"line {f['seg'] + 1} sample {f.get('sample', 1)}/{f.get('samples', 1)} "
+                                    f"@ {f['t']}s shows '{f['shows']}' while saying "
                                     f"'{f['spoken'][:70]}' ({f['score']:.0f}/10: {f['issue']})")
+    report["failed"] = sorted(failed_shots)
     if not meta["hook_text_ok"]:
         report["issues"].append(f"hook text '{hook}' judged inaccurate")
     if not meta["title_ok"]:
         report["issues"].append(f"title '{title}' judged not to match the video")
+    report["repairable"] = bool(report["failed"]) and meta["hook_text_ok"] and meta["title_ok"]
     report["meta"] = meta
     report["passed"] = not report["issues"]
     return report
