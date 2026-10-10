@@ -1,22 +1,22 @@
 {
-  "updated": "2026-10-10T18:54:54.968954+00:00",
+  "updated": "2026-10-10T22:31:51.415336+00:00",
   "videos_total": 43,
   "videos_7d": 14,
-  "views_7d": 6553,
-  "learned_this_run": 26,
+  "views_7d": 6699,
+  "learned_this_run": 1,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 24,
+      "observations": 25,
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.569,
-          "n": 4
+          "mean": 0.554,
+          "n": 5
         },
         {
           "arm": "space",
-          "mean": 0.537,
+          "mean": 0.536,
           "n": 1
         },
         {
@@ -53,7 +53,7 @@
     },
     "format": {
       "status": "learning",
-      "observations": 18,
+      "observations": 19,
       "arms": [
         {
           "arm": "scale_shock",
@@ -67,17 +67,17 @@
         },
         {
           "arm": "would_you_survive",
-          "mean": 0.537,
+          "mean": 0.536,
           "n": 1
-        },
-        {
-          "arm": "creepy_true",
-          "mean": 0.52,
-          "n": 2
         },
         {
           "arm": "sounds_fake",
           "mean": 0.512,
+          "n": 3
+        },
+        {
+          "arm": "creepy_true",
+          "mean": 0.509,
           "n": 3
         },
         {
@@ -221,18 +221,13 @@
       ]
     },
     "comment_device": {
-      "status": "exploring (7/8)",
-      "observations": 7,
+      "status": "learning",
+      "observations": 8,
       "arms": [
         {
           "arm": "correction_bait",
           "mean": 0.513,
           "n": 4
-        },
-        {
-          "arm": "poll",
-          "mean": 0.504,
-          "n": 2
         },
         {
           "arm": "none",
@@ -250,6 +245,11 @@
           "n": 0
         },
         {
+          "arm": "poll",
+          "mean": 0.496,
+          "n": 3
+        },
+        {
           "arm": "challenge",
           "mean": 0.488,
           "n": 1
@@ -261,13 +261,13 @@
     {
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
-      "views": 1467,
-      "avg_view_pct": 132.14
+      "views": 1515,
+      "avg_view_pct": 125.34
     },
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1443,
+      "views": 1444,
       "avg_view_pct": 90.69
     },
     {
@@ -279,14 +279,14 @@
     {
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
-      "views": 1282,
+      "views": 1283,
       "avg_view_pct": 51.93
     },
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1231,
-      "avg_view_pct": 80.03
+      "avg_view_pct": 79.99
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -323,7 +323,7 @@
   "retention": {
     "videos": 26,
     "where": "hook",
-    "verdict": "Largest relative watch-ratio drop: 23% of the opening level between 10% and 20% of runtime (opening). This is a ratio-curve change, not a percentage of viewers. Median average view percentage is 55% against the internal 70% target.",
+    "verdict": "Largest relative watch-ratio drop: 23% of the opening level between 10% and 20% of runtime (opening). This is a ratio-curve change, not a percentage of viewers. Median average view percentage is 56% against the internal 70% target.",
     "avg_curve": [
       1.2907,
       1.1972,
@@ -337,7 +337,7 @@
       0.3719,
       0.3116
     ],
-    "median_avg_view_pct": 55.41,
+    "median_avg_view_pct": 56.22,
     "worst_drop": {
       "size_of_opening_ratio": 0.2253,
       "from_pct": 10,
@@ -345,37 +345,37 @@
     }
   },
   "average_view_target": {
-    "n": 29,
+    "n": 30,
     "gate_pct": 70.0,
     "metric": "average_view_percentage",
-    "passing": 6,
-    "pass_rate": 0.207,
-    "median_avg_view_pct": 56.22,
-    "verdict": "6/29 measured videos clear the internal 70% average-view target (median 56%). This is average watch percentage, not the share of viewers who reached the end."
+    "passing": 8,
+    "pass_rate": 0.267,
+    "median_avg_view_pct": 57.83,
+    "verdict": "8/30 measured videos clear the internal 70% average-view target (median 58%). This is average watch percentage, not the share of viewers who reached the end."
   },
   "subscribers": {
     "net_90d": 26,
-    "views_90d": 25197,
+    "views_90d": 25346,
     "per_1k_views": 1.03,
-    "videos": 35,
+    "videos": 34,
     "denominator_basis": "public_views_fallback",
-    "videos_with_engaged_views": 30,
+    "videos_with_engaged_views": 33,
     "complete_engaged_view_coverage": false,
     "days_to_500": 1730.8,
     "days_to_1000": 3461.5
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 9344,
+    "engaged_views_90d": 9610,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003115,
-    "current_full_threshold_progress": 0.000934,
-    "feb_2027_full_threshold_progress": 0.000467,
+    "expanded_threshold_progress": 0.003203,
+    "current_full_threshold_progress": 0.000961,
+    "feb_2027_full_threshold_progress": 0.000481,
     "public_videos": 34,
-    "videos_with_metric": 30,
-    "coverage": 0.882,
+    "videos_with_metric": 33,
+    "coverage": 0.971,
     "complete": false,
     "note": "Partial if coverage is below 100%; only YouTube Analytics engagedViews count toward this proxy."
   },
