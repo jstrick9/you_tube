@@ -760,9 +760,14 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
     from . import vision
 
     mcfg = cfg["media"]
-    allowed = cfg["compliance"]["allowed_licenses"]
+    compliance = cfg.get("compliance", {}) or {}
+    allowed = compliance.get("allowed_licenses", [])
     min_w = mcfg["min_image_width"]
-    sources = mcfg["sources"]
+    configured_sources = list(mcfg.get("sources", []))
+    synthetic_disclosure = bool(compliance.get("contains_synthetic_media", False))
+    sources = configured_sources if synthetic_disclosure else [s for s in configured_sources if s != "pixazo"]
+    if "pixazo" in configured_sources and not synthetic_disclosure:
+        log.warning("Pixazo candidate generation disabled: compliance.contains_synthetic_media is false")
     min_score = float(mcfg.get("min_match_score", 7))
     multi_after = float(mcfg.get("multi_shot_seconds", 4.5))
     video_bonus = float(mcfg.get("video_bonus", 1.0)) if mcfg.get("prefer_video", True) else 0.0

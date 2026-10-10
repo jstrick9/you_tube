@@ -206,7 +206,11 @@ trends:
   outlier_window_hours: 72
   outlier_min_views: 30000
   wikipedia_spike_check: 40              # top-N Wikipedia pages compared with their own 30-day normal
-  min_wikipedia_spike: 3.0               # Wikipedia qualifies alone only at >=3x its own 30-day baseline
+  min_wikipedia_spike: 3.0               # Wikipedia is corroboration only, and only at >=3x its own 30-day baseline
+  min_google_trend_traffic: 1000          # measured RSS traffic needed for Google Trends to qualify alone
+  min_independent_trend_families: 2       # weak live signals must agree across distinct platforms, not repeated feeds
+  min_hackernews_points: 10                # minimum current front-page response before HN can corroborate
+  trend_evidence_max_age_hours: 36        # source capture timestamp must be recent; YouTube outliers also recheck video age
   # Off: an anniversary is a calendar entry, not a trend. Nothing is happening right
   # now because something happened on this date in 1847, and every channel with a
   # scheduler has the same list. Trend sources must be things actually moving today.
@@ -370,7 +374,9 @@ media:
   # photos: pexels (only with PEXELS_API_KEY), wikimedia, openverse
   # moving footage: commons_video (Wikimedia Commons videos), nasa_video (NASA library, public domain, keyless),
   #                 pexels_video (only with PEXELS_API_KEY — portrait stock clips)
-  sources: [commons_video, nasa_video, archive_video, pexels_video, pexels, wikimedia, openverse, pixazo]
+  # Pixazo-generated visuals are off by default for factual Archive 13 footage; media.gather also suppresses
+  # the provider whenever compliance.contains_synthetic_media is false, even if it is accidentally listed here.
+  sources: [commons_video, nasa_video, archive_video, pexels_video, pexels, wikimedia, openverse]
   prefer_video: true                     # a verified clip beats an equally good still (motion holds attention)
   video_bonus: 1.0
   # Ranking nudge toward assets that fill a 9:16 frame without upscaling (see media.shape_bonus).

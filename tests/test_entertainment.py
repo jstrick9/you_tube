@@ -156,9 +156,16 @@ def test_selector_asks_for_fitting_formats():
                                "angle": "the stone warned people drought had returned",
                                "formats": ["creepy_true", "plot_twist", "not_a_format"]}]}
 
-    cands = [{"topic": "Hunger stone", "topic_key": "hunger stone", "sources": ["wikipedia"],
+    captured_at = common.now_utc().isoformat(timespec="seconds")
+    cands = [{"topic": "Hunger stone", "topic_key": "hunger stone", "sources": ["wikipedia", "google_trends"],
               "score": 0.9, "spike": 4.2,
-              "context": ["Wikipedia readership is 4.2x its 30-day baseline"]}]
+              "context": ["Wikipedia readership is 4.2x its 30-day baseline"],
+              "signals": [
+                  {"source": "wikipedia", "source_url": "https://en.wikipedia.org/wiki/Hunger_stone",
+                   "captured_at": captured_at, "evidence": {"spike": 4.2}},
+                  {"source": "google_trends", "source_url": "https://trends.test/hunger-stone",
+                   "captured_at": captured_at, "evidence": {"traffic": 1_200}},
+              ]}]
     picks = ScriptWriter(CFG, LLM(), _strategy()).select_topics(cands, 1, set())
     assert "FORMATS we can make" in LLM.prompt and "ENTERTAINING" in LLM.prompt
     assert "not_a_format" not in picks[0]["formats"] and "plot_twist" in picks[0]["formats"]

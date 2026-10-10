@@ -468,7 +468,7 @@ def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int,
         viral_score = float(topic.get("viral_score", 0))
     except (TypeError, ValueError):
         viral_score = 0.0
-    if not trends.has_current_trend_evidence(topic, min_wiki_spike):
+    if not trends.has_current_trend_evidence(topic, min_wiki_spike, trend_cfg):
         log.info("  ✗ refusing topic %r without a qualifying live trend signal", topic.get("topic"))
         return None
     if viral_score < min_viral:

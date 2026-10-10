@@ -21,7 +21,7 @@ import logging
 import math
 import os
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from urllib.parse import quote
 
 import feedparser
@@ -411,9 +411,6 @@ def wikipedia_spikes(items: list[dict], lang: str = "en", top: int = 40) -> None
 SOURCE_ARMS = ["youtube_outliers", "google_trends", "youtube_chart", "reddit", "hackernews", "wikipedia",
                "on_this_day", "evergreen"]
 
-LIVE_TREND_SOURCES = {"youtube_outliers", "google_trends", "hackernews", "youtube_chart"}
-
-
 def source_family(source: str) -> str:
     """Independent trend platform, so repeats within one feed cannot masquerade as consensus."""
     if str(source).startswith("reddit_"):
@@ -440,28 +437,108 @@ def _signal_record(row: dict, captured_at: str) -> dict:
             "captured_at": captured_at, "context": context, "evidence": evidence}
 
 
-def has_current_trend_evidence(candidate: dict, min_wikipedia_spike: float = 3.0) -> bool:
-    """Require an active signal; a Wikipedia listing or evergreen subject alone is not enough.
-
-    Google Trends is a live search feed; Reddit entries are top posts for today; Hacker News and
-    YouTube chart/outlier rows are current platform signals. Wikipedia can qualify only when the
-    page's recent readership is at least ``min_wikipedia_spike`` times its own 30-day baseline.
-    Anniversaries and evergreen seeds are intentionally not standalone trend evidence.
-    """
-    raw_sources = candidate.get("sources") or ([candidate.get("source")] if candidate.get("source") else [])
-    if isinstance(raw_sources, str):
-        raw_sources = [raw_sources]
-    sources = {str(s) for s in raw_sources if s}
-    if any(s in LIVE_TREND_SOURCES or s == "reddit" or s.startswith("reddit_") for s in sources):
-        return True
-    if "wikipedia" not in sources:
+def _signal_is_recent(signal: dict, max_age_hours: float, now: datetime | None = None) -> bool:
+    """Require a recent, auditable collection timestamp; source names alone are never evidence."""
+    raw = signal.get("captured_at")
+    if not raw:
         return False
     try:
-        spike = float(candidate.get("spike") or 0.0)
-        threshold = float(min_wikipedia_spike)
-    except (TypeError, ValueError):
+        captured = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+        if captured.tzinfo is None:
+            captured = captured.replace(tzinfo=timezone.utc)
+        age = (now or now_utc()) - captured.astimezone(timezone.utc)
+        return timedelta(minutes=-5) <= age <= timedelta(hours=max_age_hours)
+    except (TypeError, ValueError, OverflowError):
         return False
-    return spike >= threshold > 0
+
+
+def _evidence_number(value, default: float = 0.0) -> float:
+    try:
+        number = float(value)
+        return number if math.isfinite(number) else default
+    except (TypeError, ValueError, OverflowError):
+        return default
+
+
+def has_current_trend_evidence(candidate: dict, min_wikipedia_spike: float = 3.0,
+                               trend_cfg: dict | None = None) -> bool:
+    """Require measured, recent, source-linked trend evidence.
+
+    A measured YouTube outlier or a sufficiently strong Google Trends result can qualify on its own.
+    Reddit, Hacker News, YouTube-chart and Wikipedia-spike signals are discovery/corroboration
+    evidence only: at least two *independent source families* must agree. Multiple subreddits still
+    count as one family; a Wikipedia listing, anniversary, evergreen seed, or source label alone never
+    proves a topic is trending. Every accepted signal must retain a URL and recent capture timestamp.
+    """
+    if not isinstance(candidate, dict):
+        return False
+    tcfg = trend_cfg or {}
+    try:
+        wiki_threshold = float(min_wikipedia_spike)
+    except (TypeError, ValueError):
+        wiki_threshold = 3.0
+    min_views = max(1, int(_evidence_number(tcfg.get("outlier_min_views", 30_000), 30_000)))
+    max_outlier_hours = max(0.0, _evidence_number(tcfg.get("outlier_window_hours", 72), 72))
+    min_google_traffic = max(1, int(_evidence_number(tcfg.get("min_google_trend_traffic", 1_000), 1_000)))
+    min_hn_points = max(1, int(_evidence_number(tcfg.get("min_hackernews_points", 10), 10)))
+    max_capture_age = max(0.0, _evidence_number(tcfg.get("trend_evidence_max_age_hours", 36), 36))
+    min_families = max(2, int(_evidence_number(tcfg.get("min_independent_trend_families", 2), 2)))
+    if wiki_threshold <= 0 or max_outlier_hours <= 0 or max_capture_age <= 0:
+        return False
+
+    signals = candidate.get("signals")
+    if not isinstance(signals, list):
+        return False
+    now = now_utc()
+    corroborating_families: set[str] = set()
+    for signal in signals:
+        if not isinstance(signal, dict) or not _signal_is_recent(signal, max_capture_age, now):
+            continue
+        source = str(signal.get("source") or "")
+        evidence = signal.get("evidence") if isinstance(signal.get("evidence"), dict) else {}
+        source_url = str(signal.get("source_url") or evidence.get("video_url") or "").strip()
+        if not source_url.lower().startswith(("https://", "http://")):
+            continue
+
+        if source == "youtube_outliers":
+            views = _evidence_number(evidence.get("views") or evidence.get("view_count"))
+            hours = _evidence_number(evidence.get("hours"))
+            vph = _evidence_number(evidence.get("vph"), views / hours if hours > 0 else 0.0)
+            video_id = str(evidence.get("video_id") or signal.get("video_id") or "").strip()
+            if views >= min_views and 0 < hours <= max_outlier_hours and vph > 0 and video_id:
+                return True
+            continue
+
+        if source == "google_trends":
+            traffic = _evidence_number(evidence.get("traffic") or signal.get("traffic"))
+            if traffic >= min_google_traffic:
+                return True
+            if traffic > 0:
+                corroborating_families.add("google_trends")
+            continue
+
+        if source == "wikipedia":
+            spike = _evidence_number(evidence.get("spike") or signal.get("spike"))
+            if spike >= wiki_threshold:
+                corroborating_families.add("wikimedia")
+            continue
+
+        if source == "youtube_chart":
+            views = _evidence_number(evidence.get("view_count") or evidence.get("views"))
+            if views > 0:
+                corroborating_families.add("youtube")
+            continue
+
+        if source == "hackernews":
+            points = _evidence_number(evidence.get("points") or signal.get("points"))
+            if points >= min_hn_points:
+                corroborating_families.add("hackernews")
+            continue
+
+        if source.startswith("reddit_"):
+            corroborating_families.add("reddit")
+
+    return len(corroborating_families) >= min_families
 
 
 def primary_source(sources: list[str]) -> str:
@@ -619,7 +696,7 @@ def collect(cfg: dict) -> list[dict]:
         out.append(c)
     out.sort(key=lambda x: -x["score"])
     min_wiki_spike = float(tcfg.get("min_wikipedia_spike", 3.0))
-    eligible = [c for c in out if has_current_trend_evidence(c, min_wiki_spike)]
+    eligible = [c for c in out if has_current_trend_evidence(c, min_wiki_spike, tcfg)]
     log.info("%d candidates after merge + safety triage (%d hard-blocked, %d kept for context review); "
              "%d have a qualifying current trend signal (%d excluded)",
              len(out), hard, flagged, len(eligible), len(out) - len(eligible))

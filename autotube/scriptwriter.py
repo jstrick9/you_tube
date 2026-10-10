@@ -567,7 +567,12 @@ class ScriptWriter:
         min_viral = float(ccfg.get("min_viral_score", 7))
         trend_cfg = self.cfg.get("trends", {}) or {}
         min_wiki_spike = float(trend_cfg.get("min_wikipedia_spike", 3.0))
-        eligible = [c for c in candidates if has_current_trend_evidence(c, min_wiki_spike)]
+        min_google_traffic = int(trend_cfg.get("min_google_trend_traffic", 1_000))
+        min_families = max(2, int(trend_cfg.get("min_independent_trend_families", 2)))
+        min_hn_points = int(trend_cfg.get("min_hackernews_points", 10))
+        outlier_min_views = int(trend_cfg.get("outlier_min_views", 30_000))
+        outlier_window_hours = float(trend_cfg.get("outlier_window_hours", 72))
+        eligible = [c for c in candidates if has_current_trend_evidence(c, min_wiki_spike, trend_cfg)]
         if len(eligible) < len(candidates):
             log.info("excluding %d candidate(s) without a qualifying live trend signal",
                      len(candidates) - len(eligible))
@@ -601,11 +606,12 @@ CHANNEL NICHE: {self.cfg['channel']['niche']}
 CATEGORIES (learned audience preference 0-1 from our own analytics, favor higher): {json.dumps(weights)}
 RECENTLY COVERED (avoid): {', '.join(list(recent)[:40]) or 'none'}
 
-LIVE TREND CANDIDATES (every one is trending now; evidence shows how strongly):
-  youtube_outliers = a fact Short on this topic is going viral right now (proven demand — strongest signal)
-  wikipedia only qualifies when recent readership is at least {min_wiki_spike:g}x its own 30-day normal
-  google_trends = live search spike; reddit_* = top post today; HN/YouTube chart = current platform signal
-  Evergreen subjects, a Wikipedia listing without a qualifying spike, and a calendar anniversary alone do NOT prove a trend.
+LIVE TREND CANDIDATES (every one has a recent capture time and auditable source URL):
+  youtube_outliers = a measured Short with >= {outlier_min_views:,} views in <= {outlier_window_hours:g}h and measured views/hour; it may qualify alone
+  google_trends = live feed with >= {min_google_traffic:,} approximate searches; it may qualify alone
+  Lower-volume Google Trends, Reddit top-day posts, Hacker News (>= {min_hn_points} points), YouTube chart, and Wikipedia spikes are corroboration only: at least {min_families} independent source families must agree
+  Reddit feeds all count as ONE family; YouTube chart and outliers are ONE family; Wikipedia counts only at >= {min_wiki_spike:g}x its own 30-day readership baseline
+  A source label, plain Wikipedia listing, evergreen seed, or calendar anniversary alone does NOT prove a trend.
 {listing}
 
 Pick the {want} candidates most likely to make a VIRAL, genuinely ENTERTAINING (not just "interesting") YouTube Short

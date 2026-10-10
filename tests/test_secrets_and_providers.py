@@ -514,9 +514,8 @@ def test_both_spellings_reach_the_workflows():
 def test_generated_imagery_is_labelled_and_last():
     """"Every file is real" is the channel's claim and the appeal's evidence.
 
-    Generated frames are allowed as a last resort, but they must never be silently
-    mixed into a provenance record whose whole value is being truthful about what the
-    footage is.
+    Keep the optional provider plainly labelled and ordered behind real sources. Production
+    additionally requires the explicit synthetic-media disclosure flag before dispatching it.
     """
     import autotube.media as M
     src = (ROOT / "autotube" / "media.py").read_text()
@@ -534,9 +533,10 @@ def test_generated_imagery_is_labelled_and_last():
         "must no-op without a key"
 
 
-def test_pixazo_is_configured_last_in_the_source_order():
+def test_pixazo_is_disabled_by_default_without_synthetic_disclosure():
     srcs = CFG["media"]["sources"]
-    assert srcs[-1] == "pixazo", f"generated imagery should be the final fallback, got {srcs}"
+    assert "pixazo" not in srcs, f"factual visuals should default to real sources only, got {srcs}"
+    assert CFG["compliance"]["contains_synthetic_media"] is False
 
 
 # ── series numbering ────────────────────────────────────────────────────────

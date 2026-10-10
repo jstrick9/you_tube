@@ -10,6 +10,12 @@ from autotube.scriptwriter import ScriptWriter  # noqa: E402
 CFG = common.load_config()
 
 
+def signal(source, url, evidence=None, captured_at=None):
+    return {"source": source, "source_family": trends.source_family(source), "source_url": url,
+            "captured_at": captured_at or common.now_utc().isoformat(timespec="seconds"),
+            "evidence": evidence or {}}
+
+
 class Strat:
     def category_weight(self, c):
         return 0.5
@@ -40,12 +46,23 @@ def cands():
     out = []
     for t, s, sc, ctx, spike in rows:
         candidate = {"topic": t, "topic_key": t.lower(), "source": s, "sources": [s], "score": sc,
-                     "context": ctx, "spike": spike}
-        if t.startswith("Octopus"):
-            candidate["signals"] = [{
-                "source": "youtube_outliers", "source_url": "https://youtube.test/short",
-                "evidence": {"views": 2_000_000, "hours": 20, "vph": 100_000, "breakout": 4.2},
-            }]
+                     "context": ctx, "spike": spike, "signals": []}
+        if t == "Hunger stone":
+            candidate["sources"].append("google_trends")
+            candidate["signals"] = [
+                signal("wikipedia", "https://en.wikipedia.org/wiki/Hunger_stone",
+                       {"spike": 1496.5, "views": 111_489}),
+                signal("google_trends", "https://trends.test/hunger-stone", {"traffic": 25_000}),
+            ]
+        elif t == "Willie Mays":
+            candidate["signals"] = [signal("wikipedia", "https://en.wikipedia.org/wiki/Willie_Mays",
+                                           {"views": 42_000})]
+        elif t.startswith("Octopus"):
+            candidate["signals"] = [signal(
+                "youtube_outliers", "https://youtube.test/short",
+                {"views": 2_000_000, "hours": 20, "vph": 100_000, "breakout": 4.2, "video_id": "abc123"})]
+        else:
+            candidate["signals"] = [signal("google_trends", "https://trends.test/dry-policy", {"traffic": 500})]
         out.append(candidate)
     return out
 
@@ -61,7 +78,7 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     picks = w.select_topics(cands(), 2, set())
     assert [p["topic"] for p in picks] == ["Octopus can taste with its arms", "Hunger stone"]   # source weight breaks tie
     assert all(p["viral_score"] >= CFG["content"]["min_viral_score"] for p in picks)
-    assert "1496.5x its normal" in llm.prompt and "2,000,000 views" in llm.prompt          # judged WITH evidence
+    assert "1496.5x its 30-day baseline" in llm.prompt and "2,000,000 views" in llm.prompt  # judged WITH evidence
     assert "100,000 views/hour" in llm.prompt
     assert "An unverified claim" not in picks[0]["why_trending"]
     assert "2,000,000 views in 20h" in picks[0]["why_trending"]
@@ -109,15 +126,67 @@ def test_selection_outage_returns_nothing_not_guesses():
     assert ScriptWriter(CFG, Down([]), Strat()).select_topics(cands(), 2, set()) == []
 
 
-def test_wikipedia_only_requires_a_verified_pageview_spike():
-    wiki = {"sources": ["wikipedia"], "spike": 2.99}
-    assert not trends.has_current_trend_evidence(wiki, 3.0)
-    assert not trends.has_current_trend_evidence({"sources": ["wikipedia"]}, 3.0)
-    assert trends.has_current_trend_evidence({"sources": ["wikipedia"], "spike": 3.0}, 3.0)
-    assert not trends.has_current_trend_evidence({"sources": ["evergreen"]}, 3.0)
-    assert not trends.has_current_trend_evidence({"sources": ["on_this_day"]}, 3.0)
-    assert trends.has_current_trend_evidence({"sources": ["google_trends"]}, 3.0)
-    assert trends.has_current_trend_evidence({"source": "reddit_science"}, 3.0)
+def test_trend_evidence_uses_measured_signals_and_distinct_families():
+    cfg = CFG["trends"]
+    wiki_low = {"signals": [signal("wikipedia", "https://wiki.test/page", {"spike": 2.99})]}
+    wiki_spike = {"signals": [signal("wikipedia", "https://wiki.test/page", {"spike": 3.0})]}
+    assert not trends.has_current_trend_evidence(wiki_low, 3.0, cfg)
+    assert not trends.has_current_trend_evidence(wiki_spike, 3.0, cfg), "a large Wikipedia spike is corroboration, not proof"
+    assert not trends.has_current_trend_evidence({"sources": ["google_trends"]}, 3.0, cfg)
+    assert not trends.has_current_trend_evidence({"source": "reddit_science"}, 3.0, cfg)
+    assert not trends.has_current_trend_evidence({"signals": [signal("evergreen", "https://x.test")]}, 3.0, cfg)
+    assert not trends.has_current_trend_evidence({"signals": [signal("on_this_day", "https://x.test")]}, 3.0, cfg)
+
+    # The same platform is only one family: repeated Reddit feeds and Reddit + Wikipedia
+    # without a qualifying spike cannot pass.
+    repeated_reddit = {"signals": [signal("reddit_science", "https://reddit.test/a"),
+                                   signal("reddit_space", "https://reddit.test/b")]}
+    assert not trends.has_current_trend_evidence(repeated_reddit, 3.0, cfg)
+    chart_only = {"signals": [signal("youtube_chart", "https://youtube.test/chart", {"view_count": 50_000})]}
+    assert not trends.has_current_trend_evidence(chart_only, 3.0, cfg)
+    chart_reddit = {"signals": chart_only["signals"] + [signal("reddit_science", "https://reddit.test/a")]}
+    assert trends.has_current_trend_evidence(chart_reddit, 3.0, cfg)
+    hn_low = {"signals": [signal("hackernews", "https://news.ycombinator.com/item?id=1", {"points": 9}),
+                           signal("reddit_science", "https://reddit.test/a")]}
+    hn_confirmed = {"signals": [signal("hackernews", "https://news.ycombinator.com/item?id=1", {"points": 10}),
+                                 signal("reddit_science", "https://reddit.test/a")]}
+    assert not trends.has_current_trend_evidence(hn_low, 3.0, cfg)
+    assert trends.has_current_trend_evidence(hn_confirmed, 3.0, cfg)
+    reddit_wiki = {"signals": [signal("reddit_science", "https://reddit.test/a"),
+                               signal("wikipedia", "https://wiki.test/page", {"spike": 2.99})]}
+    assert not trends.has_current_trend_evidence(reddit_wiki, 3.0, cfg)
+    reddit_wiki["signals"][1]["evidence"]["spike"] = 3.0
+    assert trends.has_current_trend_evidence(reddit_wiki, 3.0, cfg)
+
+    assert not trends.has_current_trend_evidence({"signals": [
+        signal("google_trends", "https://trends.test/page", {"traffic": 999})]}, 3.0, cfg)
+    assert trends.has_current_trend_evidence({"signals": [
+        signal("google_trends", "https://trends.test/page", {"traffic": 1_000})]}, 3.0, cfg)
+    assert not trends.has_current_trend_evidence({"signals": [
+        signal("google_trends", "", {"traffic": 100_000})]}, 3.0, cfg), "unlinked numbers are not auditable"
+
+    weak_google_reddit = {"signals": [signal("google_trends", "https://trends.test/page", {"traffic": 200}),
+                                        signal("reddit_science", "https://reddit.test/a")]}
+    assert trends.has_current_trend_evidence(weak_google_reddit, 3.0, cfg)
+
+    assert not trends.has_current_trend_evidence({"signals": [signal(
+        "youtube_outliers", "https://youtube.test/short",
+        {"views": 29_999, "hours": 20, "vph": 1_500, "video_id": "abc"})]}, 3.0, cfg)
+    assert trends.has_current_trend_evidence({"signals": [signal(
+        "youtube_outliers", "https://youtube.test/short",
+        {"views": 30_000, "hours": 20, "vph": 1_500, "video_id": "abc"})]}, 3.0, cfg)
+    assert not trends.has_current_trend_evidence({"signals": [signal(
+        "youtube_outliers", "https://youtube.test/short",
+        {"views": 3_000_000, "hours": 73, "vph": 40_000, "video_id": "abc"})]}, 3.0, cfg)
+    no_capture = signal("google_trends", "https://trends.test/page", {"traffic": 5_000})
+    no_capture["captured_at"] = "2026-01-01T00:00:00+00:00"
+    assert not trends.has_current_trend_evidence({"signals": [no_capture]}, 3.0, cfg)
+    missing_capture = signal("google_trends", "https://trends.test/page", {"traffic": 5_000})
+    missing_capture.pop("captured_at")
+    assert not trends.has_current_trend_evidence({"signals": [missing_capture]}, 3.0, cfg)
+    verified_but_mislabeled = {"signals": [signal(
+        "google_trends", "https://trends.test/page", {"traffic": 5_000})], "sources": ["evergreen"]}
+    assert trends.has_current_trend_evidence(verified_but_mislabeled, 3.0, cfg)
 
 
 def test_make_one_fails_closed_without_live_trend_evidence(monkeypatch):
@@ -136,7 +205,8 @@ def test_make_one_rejects_below_floor_viral_score_even_with_live_source(monkeypa
 
     monkeypatch.setattr(pipeline, "produce_assets", lambda *a, **k: (_ for _ in ()).throw(
         AssertionError("weak viral score must be rejected before production")))
-    topic = {"topic": "Current Google trend", "sources": ["google_trends"], "score": 0.9, "viral_score": 6}
+    topic = {"topic": "Current Google trend", "sources": ["google_trends"], "score": 0.9, "viral_score": 6,
+             "signals": [signal("google_trends", "https://trends.test/current", {"traffic": 20_000})]}
     assert pipeline.make_one(CFG, object(), topic, {}, 1, "test-run") is None
 
 
@@ -176,12 +246,7 @@ def test_trend_merge_only_rewards_independent_sources_and_keeps_measured_evidenc
     monkeypatch.setattr("autotube.safety.screen", lambda *a, **k: ("allow", ""))
 
     merged = trends.collect(cfg)
-    candidate = next(c for c in merged if c["topic"] == topic)
-    assert candidate["score"] == 0.91, "two subreddits are not two independent platforms"
-    assert candidate["source_families"] == ["reddit"]
-    assert {x["source_url"] for x in candidate["signals"]} == {
-        "https://reddit.test/science", "https://reddit.test/space"}
-    assert all(x["captured_at"] and x["context"] for x in candidate["signals"])
+    assert merged == [], "multiple subreddit feeds are one family and cannot qualify alone"
 
     monkeypatch.setattr(trends, "google_trends", lambda region: [
         {"topic": topic, "source": "google_trends", "score": 0.80, "traffic": 100000,

@@ -3,6 +3,7 @@
 A fake vision model approves an image for a line only when the image's hidden "truth" word appears in that line —
 so these tests prove the plumbing never lets an unapproved / mismatched image through.
 """
+import copy
 import re
 import subprocess
 import zlib
@@ -101,6 +102,26 @@ def test_every_line_gets_an_image_approved_for_that_line(patched, tmp_path):
         assert shot["score"] >= 7 and shot["judge"] == "fake:vision"
     assert {sh["seg"] for sh in v["shots"]} == {0, 1, 2}
     assert not any("building" in sh["credit"]["title"] or "street" in sh["credit"]["title"] for sh in v["shots"])
+
+
+def test_pixazo_is_suppressed_without_synthetic_disclosure(patched, tmp_path, monkeypatch):
+    cfg = copy.deepcopy(CFG)
+    cfg["media"]["sources"] = ["pixazo"]  # even an accidental config entry must not leak through
+    cfg["compliance"]["contains_synthetic_media"] = False
+    searched_sources = []
+    search = media._candidates_for
+
+    def capture(queries, sources, allowed, min_w):
+        searched_sources.append(list(sources))
+        return search(queries, sources, allowed, min_w)
+
+    monkeypatch.setattr(media, "_candidates_for", capture)
+    patched["q-cat"] = [cand("cat", 11)]
+    patched["q-fossil"] = [cand("fossil", 12)]
+    patched["q-paw"] = [cand("paw", 13)]
+    media.gather(SRC, segs(("a cat", "q-cat"), ("a fossil", "q-fossil"), ("a paw", "q-paw")),
+                 cfg, tmp_path, llm=FakeLLM())
+    assert searched_sources and all("pixazo" not in sources for sources in searched_sources)
 
 
 def test_line_without_match_requeries_then_skips_topic(patched, tmp_path):
