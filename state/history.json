@@ -30,15 +30,21 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 383.9,
-      "vph": 0.063,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
+      "hours_live": 386.9,
+      "vph": 0.016,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "a_views": 24,
+      "engaged_views_90d": 6,
       "avg_view_dur": 771,
-      "avg_view_pct_raw": 2336.97,
       "subs_gained": 0,
       "subs_lost": 0,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "avg_view_pct_raw": 2336.97,
+      "vph_basis": "engaged_views"
     }
   },
   {
@@ -72,17 +78,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 378.4,
-      "vph": 3.253,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1228,
-      "avg_view_pct": 80.03,
-      "avg_view_dur": 35,
-      "hook_retention": 1.0277,
-      "completion": 0.4939,
-      "swipe_point": 0.99,
+      "hours_live": 381.4,
+      "vph": 1.526,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.4939,
+      "watch_ratio_at_15pct": 1.0277,
+      "audience_watch_ratio_curve": [
         1.4159,
         1.3241,
         0.9133,
@@ -95,17 +97,31 @@
         0.6464,
         0.4939
       ],
+      "first_below_half_watch_ratio_at": 0.99,
+      "a_views": 1228,
+      "engaged_views_90d": 582,
+      "avg_view_pct": 80.03,
+      "avg_view_dur": 35,
       "subs_gained": 2,
       "subs_lost": 0,
-      "shares": 1
+      "shares": 1,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.7277,
+    "reward": 0.6326,
     "reward_parts": {
       "retention": 1.0,
-      "reach": 0.163,
-      "engagement": 0.369,
+      "reach": 0.038,
+      "engagement": 0.366,
+      "subs": 1.0,
+      "subs_per_1k": 3.44,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-24T18:04:55.259364+00:00",
@@ -138,17 +154,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 375.4,
-      "vph": 3.151,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1183,
-      "avg_view_pct": 41.66,
-      "avg_view_dur": 14,
-      "hook_retention": 0.9136,
-      "completion": 0.0814,
-      "swipe_point": 0.29,
+      "hours_live": 378.4,
+      "vph": 1.591,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.0814,
+      "watch_ratio_at_15pct": 0.9136,
+      "audience_watch_ratio_curve": [
         1.0565,
         1.0349,
         0.6628,
@@ -161,17 +173,31 @@
         0.1777,
         0.0814
       ],
+      "first_below_half_watch_ratio_at": 0.29,
+      "a_views": 1183,
+      "engaged_views_90d": 602,
+      "avg_view_pct": 41.66,
+      "avg_view_dur": 14,
       "subs_gained": 0,
       "subs_lost": 0,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.4252,
+    "reward": 0.2789,
     "reward_parts": {
-      "retention": 0.555,
-      "reach": 0.161,
-      "engagement": 0.24,
+      "retention": 0.595,
+      "reach": 0.04,
+      "engagement": 0.225,
+      "subs": 0.0,
+      "subs_per_1k": 0.0,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-24T18:04:58.142709+00:00",
@@ -204,17 +230,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 359.9,
-      "vph": 3.562,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1282,
-      "avg_view_pct": 51.93,
-      "avg_view_dur": 16,
-      "hook_retention": 1.118,
-      "completion": 0.2146,
-      "swipe_point": 0.34,
+      "hours_live": 362.9,
+      "vph": 1.29,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.2146,
+      "watch_ratio_at_15pct": 1.118,
+      "audience_watch_ratio_curve": [
         1.2146,
         1.1695,
         0.7833,
@@ -227,17 +249,31 @@
         0.2833,
         0.2146
       ],
+      "first_below_half_watch_ratio_at": 0.34,
+      "a_views": 1282,
+      "engaged_views_90d": 468,
+      "avg_view_pct": 51.93,
+      "avg_view_dur": 16,
       "subs_gained": 1,
       "subs_lost": 0,
-      "shares": 1
+      "shares": 1,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.5319,
+    "reward": 0.5195,
     "reward_parts": {
-      "retention": 0.693,
-      "reach": 0.19,
-      "engagement": 0.339,
+      "retention": 0.742,
+      "reach": 0.032,
+      "engagement": 0.338,
+      "subs": 1.0,
+      "subs_per_1k": 2.14,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-25T17:00:38.361521+00:00",
@@ -270,17 +306,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 354.4,
-      "vph": 3.267,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1157,
-      "avg_view_pct": 59.43000000000001,
-      "avg_view_dur": 18,
-      "hook_retention": 1.1271,
-      "completion": 0.291,
-      "swipe_point": 0.5,
+      "hours_live": 357.4,
+      "vph": 0.993,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.291,
+      "watch_ratio_at_15pct": 1.1271,
+      "audience_watch_ratio_curve": [
         1.2486,
         1.1921,
         0.8362,
@@ -293,17 +325,31 @@
         0.3418,
         0.291
       ],
+      "first_below_half_watch_ratio_at": 0.5,
+      "a_views": 1157,
+      "engaged_views_90d": 355,
+      "avg_view_pct": 59.43000000000001,
+      "avg_view_dur": 18,
       "subs_gained": 0,
       "subs_lost": 0,
-      "shares": 1
+      "shares": 1,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.5806,
+    "reward": 0.3846,
     "reward_parts": {
-      "retention": 0.789,
-      "reach": 0.177,
-      "engagement": 0.231,
+      "retention": 0.849,
+      "reach": 0.025,
+      "engagement": 0.23,
+      "subs": 0.0,
+      "subs_per_1k": 0.0,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-25T17:00:40.966352+00:00",
@@ -336,17 +382,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 351.4,
-      "vph": 3.21,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1128,
-      "avg_view_pct": 30.049999999999997,
-      "avg_view_dur": 13,
-      "hook_retention": 0.6593,
-      "completion": 0.0827,
-      "swipe_point": 0.19,
+      "hours_live": 354.4,
+      "vph": 1.402,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.0827,
+      "watch_ratio_at_15pct": 0.6593,
+      "audience_watch_ratio_curve": [
         1.0625,
         1.0101,
         0.4274,
@@ -359,17 +401,31 @@
         0.0907,
         0.0827
       ],
+      "first_below_half_watch_ratio_at": 0.19,
+      "a_views": 1128,
+      "engaged_views_90d": 497,
+      "avg_view_pct": 30.049999999999997,
+      "avg_view_dur": 13,
       "subs_gained": 2,
       "subs_lost": 0,
-      "shares": 1
+      "shares": 1,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.3243,
+    "reward": 0.3747,
     "reward_parts": {
-      "retention": 0.401,
-      "reach": 0.176,
+      "retention": 0.429,
+      "reach": 0.035,
       "engagement": 0.192,
+      "subs": 1.0,
+      "subs_per_1k": 4.02,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-25T17:00:44.383783+00:00",
@@ -402,17 +458,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 335.9,
-      "vph": 3.453,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1160,
-      "avg_view_pct": 41.37,
-      "avg_view_dur": 13,
-      "hook_retention": 0.9554,
-      "completion": 0.0971,
-      "swipe_point": 0.34,
+      "hours_live": 338.9,
+      "vph": 1.124,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.0971,
+      "watch_ratio_at_15pct": 0.9554,
+      "audience_watch_ratio_curve": [
         1.0892,
         1.0577,
         0.769,
@@ -425,17 +477,31 @@
         0.126,
         0.0971
       ],
+      "first_below_half_watch_ratio_at": 0.34,
+      "a_views": 1160,
+      "engaged_views_90d": 381,
+      "avg_view_pct": 41.37,
+      "avg_view_dur": 13,
       "subs_gained": 1,
       "subs_lost": 0,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.4318,
+    "reward": 0.4455,
     "reward_parts": {
-      "retention": 0.552,
-      "reach": 0.201,
+      "retention": 0.591,
+      "reach": 0.028,
       "engagement": 0.23,
+      "subs": 1.0,
+      "subs_per_1k": 2.62,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-26T14:36:59.067500+00:00",
@@ -468,17 +534,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 330.4,
-      "vph": 3.644,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1204,
-      "avg_view_pct": 59.75,
-      "avg_view_dur": 23,
-      "hook_retention": 1.0037,
-      "completion": 0.3297,
-      "swipe_point": 0.45,
+      "hours_live": 333.4,
+      "vph": 1.641,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.3297,
+      "watch_ratio_at_15pct": 1.0037,
+      "audience_watch_ratio_curve": [
         1.315,
         1.2857,
         0.7271,
@@ -491,17 +553,31 @@
         0.4194,
         0.3297
       ],
+      "first_below_half_watch_ratio_at": 0.45,
+      "a_views": 1204,
+      "engaged_views_90d": 547,
+      "avg_view_pct": 59.75,
+      "avg_view_dur": 23,
       "subs_gained": 0,
       "subs_lost": 0,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.5868,
+    "reward": 0.3827,
     "reward_parts": {
-      "retention": 0.796,
-      "reach": 0.217,
+      "retention": 0.854,
+      "reach": 0.041,
       "engagement": 0.152,
+      "subs": 0.0,
+      "subs_per_1k": 0.0,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-26T14:37:01.717296+00:00",
@@ -534,17 +610,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 327.4,
-      "vph": 1.9,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 622,
-      "avg_view_pct": 56.220000000000006,
-      "avg_view_dur": 20,
-      "hook_retention": 0.9637,
-      "completion": 0.2379,
-      "swipe_point": 0.53,
+      "hours_live": 330.4,
+      "vph": 0.751,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.2379,
+      "watch_ratio_at_15pct": 0.9637,
+      "audience_watch_ratio_curve": [
         1.2097,
         1.1855,
         0.7419,
@@ -557,17 +629,31 @@
         0.3266,
         0.2379
       ],
+      "first_below_half_watch_ratio_at": 0.53,
+      "a_views": 622,
+      "engaged_views_90d": 248,
+      "avg_view_pct": 56.220000000000006,
+      "avg_view_dur": 20,
       "subs_gained": 1,
       "subs_lost": 1,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.5252,
+    "reward": 0.3605,
     "reward_parts": {
-      "retention": 0.735,
-      "reach": 0.114,
+      "retention": 0.803,
+      "reach": 0.019,
       "engagement": 0.188,
+      "subs": 0.0,
+      "subs_per_1k": 0.0,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-26T14:37:04.673832+00:00",
@@ -600,17 +686,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 311.9,
-      "vph": 2.933,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 915,
-      "avg_view_pct": 52.190000000000005,
-      "avg_view_dur": 15,
-      "hook_retention": 1.0032,
-      "completion": 0.1186,
-      "swipe_point": 0.39,
+      "hours_live": 314.9,
+      "vph": 1.0,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.1186,
+      "watch_ratio_at_15pct": 1.0032,
+      "audience_watch_ratio_curve": [
         1.0962,
         1.0417,
         0.8718,
@@ -623,17 +705,31 @@
         0.3077,
         0.1186
       ],
+      "first_below_half_watch_ratio_at": 0.39,
+      "a_views": 915,
+      "engaged_views_90d": 315,
+      "avg_view_pct": 52.190000000000005,
+      "avg_view_dur": 15,
       "subs_gained": 0,
       "subs_lost": 0,
-      "shares": 2
+      "shares": 2,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.5166,
+    "reward": 0.3381,
     "reward_parts": {
-      "retention": 0.691,
-      "reach": 0.19,
-      "engagement": 0.201,
+      "retention": 0.746,
+      "reach": 0.025,
+      "engagement": 0.2,
+      "subs": 0.0,
+      "subs_per_1k": 0.0,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-27T15:15:47.468680+00:00",
@@ -666,17 +762,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 306.4,
-      "vph": 3.844,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1178,
-      "avg_view_pct": 50.25999999999999,
-      "avg_view_dur": 19,
-      "hook_retention": 0.9013,
-      "completion": 0.1556,
-      "swipe_point": 0.38,
+      "hours_live": 309.4,
+      "vph": 1.723,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.1556,
+      "watch_ratio_at_15pct": 0.9013,
+      "audience_watch_ratio_curve": [
         1.1518,
         1.1006,
         0.7078,
@@ -689,17 +781,31 @@
         0.2562,
         0.1556
       ],
+      "first_below_half_watch_ratio_at": 0.38,
+      "a_views": 1178,
+      "engaged_views_90d": 533,
+      "avg_view_pct": 50.25999999999999,
+      "avg_view_dur": 19,
       "subs_gained": 1,
       "subs_lost": 0,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.5084,
+    "reward": 0.4828,
     "reward_parts": {
-      "retention": 0.664,
-      "reach": 0.256,
-      "engagement": 0.128,
+      "retention": 0.718,
+      "reach": 0.043,
+      "engagement": 0.127,
+      "subs": 0.938,
+      "subs_per_1k": 1.88,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-27T15:15:50.159261+00:00",
@@ -732,17 +838,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 303.4,
-      "vph": 1.565,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 473,
-      "avg_view_pct": 49.19,
-      "avg_view_dur": 18,
-      "hook_retention": 0.9434,
-      "completion": 0.1623,
-      "swipe_point": 0.33,
+      "hours_live": 306.4,
+      "vph": 0.878,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.1623,
+      "watch_ratio_at_15pct": 0.9434,
+      "audience_watch_ratio_curve": [
         1.117,
         1.0906,
         0.6868,
@@ -755,17 +857,31 @@
         0.2642,
         0.1623
       ],
+      "first_below_half_watch_ratio_at": 0.33,
+      "a_views": 473,
+      "engaged_views_90d": 269,
+      "avg_view_pct": 49.19,
+      "avg_view_dur": 18,
       "subs_gained": 0,
       "subs_lost": 0,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.4587,
+    "reward": 0.3173,
     "reward_parts": {
-      "retention": 0.638,
-      "reach": 0.103,
-      "engagement": 0.181,
+      "retention": 0.703,
+      "reach": 0.022,
+      "engagement": 0.175,
+      "subs": 0.0,
+      "subs_per_1k": 0.0,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-27T15:15:52.827506+00:00",
@@ -798,17 +914,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 287.9,
-      "vph": 3.376,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 972,
-      "avg_view_pct": 45.65,
-      "avg_view_dur": 17,
-      "hook_retention": 0.817,
-      "completion": 0.1571,
-      "swipe_point": 0.25,
+      "hours_live": 290.9,
+      "vph": 1.856,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.1571,
+      "watch_ratio_at_15pct": 0.817,
+      "audience_watch_ratio_curve": [
         1.1497,
         1.1146,
         0.5638,
@@ -821,17 +933,31 @@
         0.2625,
         0.1571
       ],
+      "first_below_half_watch_ratio_at": 0.25,
+      "a_views": 972,
+      "engaged_views_90d": 540,
+      "avg_view_pct": 45.65,
+      "avg_view_dur": 17,
       "subs_gained": 0,
       "subs_lost": 0,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.4886,
+    "reward": 0.3113,
     "reward_parts": {
-      "retention": 0.607,
-      "reach": 0.253,
-      "engagement": 0.308,
+      "retention": 0.652,
+      "reach": 0.046,
+      "engagement": 0.309,
+      "subs": 0.0,
+      "subs_per_1k": 0.0,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-28T18:24:54.310876+00:00",
@@ -942,17 +1068,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 263.9,
-      "vph": 1.235,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 326,
-      "avg_view_pct": 36.64,
-      "avg_view_dur": 12,
-      "hook_retention": 0.6491,
-      "completion": 0.0702,
-      "swipe_point": 0.19,
+      "hours_live": 266.9,
+      "vph": 0.217,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.0702,
+      "watch_ratio_at_15pct": 0.6491,
+      "audience_watch_ratio_curve": [
         1.0702,
         0.9825,
         0.4561,
@@ -965,17 +1087,31 @@
         0.1404,
         0.0702
       ],
+      "first_below_half_watch_ratio_at": 0.19,
+      "a_views": 326,
+      "engaged_views_90d": 58,
+      "avg_view_pct": 36.64,
+      "avg_view_dur": 12,
       "subs_gained": 0,
       "subs_lost": 0,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.4549,
+    "reward": 0.2364,
     "reward_parts": {
-      "retention": 0.633,
-      "reach": 0.112,
-      "engagement": 0.154,
+      "retention": 0.523,
+      "reach": 0.005,
+      "engagement": 0.153,
+      "subs": 0.0,
+      "subs_per_1k": 0.0,
+      "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-09-29T16:56:56.095133+00:00",
@@ -1108,15 +1244,21 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 234.4,
-      "vph": 0.017,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
+      "hours_live": 237.4,
+      "vph": 0.013,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "a_views": 4,
+      "engaged_views_90d": 3,
       "avg_view_pct": 61.55,
       "avg_view_dur": 17,
       "subs_gained": 0,
       "subs_lost": 0,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     }
   },
   {
@@ -1156,15 +1298,21 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 231.4,
-      "vph": 0.022,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
+      "hours_live": 234.4,
+      "vph": 0.009,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "a_views": 3,
+      "engaged_views_90d": 2,
       "avg_view_pct": 69.38,
       "avg_view_dur": 19,
       "subs_gained": 0,
       "subs_lost": 0,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     }
   },
   {
@@ -1204,15 +1352,21 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 215.9,
+      "hours_live": 218.9,
       "vph": 0.005,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "a_views": 1,
+      "engaged_views_90d": 1,
       "avg_view_pct": 0.67,
       "avg_view_dur": 0,
       "subs_gained": 0,
       "subs_lost": 0,
-      "shares": 0
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     }
   },
   {
@@ -1253,20 +1407,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 210.4,
-      "vph": 5.717,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1201,
-      "avg_view_pct": 54.59,
-      "avg_view_dur": 13,
-      "subs_gained": 4,
-      "subs_lost": 0,
-      "shares": 0,
-      "hook_retention": 1.1284,
-      "completion": 0.1552,
-      "swipe_point": 0.41,
+      "hours_live": 213.4,
+      "vph": 2.02,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.1552,
+      "watch_ratio_at_15pct": 1.1284,
+      "audience_watch_ratio_curve": [
         1.2358,
         1.1612,
         0.9552,
@@ -1278,18 +1425,32 @@
         0.2955,
         0.2567,
         0.1552
-      ]
+      ],
+      "first_below_half_watch_ratio_at": 0.41,
+      "a_views": 1201,
+      "engaged_views_90d": 431,
+      "avg_view_pct": 54.59,
+      "avg_view_dur": 13,
+      "subs_gained": 4,
+      "subs_lost": 0,
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.6181,
+    "reward": 0.5465,
     "reward_parts": {
-      "retention": 0.724,
-      "reach": 0.609,
-      "engagement": 0.433,
+      "retention": 0.78,
+      "reach": 0.051,
+      "engagement": 0.429,
       "subs": 1.0,
-      "subs_per_1k": 3.36,
+      "subs_per_1k": 9.28,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-01T17:16:00.914460+00:00",
@@ -1329,20 +1490,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 207.4,
-      "vph": 6.735,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1394,
-      "avg_view_pct": 63.27,
-      "avg_view_dur": 22,
-      "subs_gained": 3,
-      "subs_lost": 0,
-      "shares": 0,
-      "hook_retention": 1.0065,
-      "completion": 0.4121,
-      "swipe_point": 0.6,
+      "hours_live": 210.4,
+      "vph": 3.037,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.4121,
+      "watch_ratio_at_15pct": 1.0065,
+      "audience_watch_ratio_curve": [
         1.3514,
         1.1518,
         0.7831,
@@ -1354,18 +1508,32 @@
         0.4512,
         0.436,
         0.4121
-      ]
+      ],
+      "first_below_half_watch_ratio_at": 0.6,
+      "a_views": 1394,
+      "engaged_views_90d": 639,
+      "avg_view_pct": 63.27,
+      "avg_view_dur": 22,
+      "subs_gained": 3,
+      "subs_lost": 0,
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.6279,
+    "reward": 0.6096,
     "reward_parts": {
-      "retention": 0.833,
-      "reach": 0.613,
-      "engagement": 0.508,
-      "subs": 0.743,
-      "subs_per_1k": 1.49,
+      "retention": 0.904,
+      "reach": 0.076,
+      "engagement": 0.501,
+      "subs": 1.0,
+      "subs_per_1k": 4.69,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-01T17:16:03.564535+00:00",
@@ -1405,20 +1573,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 191.9,
-      "vph": 1.511,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 290,
-      "avg_view_pct": 53.349999999999994,
-      "avg_view_dur": 14,
-      "subs_gained": 0,
-      "subs_lost": 0,
-      "shares": 0,
-      "hook_retention": 1.1011,
-      "completion": 0.2584,
-      "swipe_point": 0.5,
+      "hours_live": 194.9,
+      "vph": 0.457,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.2584,
+      "watch_ratio_at_15pct": 1.1011,
+      "audience_watch_ratio_curve": [
         1.2135,
         1.1348,
         0.7753,
@@ -1430,18 +1591,32 @@
         0.2697,
         0.2584,
         0.2584
-      ]
+      ],
+      "first_below_half_watch_ratio_at": 0.5,
+      "a_views": 290,
+      "engaged_views_90d": 89,
+      "avg_view_pct": 53.349999999999994,
+      "avg_view_dur": 14,
+      "subs_gained": 0,
+      "subs_lost": 0,
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.3602,
+    "reward": 0.3649,
     "reward_parts": {
-      "retention": 0.71,
-      "reach": 0.114,
-      "engagement": 0.458,
+      "retention": 0.762,
+      "reach": 0.011,
+      "engagement": 0.46,
       "subs": 0.0,
       "subs_per_1k": 0.0,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-02T16:53:14.114059+00:00",
@@ -1480,20 +1655,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 186.4,
-      "vph": 2.35,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 438,
-      "avg_view_pct": 62.529999999999994,
-      "avg_view_dur": 20,
-      "subs_gained": 1,
-      "subs_lost": 0,
-      "shares": 0,
-      "hook_retention": 1.0427,
-      "completion": 0.4188,
-      "swipe_point": 0.78,
+      "hours_live": 189.4,
+      "vph": 0.644,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.4188,
+      "watch_ratio_at_15pct": 1.0427,
+      "audience_watch_ratio_curve": [
         1.4103,
         1.1453,
         0.7521,
@@ -1505,18 +1673,32 @@
         0.4957,
         0.4786,
         0.4188
-      ]
+      ],
+      "first_below_half_watch_ratio_at": 0.78,
+      "a_views": 438,
+      "engaged_views_90d": 122,
+      "avg_view_pct": 62.529999999999994,
+      "avg_view_dur": 20,
+      "subs_gained": 1,
+      "subs_lost": 0,
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.5749,
+    "reward": 0.5783,
     "reward_parts": {
-      "retention": 0.817,
-      "reach": 0.186,
-      "engagement": 0.308,
+      "retention": 0.893,
+      "reach": 0.016,
+      "engagement": 0.304,
       "subs": 1.0,
-      "subs_per_1k": 2.31,
+      "subs_per_1k": 8.2,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-02T16:53:16.857245+00:00",
@@ -1586,20 +1768,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 167.9,
-      "vph": 5.985,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1002,
-      "avg_view_pct": 53.67000000000001,
-      "avg_view_dur": 15,
-      "subs_gained": 2,
-      "subs_lost": 0,
-      "shares": 0,
-      "hook_retention": 1.0381,
-      "completion": 0.2353,
-      "swipe_point": 0.45,
+      "hours_live": 170.9,
+      "vph": 2.492,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.2353,
+      "watch_ratio_at_15pct": 1.0381,
+      "audience_watch_ratio_curve": [
         1.1903,
         1.0727,
         0.8893,
@@ -1611,18 +1786,32 @@
         0.2803,
         0.2595,
         0.2353
-      ]
+      ],
+      "first_below_half_watch_ratio_at": 0.45,
+      "a_views": 1002,
+      "engaged_views_90d": 426,
+      "avg_view_pct": 53.67000000000001,
+      "avg_view_dur": 15,
+      "subs_gained": 2,
+      "subs_lost": 0,
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.4995,
+    "reward": 0.5276,
     "reward_parts": {
-      "retention": 0.729,
-      "reach": 0.472,
-      "engagement": 0.258,
-      "subs": 0.516,
-      "subs_per_1k": 1.03,
+      "retention": 0.767,
+      "reach": 0.062,
+      "engagement": 0.249,
+      "subs": 1.0,
+      "subs_per_1k": 4.69,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-02T21:41:48.073133+00:00",
@@ -1664,20 +1853,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 183.4,
-      "vph": 7.867,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1442,
-      "avg_view_pct": 90.69,
-      "avg_view_dur": 24,
-      "subs_gained": 4,
-      "subs_lost": 0,
-      "shares": 1,
-      "hook_retention": 1.406,
-      "completion": 0.6677,
-      "swipe_point": null,
+      "hours_live": 186.4,
+      "vph": 3.76,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.6677,
+      "watch_ratio_at_15pct": 1.406,
+      "audience_watch_ratio_curve": [
         1.6301,
         1.4376,
         1.2286,
@@ -1689,18 +1871,32 @@
         0.7143,
         0.6962,
         0.6677
-      ]
+      ],
+      "first_below_half_watch_ratio_at": null,
+      "a_views": 1442,
+      "engaged_views_90d": 701,
+      "avg_view_pct": 90.69,
+      "avg_view_dur": 24,
+      "subs_gained": 4,
+      "subs_lost": 0,
+      "shares": 1,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.7755,
+    "reward": 0.6846,
     "reward_parts": {
       "retention": 1.0,
-      "reach": 0.631,
-      "engagement": 0.862,
+      "reach": 0.094,
+      "engagement": 0.866,
       "subs": 1.0,
-      "subs_per_1k": 2.87,
+      "subs_per_1k": 5.71,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-04T00:22:18.077412+00:00",
@@ -1926,20 +2122,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 114.6,
-      "vph": 4.931,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 565,
-      "avg_view_pct": 69.95,
-      "avg_view_dur": 12,
-      "subs_gained": 0,
-      "subs_lost": 0,
-      "shares": 0,
-      "hook_retention": 1.2132,
-      "completion": 0.3299,
-      "swipe_point": 0.68,
+      "hours_live": 117.6,
+      "vph": 1.743,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.3299,
+      "watch_ratio_at_15pct": 1.2132,
+      "audience_watch_ratio_curve": [
         1.2893,
         1.2132,
         1.1929,
@@ -1951,18 +2140,32 @@
         0.4467,
         0.3909,
         0.3299
-      ]
+      ],
+      "first_below_half_watch_ratio_at": 0.68,
+      "a_views": 565,
+      "engaged_views_90d": 205,
+      "avg_view_pct": 69.95,
+      "avg_view_dur": 12,
+      "subs_gained": 0,
+      "subs_lost": 0,
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.4749,
+    "reward": 0.4647,
     "reward_parts": {
-      "retention": 0.944,
-      "reach": 0.241,
+      "retention": 0.999,
+      "reach": 0.044,
       "engagement": 0.383,
       "subs": 0.0,
       "subs_per_1k": 0.0,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-05T20:07:44.870398+00:00",
@@ -2041,20 +2244,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 110.9,
-      "vph": 7.829,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 869,
-      "avg_view_pct": 115.64000000000001,
-      "avg_view_dur": 19,
-      "subs_gained": 0,
-      "subs_lost": 0,
-      "shares": 0,
-      "hook_retention": 1.2339,
-      "completion": 0.4677,
-      "swipe_point": 0.78,
+      "hours_live": 113.9,
+      "vph": 2.002,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.4677,
+      "watch_ratio_at_15pct": 1.2339,
+      "audience_watch_ratio_curve": [
         1.4274,
         1.2903,
         1.2097,
@@ -2066,18 +2262,32 @@
         0.4919,
         0.4758,
         0.4677
-      ]
+      ],
+      "first_below_half_watch_ratio_at": 0.78,
+      "a_views": 869,
+      "engaged_views_90d": 228,
+      "avg_view_pct": 115.64000000000001,
+      "avg_view_dur": 19,
+      "subs_gained": 0,
+      "subs_lost": 0,
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.5148,
+    "reward": 0.4564,
     "reward_parts": {
       "retention": 1.0,
-      "reach": 0.393,
-      "engagement": 0.27,
+      "reach": 0.05,
+      "engagement": 0.269,
       "subs": 0.0,
       "subs_per_1k": 0.0,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-06T18:33:28.796197+00:00",
@@ -2165,20 +2375,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 89.8,
-      "vph": 10.412,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 912,
-      "avg_view_pct": 60.53999999999999,
-      "avg_view_dur": 12,
-      "subs_gained": 0,
-      "subs_lost": 0,
-      "shares": 0,
-      "hook_retention": 1.0799,
-      "completion": 0.1853,
-      "swipe_point": 0.48,
+      "hours_live": 92.8,
+      "vph": 3.729,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.1853,
+      "watch_ratio_at_15pct": 1.0799,
+      "audience_watch_ratio_curve": [
         1.1693,
         1.099,
         1.0607,
@@ -2190,18 +2393,32 @@
         0.2492,
         0.2045,
         0.1853
-      ]
+      ],
+      "first_below_half_watch_ratio_at": 0.48,
+      "a_views": 912,
+      "engaged_views_90d": 346,
+      "avg_view_pct": 60.53999999999999,
+      "avg_view_dur": 12,
+      "subs_gained": 0,
+      "subs_lost": 0,
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.4148,
+    "reward": 0.3986,
     "reward_parts": {
-      "retention": 0.75,
-      "reach": 0.475,
-      "engagement": 0.18,
+      "retention": 0.865,
+      "reach": 0.093,
+      "engagement": 0.178,
       "subs": 0.0,
       "subs_per_1k": 0.0,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-06T18:33:31.116605+00:00",
@@ -2278,20 +2495,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 87.3,
-      "vph": 16.814,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 1073,
-      "avg_view_pct": 132.14,
-      "avg_view_dur": 21,
-      "subs_gained": 2,
-      "subs_lost": 0,
-      "shares": 0,
-      "hook_retention": 1.8053,
-      "completion": 1.177,
-      "swipe_point": null,
+      "hours_live": 90.2,
+      "vph": 4.543,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 1.177,
+      "watch_ratio_at_15pct": 1.8053,
+      "audience_watch_ratio_curve": [
         2.1504,
         1.8555,
         1.7699,
@@ -2303,18 +2513,32 @@
         1.2389,
         1.2035,
         1.177
-      ]
+      ],
+      "first_below_half_watch_ratio_at": null,
+      "a_views": 1073,
+      "engaged_views_90d": 410,
+      "avg_view_pct": 132.14,
+      "avg_view_dur": 21,
+      "subs_gained": 2,
+      "subs_lost": 0,
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.6748,
+    "reward": 0.6278,
     "reward_parts": {
       "retention": 1.0,
-      "reach": 0.537,
-      "engagement": 0.182,
-      "subs": 0.841,
-      "subs_per_1k": 1.68,
+      "reach": 0.114,
+      "engagement": 0.159,
+      "subs": 1.0,
+      "subs_per_1k": 4.88,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-06T23:53:22.786592+00:00",
@@ -2397,20 +2621,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 71.9,
-      "vph": 7.14,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 524,
-      "avg_view_pct": 53.73,
-      "avg_view_dur": 10,
-      "subs_gained": 0,
-      "subs_lost": 0,
-      "shares": 1,
-      "hook_retention": 1.0965,
-      "completion": 0.1842,
-      "swipe_point": 0.43,
+      "hours_live": 74.8,
+      "vph": 1.523,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.1842,
+      "watch_ratio_at_15pct": 1.0965,
+      "audience_watch_ratio_curve": [
         1.1754,
         1.0965,
         1.0965,
@@ -2422,18 +2639,32 @@
         0.2368,
         0.2018,
         0.1842
-      ]
+      ],
+      "first_below_half_watch_ratio_at": 0.43,
+      "a_views": 524,
+      "engaged_views_90d": 114,
+      "avg_view_pct": 53.73,
+      "avg_view_dur": 10,
+      "subs_gained": 0,
+      "subs_lost": 0,
+      "shares": 1,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.168,
+    "reward": 0.3465,
     "reward_parts": {
-      "retention": 0.0,
-      "reach": 0.259,
-      "engagement": 0.163,
+      "retention": 0.768,
+      "reach": 0.038,
+      "engagement": 0.162,
       "subs": 0.0,
       "subs_per_1k": 0.0,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-07T18:55:39.299640+00:00",
@@ -2518,20 +2749,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 66.3,
-      "vph": 5.177,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 312,
-      "avg_view_pct": 107.05,
-      "avg_view_dur": 20,
-      "subs_gained": 2,
-      "subs_lost": 0,
-      "shares": 0,
-      "hook_retention": 1.5616,
-      "completion": 0.6986,
-      "swipe_point": null,
+      "hours_live": 69.2,
+      "vph": 1.054,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.6986,
+      "watch_ratio_at_15pct": 1.5616,
+      "audience_watch_ratio_curve": [
         1.6986,
         1.6301,
         1.5342,
@@ -2543,18 +2767,32 @@
         0.7534,
         0.7397,
         0.6986
-      ]
+      ],
+      "first_below_half_watch_ratio_at": null,
+      "a_views": 312,
+      "engaged_views_90d": 73,
+      "avg_view_pct": 107.05,
+      "avg_view_dur": 20,
+      "subs_gained": 2,
+      "subs_lost": 0,
+      "shares": 0,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.6742,
+    "reward": 0.649,
     "reward_parts": {
       "retention": 1.0,
-      "reach": 0.173,
-      "engagement": 0.587,
+      "reach": 0.026,
+      "engagement": 0.583,
       "subs": 1.0,
-      "subs_per_1k": 5.87,
+      "subs_per_1k": 27.4,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-07T18:55:41.303632+00:00",
@@ -2630,20 +2868,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 64.1,
-      "vph": 15.972,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00",
-      "a_views": 669,
-      "avg_view_pct": 77.77,
-      "avg_view_dur": 13,
-      "subs_gained": 1,
-      "subs_lost": 0,
-      "shares": 1,
-      "hook_retention": 1.1961,
-      "completion": 0.4183,
-      "swipe_point": 0.77,
+      "hours_live": 67.0,
+      "vph": 2.282,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
       "curve_points": 100,
-      "curve": [
+      "end_watch_ratio": 0.4183,
+      "watch_ratio_at_15pct": 1.1961,
+      "audience_watch_ratio_curve": [
         1.4183,
         1.2484,
         1.1699,
@@ -2655,18 +2886,32 @@
         0.4706,
         0.4248,
         0.4183
-      ]
+      ],
+      "first_below_half_watch_ratio_at": 0.77,
+      "a_views": 669,
+      "engaged_views_90d": 153,
+      "avg_view_pct": 77.77,
+      "avg_view_dur": 13,
+      "subs_gained": 1,
+      "subs_lost": 0,
+      "shares": 1,
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "engaged_views"
     },
-    "reward": 0.6088,
+    "reward": 0.6172,
     "reward_parts": {
       "retention": 1.0,
-      "reach": 0.517,
+      "reach": 0.057,
       "engagement": 0.147,
-      "subs": 0.491,
-      "subs_per_1k": 0.98,
+      "subs": 1.0,
+      "subs_per_1k": 6.54,
       "breakout": 0.0,
       "mode": "absolute"
-    }
+    },
+    "reward_version": 2
   },
   {
     "created_at": "2026-10-08T19:36:19.054204+00:00",
@@ -2741,15 +2986,20 @@
     "status": "scheduled",
     "provenance": "/home/runner/work/you_tube/you_tube/state/provenance/2026-10-08-field--008---a-33-foot-flying-monster-wa.json",
     "metrics": {
-      "views": 266,
+      "views": 274,
       "likes": 7,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 43.0,
-      "vph": 6.181,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00"
+      "hours_live": 46.0,
+      "vph": 5.952,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "public_views_fallback"
     }
   },
   {
@@ -2821,15 +3071,20 @@
     "status": "scheduled",
     "provenance": "/home/runner/work/you_tube/you_tube/state/provenance/2026-10-08-field--011---the-fish-that-lives-on-land.json",
     "metrics": {
-      "views": 465,
+      "views": 464,
       "likes": 13,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 40.0,
-      "vph": 11.615,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00"
+      "hours_live": 43.0,
+      "vph": 10.783,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "public_views_fallback"
     }
   },
   {
@@ -2909,15 +3164,20 @@
     "status": "scheduled",
     "provenance": "/home/runner/work/you_tube/you_tube/state/provenance/2026-10-08-case--007---alcatraz-escape--the-head-th.json",
     "metrics": {
-      "views": 73,
+      "views": 74,
       "likes": 2,
       "comments": 0,
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 23.3,
-      "vph": 3.14,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00"
+      "hours_live": 26.2,
+      "vph": 2.819,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "public_views_fallback"
     }
   },
   {
@@ -2993,15 +3253,20 @@
     "status": "scheduled",
     "provenance": "/home/runner/work/you_tube/you_tube/state/provenance/2026-10-10-case--008---why-plague-doctors-wore-thos.json",
     "metrics": {
-      "views": 0,
-      "likes": 0,
+      "views": 27,
+      "likes": 1,
       "comments": 0,
-      "privacy": "private",
+      "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1.0,
-      "vph": 0.0,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00"
+      "hours_live": 2.7,
+      "vph": 10.13,
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "public_views_fallback"
     }
   },
   {
@@ -3081,7 +3346,12 @@
       "rejection": null,
       "hours_live": 1.0,
       "vph": 0.0,
-      "checked_at": "2026-10-10T15:55:04.563806+00:00"
+      "checked_at": "2026-10-10T18:54:54.968954+00:00",
+      "engaged_views_window": {
+        "start": "2026-09-24",
+        "end": "2026-10-10"
+      },
+      "vph_basis": "public_views_fallback"
     }
   }
 ]
