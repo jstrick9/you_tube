@@ -7,7 +7,7 @@ imageio-ffmpeg>=0.5
 feedparser>=6.0
 requests>=2.31
 pillow>=10.0
-numpy>=1.26
+numpy==2.5.4               # exact pin: keep the scientific/image binary stack reproducible; bump with a lock refresh
 onnxruntime>=1.18         # 2.5D 'living photo' motion (small depth model, CPU)
 opencv-python-headless>=4.9
 pyyaml>=6.0
