@@ -21,12 +21,12 @@ What we actually have is better than it first looks:
 | Repo visibility | **public** | [verified] GitHub API |
 | Actions minutes | **free and unlimited** | public repos, standard runners |
 | Runner shape | **4 vCPU / 16 GB RAM** | public repos get double the private shape |
-| Job ceiling | 6 h (we currently cap at 150 min) | `daily.yml` |
+| Job ceiling | 6 h (`daily.yml` uses 360 min; producer step 350 min) | `daily.yml` |
 
 So compute is not scarce — **wall-clock is**. We can spend an hour of CPU per video and
 it costs nothing. That reframes the question from "what can we afford" to "what finishes
-on 4 cores". It also means the 150-minute timeout is a self-imposed limit, not a
-platform one.
+on 4 cores". The workflow now uses GitHub's documented six-hour job ceiling, while the
+pipeline keeps a separate 300-minute soft budget plus a 45-minute topic reserve.
 
 ---
 
@@ -88,7 +88,7 @@ slow — viable precisely because minutes are unlimited).
 | # | Change | Effort | Why |
 |---|---|---|---|
 | 1 | **Internet Archive film as b-roll** | M | Biggest quality jump; on-brand; unlocks long-form |
-| 2 | **Raise the 150-min job cap** | XS | Minutes are free; we are leaving budget unused |
+| 2 | **Use the six-hour job ceiling** *(implemented: 360-min job, 350-min producer step)* | XS | Public-runner time is free; the independent pipeline budget still protects completion |
 | 3 | **faster-whisper for forced alignment** | S | 25,683★, MIT, active [verified]. True word-level caption timing |
 | 4 | **NASA + LoC as extra visual sources** | S | More real supply = fewer "no image shows this line" failures |
 | 5 | **Kokoro TTS** | M | 9,136★, Apache-2.0, CPU, MOS 4.2. A real but incremental gain |
@@ -220,6 +220,6 @@ The second pass changes the order. Fixing supply of *compute* now outranks impro
 
 1. **Add 2–3 no-credit-card LLM providers** (§7b) — unblocks production
 2. **Internet Archive b-roll** (§3) — biggest on-brand quality gain
-3. **Raise the 150-min cap** — free minutes going unused
+3. **Use the six-hour Actions ceiling** — implemented (360-minute job cap)
 4. **Cloudflare Whisper or faster-whisper** — caption alignment
 5. **Cloudflare FLUX, non-depictive only** — backgrounds and thumbnails, never evidence

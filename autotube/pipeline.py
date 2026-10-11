@@ -677,6 +677,9 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     run_id = now_utc().strftime("%Y%m%d-%H%M")
     n = count or daily_target(cfg)
     do_upload = cfg["upload"]["enabled"] if upload is None else upload
+    # Start the soft budget at pipeline entry so trend selection and initialization also
+    # consume wall-clock. The outer Actions timeout remains the final hard ceiling.
+    deadline = time.monotonic() + 60 * float(cfg["schedule"].get("max_run_minutes", 300))
     llm = LLM(cfg)
     strat = Strategy(cfg)
     writer = ScriptWriter(cfg, llm, strat)
@@ -694,7 +697,6 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     series_mod.reset()          # episode numbers are per-run unique, see series._ISSUED
     results, used_titles, used_formats = [], set(), set()
     pi = 0
-    deadline = time.time() + 60 * float(cfg["schedule"].get("max_run_minutes", 120))
     vision_down = False
     for i in range(n):
         if vision_down:
@@ -703,7 +705,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
         while True:
             if pi >= len(picks):
                 # every pick so far failed the accuracy/visual checks → pick again from the remaining live trends
-                if rounds >= int(cfg["content"].get("selection_rounds", 3)) or not cands or time.time() > deadline:
+                if rounds >= int(cfg["content"].get("selection_rounds", 3)) or not cands or time.monotonic() > deadline:
                     break
                 rounds += 1
                 more = writer.select_topics(cands, n - len(results), recent, exclude=tried)
@@ -711,13 +713,11 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
                     break
                 log.info("selection round %d: %d more viral picks", rounds, len(more))
                 picks += more
-            # Do not start what cannot finish. The budget used to be checked only at
-            # the topic boundary, and a single topic costs 20-40 minutes of drafting,
-            # vision and rendering - so a run that passed this test at 119 minutes ran
-            # past the 150-minute job cap and was killed mid-render, losing the work
-            # and the artifact with it. Keep a reserve the size of one topic.
-            reserve = 60 * float(cfg["schedule"].get("topic_reserve_minutes", 30))
-            if time.time() > deadline - reserve:
+            # Do not start work too close to the soft deadline: one topic can take
+            # 20-40 minutes of drafting, vision and rendering. The configured 45-minute
+            # reserve exceeds that observed range; the workflow timeout is the final cap.
+            reserve = 60 * float(cfg["schedule"].get("topic_reserve_minutes", 45))
+            if time.monotonic() > deadline - reserve:
                 log.warning("time budget reached (within %.0f min reserve) — stopping with %d videos",
                             reserve / 60, len(results))
                 break

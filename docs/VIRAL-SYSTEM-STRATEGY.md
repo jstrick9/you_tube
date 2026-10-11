@@ -169,11 +169,20 @@ Ordered by effect on your actual goal, not by novelty.
 2. **Niche profiles per lane** (§3). Best quality-and-compliance gain per hour.
 3. **Internet Archive b-roll.** 10,461 public-domain films, keyless, verified. Real
    footage, on-brand, and it is the visual-supply fix that also unlocks long-form.
-4. **Outlier-driven format mining.** Extend `youtube_outliers()` to extract *structure*
-   from winners — hook type, beat count, caption density — and feed it to the writer as
-   format guidance, without copying a creator's execution. This keeps the source video
-   as trend evidence rather than a template to clone.
-5. **Raise the 150-min cap.** Actions minutes are free and unlimited on a public repo.
+4. **Outlier-driven format mining — implemented.** `youtube_outliers()` now aggregates
+   lane-specific, views/hour-weighted title-pattern shares and official video-duration
+   bands, then passes only those anonymized aggregates to the script-generation prompt.
+   The topic selector sees an outlier title only to identify a currently trending subject;
+   the drafter gets the independent research title and original angle—not competitor
+   titles/descriptions, scripts, captions, footage, audio or creator identity as format
+   examples. Title text is only a metadata proxy for an opening; the metadata used here
+   cannot reveal a spoken hook, beat count or caption density, so those are explicitly
+   unmeasured—not estimated. These are correlations, not retention or causal evidence.
+   Format may repeat; substance cannot.
+5. **Raise the 150-min cap — implemented.** The daily job timeout is now 360 minutes,
+   with a 350-minute producer-step ceiling and a 300-minute internal run budget plus a
+   45-minute topic reserve. No repository visibility or other GitHub repository setting
+   was changed.
 6. **Cloudflare FLUX, non-depictive only.** Backgrounds, texture, thumbnails. Never as
    evidence behind a factual claim.
 

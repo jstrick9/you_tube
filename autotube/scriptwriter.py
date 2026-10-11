@@ -5,6 +5,7 @@ import json
 import logging
 import math
 import re
+from datetime import datetime, timedelta, timezone
 
 from . import gates, originality, safety, series
 from . import lanes
@@ -217,6 +218,90 @@ def trend_evidence_summary(candidate: dict) -> str:
         return " | ".join(context[:3])
     sources = candidate.get("sources") or ([candidate.get("source")] if candidate.get("source") else [])
     return "Current feed signal(s): " + ", ".join(str(s) for s in sources if s)
+
+
+_FORMAT_PULSE_MIN_SAMPLE = 8
+_FORMAT_PULSE_MAX_AGE_HOURS = 72
+_FORMAT_DURATION_LABELS = {
+    "le_20s": "20 seconds or less", "21_40s": "21–40 seconds",
+    "41_60s": "41–60 seconds", "over_60s": "over 60 seconds",
+}
+
+
+def outlier_structure_guidance(topic: dict, cfg: dict) -> str:
+    """Return fresh, lane-specific aggregate metadata guidance, never creator examples."""
+    pulse = read_json("format_pulse.json", {})
+    if not isinstance(pulse, dict):
+        return ""
+    raw_updated = pulse.get("updated")
+    try:
+        updated = datetime.fromisoformat(str(raw_updated).replace("Z", "+00:00"))
+        if updated.tzinfo is None:
+            return ""
+        age = now_utc() - updated.astimezone(timezone.utc)
+    except (TypeError, ValueError, OverflowError):
+        return ""
+    if age < -timedelta(minutes=5) or age > timedelta(hours=_FORMAT_PULSE_MAX_AGE_HOURS):
+        return ""
+
+    lane = lanes.lane_for(topic, cfg)
+    by_lane = pulse.get("by_lane")
+    if isinstance(by_lane, dict):
+        summary = by_lane.get(lane) if lane else None
+        if not isinstance(summary, dict):
+            return ""  # Do not let one approved lane's patterns stand in for the other.
+        scope = f"the {lane} lane"
+    else:
+        # Backward-compatible, fresh pulse files have only a pooled hook distribution.
+        summary = pulse
+        scope = "a pooled all-lane sample (lane detail not yet available)"
+
+    sample = summary.get("sample", pulse.get("sample"))
+    if type(sample) is not int or sample < _FORMAT_PULSE_MIN_SAMPLE:
+        return ""
+    content_cfg = cfg.get("content", {}) if isinstance(cfg, dict) else {}
+    allowed_styles = set(content_cfg.get("hook_styles") or []) if isinstance(content_cfg, dict) else set()
+    raw_styles = summary.get("title_hook_style") or summary.get("hook_style")
+    styles: dict[str, float] = {}
+    if isinstance(raw_styles, dict):
+        for key, value in raw_styles.items():
+            if (not allowed_styles or key in allowed_styles) and _finite_in_range(value, 0, 1):
+                styles[key] = float(value)
+    total_style = sum(styles.values())
+    details = []
+    if total_style > 0:
+        ranked = sorted(styles.items(), key=lambda item: (-item[1], item[0]))[:3]
+        details.append("metadata title-pattern mix (views/hour weighted): " + ", ".join(
+            f"{name} {value / total_style:.0%}" for name, value in ranked))
+
+    duration_sample = summary.get("duration_sample", 0)
+    raw_durations = summary.get("duration_bands")
+    durations: dict[str, float] = {}
+    if (type(duration_sample) is int and duration_sample >= _FORMAT_PULSE_MIN_SAMPLE
+            and isinstance(raw_durations, dict)):
+        for key, value in raw_durations.items():
+            if key in _FORMAT_DURATION_LABELS and _finite_in_range(value, 0, 1):
+                durations[key] = float(value)
+    total_duration = sum(durations.values())
+    if total_duration > 0:
+        ranked = sorted(durations.items(), key=lambda item: (-item[1], item[0]))
+        details.append("outlier clip-duration mix (metadata only): " + ", ".join(
+            f"{_FORMAT_DURATION_LABELS[key]} {value / total_duration:.0%}" for key, value in ranked))
+    if not details:
+        return ""
+
+    duration = cfg.get("video", {}).get("target_seconds", [15, 20])
+    target = (f"{duration[0]}–{duration[1]} seconds"
+              if isinstance(duration, (list, tuple)) and len(duration) == 2 else "the configured runtime")
+    return (
+        f"OUTLIER-DERIVED FORMAT GUIDANCE (aggregate metadata only; {scope}; n={sample}): "
+        + "; ".join(details)
+        + ". This is an observational association, not evidence of causation or viewer retention. "
+          "Use a broad pattern only if it naturally fits the independently sourced topic and angle. "
+          "Do not copy or imitate any creator's wording, sequence, captions, visuals, audio, or signature style; "
+          "no creator examples are supplied to this prompt. Keep the assigned format, lane hook, required beat count, "
+          f"and {target} target. The public video metadata cannot reveal the spoken hook, beat count, or caption density; do not infer them.\n"
+    )
 
 
 def actionable_review_fixes(value) -> list[str]:
@@ -776,8 +861,9 @@ for our channel. Score each one's viral_score 0-10:
 FORMATS we can make (pick the 2-4 this topic can HONESTLY support from its Wikipedia article — e.g. myth_buster only
 if the article describes a misconception, dumbest_decision only for a documented absurd decision):
 {fmt_list}
-For a viral Short topic, give our OWN angle (never copy the other video) and the English Wikipedia article that
-grounds it.
+For a viral Short topic, the outlier title is discovery evidence only: give our OWN independently worded angle and
+never reuse its title wording, script, sequence, captions, visuals, audio, or creator style. Give the English Wikipedia
+article that grounds the angle.
 
 The article must be the MOST SPECIFIC one that actually contains the surprising claim - the named thing, event,
 person, creature or place the claim is about. Do NOT widen to the category: "the longest conveyor belt in the
@@ -948,6 +1034,12 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
             hook_line = f"HOOK: {_lane_hook.strip()}"
         else:
             hook_line = f"HOOK STYLE: {plan['hook_style']} — {HOOK_GUIDE[plan['hook_style']]}"
+        structure_line = outlier_structure_guidance(topic, self.cfg)
+        originality_line = (
+            "ORIGINALITY: Trend evidence is for choosing a currently interesting subject, not a template. "
+            "Write a fresh, independently valuable treatment from the source text and angle; never reuse or imitate "
+            "another creator's title wording, script, sequence, visuals, captions, audio or signature style.\n"
+        )
         person_rule = ""
         if source.get("person"):
             person_rule = (
@@ -973,14 +1065,14 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                      if turn_rule else "")
         feedback_line = (f"PREVIOUS DRAFT FEEDBACK (fix without changing the facts or trend angle): {str(topic.get('_draft_feedback') or '')[:600]}\n"
                          if topic.get("_draft_feedback") else "")
-        user = f"""TOPIC: {topic['topic']}
+        user = f"""SOURCE SUBJECT (research article): {source.get('title') or topic.get('topic', '')}
 WHY IT'S TRENDING: {topic.get('why_trending') or ', '.join(topic.get('sources', []))}
-ANGLE (this is the story to tell — not the article's summary, not the subject's general
+{originality_line}ANGLE (this is the story to tell — not the article's summary, not the subject's general
 history. If the angle names a specific surprise, that surprise IS the video):
 {topic.get('angle') or 'most surprising educational angle'}
 {feedback_line}FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
 {hook_line}
-{comment_line}{turn_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
+{structure_line}{comment_line}{turn_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
 CHANNEL: {self.cfg['channel']['name']}
 {persona_line}
 SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of facts:

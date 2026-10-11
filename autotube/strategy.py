@@ -99,13 +99,12 @@ class Strategy:
         return sum(v.get("n", 0) for v in self.state["arms"].get(dim, {}).values())
 
     def pulse_weights(self, dim: str, keys: list[str]) -> list[float] | None:
-        """Live external demand for `dim`, from other people's viral Shorts (trends.format_pulse).
+        """External title-pattern mix from outlier metadata (trends.format_pulse), not actual hooks.
 
-        Our own reward loop sees a handful of videos a week, so it cannot notice in time that a
-        particular hook shape is hot this month. The outlier scanner reads thousands of viral Shorts
-        a day, which is a far faster signal — but it is other channels' evidence, not ours, so it
-        only ever biases a choice we were otherwise making blind. Blended with a uniform floor so
-        no option is ever starved to zero.
+        Our own reward loop sees a handful of videos a week, so the separate metadata pulse can
+        provide a faster, exploratory prior. It is other channels' evidence, not ours or causal
+        retention evidence; it only biases a choice we were otherwise making blind. Blended with a
+        uniform floor so no option is ever starved to zero.
         """
         share = (read_json("format_pulse.json", {}) or {}).get(dim) or {}
         if not share or not keys:

@@ -40,7 +40,9 @@ permissions:
 jobs:
   produce:
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    # GitHub's hosted-runner ceiling is 360 minutes. The producer has a 300-minute
+    # soft budget plus a 45-minute topic reserve; this leaves time for finalization.
+    timeout-minutes: 360
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -118,6 +120,7 @@ jobs:
 
       - name: Produce & schedule today's videos
         if: steps.need.outputs.needed != '0'
+        timeout-minutes: 350
         run: |
           ARGS=""
           if [ -n "${{ github.event.inputs.count }}" ]; then ARGS="$ARGS -n ${{ github.event.inputs.count }}"; fi

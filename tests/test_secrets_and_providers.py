@@ -1589,12 +1589,11 @@ def test_illegible_flag_actually_lowers_the_score():
 
 # ── run budget ─────────────────────────────────────────────────────────────
 def test_the_run_keeps_a_reserve_so_it_never_starts_work_it_cannot_finish():
-    """Measured run durations: 49, 73, 112, 142, 217 and 220 minutes against a
-    150-minute job cap.
+    """The former 150-minute cap ended measured 217/220-minute runs mid-render.
 
-    The budget was only testable between topics, and one topic costs 20-40 minutes of
-    drafting, vision and rendering. A run that passed the check at minute 119 finished
-    past the cap and was killed mid-render, losing the work and the artifact.
+    The pipeline now budgets from run entry, leaves a 45-minute topic reserve, and
+    stays beneath the 350-minute producer-step timeout inside a 360-minute job ceiling.
+    The workflow's always-run artifact/state steps retain time after the producer step.
     """
     import yaml as _y
 
@@ -1606,11 +1605,17 @@ def test_the_run_keeps_a_reserve_so_it_never_starts_work_it_cannot_finish():
     assert "topic_reserve_minutes" in src, "the reserve must be applied, not just configured"
     assert "deadline - reserve" in src, "the check must subtract the reserve"
 
-    # The job cap lives in the workflow; budget plus reserve has to fit inside it.
+    # The job cap lives in the workflow. Keep the soft budget below both the
+    # producer-step timeout and GitHub's documented six-hour job maximum.
     wf = (WF / "daily.yml").read_text()
     import re as _re
-    cap = int(_re.search(r"timeout-minutes:\s*(\d+)", wf).group(1))
-    assert budget + reserve <= cap, (
-        f"budget {budget} + reserve {reserve} exceeds the {cap} minute job cap, so a "
-        "run can still be killed mid-render")
-    assert reserve >= 20, "a reserve smaller than one topic does not prevent the overshoot"
+    cap = int(_re.search(r"(?m)^    timeout-minutes:\s*(\d+)\s*$", wf).group(1))
+    produce = _re.search(r"(?ms)^      - name: Produce & schedule today's videos\n(.*?)(?=^      - name:|\Z)", wf)
+    assert produce, "the producer step and its independent timeout must remain explicit"
+    step_cap = int(_re.search(r"(?m)^        timeout-minutes:\s*(\d+)\s*$", produce.group(1)).group(1))
+    assert cap == 360, "the daily job should use GitHub's six-hour maximum"
+    assert budget + reserve <= step_cap - 5, (
+        f"budget {budget} + reserve {reserve} must leave preflight margin under the "
+        f"{step_cap}-minute producer step")
+    assert step_cap < cap, "the job needs time after production for artifact/state finalization"
+    assert reserve >= 40, "the reserve must exceed the observed 20-40 minute per-topic range"

@@ -199,6 +199,23 @@ def _parse_ts(ts: str):
     return datetime.fromisoformat(ts.replace("Z", "+00:00"))
 
 
+def youtube_duration_seconds(value: str | None) -> int | None:
+    """Parse the ISO-8601 duration returned by videos.list(contentDetails)."""
+    if not isinstance(value, str):
+        return None
+    match = re.fullmatch(r"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?", value.strip())
+    if not match or not any(match.groups()):
+        return None
+    try:
+        hours, minutes, seconds = match.groups()
+        total = int(hours or 0) * 3600 + int(minutes or 0) * 60 + float(seconds or 0)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if not math.isfinite(total) or total <= 0:
+        return None
+    return int(round(total))
+
+
 # ── lanes & format DNA ────────────────────────────────────────────────────────
 HOOK_PATTERNS = [
     ("question",      r"^\s*(why|how|what|who|when|where|which|can|did|do|does|is|are|was|could|should)\b|\?"),
@@ -268,38 +285,107 @@ def lane_of(cfg: dict, category: str) -> str:
     return ""
 
 
-def format_pulse(rows: list[dict]) -> dict:
-    """Which hook shapes are actually winning on YouTube right now.
+def _pulse_summary(rows: list[dict]) -> dict:
+    """Aggregate metadata patterns only; never retain an example title or creator identity."""
+    hook_velocity: dict[str, float] = {}
+    hook_counts: dict[str, int] = {}
+    duration_velocity: dict[str, float] = {}
+    duration_counts: dict[str, int] = {}
+    total_hook_velocity = 0.0
+    total_duration_velocity = 0.0
+    valid_patterns = {name for name, _ in HOOK_PATTERNS} | {"bold_claim"}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        pattern = row.get("hook")
+        if not isinstance(pattern, str) or pattern not in valid_patterns:
+            title = row.get("topic")
+            pattern = hook_pattern(title if isinstance(title, str) else "")
+        velocity = row.get("vph", 0)
+        try:
+            velocity = float(velocity) if not isinstance(velocity, bool) else 0.0
+        except (TypeError, ValueError, OverflowError):
+            velocity = 0.0
+        if not math.isfinite(velocity) or velocity < 0:
+            velocity = 0.0
+        hook_counts[pattern] = hook_counts.get(pattern, 0) + 1
+        hook_velocity[pattern] = hook_velocity.get(pattern, 0.0) + velocity
+        total_hook_velocity += velocity
 
-    The reward loop can only learn from our own uploads, which is a handful of videos a week — far
-    too slow to notice that, say, number-first hooks are hot this month. These rows are other
-    people's viral Shorts, so they are a live read on format demand that costs us nothing and
-    arrives thousands of videos at a time. Weighted by views per hour rather than by video count,
-    so one breakout counts for more than ten mild performers.
-    """
-    tally: dict[str, dict] = {}
-    for r in rows:
-        pat = hook_pattern(r.get("topic", ""))
-        d = tally.setdefault(pat, {"videos": 0, "vph": 0.0})
-        d["videos"] += 1
-        d["vph"] += float(r.get("vph") or 0)
-    total = sum(d["vph"] for d in tally.values()) or 1.0
+        seconds = row.get("duration_seconds")
+        if isinstance(seconds, bool) or not isinstance(seconds, (int, float)):
+            continue
+        try:
+            seconds = float(seconds)
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if not math.isfinite(seconds) or seconds <= 0:
+            continue
+        if seconds <= 20:
+            band = "le_20s"
+        elif seconds <= 40:
+            band = "21_40s"
+        elif seconds <= 60:
+            band = "41_60s"
+        else:
+            band = "over_60s"
+        duration_counts[band] = duration_counts.get(band, 0) + 1
+        duration_velocity[band] = duration_velocity.get(band, 0.0) + velocity
+        total_duration_velocity += velocity
+
+    hook_shares = ({key: round(value / total_hook_velocity, 4) for key, value in
+                    sorted(hook_velocity.items(), key=lambda item: -item[1])}
+                   if total_hook_velocity > 0 else {})
+    duration_shares = ({key: round(value / total_duration_velocity, 4) for key, value in
+                        sorted(duration_velocity.items(), key=lambda item: -item[1])}
+                       if total_duration_velocity > 0 else {})
     return {
-        "updated": now_utc().isoformat(timespec="seconds"),
         "sample": len(rows),
-        "hook_style": {k: round(v["vph"] / total, 4) for k, v in sorted(
-            tally.items(), key=lambda kv: -kv[1]["vph"])},
-        "videos": {k: v["videos"] for k, v in tally.items()},
+        "hook_style": hook_shares,
+        # This is a title-text classifier, not the spoken opening of the video.
+        "title_hook_style": dict(hook_shares),
+        "videos": hook_counts,
+        "duration_sample": sum(duration_counts.values()),
+        "duration_bands": duration_shares,
+    }
+
+
+def format_pulse(rows: list[dict]) -> dict:
+    """Summarize broad format signals from viral Shorts without collecting their execution.
+
+    The official video metadata used here supports title-pattern labels and clip duration only.
+    Beat counts, spoken hooks and caption density are not available from that metadata, so they
+    are explicitly left unmeasured. All shares are weighted by observed views/hour (an association,
+    not evidence that a format caused a breakout) and are stored as anonymous aggregates, never as
+    title, description, script, transcript, footage or creator examples.
+    """
+    valid_rows = [row for row in rows if isinstance(row, dict)] if isinstance(rows, list) else []
+    summary = _pulse_summary(valid_rows)
+    by_lane: dict[str, dict] = {}
+    lane_names = sorted({row.get("lane") for row in valid_rows
+                         if isinstance(row.get("lane"), str) and row["lane"]})
+    for lane in lane_names:
+        by_lane[lane] = _pulse_summary([row for row in valid_rows if row.get("lane") == lane])
+    return {
+        "schema_version": 2,
+        "updated": now_utc().isoformat(timespec="seconds"),
+        **summary,
+        "by_lane": by_lane,
+        "aggregate_basis": "YouTube title-pattern labels and official video duration metadata; views/hour weighted",
+        "not_measured": ["spoken_hook", "beat_count", "caption_density"],
     }
 
 
 def youtube_outliers(cfg: dict) -> list[dict]:
-    """Fact/explainer Shorts that are going viral RIGHT NOW (proven demand for the topic).
+    """Fact/explainer Shorts that are going viral RIGHT NOW (measured demand for the subject).
 
     search.list (100 units/query) for recent short videos ordered by views, then videos.list + channels.list
     (1 unit per 50) to compute views/hour and views relative to the channel's size. A Short with far more views
-    than its channel has subscribers is an "outlier": the topic itself is what's spreading. Cached once per day.
-    Only the TOPIC is used — our video is an original, sourced take, never a copy.
+    than its channel has subscribers is an "outlier": the subject is spreading. The topic selector may see an
+    outlier title only to identify that subject; the script-generation prompt receives the independent research
+    title and original angle, while format guidance is only aggregate, lane-level title-pattern/duration metadata.
+    No creator title, description, script, caption, footage, audio or identity is used as a format example. Beat
+    count and caption density remain unmeasured. Results are cached once per day.
     """
     t = cfg.get("trends", {})
     pairs = lane_queries(cfg)
@@ -336,7 +422,8 @@ def youtube_outliers(cfg: dict) -> list[dict]:
         ids = list(found)
         vids = []
         for i in range(0, len(ids), 50):
-            vids += yt.videos().list(part="snippet,statistics", id=",".join(ids[i:i + 50])).execute().get("items", [])
+            page = yt.videos().list(part="snippet,statistics,contentDetails", id=",".join(ids[i:i + 50])).execute()
+            vids += page.get("items", [])
         ch_ids = list({v["snippet"]["channelId"] for v in vids})
         subs: dict[str, int] = {}
         for i in range(0, len(ch_ids), 50):
@@ -368,7 +455,8 @@ def youtube_outliers(cfg: dict) -> list[dict]:
             if len(topic) < 8:
                 continue
             rows.append({"topic": topic, "vph": vph, "ratio": ratio, "views": views, "hours": hours, "subs": s_count,
-                         "desc": _clean_title(sn.get("description", ""))[:140],
+                         "duration_seconds": youtube_duration_seconds(
+                             (v.get("contentDetails") or {}).get("duration")),
                          "video_id": v["id"], "source_url": f"https://www.youtube.com/watch?v={v['id']}",
                          "published_at": sn.get("publishedAt", ""), "channel_title": sn.get("channelTitle", ""),
                          "query": found.get(v["id"], ("", ""))[0], "lane": found.get(v["id"], ("", ""))[1],
@@ -381,14 +469,16 @@ def youtube_outliers(cfg: dict) -> list[dict]:
                 "topic": r["topic"], "source": "youtube_outliers", "is_fact": True,
                 "lane": r["lane"], "hook": r["hook"],
                 "score": round(min(1.0, 0.55 + 0.45 * _norm_rank(i, n)), 4),
+                # Trend selection receives the subject and measured demand, never the creator's description.
                 "context": [f"viral Short now: {r['views']:,} views in {r['hours']:.0f}h"
-                            + (f", {r['ratio']:.0f}x its channel's subscribers" if r["subs"] else ""), r["desc"]],
+                            + (f", {r['ratio']:.0f}x its channel's subscribers" if r["subs"] else "")],
                 "source_url": r["source_url"], "video_id": r["video_id"],
                 "published_at": r["published_at"], "channel_title": r["channel_title"],
                 "evidence": {"views": r["views"], "hours": round(r["hours"], 1), "vph": round(r["vph"]),
                              "breakout": round(r["ratio"], 1), "video_id": r["video_id"],
                              "video_url": r["source_url"], "published_at": r["published_at"],
-                             "channel_title": r["channel_title"], "search_query": r["query"]},
+                             "channel_title": r["channel_title"], "search_query": r["query"],
+                             "duration_seconds": r["duration_seconds"]},
             })
         by_lane: dict[str, int] = {}
         for o in out:
