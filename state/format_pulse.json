@@ -1,17 +1,17 @@
 {
-  "updated": "2026-10-10T01:08:22+00:00",
-  "sample": 127,
+  "updated": "2026-10-11T02:12:51+00:00",
+  "sample": 124,
   "hook_style": {
-    "bold_claim": 0.5306,
-    "question": 0.3509,
-    "disbelief": 0.068,
-    "you_statement": 0.0321,
-    "number_first": 0.0184
+    "bold_claim": 0.4736,
+    "question": 0.4289,
+    "disbelief": 0.0461,
+    "number_first": 0.0313,
+    "you_statement": 0.02
   },
   "videos": {
-    "bold_claim": 60,
-    "disbelief": 9,
-    "question": 48,
+    "question": 49,
+    "bold_claim": 59,
+    "disbelief": 6,
     "you_statement": 5,
     "number_first": 5
   }

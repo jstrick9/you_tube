@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-10T22:31:51.415336+00:00",
+  "updated": "2026-10-11T02:12:44.167002+00:00",
   "videos_total": 43,
-  "videos_7d": 14,
-  "views_7d": 6699,
-  "learned_this_run": 1,
+  "videos_7d": 13,
+  "views_7d": 6745,
+  "learned_this_run": 0,
   "strategy": {
     "category": {
       "status": "learning",
@@ -20,14 +20,14 @@
           "n": 1
         },
         {
+          "arm": "mysteries",
+          "mean": 0.486,
+          "n": 1
+        },
+        {
           "arm": "animals",
           "mean": 0.486,
           "n": 2
-        },
-        {
-          "arm": "mysteries",
-          "mean": 0.485,
-          "n": 1
         },
         {
           "arm": "history",
@@ -62,7 +62,7 @@
         },
         {
           "arm": "dumbest_decision",
-          "mean": 0.543,
+          "mean": 0.542,
           "n": 1
         },
         {
@@ -92,7 +92,7 @@
         },
         {
           "arm": "plot_twist",
-          "mean": 0.485,
+          "mean": 0.486,
           "n": 1
         },
         {
@@ -261,7 +261,7 @@
     {
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
-      "views": 1515,
+      "views": 1547,
       "avg_view_pct": 125.34
     },
     {
@@ -321,42 +321,42 @@
   ],
   "rejected": [],
   "retention": {
-    "videos": 26,
+    "videos": 27,
     "where": "hook",
-    "verdict": "Largest relative watch-ratio drop: 23% of the opening level between 10% and 20% of runtime (opening). This is a ratio-curve change, not a percentage of viewers. Median average view percentage is 56% against the internal 70% target.",
+    "verdict": "Largest relative watch-ratio drop: 20% of the opening level between 10% and 20% of runtime (opening). This is a ratio-curve change, not a percentage of viewers. Median average view percentage is 56% against the internal 70% target.",
     "avg_curve": [
-      1.2907,
-      1.1972,
-      0.9063,
-      0.7176,
-      0.5984,
-      0.5296,
-      0.4712,
-      0.4309,
-      0.398,
-      0.3719,
-      0.3116
+      1.4091,
+      1.3129,
+      1.0287,
+      0.8409,
+      0.7211,
+      0.6503,
+      0.5899,
+      0.5499,
+      0.5137,
+      0.4878,
+      0.4297
     ],
     "median_avg_view_pct": 56.22,
     "worst_drop": {
-      "size_of_opening_ratio": 0.2253,
+      "size_of_opening_ratio": 0.2017,
       "from_pct": 10,
       "to_pct": 20
     }
   },
   "average_view_target": {
-    "n": 30,
+    "n": 31,
     "gate_pct": 70.0,
     "metric": "average_view_percentage",
     "passing": 8,
-    "pass_rate": 0.267,
-    "median_avg_view_pct": 57.83,
-    "verdict": "8/30 measured videos clear the internal 70% average-view target (median 58%). This is average watch percentage, not the share of viewers who reached the end."
+    "pass_rate": 0.258,
+    "median_avg_view_pct": 56.22,
+    "verdict": "8/31 measured videos clear the internal 70% average-view target (median 56%). This is average watch percentage, not the share of viewers who reached the end."
   },
   "subscribers": {
     "net_90d": 26,
-    "views_90d": 25346,
-    "per_1k_views": 1.03,
+    "views_90d": 25392,
+    "per_1k_views": 1.02,
     "videos": 34,
     "denominator_basis": "public_views_fallback",
     "videos_with_engaged_views": 33,
