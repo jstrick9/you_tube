@@ -44,11 +44,12 @@ def test_titles_are_stricter_than_narration():
 def test_classifier_decides_sensitive_subjects():
     class Yes:
         def json(self, *a, **k):
-            return {"allowed": True, "reason": "non-graphic engineering history"}
+            return {"allowed": True, "reason": "non-graphic engineering history",
+                    "angle": "the evolution of vehicle safety testing"}
 
     class No:
         def json(self, *a, **k):
-            return {"allowed": False, "reason": "real victims of a recent event"}
+            return {"allowed": False, "reason": "real victims of a recent event", "angle": ""}
 
     ok, _ = safety.check_subject("Crash test dummy", "history of vehicle safety testing", CFG, Yes())
     assert ok
@@ -65,6 +66,18 @@ def test_classifier_outage_falls_back_to_rejecting():
     ok, reason = safety.check_subject("Thirty Years' War", "a date reference", CFG, Down())
     assert not ok and "classifier unavailable" in reason
     assert not safety.check_subject("Thirty Years' War", "x", CFG, None)[0]
+
+
+def test_malformed_safety_term_lists_fall_back_to_safe_defaults():
+    cfg = {"safety": {"hard_blocked": "murder", "title_blocked": "xxx", "sensitive": "war"}}
+    assert safety.screen("serial killer documentary", cfg)[0] == "block"
+    assert safety.screen("Thirty Years' War", cfg)[0] == "review"
+    assert safety.screen_title("A murder mystery", cfg) == "murder"
+
+
+def test_malformed_context_review_setting_blocks_sensitive_topics():
+    cfg = {"safety": {"context_review": "false"}}
+    assert safety.screen("Thirty Years' War", cfg)[0] == "block"
 
 
 def test_legacy_blocked_topics_config_still_works():

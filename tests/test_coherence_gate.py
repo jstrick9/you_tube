@@ -55,6 +55,7 @@ class ReviewLLM:
             "advertiser_friendly": True,
             "policy_concerns": [],
             "loops": True,
+            "value_add": "A clear explanation of the fact's cause and consequence.",
             "fixes": [],
         }
         if kwargs.get("validate"):
@@ -94,13 +95,13 @@ def test_missing_coherence_score_fails_closed():
     def without_score(system, user, **kwargs):
         result = {"score": 9, "hook_strength": 9, "entertainment": 8,
                   "factual_errors": [], "misleading_title": False,
-                  "advertiser_friendly": True, "policy_concerns": [], "loops": True, "fixes": []}
-        if kwargs.get("validate"):
-            kwargs["validate"](result)
-        return result
+                  "advertiser_friendly": True, "policy_concerns": [], "loops": True,
+                  "value_add": "A clear explanation of the fact's cause and consequence.", "fixes": []}
+        return result  # simulate an adapter that ignores its validation callback
 
     writer.llm.json = without_score
     ok, review = writer.check(copy.deepcopy(SCRIPT), SOURCE)
     assert not ok
-    assert review["coherence"] == 0
-    assert any("need 6" in issue for issue in review["issues"])
+    assert review["unavailable"]
+    assert any("coherence must be a finite number" in issue for issue in review["review_schema_issues"])
+    assert any("incomplete or malformed" in issue for issue in review["issues"])

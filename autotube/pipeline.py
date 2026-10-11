@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import math
 import random
 import re
 import shutil
@@ -316,6 +317,140 @@ def _trend_qa_evidence(topic: dict) -> list[str]:
     return rows[:4]
 
 
+def _finite_range(value, low: float, high: float) -> bool:
+    try:
+        return (not isinstance(value, bool) and isinstance(value, (int, float))
+                and math.isfinite(value) and low <= value <= high)
+    except (OverflowError, TypeError, ValueError):
+        return False
+
+
+def _qa_pass_is_explicit(result) -> bool:
+    """An upload result must carry an actual Boolean True, never a truthy string or number."""
+    return (isinstance(result, dict) and isinstance(result.get("qa"), dict)
+            and result["qa"].get("passed") is True)
+
+
+def _qa_report_publishable(report: dict, cfg: dict, timeline, shots, n_segs: int) -> bool:
+    """Trust-boundary check: QA must cover each rendered interval and its approved shot."""
+    if (not isinstance(report, dict) or report.get("passed") is not True or not isinstance(cfg, dict)
+            or type(n_segs) is not int or n_segs < 1 or not isinstance(timeline, list) or not isinstance(shots, list)):
+        return False
+    media_cfg, qa_cfg = cfg.get("media"), cfg.get("qa")
+    if not isinstance(media_cfg, dict) or not isinstance(qa_cfg, dict):
+        return False
+    min_match = media_cfg.get("min_match_score", 7)
+    minimum = qa_cfg.get("min_frame_score", 7)
+    if not _finite_range(min_match, 7, 10) or not _finite_range(minimum, 7, 10):
+        return False
+    if qa.coverage_check(timeline, shots, n_segs, min_match):
+        return False
+    issues = report.get("issues")
+    if not isinstance(issues, list) or issues or report.get("failed") != [] or report.get("repairable") is not False:
+        return False
+    frames = report.get("frames")
+    meta = report.get("meta")
+    if not isinstance(frames, list) or not frames or not isinstance(meta, dict):
+        return False
+    if any(meta.get(key) is not True for key in ("hook_text_ok", "title_ok", "visual_variety_ok")):
+        return False
+    if (not isinstance(meta.get("notes"), list)
+            or any(not isinstance(note, str) for note in meta["notes"])
+            or not isinstance(meta.get("visual_variety_notes"), str)):
+        return False
+
+    frames_by_timeline: dict[int, list[dict]] = {}
+    for frame in frames:
+        if not isinstance(frame, dict) or frame.get("match") is not True:
+            return False
+        score = frame.get("score")
+        if not _finite_range(score, minimum, 10):
+            return False
+        timeline_index = frame.get("timeline_index")
+        if type(timeline_index) is not int or not 0 <= timeline_index < len(timeline):
+            return False
+        entry = timeline[timeline_index]
+        if (not isinstance(entry, dict) or type(frame.get("seg")) is not int
+                or frame["seg"] != entry.get("seg") or frame.get("path") != entry.get("path")):
+            return False
+        if not _finite_range(frame.get("t"), entry["start"], entry["end"]):
+            return False
+        sample, samples = frame.get("sample"), frame.get("samples")
+        if type(sample) is not int or type(samples) is not int or samples < 1 or not 1 <= sample <= samples:
+            return False
+        if not isinstance(frame.get("shows"), str) or not frame["shows"].strip():
+            return False
+        if (not isinstance(frame.get("audit_shows"), str) or not frame["audit_shows"].strip()
+                or frame.get("audit_match") is not True
+                or not _finite_range(frame.get("audit_score"), minimum, 10)):
+            return False
+        for key in ("judge", "audit_judge"):
+            judge = frame.get(key)
+            if not isinstance(judge, str) or not judge.strip() or judge.strip().lower() == "clip":
+                return False
+        frames_by_timeline.setdefault(timeline_index, []).append(frame)
+
+    # Every timeline entry is inspected; a repeated path on the same line is still a separate
+    # rendered interval. Moving footage must receive start/middle/end review, not one arbitrary tile.
+    for index, entry in enumerate(timeline):
+        seg, path = entry["seg"], entry["path"]
+        shot = next((s for s in shots if s["seg"] == seg and str(s["path"]) == path), None)
+        if shot is None:
+            return False  # coverage_check should already catch this; keep the report boundary explicit
+        credit = shot.get("credit") if isinstance(shot.get("credit"), dict) else {}
+        kind = str(shot.get("kind") or credit.get("kind") or "").lower()
+        moving = kind == "video" or path.lower().endswith((".mp4", ".webm", ".mov", ".mkv"))
+        expected_samples = 3 if moving and entry["end"] - entry["start"] >= 1.0 else 1
+        observed = frames_by_timeline.get(index, [])
+        if (len(observed) != expected_samples
+                or {frame["sample"] for frame in observed} != set(range(1, expected_samples + 1))
+                or any(frame["samples"] != expected_samples for frame in observed)):
+            return False
+    if set(frames_by_timeline) != set(range(len(timeline))):
+        return False
+    return True
+
+
+def _normalize_qa_report(report, cfg: dict, timeline=None, shots=None, n_segs: int | None = None) -> dict:
+    """Convert malformed QA result shapes to an explicit, non-repairable rejection."""
+    if not isinstance(report, dict):
+        return {"passed": False, "issues": ["final QA returned a malformed report; rejecting"],
+                "frames": [], "failed": [], "repairable": False}
+    result = dict(report)
+    malformed = []
+    if type(result.get("passed")) is not bool:
+        result["passed"] = False
+        malformed.append("final QA passed verdict was not a boolean")
+    if not isinstance(result.get("issues"), list) or any(not isinstance(item, str) for item in result["issues"]):
+        result["issues"] = []
+        malformed.append("final QA issues were missing or malformed")
+    if type(result.get("repairable")) is not bool:
+        result["repairable"] = False
+        malformed.append("final QA repairable verdict was not a boolean")
+    if not isinstance(result.get("failed"), list):
+        result["failed"] = []
+        result["repairable"] = False
+        malformed.append("final QA failed-shot list was malformed")
+    if result["passed"] and not _qa_report_publishable(result, cfg, timeline, shots, n_segs):
+        result["passed"] = False
+        result["repairable"] = False
+        malformed.append("final QA pass report was incomplete or inconsistent")
+    if malformed:
+        result["passed"] = False
+        result["repairable"] = False
+        result["issues"] = [*result["issues"], *malformed]
+    return result
+
+
+def _qa_repairable(report: dict) -> bool:
+    failed = report.get("failed") if isinstance(report, dict) else None
+    return (isinstance(report, dict) and report.get("passed") is False
+            and report.get("repairable") is True and isinstance(failed, list) and bool(failed)
+            and all(isinstance(item, (list, tuple)) and len(item) == 2
+                    and type(item[0]) is int and item[0] >= 0
+                    and isinstance(item[1], str) and item[1].strip() for item in failed))
+
+
 def _qa_repair_feedback(report: dict, seg: int, path: str) -> str:
     """Turn final-frame findings into concrete search guidance, not a generic retry."""
     frames = [f for f in report.get("frames", [])
@@ -352,17 +487,22 @@ def render_with_qa(a: dict, cfg: dict, writer: ScriptWriter) -> tuple[dict, dict
     for attempt in range(repairs + 1):
         r = render.render(a["tts"], a["visuals"]["shots"], a["music"], a["hook_card"],
                           cfg["channel"]["name"], cfg, a["work"], a["out"], a["seed"], fx=a["fx"])
-        report = qa.verify(a["out"], r["timeline"], a["visuals"]["shots"], a["tts"], a["script"],
-                           a["title"], a["hook_card"], a["subject"], writer.llm, cfg,
-                           trend_angle=(a.get("topic") or {}).get("angle") or "",
-                           trend_evidence=_trend_qa_evidence(a.get("topic") or {}))
+        report = _normalize_qa_report(
+            qa.verify(a["out"], r["timeline"], a["visuals"]["shots"], a["tts"], a["script"],
+                      a["title"], a["hook_card"], a["subject"], writer.llm, cfg,
+                      trend_angle=(a.get("topic") or {}).get("angle") or "",
+                      trend_evidence=_trend_qa_evidence(a.get("topic") or {})), cfg,
+            timeline=r.get("timeline") if isinstance(r, dict) else None,
+            shots=(a.get("visuals") or {}).get("shots") if isinstance(a.get("visuals"), dict) else None,
+            n_segs=len(a["script"].get("segments", [])) if isinstance(a.get("script"), dict)
+            and isinstance(a["script"].get("segments"), list) else None)
         report["attempt"] = attempt + 1
-        if report["passed"]:
+        if report["passed"] is True:
             log.info("  ✓ final QA passed: %d frames checked against the narration", len(report["frames"]))
             break
         log.info("  ✗ final QA attempt %d: %s", attempt + 1, "; ".join(report["issues"])[:500])
-        if not report.get("repairable"):
-            break                    # narration/title/hook or structural problems cannot be fixed by swapping shots
+        if not _qa_repairable(report):
+            break                    # structural or malformed reports cannot be repaired by guessing at a shot
         if attempt >= repairs:
             log.warning("  final QA attempt failed; leaving the rendered frames unchanged and unverified")
             break                    # every replacement must get a fresh render and QA pass
@@ -414,8 +554,13 @@ def _shot_provenance(shots: list[dict]) -> list[dict]:
 
 
 def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
-    """Thumbnail, metadata and the run artifact. None if final QA failed — never hand that upstream."""
+    """Thumbnail, metadata and the run artifact. Only a complete, explicit QA pass can be uploaded."""
     script, source, visuals, out = a["script"], a["source"], a["visuals"], a["out"]
+    report = _normalize_qa_report(
+        report, cfg, timeline=r.get("timeline") if isinstance(r, dict) else None,
+        shots=visuals.get("shots") if isinstance(visuals, dict) else None,
+        n_segs=len(script.get("segments", [])) if isinstance(script, dict)
+        and isinstance(script.get("segments"), list) else None)
     thumb = render.thumbnail(r["first_frame"], a["hook_card"] or source["title"],
                              out.with_suffix(".jpg"), r["theme"])
     _shots_sheet(visuals, out)
@@ -433,7 +578,7 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
               "archetype": r.get("archetype"), "words": words,
               "qa": {k: report.get(k) for k in ("passed", "attempt", "issues", "frames", "meta")},
               "shots": _shot_provenance(visuals["shots"]), "timeline": r["timeline"]}
-    if not report["passed"]:
+    if report.get("passed") is not True:
         # keep the evidence in the run artifact, clearly marked, and never hand it to the uploader
         rejected = out.with_name(out.stem + "-REJECTED.mp4")
         out.replace(rejected)
@@ -461,13 +606,31 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
 
 
 def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int, run_id: str) -> dict | None:
+    if not isinstance(cfg, dict) or not isinstance(topic, dict) or not isinstance(plan, dict):
+        log.warning("refusing malformed topic, plan, or configuration")
+        return None
     trend_cfg = cfg.get("trends") or {}
-    min_wiki_spike = float(trend_cfg.get("min_wikipedia_spike", 3.0))
-    min_viral = float(cfg.get("content", {}).get("min_viral_score", 7))
-    try:
-        viral_score = float(topic.get("viral_score", 0))
-    except (TypeError, ValueError):
-        viral_score = 0.0
+    content_cfg = cfg.get("content") or {}
+    if not isinstance(trend_cfg, dict) or not isinstance(content_cfg, dict):
+        log.warning("refusing malformed trend or content configuration")
+        return None
+    min_wiki_raw = trend_cfg.get("min_wikipedia_spike", 3.0)
+    min_viral_raw = content_cfg.get("min_viral_score", 7)
+    if (not _finite_range(min_viral_raw, 7, 10) or not _finite_range(min_wiki_raw, 0, float("inf"))
+            or min_wiki_raw <= 0):
+        log.warning("refusing invalid trend or viral-potential threshold configuration")
+        return None
+    min_wiki_spike = float(min_wiki_raw)
+    min_viral = float(min_viral_raw)
+    viral_raw = topic.get("viral_score")
+    if not _finite_range(viral_raw, 0, 10):
+        log.info("  ✗ refusing topic with invalid viral score")
+        return None
+    viral_score = float(viral_raw)
+    if not isinstance(topic.get("topic"), str) or not topic["topic"].strip() \
+            or not isinstance(topic.get("angle"), str) or not topic["angle"].strip():
+        log.info("  ✗ refusing topic without a name and a specific current-trend angle")
+        return None
     if not trends.has_current_trend_evidence(topic, min_wiki_spike, trend_cfg):
         log.info("  ✗ refusing topic %r without a qualifying live trend signal", topic.get("topic"))
         return None
@@ -581,7 +744,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             "tts_engine": res["tts_engine"], "file": res["file"].name, "publish_at": slot.isoformat() if slot else None,
             "llm": llm.last_used,
         }
-        if not (res.get("qa") or {}).get("passed"):
+        if not _qa_pass_is_explicit(res):
             log.error("refusing to upload %s: final QA did not pass", res["file"].name)
             continue
         if do_upload:

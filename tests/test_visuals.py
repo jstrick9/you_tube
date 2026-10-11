@@ -24,7 +24,8 @@ class FakeLLM:
         self.calls.append(user)
         if self.fail:
             raise RuntimeError("quota")
-        out = {"images": [{"n": i + 1, "shows": f"thing {i + 1}", "score": s} for i, s in enumerate(self.scores)]}
+        out = {"images": [{"n": i + 1, "shows": f"thing {i + 1}", "score": s, "legible": True}
+                          for i, s in enumerate(self.scores)]}
         if validate:
             validate(out)
         return out
@@ -44,6 +45,59 @@ def test_llm_scores_are_applied_and_sorted():
     assert [c["title"] for c in out] == ["img 1", "img 2", "img 0"]
     assert out[0]["vscore"] == 9 and out[0]["vjudge"] == "fake:vision"
     assert "Cats have whiskers." in j.llm.calls[0]
+
+
+def test_provider_supplied_judge_fields_are_never_trusted():
+    candidates = _cands(1)
+    expected_hash = vision.ahash(candidates[0]["_img"])
+    candidates[0].update(vscore=10, vshows="provider says perfect", vjudge="gemini", clip=10,
+                         clip_cos=1.0, _hash=0, _emb=[1.0])
+    judged = vision.Judge({"media": {"clip": False}}, FakeLLM([1])).score(
+        candidates, "a cat's whiskers", "Cats have whiskers.", "Whiskers")
+    assert len(judged) == 1
+    assert judged[0]["vscore"] == 1 and judged[0]["vshows"] == "thing 1"
+    assert judged[0]["vjudge"] == "fake:vision"
+    assert judged[0]["_hash"] == expected_hash and "_emb" not in judged[0]
+
+
+def test_vision_schema_rejects_non_finite_scores_duplicate_indices_and_non_boolean_legibility():
+    import pytest
+
+    valid = {"images": [{"n": 1, "shows": "the actual object", "score": 9, "legible": True},
+                        {"n": 2, "shows": "a museum specimen", "score": 7, "legible": False}]}
+    assert vision._validate_vision_output(valid, 2) is valid
+    malformed = [
+        {"images": [{"n": 1, "shows": "actual object", "score": float("nan"), "legible": True},
+                    {"n": 2, "shows": "museum specimen", "score": 7, "legible": False}]},
+        {"images": [{"n": 1, "shows": "actual object", "score": 9, "legible": "false"},
+                    {"n": 2, "shows": "museum specimen", "score": 7, "legible": False}]},
+        {"images": [{"n": 1, "shows": "actual object", "score": 9, "legible": True},
+                    {"n": 1, "shows": "museum specimen", "score": 7, "legible": False}]},
+        {"images": [{"n": "1", "shows": "actual object", "score": 9, "legible": True},
+                    {"n": 2, "shows": "museum specimen", "score": 7, "legible": False}]},
+        {"images": [{"n": 1, "shows": "actual object", "score": 9, "legible": True}]},
+    ]
+    for result in malformed:
+        with pytest.raises(ValueError):
+            vision._validate_vision_output(result, 2)
+
+
+def test_vision_adapter_that_skips_validator_cannot_return_nan_verdict():
+    import pytest
+
+    class Malformed:
+        last_used = "fake:vision"
+
+        def vision_available(self):
+            return True
+
+        def vision_json(self, *args, **kwargs):
+            return {"images": [{"n": 1, "shows": "looks about right", "score": float("nan"), "legible": True}]}
+
+    judge = vision.Judge({"media": {"clip": False}}, Malformed())
+    judge.retry_pauses = []
+    with pytest.raises(vision.VisionUnavailable):
+        judge.score(_cands(1), "an artifact", "This is an artifact.", "Artifact")
 
 
 def test_no_judge_means_no_verdict():

@@ -1,5 +1,6 @@
 """Virality: topics must come from live trends, be scored for viral potential, and scripts must have strong hooks."""
 import sys
+from datetime import timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -11,9 +12,14 @@ CFG = common.load_config()
 
 
 def signal(source, url, evidence=None, captured_at=None):
+    evidence = dict(evidence) if isinstance(evidence, dict) else {}
+    hours = evidence.get("hours")
+    if (source == "youtube_outliers" and "published_at" not in evidence
+            and type(hours) in (int, float) and hours > 0):
+        evidence["published_at"] = (common.now_utc() - timedelta(hours=hours)).isoformat(timespec="seconds")
     return {"source": source, "source_family": trends.source_family(source), "source_url": url,
             "captured_at": captured_at or common.now_utc().isoformat(timespec="seconds"),
-            "evidence": evidence or {}}
+            "evidence": evidence}
 
 
 class Strat:
@@ -59,8 +65,8 @@ def cands():
                                            {"views": 42_000})]
         elif t.startswith("Octopus"):
             candidate["signals"] = [signal(
-                "youtube_outliers", "https://youtube.test/short",
-                {"views": 2_000_000, "hours": 20, "vph": 100_000, "breakout": 4.2, "video_id": "abc123"})]
+                "youtube_outliers", "https://www.youtube.com/shorts/abcdefghijk",
+                {"views": 2_000_000, "hours": 20, "vph": 100_000, "breakout": 4.2, "video_id": "abcdefghijk"})]
         else:
             candidate["signals"] = [signal("google_trends", "https://trends.test/dry-policy", {"traffic": 500})]
         out.append(candidate)
@@ -68,9 +74,10 @@ def cands():
 
 
 def test_select_keeps_only_viral_topics_and_ranks_them():
-    llm = LLMPicks([{"index": 0, "viral_score": 9, "category": "history", "wiki_query": "Hunger stone",
-                     "angle": "the stone appeared only when drought returned", "formats": ["creepy_true"]},
-                    {"index": 1, "viral_score": 9, "category": "nature", "wiki_query": "Octopus",
+    llm = LLMPicks([{"index": 0, "viral_score": 9, "category": "history", "risk": "none",
+                     "wiki_query": "Hunger stone", "angle": "the stone appeared only when drought returned",
+                     "formats": ["creepy_true"]},
+                    {"index": 1, "viral_score": 9, "category": "nature", "risk": "low", "wiki_query": "Octopus",
                      "angle": "its arms taste prey before it reaches the mouth", "formats": ["sounds_fake"],
                      "why_trending": "An unverified claim from the selector."},
                     {"index": 2, "viral_score": 8, "category": "culture", "risk": "high"}])
@@ -85,13 +92,46 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     assert "Willie Mays" not in llm.prompt                                               # no Wikipedia-only fallback
 
 
+def test_selector_rejects_configuration_that_weakens_viral_floor():
+    import copy
+
+    cfg = copy.deepcopy(CFG)
+    cfg["content"]["min_viral_score"] = 6
+    llm = LLMPicks([])
+    assert ScriptWriter(cfg, llm, Strat()).select_topics(cands(), 1, set()) == []
+    assert llm.prompt == "", "invalid low floors must fail before invoking the provider"
+
+
+def test_selector_rejects_malformed_live_trend_thresholds_before_provider_call():
+    import copy
+
+    for key, value in (("min_google_trend_traffic", True),
+                       ("min_independent_trend_families", 1),
+                       ("min_hackernews_points", "10"),
+                       ("outlier_window_hours", float("nan"))):
+        cfg = copy.deepcopy(CFG)
+        cfg["trends"][key] = value
+        llm = LLMPicks([])
+        assert ScriptWriter(cfg, llm, Strat()).select_topics(cands(), 1, set()) == [], key
+        assert llm.prompt == "", key
+
+
+def test_selector_deduplicates_repeated_provider_picks():
+    pick = {"index": 0, "viral_score": 9, "category": "history", "risk": "none",
+            "wiki_query": "Hunger stone", "angle": "the stone appeared only when drought returned",
+            "formats": ["creepy_true"]}
+    picks = ScriptWriter(CFG, LLMPicks([pick, dict(pick)]), Strat()).select_topics(cands(), 2, set())
+    assert len(picks) == 1
+    assert picks[0]["topic"] == "Hunger stone"
+
+
 def test_selector_fails_closed_without_a_specific_angle_and_out_of_range_viral_score():
     llm = LLMPicks([
-        {"index": 0, "viral_score": 9, "category": "history", "wiki_query": "Hunger stone",
+        {"index": 0, "viral_score": 9, "category": "history", "risk": "none", "wiki_query": "Hunger stone",
          "angle": "Hunger stone", "formats": ["creepy_true"]},
-        {"index": 1, "viral_score": 9, "category": "nature", "wiki_query": "Octopus",
+        {"index": 1, "viral_score": 9, "category": "nature", "risk": "low", "wiki_query": "Octopus",
          "angle": "octopus can taste with arms", "formats": ["sounds_fake"]},
-        {"index": 2, "viral_score": 11, "category": "culture", "wiki_query": "Dry policy news",
+        {"index": 2, "viral_score": 11, "category": "culture", "risk": "none", "wiki_query": "Dry policy news",
          "angle": "a surprising policy fact changed everything", "formats": ["backstory"]},
     ])
     picks = ScriptWriter(CFG, llm, Strat()).select_topics(cands(), 2, set())
@@ -100,12 +140,26 @@ def test_selector_fails_closed_without_a_specific_angle_and_out_of_range_viral_s
 
 def test_selector_rejects_invalid_category_or_no_fitting_format():
     llm = LLMPicks([
-        {"index": 0, "viral_score": 9, "category": "off_topic", "wiki_query": "Hunger stone",
+        {"index": 0, "viral_score": 9, "category": "off_topic", "risk": "none", "wiki_query": "Hunger stone",
          "angle": "the stone appeared only when drought returned", "formats": ["creepy_true"]},
-        {"index": 1, "viral_score": 9, "category": "nature", "wiki_query": "Octopus",
+        {"index": 1, "viral_score": 9, "category": "nature", "risk": "none", "wiki_query": "Octopus",
          "angle": "its arms taste prey before it reaches the mouth", "formats": ["not_a_format"]},
     ])
     assert ScriptWriter(CFG, llm, Strat()).select_topics(cands(), 2, set()) == []
+
+
+def test_selector_fails_closed_on_malformed_scores_indices_risks_and_angles():
+    bad_picks = [
+        {"index": 0, "viral_score": True, "category": "history", "risk": "none",
+         "wiki_query": "Hunger stone", "angle": "the stone appeared when drought returned", "formats": ["creepy_true"]},
+        {"index": True, "viral_score": 9, "category": "history", "risk": "none",
+         "wiki_query": "Hunger stone", "angle": "the stone appeared when drought returned", "formats": ["creepy_true"]},
+        {"index": 0, "viral_score": 9, "category": "history",
+         "wiki_query": "Hunger stone", "angle": "the stone appeared when drought returned", "formats": ["creepy_true"]},
+        {"index": 0, "viral_score": 9, "category": "history", "risk": "none",
+         "wiki_query": "Hunger stone", "angle": ["the stone appeared", "when drought returned"], "formats": ["creepy_true"]},
+    ]
+    assert ScriptWriter(CFG, LLMPicks(bad_picks), Strat()).select_topics(cands(), 2, set()) == []
 
 
 def test_wikipedia_listing_without_spike_never_reaches_topic_selector():
@@ -142,10 +196,15 @@ def test_trend_evidence_uses_measured_signals_and_distinct_families():
     repeated_reddit = {"signals": [signal("reddit_science", "https://reddit.test/a"),
                                    signal("reddit_space", "https://reddit.test/b")]}
     assert not trends.has_current_trend_evidence(repeated_reddit, 3.0, cfg)
-    chart_only = {"signals": [signal("youtube_chart", "https://youtube.test/chart", {"view_count": 50_000})]}
+    chart_only = {"signals": [signal("youtube_chart", "https://www.youtube.com/watch?v=abcdefghijk",
+                                      {"view_count": 50_000, "video_id": "abcdefghijk"})]}
     assert not trends.has_current_trend_evidence(chart_only, 3.0, cfg)
     chart_reddit = {"signals": chart_only["signals"] + [signal("reddit_science", "https://reddit.test/a")]}
     assert trends.has_current_trend_evidence(chart_reddit, 3.0, cfg)
+    mismatched_chart = {"signals": [dict(chart_only["signals"][0],
+                                         source_url="https://www.youtube.com/watch?v=zyxwvutsrqp"),
+                                    signal("reddit_science", "https://reddit.test/a")]}
+    assert not trends.has_current_trend_evidence(mismatched_chart, 3.0, cfg)
     hn_low = {"signals": [signal("hackernews", "https://news.ycombinator.com/item?id=1", {"points": 9}),
                            signal("reddit_science", "https://reddit.test/a")]}
     hn_confirmed = {"signals": [signal("hackernews", "https://news.ycombinator.com/item?id=1", {"points": 10}),
@@ -176,14 +235,52 @@ def test_trend_evidence_uses_measured_signals_and_distinct_families():
     assert trends.has_current_trend_evidence(weak_google_reddit, 3.0, cfg)
 
     assert not trends.has_current_trend_evidence({"signals": [signal(
-        "youtube_outliers", "https://youtube.test/short",
-        {"views": 29_999, "hours": 20, "vph": 1_500, "video_id": "abc"})]}, 3.0, cfg)
+        "youtube_outliers", "https://www.youtube.com/shorts/abcdefghijk",
+        {"views": 29_999, "hours": 20, "vph": 1_500, "video_id": "abcdefghijk"})]}, 3.0, cfg)
     assert trends.has_current_trend_evidence({"signals": [signal(
-        "youtube_outliers", "https://youtube.test/short",
-        {"views": 30_000, "hours": 20, "vph": 1_500, "video_id": "abc"})]}, 3.0, cfg)
+        "youtube_outliers", "https://www.youtube.com/shorts/abcdefghijk",
+        {"views": 30_000, "hours": 20, "vph": 1_500, "video_id": "abcdefghijk"})]}, 3.0, cfg)
     assert not trends.has_current_trend_evidence({"signals": [signal(
-        "youtube_outliers", "https://youtube.test/short",
-        {"views": 3_000_000, "hours": 73, "vph": 40_000, "video_id": "abc"})]}, 3.0, cfg)
+        "youtube_outliers", "https://www.youtube.com/shorts/abcdefghijk",
+        {"views": 3_000_000, "hours": 73, "vph": 40_000, "video_id": "abcdefghijk"})]}, 3.0, cfg)
+
+    def outlier(url, video_id="abcdefghijk", **extra):
+        evidence = {"views": 50_000, "hours": 20, "vph": 2_500, "video_id": video_id, **extra}
+        return {"signals": [signal("youtube_outliers", url, evidence)]}
+
+    assert trends.has_current_trend_evidence(
+        outlier("https://www.youtube.com/watch?v=abcdefghijk"), 3.0, cfg)
+    assert trends.has_current_trend_evidence(
+        outlier("https://youtu.be/abcdefghijk"), 3.0, cfg)
+    assert not trends.has_current_trend_evidence(
+        outlier("https://unrelated.example/shorts/abcdefghijk"), 3.0, cfg)
+    assert not trends.has_current_trend_evidence(
+        outlier("https://www.youtube.com/shorts/zyxwvutsrqp"), 3.0, cfg)
+    assert not trends.has_current_trend_evidence(
+        outlier("http://www.youtube.com/shorts/abcdefghijk"), 3.0, cfg)
+    assert not trends.has_current_trend_evidence(
+        outlier("https://www.youtube.com/watch?v=abcdefghijk&v=zyxwvutsrqp"), 3.0, cfg)
+    assert not trends.has_current_trend_evidence(
+        outlier("https://www.youtube.com/shorts/abcdefghijk", video_id="short-id"), 3.0, cfg)
+    conflicting_id = outlier("https://www.youtube.com/shorts/abcdefghijk")
+    conflicting_id["signals"][0]["video_id"] = "zyxwvutsrqp"
+    assert not trends.has_current_trend_evidence(conflicting_id, 3.0, cfg)
+    malformed_url = outlier("https://")
+    assert not trends.has_current_trend_evidence(malformed_url, 3.0, cfg)
+    assert not trends.has_current_trend_evidence(
+        outlier("https://www.youtube.com/shorts/abcdefghijk", vph=1), 3.0, cfg)
+    assert not trends.has_current_trend_evidence(
+        outlier("https://www.youtube.com/shorts/abcdefghijk", vph=True), 3.0, cfg)
+    assert not trends.has_current_trend_evidence(
+        outlier("https://www.youtube.com/shorts/abcdefghijk", published_at=(
+            common.now_utc() + timedelta(hours=1)).isoformat()), 3.0, cfg)
+    stale = outlier("https://www.youtube.com/shorts/abcdefghijk",
+                    published_at=(common.now_utc() - timedelta(days=10)).isoformat())
+    assert not trends.has_current_trend_evidence(stale, 3.0, cfg)
+    missing_publication = outlier("https://www.youtube.com/shorts/abcdefghijk")
+    missing_publication["signals"][0]["evidence"].pop("published_at")
+    assert not trends.has_current_trend_evidence(missing_publication, 3.0, cfg)
+
     no_capture = signal("google_trends", "https://trends.test/page", {"traffic": 5_000})
     no_capture["captured_at"] = "2026-01-01T00:00:00+00:00"
     assert not trends.has_current_trend_evidence({"signals": [no_capture]}, 3.0, cfg)
@@ -193,6 +290,19 @@ def test_trend_evidence_uses_measured_signals_and_distinct_families():
     verified_but_mislabeled = {"signals": [signal(
         "google_trends", "https://trends.test/page", {"traffic": 5_000})], "sources": ["evergreen"]}
     assert trends.has_current_trend_evidence(verified_but_mislabeled, 3.0, cfg)
+
+
+def test_trend_gate_rejects_boolean_evidence_and_malformed_thresholds():
+    cfg = dict(CFG["trends"])
+    current = {"signals": [signal("google_trends", "https://trends.test/page", {"traffic": 100_000})]}
+    assert not trends.has_current_trend_evidence(current, 3.0, {**cfg, "min_google_trend_traffic": True})
+    assert not trends.has_current_trend_evidence(current, True, cfg)
+    assert not trends.has_current_trend_evidence(current, 3.0, {**cfg, "min_independent_trend_families": 1.5})
+    assert not trends.has_current_trend_evidence(current, 3.0, {**cfg, "min_google_trend_traffic": "1000"})
+    boolean_evidence = {"signals": [signal("google_trends", "https://trends.test/page", {"traffic": True})]}
+    assert not trends.has_current_trend_evidence(boolean_evidence, 3.0, cfg)
+    string_evidence = {"signals": [signal("google_trends", "https://trends.test/page", {"traffic": "100000"})]}
+    assert not trends.has_current_trend_evidence(string_evidence, 3.0, cfg)
 
 
 def test_make_one_fails_closed_without_live_trend_evidence(monkeypatch):
@@ -206,6 +316,20 @@ def test_make_one_fails_closed_without_live_trend_evidence(monkeypatch):
     assert pipeline.make_one(CFG, object(), topic, {}, 1, "test-run") is None
 
 
+def test_make_one_rejects_configuration_that_weakens_viral_floor(monkeypatch):
+    import copy
+    from autotube import pipeline
+
+    cfg = copy.deepcopy(CFG)
+    cfg["content"]["min_viral_score"] = 6
+    monkeypatch.setattr(pipeline, "produce_assets", lambda *a, **k: (_ for _ in ()).throw(
+        AssertionError("invalid low viral floor must be rejected before production")))
+    topic = {"topic": "Current Google trend", "angle": "a rare object surged in searches",
+             "sources": ["google_trends"], "score": 0.9, "viral_score": 9,
+             "signals": [signal("google_trends", "https://trends.test/current", {"traffic": 20_000})]}
+    assert pipeline.make_one(cfg, object(), topic, {}, 1, "test-run") is None
+
+
 def test_make_one_rejects_below_floor_viral_score_even_with_live_source(monkeypatch):
     from autotube import pipeline
 
@@ -216,7 +340,42 @@ def test_make_one_rejects_below_floor_viral_score_even_with_live_source(monkeypa
     assert pipeline.make_one(CFG, object(), topic, {}, 1, "test-run") is None
 
 
+def test_make_one_rejects_non_finite_or_coerced_viral_scores(monkeypatch):
+    from autotube import pipeline
+
+    def should_not_produce(*args, **kwargs):
+        raise AssertionError("invalid viral scores must not reach production")
+
+    monkeypatch.setattr(pipeline, "produce_assets", should_not_produce)
+    for score in (float("nan"), float("inf"), True, "9"):
+        topic = {"topic": "Current Google trend", "angle": "a rare object suddenly surged in searches",
+                 "sources": ["google_trends"], "score": 0.9, "viral_score": score,
+                 "signals": [signal("google_trends", "https://trends.test/current", {"traffic": 20_000})]}
+        assert pipeline.make_one(CFG, object(), topic, {}, 1, "test-run") is None
+
+
+def test_youtube_chart_boolean_view_count_is_not_a_trending_signal(monkeypatch):
+    monkeypatch.setenv("YOUTUBE_API_KEY", "test-key")
+    monkeypatch.setattr(trends, "get_json", lambda *a, **k: {"items": [{
+        "id": "abcdefghijk", "snippet": {"title": "Trending topic", "tags": [],
+                                         "categoryId": "22", "publishedAt": "2026-10-10T12:00:00Z"},
+        "statistics": {"viewCount": True},
+    }]})
+    row = trends.youtube_chart("US")[0]
+    assert row["view_count"] == 0
+    signals = [trends._signal_record(row, common.now_utc().isoformat(timespec="seconds")),
+               signal("reddit_science", "https://reddit.test/post")]
+    assert not trends.has_current_trend_evidence({"signals": signals}, 3.0, CFG["trends"])
+
+
 def test_google_trends_traffic_parser_preserves_k_and_magnitude():
+    assert trends._parse_traffic(True) == 0
+    assert trends._parse_traffic(1.5) == 0
+    assert trends._parse_traffic(",1,000") == 0
+    assert trends._parse_traffic("1,,000") == 0
+    assert trends._parse_traffic(float("nan")) == 0
+    assert trends._provider_count(True) is None
+    assert trends._provider_count("1000") == 1000
     assert trends._parse_traffic("25K+") == 25_000
     assert trends._parse_traffic("1.2M+") == 1_200_000
     assert trends._parse_traffic("50,000+") == 50_000
@@ -281,8 +440,9 @@ def test_weak_hook_is_rejected_and_rewritten():
         lite = False
 
         def json(self, system, user, **kw):
-            return {"score": 9, "hook_strength": 6, "coherence": 8, "factual_errors": [], "misleading_title": False,
-                    "advertiser_friendly": True, "policy_concerns": [], "fixes": []}
+            return {"score": 9, "hook_strength": 6, "entertainment": 8, "coherence": 8, "loops": True,
+                    "factual_errors": [], "misleading_title": False, "advertiser_friendly": True,
+                    "policy_concerns": [], "value_add": "A concise explanation of the supported fact.", "fixes": []}
 
     w = ScriptWriter.__new__(ScriptWriter)
     w.cfg, w.llm, w.src_chars = CFG, Rev(), 4000
@@ -305,7 +465,10 @@ def test_titles_are_screened_for_shock_bait_not_vocabulary():
         lite = False
 
         def json(self, system, user, **kw):
-            return {"score": 9, "hook_strength": 9, "coherence": 8, "fixes": []}
+            return {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8,
+                    "loops": True, "factual_errors": [], "misleading_title": False,
+                    "advertiser_friendly": True, "policy_concerns": [],
+                    "value_add": "A concise explanation of the supported fact.", "fixes": []}
 
     w = ScriptWriter.__new__(ScriptWriter)
     w.llm, w.src_chars = Rev(), 4000

@@ -1,5 +1,6 @@
 """Packaged sidecars keep the committed episode number and trend provenance."""
 import json
+import json
 import sys
 from pathlib import Path
 
@@ -7,6 +8,31 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from autotube import pipeline, series  # noqa: E402
 from autotube.common import load_config  # noqa: E402
+
+
+def test_package_rejects_truthy_string_qa_pass_report(tmp_path, monkeypatch):
+    cfg = load_config()
+    out = tmp_path / "unverified.mp4"
+    out.write_bytes(b"placeholder")
+    monkeypatch.setattr(pipeline.render, "thumbnail", lambda *args, **kwargs: tmp_path / "thumb.jpg")
+    monkeypatch.setattr(pipeline, "_shots_sheet", lambda *args, **kwargs: None)
+    monkeypatch.setattr(pipeline, "build_description", lambda *args, **kwargs: "desc")
+    assets = {
+        "script": {"title": "A title", "segments": [{"text": "A sourced fact."}], "tags": []},
+        "source": {"title": "Topic", "url": "https://example.test/topic"},
+        "visuals": {"shots": []}, "review": {}, "plan": {}, "topic": {},
+        "out": out, "hook_card": "", "title": "A title", "tts": {"engine": "test"},
+    }
+
+    result = pipeline.package(assets, {"first_frame": "frame.jpg", "theme": 0, "duration": 2, "timeline": []},
+                             {"passed": "false", "issues": [], "frames": []}, cfg)
+
+    assert result is None
+    rejected = out.with_name("unverified-REJECTED.mp4")
+    assert rejected.exists() and not out.exists()
+    sidecar = json.loads(rejected.with_suffix(".json").read_text())
+    assert sidecar["qa"]["passed"] is False
+    assert any("passed verdict was not a boolean" in issue for issue in sidecar["qa"]["issues"])
 
 
 def test_sidecar_uses_assigned_episode_and_preserves_trend_evidence(tmp_path, monkeypatch):
@@ -30,10 +56,14 @@ def test_sidecar_uses_assigned_episode_and_preserves_trend_evidence(tmp_path, mo
                      "evidence": {"views": 2000000, "hours": 12}}],
     }
     assets = {
-        "script": {"title": "The treaty that ended a war", "description": "", "segments": [],
-                   "tags": [], "hashtags": []},
+        "script": {"title": "The treaty that ended a war", "description": "",
+                   "segments": [{"text": "The treaty ended the war."}], "tags": [], "hashtags": []},
         "source": {"title": "Treaty of Portsmouth", "url": "https://example.test/treaty", "also": []},
-        "visuals": {"shots": []},
+        "visuals": {"shots": [{"seg": 0, "path": "approved.jpg", "score": 9, "judge": "gemini",
+                                 "want": "the treaty", "shows": "the treaty document",
+                                 "credit": {"title": "Treaty document", "author": "Archive staff",
+                                            "license": "Public domain", "source": "archive",
+                                            "page": "https://example.test/document", "url": "https://example.test/document"}}]},
         "review": {"score": 9, "trend_alignment": 9, "trend_alignment_reason": "Covers the discovery"},
         "plan": {"format": "backstory"},
         "topic": topic,
@@ -45,8 +75,16 @@ def test_sidecar_uses_assigned_episode_and_preserves_trend_evidence(tmp_path, mo
         "tts": {"engine": "edge-tts"},
     }
     render_result = {"first_frame": tmp_path / "first.jpg", "theme": 0, "duration": 18.2,
-                     "archetype": "clean", "timeline": []}
-    report = {"passed": True, "attempt": 1, "issues": [], "frames": [], "meta": {}}
+                     "archetype": "clean", "timeline": [{"seg": 0, "start": 0.0, "end": 2.0,
+                                                               "path": "approved.jpg"}]}
+    report = {"passed": True, "attempt": 1, "issues": [], "failed": [], "repairable": False,
+              "frames": [{"timeline_index": 0, "seg": 0, "path": "approved.jpg", "t": 0.5,
+                          "shows": "verified subject",
+                          "sample": 1, "samples": 1, "match": True, "score": 9,
+                          "audit_shows": "verified subject", "audit_match": True, "audit_score": 9,
+                          "judge": "gemini", "audit_judge": "gemini"}],
+              "meta": {"hook_text_ok": True, "title_ok": True, "visual_variety_ok": True,
+                       "notes": [], "visual_variety_notes": ""}}
 
     result = pipeline.package(assets, render_result, report, cfg)
     sidecar = json.loads(out.with_suffix(".json").read_text())

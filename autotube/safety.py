@@ -76,21 +76,39 @@ def _match(terms: list[str], text: str) -> str | None:
 
 
 def config(cfg: dict) -> dict:
-    """Safety settings, with backward compatibility for the old compliance.blocked_topics list."""
-    raw = dict((cfg.get("safety") or {}))
+    """Safety settings, with backward compatibility and safe defaults for malformed config."""
+    if not isinstance(cfg, dict):
+        cfg = {}
+    safety_present = cfg.get("safety") is not None
+    raw = cfg.get("safety") or {}
+    raw = raw if isinstance(raw, dict) else {}
     comp = cfg.get("compliance") or {}
-    # `null`/absent in YAML means "use the module default"; an explicit list overrides it.
+    comp = comp if isinstance(comp, dict) else {}
+
+    def term_list(value, default):
+        if not value:
+            return list(default)
+        if not isinstance(value, list) or any(not isinstance(term, str) or not term.strip() for term in value):
+            return list(default)
+        return [term.strip() for term in value]
+
+    context_review = raw.get("context_review", True)
+    if type(context_review) is not bool:
+        context_review = False  # malformed setting cannot turn a sensitive topic into an LLM-approved topic
+
+    # `null`/absent in YAML means "use the module default"; an explicit valid list overrides it.
     s = {
-        "hard_blocked": raw.get("hard_blocked") or HARD_BLOCKED,
-        "title_blocked": raw.get("title_blocked") or TITLE_BLOCKED,
-        "context_review": raw.get("context_review", True),
+        "hard_blocked": term_list(raw.get("hard_blocked"), HARD_BLOCKED),
+        "title_blocked": term_list(raw.get("title_blocked"), TITLE_BLOCKED),
+        "context_review": context_review,
     }
-    if raw.get("sensitive"):
-        s["sensitive"] = raw["sensitive"]
-    elif cfg.get("safety") is not None:
-        s["sensitive"] = SENSITIVE
+    sensitive = raw.get("sensitive")
+    if sensitive:
+        s["sensitive"] = term_list(sensitive, SENSITIVE)
+    elif safety_present:
+        s["sensitive"] = list(SENSITIVE)
     else:                                    # pre-safety config: the old flat list, as-is
-        s["sensitive"] = comp.get("blocked_topics") or SENSITIVE
+        s["sensitive"] = term_list(comp.get("blocked_topics"), SENSITIVE)
     return s
 
 
@@ -112,6 +130,29 @@ def screen_title(title: str, cfg: dict) -> str | None:
     return _match(s["hard_blocked"] + s["title_blocked"], title)
 
 
+def _validate_context_classification(value) -> dict:
+    if not isinstance(value, dict) or type(value.get("allowed")) is not bool:
+        raise ValueError("safety verdict must be an object with an explicit Boolean allowed field")
+    reason, angle = value.get("reason"), value.get("angle")
+    if not isinstance(reason, str) or not reason.strip() or len(reason) > 500:
+        raise ValueError("safety verdict needs a concise text reason")
+    if not isinstance(angle, str) or (value["allowed"] and not angle.strip()):
+        raise ValueError("an allowed safety verdict needs a specific safe angle")
+    return value
+
+
+def _validate_person_classification(value) -> dict:
+    keys = ("is_public_figure", "is_adult", "angle_is_professional", "allowed")
+    if not isinstance(value, dict) or any(type(value.get(key)) is not bool for key in keys):
+        raise ValueError("person-safety verdict needs four explicit Boolean findings")
+    reason, safe_angle = value.get("reason"), value.get("safe_angle")
+    if not isinstance(reason, str) or not reason.strip() or len(reason) > 500:
+        raise ValueError("person-safety verdict needs a concise text reason")
+    if not isinstance(safe_angle, str) or (value["allowed"] and not safe_angle.strip()):
+        raise ValueError("an allowed person-safety verdict needs a specific safe angle")
+    return value
+
+
 def judge(subject: str, context: str, term: str, llm, cfg: dict) -> tuple[bool, str]:
     """Ask a model whether this subject can be covered safely. Returns (allowed, reason).
 
@@ -119,7 +160,6 @@ def judge(subject: str, context: str, term: str, llm, cfg: dict) -> tuple[bool, 
     If the model is unreachable we fall back to rejecting, which is exactly what the old keyword
     blocklist did — this path is never less safe than the behaviour it replaces.
     """
-    from .llm import LLMError
     if llm is None:
         return False, f"no classifier available to judge {term!r}"
     user = f"""SUBJECT: {subject}
@@ -139,9 +179,9 @@ anything sexual.
 Return JSON: {{"allowed": true|false, "reason": "<one short sentence>",
 "angle": "<if allowed: the safe, non-graphic angle to take>"}}"""
     try:
-        r = llm.json(CLASSIFY_SYSTEM, user, temperature=0.1,
-                     validate=lambda o: isinstance(o.get("allowed"), bool))
-    except (LLMError, Exception) as e:  # noqa: BLE001 — classifier failure must fail closed
+        r = llm.json(CLASSIFY_SYSTEM, user, temperature=0.1, validate=_validate_context_classification)
+        _validate_context_classification(r)  # trust-boundary check for adapters that ignore callbacks
+    except Exception as e:  # noqa: BLE001 — classifier failure must fail closed
         log.info("safety classifier unavailable (%s) → rejecting %r on the keyword", str(e)[:100], subject)
         return False, f"classifier unavailable; rejected on {term!r}"
     allowed = bool(r.get("allowed"))
@@ -203,11 +243,23 @@ def person_angle_hits(text: str) -> list[str]:
 
 
 def person_config(cfg: dict) -> dict:
-    raw = ((cfg.get("safety") or {}).get("person") or {})
+    safety_cfg = cfg.get("safety") if isinstance(cfg, dict) else None
+    raw = safety_cfg.get("person") if isinstance(safety_cfg, dict) else None
+    raw = raw if isinstance(raw, dict) else {}
+    require_public_figure = raw.get("require_public_figure", True)
+    allow_minors = raw.get("allow_minors", False)
+    blocked_angles = raw.get("blocked_angles")
+    if type(require_public_figure) is not bool:
+        require_public_figure = True
+    if type(allow_minors) is not bool:
+        allow_minors = False
+    if (not isinstance(blocked_angles, list) or not blocked_angles
+            or any(not isinstance(term, str) or not term.strip() for term in blocked_angles)):
+        blocked_angles = PERSON_BLOCKED_ANGLES
     return {
-        "require_public_figure": bool(raw.get("require_public_figure", True)),
-        "blocked_angles": raw.get("blocked_angles") or PERSON_BLOCKED_ANGLES,
-        "allow_minors": bool(raw.get("allow_minors", False)),
+        "require_public_figure": require_public_figure,
+        "blocked_angles": [term.strip() for term in blocked_angles],
+        "allow_minors": allow_minors,
     }
 
 
@@ -232,11 +284,10 @@ def check_person(subject: str, context: str, cfg: dict, llm=None) -> tuple[bool,
     if llm is None:
         return False, "no classifier available to judge a living person", ""
 
-    from .llm import LLMError
     user = f"""PERSON / TOPIC: {subject}
 CONTEXT: {context[:1200]}
 
-A fully automated channel wants to make a 30-60 second factual video involving this living person.
+A fully automated channel wants to make a 15-20 second factual YouTube Short involving this living person.
 There is no human editor and no legal review.
 
 Allow ONLY if ALL of these hold:
@@ -256,9 +307,9 @@ Return JSON: {{"is_public_figure": true|false, "is_adult": true|false,
 "angle_is_professional": true|false, "allowed": true|false,
 "reason": "<one short sentence>", "safe_angle": "<if allowed: the professional angle to take>"}}"""
     try:
-        r = llm.json(PERSON_SYSTEM, user, temperature=0.1,
-                     validate=lambda o: isinstance(o.get("allowed"), bool))
-    except (LLMError, Exception) as e:  # noqa: BLE001 — must fail closed
+        r = llm.json(PERSON_SYSTEM, user, temperature=0.1, validate=_validate_person_classification)
+        _validate_person_classification(r)  # do not trust adapters that skip the callback
+    except Exception as e:  # noqa: BLE001 — must fail closed
         log.info("person classifier unavailable (%s) → rejecting %r", str(e)[:100], subject)
         return False, "classifier unavailable; living person rejected", ""
 

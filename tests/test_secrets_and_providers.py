@@ -4,6 +4,7 @@ Two failure modes here are invisible until a live run and expensive when they la
 a secret that exists but is never passed into the job, and a "reviewer" that turns out
 to be the same model that wrote the script.
 """
+import copy
 import os
 import re
 import sys
@@ -106,9 +107,10 @@ def test_every_review_provider_can_actually_be_reached():
 def test_the_writer_model_is_recorded_and_excluded_from_review():
     """Independence is only real if the writer's exact model is passed as `avoid`."""
     src = (ROOT / "autotube" / "scriptwriter.py").read_text()
-    assert 'script["_writer_model"] = self.llm.last_used' in src
+    assert 'script["_writer_model"] = getattr(self.llm, "last_used", "")' in src
     assert 'avoid=script.get("_writer_model")' in src
-    assert 'review["independent"] = bool(review["reviewer"]) and review["reviewer"] != script.get("_writer_model")' in src
+    assert 'isinstance(writer_model, str) and bool(writer_model)' in src, \
+        "unknown writer identity must never be reported as an independent review"
 
 
 def test_independence_is_recorded_rather_than_assumed():
@@ -562,14 +564,26 @@ def test_package_returns_series_and_episode(monkeypatch, tmp_path):
     out = tmp_path / "v.mp4"
     out.write_bytes(b"x")
     a = {"script": {"segments": [{"text": "a b c"}], "tags": ["t"]},
-         "source": {"title": "T", "url": "u"}, "visuals": {"shots": []}, "out": out,
+         "source": {"title": "T", "url": "u"},
+         "visuals": {"shots": [{"seg": 0, "path": "approved.jpg", "score": 9, "judge": "gemini",
+                                  "want": "the subject", "shows": "the verified subject",
+                                  "credit": {"title": "Subject", "source": "archive", "page": "https://x/y"}}]},
+         "out": out,
          "review": {"score": 8}, "plan": {"format": "f"}, "tts": {"engine": "e"},
          # Undecorated on purpose: produce_assets no longer prefixes the series,
          # because the number is not known until the video survives QA.
          "hook_card": "h", "title": "A fish that walks on land", "topic": {"topic": "x"},
          "series": "field", "episode": 0}
-    r = {"first_frame": "f", "theme": "th", "duration": 18.5, "timeline": [], "archetype": "arch"}
-    rep = {"passed": True, "attempt": 1, "issues": [], "frames": 5, "meta": {}}
+    r = {"first_frame": "f", "theme": "th", "duration": 18.5,
+         "timeline": [{"seg": 0, "start": 0.0, "end": 1.0, "path": "approved.jpg"}], "archetype": "arch"}
+    rep = {"passed": True, "attempt": 1, "issues": [], "failed": [], "repairable": False,
+           "frames": [{"timeline_index": 0, "seg": 0, "path": "approved.jpg", "t": 0.5,
+                       "shows": "verified subject",
+                       "sample": 1, "samples": 1, "match": True, "score": 9,
+                       "audit_shows": "verified subject", "audit_match": True, "audit_score": 9,
+                       "judge": "gemini", "audit_judge": "gemini"}],
+           "meta": {"hook_text_ok": True, "title_ok": True, "visual_variety_ok": True,
+                    "notes": [], "visual_variety_notes": ""}}
 
     import yaml as _y
     real_cfg = _y.safe_load((ROOT / "config.yaml").read_text())
@@ -733,6 +747,19 @@ def test_rejects_the_all_ambient_shotlist_actually_published():
     assert names_subject(published, "The Mystery")
 
 
+def _validator_ready(script):
+    """Give semantic-gate fixtures the separate required output-shape fields they are not testing."""
+    for seg in script["segments"]:
+        seg.setdefault("evidence", "supporting source quote")
+        visual = seg.setdefault("visual", {"shows": "the subject", "queries": ["subject photo", "subject detail"]})
+        if isinstance(visual, dict):
+            queries = visual.get("queries")
+            if isinstance(queries, list):
+                while 0 < len(queries) < 2:
+                    queries.append(queries[0] + " close up")
+    return script
+
+
 def _grab_validator():
     """Capture the real validate() the writer hands to the LLM, and call it ourselves."""
     import yaml as _y
@@ -763,6 +790,39 @@ def _grab_validator():
     return box.get("v")
 
 
+def test_script_validator_fails_closed_on_malformed_generated_shape():
+    import pytest
+
+    validate = _grab_validator()
+    base = _validator_ready({"title": "The Montauk Monster remains unidentified", "segments": [
+        {"text": "The Montauk Monster washed ashore without a clear identity",
+         "visual": {"shows": "the Montauk Monster carcass", "queries": ["Montauk Monster", "monster carcass"]}},
+        {"text": "Biologists argued over its remains, but no test settled anything",
+         "visual": {"shows": "the Montauk Monster remains", "queries": ["monster remains", "Montauk Monster"]}},
+        {"text": "The body disappeared before anyone could identify the creature",
+         "visual": {"shows": "the Montauk Monster carcass", "queries": ["monster carcass", "Montauk Monster"]}},
+        {"text": "The Montauk Monster remains unidentified decades later",
+         "visual": {"shows": "the Montauk Monster shoreline", "queries": ["Montauk Monster", "monster shoreline"]}},
+    ]})
+    cases = []
+    too_many = copy.deepcopy(base)
+    too_many["segments"] += [copy.deepcopy(too_many["segments"][-1]) for _ in range(2)]
+    cases.append((too_many, "exactly 4 or 5 segments"))
+    no_evidence = copy.deepcopy(base)
+    no_evidence["segments"][1]["evidence"] = None
+    cases.append((no_evidence, "textual evidence"))
+    malformed_aside = copy.deepcopy(base)
+    malformed_aside["segments"][0]["aside"] = False
+    cases.append((malformed_aside, "aside must be text"))
+    one_query = copy.deepcopy(base)
+    one_query["segments"][1]["visual"]["queries"] = ["one query"]
+    cases.append((one_query, "need a"))
+
+    for script, message in cases:
+        with pytest.raises(AssertionError, match=message):
+            validate(script)
+
+
 def test_validator_actually_rejects_an_all_ambient_script():
     """Run the validator rather than grep for it.
 
@@ -785,7 +845,7 @@ def test_validator_actually_rejects_an_all_ambient_script():
          "visual": {"shows": "sunset over the ocean", "queries": ["sunset"]}},
     ]}
     with pytest.raises(AssertionError, match="no shot shows"):
-        v(ambient)
+        v(_validator_ready(ambient))
 
 
 def test_rejects_the_empty_payoff_the_echo_gate_created():
@@ -828,7 +888,7 @@ def test_empty_payoff_is_enforced_in_validation():
          "visual": {"shows": "plateau", "queries": ["plateau"]}},
     ]}
     with pytest.raises(AssertionError, match="trails off"):
-        v(trailing)
+        v(_validator_ready(trailing))
 
 
 # ── pruning the channel ─────────────────────────────────────────────────────
@@ -916,7 +976,7 @@ def test_canned_aside_is_rejected_by_the_real_validator():
          "visual": {"shows": "shore", "queries": ["shore"]}},
     ]}
     with pytest.raises(AssertionError, match="canned filler"):
-        v(script)
+        v(_validator_ready(script))
 
 
 def test_the_prompt_states_one_hook_instruction_not_two():
@@ -1056,13 +1116,13 @@ def test_both_are_enforced_by_the_real_validator():
          "visual": {"shows": "tank", "queries": ["tank"]}},
     ]
     with pytest.raises(AssertionError, match="filler every channel uses"):
-        v({"title": "T", "segments": base})
+        v(_validator_ready({"title": "T", "segments": base}))
 
     asking = [dict(x) for x in base]
     asking[0]["text"] = "The Montauk Monster washed up with no clear explanation."
     asking[-1]["text"] = "The Hittite Empire or the Nile's floods—which won?"
     with pytest.raises(AssertionError, match="asks a question"):
-        v({"title": "T", "segments": asking})
+        v(_validator_ready({"title": "T", "segments": asking}))
 
 
 # ── topic selection: specificity ───────────────────────────────────────────
@@ -1086,9 +1146,10 @@ def test_an_empty_wiki_query_drops_the_topic_instead_of_widening_it():
     """Honour the selector's refusal; never silently ground the raw trend headline."""
     src = (ROOT / "autotube" / "scriptwriter.py").read_text()
     body = src.split("def select_topics(")[1].split("\n    def ")[0]
-    i_drop = body.index("no specific article")
-    i_query = body.index('wiki_query = str(p.get("wiki_query") or "").strip()')
-    assert i_drop < i_query, "an empty article refusal must be handled before assigning a query"
+    i_query = body.index('raw_query = p.get("wiki_query")')
+    i_drop = body.rindex("no specific article")
+    i_assign = body.index("wiki_query = raw_query.strip()")
+    assert i_query < i_drop < i_assign, "an empty article refusal must precede assigning the grounding query"
     assert 'p.get("wiki_query") or c["topic"]' not in body, "the raw trend title must never widen the grounding"
 
 
@@ -1171,9 +1232,10 @@ def test_coherence_is_recorded_and_part_of_the_approval_boolean():
 
     src = (ROOT / "autotube" / "scriptwriter.py").read_text()
     assert 'review["coherence"] = coh' in src, "every script's score must be recorded"
-    assert 'self.cfg["content"].get("min_coherence", 0)' in src, "threshold must be config-driven"
+    assert '"min_coh": content_cfg.get("min_coherence", 6)' in src, "threshold must be validated from config"
     assert "coh >= min_coh" in src, "the configured coherence score must participate in final approval"
-    assert 'get("coherence", 0)' in src, "a missing coherence score must fail closed"
+    assert 'reviewer_schema_issues(r, has_trend=topic is not None)' in src, \
+        "missing or malformed coherence values must be rejected at the reviewer-schema boundary"
 
     cfg = _y.safe_load((ROOT / "config.yaml").read_text())
     assert cfg["content"]["min_coherence"] == 6
@@ -1244,9 +1306,9 @@ def test_all_three_are_enforced_by_the_real_validator():
     assert v is not None
 
     def script(lines, asides=None):
-        return {"title": "T", "segments": [
+        return _validator_ready({"title": "T", "segments": [
             {"text": t, "visual": {"shows": "the Montauk Monster carcass",
-                                   "queries": ["montauk monster"]}} for t in lines]}
+                                   "queries": ["montauk monster"]}} for t in lines]})
 
     with pytest.raises(AssertionError, match="never says"):
         v(script(["Some fish spend three quarters of their life on land.",
@@ -1384,14 +1446,14 @@ def test_angle_delivery_is_enforced_by_the_real_validator(monkeypatch):
     v = box.get("v")
     assert v is not None
     drifted = {"title": "T", "segments": [
-        {"text": "Nintendo DS sold one hundred fifty four million units worldwide.",
-         "visual": {"shows": "a Nintendo DS console", "queries": ["nintendo ds"]}},
-        {"text": "It beat every internal sales expectation that year.",
-         "visual": {"shows": "a Nintendo DS console", "queries": ["nintendo ds"]}},
-        {"text": "Some early units shipped with stuck pixels on screen.",
-         "visual": {"shows": "a Nintendo DS screen", "queries": ["nintendo ds screen"]}},
-        {"text": "Nintendo later repaired those panels for owners free.",
-         "visual": {"shows": "a Nintendo DS repair", "queries": ["nintendo ds"]}}]}
+        {"text": "Nintendo DS sold one hundred fifty four million units worldwide.", "evidence": "DS sold millions",
+         "visual": {"shows": "a Nintendo DS console", "queries": ["nintendo ds console", "handheld console"]}},
+        {"text": "It beat every internal sales expectation that year.", "evidence": "sales expectations",
+         "visual": {"shows": "a Nintendo DS console", "queries": ["nintendo ds console", "handheld console"]}},
+        {"text": "Some early units shipped with stuck pixels on screen.", "evidence": "early units shipped",
+         "visual": {"shows": "a Nintendo DS screen", "queries": ["nintendo ds screen", "handheld screen"]}},
+        {"text": "Nintendo later repaired those panels for owners free.", "evidence": "repaired those panels",
+         "visual": {"shows": "a Nintendo DS repair", "queries": ["nintendo ds repair", "console repair"]}}]}
     with pytest.raises(AssertionError, match="not the story that trended"):
         v(drifted)
 
@@ -1441,7 +1503,7 @@ def test_unreadable_shot_is_enforced_by_the_real_validator():
     v = _grab_validator()
     assert v is not None
     with pytest.raises(AssertionError, match="nobody reads a chart"):
-        v({"title": "T", "segments": [
+        v(_validator_ready({"title": "T", "segments": [
             {"text": "The Montauk Monster washed up on a New York beach.",
              "visual": {"shows": "the Montauk Monster carcass", "queries": ["montauk monster"]}},
             {"text": "Biologists could not agree on what it really was.",
@@ -1449,7 +1511,7 @@ def test_unreadable_shot_is_enforced_by_the_real_validator():
             {"text": "The carcass vanished before any testing could happen.",
              "visual": {"shows": "the Montauk Monster beach", "queries": ["montauk"]}},
             {"text": "Nobody has identified the Montauk Monster since then.",
-             "visual": {"shows": "the Montauk Monster shoreline", "queries": ["montauk"]}}]})
+             "visual": {"shows": "the Montauk Monster shoreline", "queries": ["montauk"]}}]}))
 
 
 # ── visual variety ─────────────────────────────────────────────────────────
@@ -1507,8 +1569,8 @@ def test_a_discarded_video_does_not_burn_an_episode_number():
     # Match the call, not the word: the surrounding comments mention episode_number too.
     call = "series_mod.episode_number("
     assert call in package, "the number should be issued once QA has passed"
-    assert package.index('if not report["passed"]') < package.index(call), \
-        "a rejected video must return before taking a number"
+    assert package.index('if report.get("passed") is not True') < package.index(call), \
+        "a missing, malformed, or rejected QA verdict must return before taking a number"
 
 
 def test_illegible_flag_actually_lowers_the_score():

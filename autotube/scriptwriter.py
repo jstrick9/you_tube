@@ -114,7 +114,9 @@ WRITER_SYSTEM = (
     "scripts that are 100% factually grounded in the SOURCE TEXT provided. "
     "Hard rules: (1) Every factual claim, number, date and name must appear in or be directly implied by the SOURCE TEXT. "
     "(2) Never invent quotes, statistics or events. (3) No clickbait that the video doesn't deliver on. "
-    "(4) Family-friendly, no profanity, no medical/financial/legal advice. (5) Write for the ear: short sentences, "
+    "(4) Create an original treatment in our own words: never imitate, paraphrase, reconstruct, or reuse a viral Short, "
+    "competitor script, or source publisher's distinctive wording. (5) Family-friendly, no profanity, no medical/financial/legal advice. "
+    "(6) Write for the ear: short sentences, "
     "numbers written as digits, no emojis, no hashtags in narration, no stage directions. Reply with JSON only."
 )
 
@@ -225,6 +227,79 @@ def actionable_review_fixes(value) -> list[str]:
         if text.lower().strip(" .!?") not in no_change:
             out.append(text[:300])
     return out
+
+
+def _finite_in_range(number, low: float, high: float) -> bool:
+    try:
+        return (not isinstance(number, bool) and isinstance(number, (int, float))
+                and math.isfinite(number) and low <= number <= high)
+    except (OverflowError, TypeError, ValueError):
+        return False
+
+
+def _valid_review_score(number) -> bool:
+    return _finite_in_range(number, 0, 10)
+
+
+def metadata_schema_issues(value) -> list[str]:
+    """Validate upload-facing metadata before it can be attached to an otherwise approved script."""
+    if not isinstance(value, dict):
+        return ["metadata response must be a JSON object"]
+    issues = []
+    description = value.get("description")
+    if not isinstance(description, str) or len(description.strip()) < 40 or len(description) > 1_000 \
+            or "#" in description or "\n" in description:
+        issues.append("description must be a complete 40-1000 character paragraph with no hashtags")
+    tags = value.get("tags")
+    if (not isinstance(tags, list) or not 8 <= len(tags) <= 12
+            or any(not isinstance(tag, str) or not tag.strip() or tag != tag.strip()
+                   or tag.startswith("#") or len(tag) > 50 for tag in tags)
+            or (isinstance(tags, list) and sum(len(tag) for tag in tags if isinstance(tag, str)) > 500)
+            or (isinstance(tags, list)
+                and len({tag.casefold() for tag in tags if isinstance(tag, str)}) != len(tags))):
+        issues.append("tags must be an array of 8-12 short, non-hashtag strings")
+    hashtags = value.get("hashtags")
+    if (not isinstance(hashtags, list) or len(hashtags) != 3
+            or any(not isinstance(tag, str) or not re.fullmatch(r"#[A-Za-z0-9_]{1,30}", tag) for tag in hashtags)
+            or (isinstance(hashtags, list) and len(set(hashtags)) != len(hashtags))):
+        issues.append("hashtags must be exactly three valid hashtag strings")
+    thumbnail = value.get("thumbnail_text")
+    if (not isinstance(thumbnail, str) or not 2 <= len(thumbnail.split()) <= 4 or len(thumbnail) > 60
+            or "#" in thumbnail or "\n" in thumbnail):
+        issues.append("thumbnail_text must be 2-4 words and at most 60 characters")
+    return issues
+
+
+def reviewer_schema_issues(value, has_trend: bool = False) -> list[str]:
+    """Validate every decision used by the publish gate; never replace missing scores with a pass."""
+    if not isinstance(value, dict):
+        return ["response must be a JSON object"]
+    issues = []
+    for key in ("score", "hook_strength", "entertainment", "coherence"):
+        number = value.get(key)
+        if not _valid_review_score(number):
+            issues.append(f"{key} must be a finite number from 0 to 10")
+    value_add = value.get("value_add")
+    if not isinstance(value_add, str) or not value_add.strip():
+        issues.append("value_add must be a non-empty explanation of what the viewer learns")
+    for key in ("misleading_title", "advertiser_friendly", "loops"):
+        if not isinstance(value.get(key), bool):
+            issues.append(f"{key} must be a boolean")
+    for key in ("factual_errors", "policy_concerns", "fixes"):
+        items = value.get(key)
+        if not isinstance(items, list) or any(not isinstance(item, str) for item in items):
+            issues.append(f"{key} must be an array of strings")
+    if has_trend:
+        number = value.get("trend_alignment")
+        if not _valid_review_score(number):
+            issues.append("trend_alignment must be a finite number from 0 to 10")
+        reason = value.get("trend_alignment_reason")
+        if not isinstance(reason, str) or not reason.strip():
+            issues.append("trend_alignment_reason must be a non-empty string")
+    if "issues" in value and (not isinstance(value["issues"], list)
+                               or any(not isinstance(item, str) for item in value["issues"])):
+        issues.append("issues must be an array of strings when present")
+    return issues
 
 
 ASIDE_BAD = re.compile(r"\d|\b(hundred|thousand|million|billion|trillion|percent|dozen)s?\b", re.I)
@@ -581,18 +656,58 @@ class ScriptWriter:
         whether real photos can show it), and only picks scoring >= content.min_viral_score survive. Final order
         blends that score with the measured trend strength and the channel's learned category preferences.
         """
+        if type(n) is not int or n <= 0 or not isinstance(candidates, list):
+            return []
         cats = self.cfg["channel"]["categories"]
         ccfg = self.cfg["content"]
-        exclude = exclude or set()
-        min_viral = float(ccfg.get("min_viral_score", 7))
+        exclude = exclude if isinstance(exclude, set) else set()
+        recent = recent if isinstance(recent, set) else set()
+        min_viral_raw = ccfg.get("min_viral_score", 7)
+        if not _finite_in_range(min_viral_raw, 7, 10):
+            log.warning("minimum viral-score configuration must be finite and at least 7; no topics selected")
+            return []
+        min_viral = float(min_viral_raw)
         trend_cfg = self.cfg.get("trends", {}) or {}
-        min_wiki_spike = float(trend_cfg.get("min_wikipedia_spike", 3.0))
-        min_google_traffic = int(trend_cfg.get("min_google_trend_traffic", 1_000))
-        min_families = max(2, int(trend_cfg.get("min_independent_trend_families", 2)))
-        min_hn_points = int(trend_cfg.get("min_hackernews_points", 10))
-        outlier_min_views = int(trend_cfg.get("outlier_min_views", 30_000))
-        outlier_window_hours = float(trend_cfg.get("outlier_window_hours", 72))
-        eligible = [c for c in candidates if has_current_trend_evidence(c, min_wiki_spike, trend_cfg)]
+        if not isinstance(trend_cfg, dict):
+            log.warning("invalid trend configuration; no topics selected")
+            return []
+        min_wiki_raw = trend_cfg.get("min_wikipedia_spike", 3.0)
+        if not _finite_in_range(min_wiki_raw, 0, float("inf")) or min_wiki_raw <= 0:
+            log.warning("invalid Wikipedia trend threshold; no topics selected")
+            return []
+        min_wiki_spike = float(min_wiki_raw)
+        int_thresholds = {
+            "min_google_trend_traffic": trend_cfg.get("min_google_trend_traffic", 1_000),
+            "min_independent_trend_families": trend_cfg.get("min_independent_trend_families", 2),
+            "min_hackernews_points": trend_cfg.get("min_hackernews_points", 10),
+            "outlier_min_views": trend_cfg.get("outlier_min_views", 30_000),
+        }
+        if any(not _finite_in_range(value, 1, float("inf")) or int(value) != value
+               for value in int_thresholds.values()):
+            log.warning("trend count thresholds must be positive integers; no topics selected")
+            return []
+        min_google_traffic = int(int_thresholds["min_google_trend_traffic"])
+        min_families = int(int_thresholds["min_independent_trend_families"])
+        min_hn_points = int(int_thresholds["min_hackernews_points"])
+        outlier_min_views = int(int_thresholds["outlier_min_views"])
+        outlier_window_raw = trend_cfg.get("outlier_window_hours", 72)
+        if not _finite_in_range(outlier_window_raw, 0, float("inf")) or outlier_window_raw <= 0:
+            log.warning("outlier-window threshold must be finite and positive; no topics selected")
+            return []
+        outlier_window_hours = float(outlier_window_raw)
+        if min_families < 2:
+            log.warning("at least two independent trend families are required; no topics selected")
+            return []
+
+        def valid_candidate(candidate):
+            return (isinstance(candidate, dict) and isinstance(candidate.get("topic"), str)
+                    and bool(candidate["topic"].strip()) and isinstance(candidate.get("topic_key"), str)
+                    and bool(candidate["topic_key"].strip()) and isinstance(candidate.get("sources"), list)
+                    and all(isinstance(source, str) and source for source in candidate["sources"])
+                    and _finite_in_range(candidate.get("score"), 0, 1))
+
+        eligible = [c for c in candidates if valid_candidate(c)
+                    and has_current_trend_evidence(c, min_wiki_spike, trend_cfg)]
         if len(eligible) < len(candidates):
             log.info("excluding %d candidate(s) without a qualifying live trend signal",
                      len(candidates) - len(eligible))
@@ -667,44 +782,65 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
 "why_trending": "<short, cite the evidence>", "risk": "none|low|high"}}]}} — best first."""
 
         def validate(o):
+            assert isinstance(o, dict), "selection response must be a JSON object"
             assert isinstance(o.get("picks"), list) and o["picks"], "no picks"
+            assert all(isinstance(pick, dict) for pick in o["picks"]), "every pick must be a JSON object"
 
         try:
             res = self.llm.json(SELECT_SYSTEM, user, temperature=0.4, validate=validate)
-        except LLMError as e:
-            # fail closed on virality: no un-scored "maybe trending" guesses
-            log.warning("topic selection unavailable (%s) — no topics this round", e)
+            validate(res)  # protect adapters that do not enforce the callback
+        except Exception as e:  # noqa: BLE001 — invalid/unavailable selection yields no candidates
+            # Fail closed on virality: no un-scored "maybe trending" guesses.
+            log.warning("topic selection unavailable or malformed (%s) — no topics this round", str(e)[:300])
             return []
         picks, dropped = [], []
+        seen_topics: set[str] = set()
         for p in res["picks"]:
             try:
-                idx = int(p["index"])
-                if not (0 <= idx < len(pool)) or p.get("risk") == "high":
+                idx = p.get("index")
+                if type(idx) is not int or not 0 <= idx < len(pool):
+                    dropped.append("(invalid candidate index)")
                     continue
-                vs = float(p.get("viral_score", 0))
                 c = dict(pool[idx])
-                if not math.isfinite(vs) or not 0 <= vs <= 10:
+                risk = p.get("risk")
+                if risk not in {"none", "low", "high"}:
+                    dropped.append(f"{c['topic'][:40]} (missing or invalid risk verdict)")
+                    continue
+                if risk == "high":
+                    continue
+                viral_raw = p.get("viral_score")
+                if not _valid_review_score(viral_raw):
                     dropped.append(f"{c['topic'][:40]} (invalid viral score)")
                     continue
+                vs = float(viral_raw)
                 if vs < min_viral:
                     dropped.append(f"{c['topic'][:40]} ({vs:.0f})")
                     continue
                 # A topic must have a specific article and a specific trend angle. Falling
                 # back to the raw headline can resolve to a broad category page and erase
                 # the event/detail that actually made people notice the topic.
-                wiki_query = str(p.get("wiki_query") or "").strip()
-                if not wiki_query:
+                raw_query = p.get("wiki_query")
+                if not isinstance(raw_query, str) or not raw_query.strip():
                     dropped.append(f"{c['topic'][:40]} (no specific article)")
                     continue
-                angle = str(p.get("angle") or "").strip()
+                wiki_query = raw_query.strip()
+                raw_angle = p.get("angle")
+                if not isinstance(raw_angle, str) or not raw_angle.strip():
+                    dropped.append(f"{c['topic'][:40]} (no specific trend angle)")
+                    continue
+                angle = raw_angle.strip()
                 if len(_angle_terms(angle, c["topic"])) < 2:
                     dropped.append(f"{c['topic'][:40]} (no distinctive trend angle)")
                     continue
                 cat = p.get("category")
-                if cat not in cats:
+                if not isinstance(cat, str) or cat not in cats:
                     dropped.append(f"{c['topic'][:40]} (invalid category)")
                     continue
-                fits = [f for f in (p.get("formats") or []) if isinstance(f, str) and f in formats]
+                raw_formats = p.get("formats")
+                if not isinstance(raw_formats, list) or any(not isinstance(f, str) for f in raw_formats):
+                    dropped.append(f"{c['topic'][:40]} (malformed format list)")
+                    continue
+                fits = [f for f in raw_formats if f in formats]
                 if not fits:
                     dropped.append(f"{c['topic'][:40]} (no fitting format)")
                     continue
@@ -717,6 +853,10 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                 src_w = self.strategy.source_weight(primary_source(c.get("sources", [])))
                 c["priority"] = round(0.50 * vs / 10 + 0.25 * c["score"] + 0.125 * weights.get(cat, 0.5)
                                       + 0.125 * src_w, 4)
+                if c["topic_key"] in seen_topics:
+                    dropped.append(f"{c['topic'][:40]} (duplicate selector result)")
+                    continue
+                seen_topics.add(c["topic_key"])
                 picks.append(c)
             except (KeyError, ValueError, TypeError):
                 continue
@@ -827,7 +967,7 @@ SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of fact
 \"\"\"{source['text'][:self.src_chars]}\"\"\"
 
 {HOOK_RULES}
-Write the script as 4-5 segments. Each beat has a DIFFERENT job — do not write interchangeable body lines:
+Write the script as exactly 4 or 5 segments. Each beat has a DIFFERENT job — do not write interchangeable body lines:
   - segment 1 = HOOK (see rules), spoken in under 3 seconds;
   - segment 2 = THE TURN, {body_min}-{body_max} factual words. This single line decides whether the video is watched, and it is the
     one most often written wrong. It must make the hook BIGGER — a second surprise, or the consequence of the
@@ -890,14 +1030,20 @@ Return JSON:
         subject_for_visuals = source["title"]
 
         def validate(o):
+            assert isinstance(o, dict), "script must be a JSON object"
             segs = o.get("segments")
-            assert isinstance(segs, list) and 4 <= len(segs) <= 8, "need 5-6 segments"
+            assert isinstance(segs, list) and 4 <= len(segs) <= 5, "need exactly 4 or 5 segments"
+            assert all(isinstance(s, dict) for s in segs), "every segment must be a JSON object"
             assert all(isinstance(s.get("text"), str) and s["text"].strip() for s in segs), "empty segment"
-            assert o.get("title"), "missing title"
-            vis = [s.get("visual") for s in segs]
-            bad = [i + 1 for i, v in enumerate(vis) if not (isinstance(v, dict) and str(v.get("shows", "")).strip()
-                                                             and isinstance(v.get("queries"), list) and v["queries"])]
-            assert len(bad) <= 1, f"segments {bad} are missing \"visual\": {{\"shows\": ..., \"queries\": [...]}}"
+            assert all("aside" not in s or isinstance(s["aside"], str) for s in segs), "aside must be text"
+            assert all(isinstance(s.get("evidence"), str) for s in segs), "every segment must include textual evidence"
+            assert isinstance(o.get("title"), str) and o["title"].strip(), "missing title"
+            bad = [i + 1 for i, s in enumerate(segs) if not (
+                isinstance(s.get("visual"), dict)
+                and isinstance(s["visual"].get("shows"), str) and s["visual"]["shows"].strip()
+                and isinstance(s["visual"].get("queries"), list) and 2 <= len(s["visual"]["queries"]) <= 3
+                and all(isinstance(q, str) and q.strip() for q in s["visual"]["queries"]))]
+            assert not bad, f"segments {bad} need a \"visual\": {{\"shows\": ..., \"queries\": [2-3 strings]}}"
             # A closing line that is the hook again is the single most common defect in
             # this channel's published output, and asking the model not to do it has a
             # 0-for-3 record. Reject it where rejection actually costs the model a retry.
@@ -960,7 +1106,8 @@ Return JSON:
                    else "shorten the body segments"))
 
         script = self.llm.json(WRITER_SYSTEM, user, validate=validate)
-        script["_writer_model"] = self.llm.last_used          # so the reviewer can be a different one
+        validate(script)  # trust-boundary check even for custom routers that ignore the callback
+        script["_writer_model"] = getattr(self.llm, "last_used", "")
         tidy(script, fmt, max_asides)
         script.update(self.metadata(script, source))
         return script
@@ -976,11 +1123,17 @@ Write YouTube metadata for this Short. Return JSON:
  "tags": ["8-12 relevant search tags"],
  "hashtags": ["#three", "#relevant", "#hashtags"],
  "thumbnail_text": "2-4 punchy words for the on-screen title card"}}"""
+        def validate_metadata(value):
+            schema_issues = metadata_schema_issues(value)
+            if schema_issues:
+                raise AssertionError("metadata schema invalid: " + "; ".join(schema_issues))
+
         try:
-            m = self.llm.json(WRITER_SYSTEM, user, temperature=0.5,
-                              validate=lambda o: o["description"] and o["thumbnail_text"])
-            return {k: m.get(k) for k in ("description", "tags", "hashtags", "thumbnail_text") if m.get(k)}
-        except LLMError:
+            m = self.llm.json(WRITER_SYSTEM, user, temperature=0.5, validate=validate_metadata)
+            validate_metadata(m)  # adapters that skip validation still cannot inject malformed upload metadata
+            return {k: m[k] for k in ("description", "tags", "hashtags", "thumbnail_text")}
+        except Exception as e:  # noqa: BLE001 — use grounded deterministic metadata rather than publish bad output
+            log.warning("metadata response unavailable or malformed; using source-grounded fallback: %s", str(e)[:200])
             words = script["title"].split()
             return {"description": narration[:300], "tags": [source["title"]], "hashtags": [],
                     "thumbnail_text": " ".join(words[:4])}
@@ -1049,7 +1202,11 @@ Write YouTube metadata for this Short. Return JSON:
         # tightening nobody asked for, and one that would have shown up as unexplained topic abandonment
         # rather than as a failing test. The ratio keeps 5- and 6-segment behaviour identical.
         need = grounding_floor(len(script["segments"]), self.cfg["content"])
-        if self.cfg["content"]["require_grounding"] and grounded < need:
+        require_grounding = self.cfg["content"].get("require_grounding", True)
+        if type(require_grounding) is not bool:
+            issues.append("require_grounding configuration must be a Boolean; not publishing")
+            require_grounding = True
+        if require_grounding and grounded < need:
             issues.append(f"only {grounded} of {len(script['segments'])} segments have verifiable "
                           f"evidence (need {need})")
         # Context-aware (autotube/safety.py): titles stay strict, narration is only hard-blocked on
@@ -1091,31 +1248,62 @@ Observed live evidence:
 The script must deliver the selected angle, not just repeat the trend headline or discuss the broad subject.
 \n"""
         trend_schema = ', "trend_alignment": 0-10, "trend_alignment_reason": "brief evidence-based reason"' if topic is not None else ""
-        min_trend_alignment = float(self.cfg.get("content", {}).get("min_trend_alignment", 8))
+        content_cfg = self.cfg.get("content", {})
+        compliance_cfg = self.cfg.get("compliance", {})
+        if not isinstance(content_cfg, dict) or not isinstance(compliance_cfg, dict):
+            review["issues"].append("review score configuration is malformed; not publishing")
+            return False, review
+        require_independent_review = compliance_cfg.get("require_independent_review", False)
+        if type(require_independent_review) is not bool:
+            review["issues"].append("independent-review requirement must be a Boolean; not publishing")
+            return False, review
+        thresholds = {
+            "min_hook": content_cfg.get("min_hook_score", 7),
+            "min_ent": content_cfg.get("min_entertainment", 6),
+            "min_coh": content_cfg.get("min_coherence", 6),
+            "min_alignment": content_cfg.get("min_trend_alignment", 8),
+            "min_review": compliance_cfg.get("quality_gate_min_score", 7),
+        }
+        if any(not _finite_in_range(value, 0, 10) for value in thresholds.values()):
+            review["issues"].append("review score thresholds must be finite numbers from 0 to 10; not publishing")
+            return False, review
+        min_hook = float(thresholds["min_hook"])
+        min_ent = float(thresholds["min_ent"])
+        min_coh = float(thresholds["min_coh"])
+        min_trend_alignment = float(thresholds["min_alignment"])
+        min_review_score = float(thresholds["min_review"])
         trend_rubric = (f"\ntrend_alignment — score whether the script tells the CURRENT TREND CONTEXT's specific selected angle, not merely its broad topic. "
                         f"10 = clearly delivers the distinctive viral/trending story; 8-9 = direct, strong coverage; 6-7 = partial or diluted; 0-5 = generic, tangential, or absent. "
                         f"Need at least {min_trend_alignment:g}/10. Explain the score briefly in trend_alignment_reason. The angle is not proof of facts; SOURCE TEXT remains the only fact source."
                         if topic is not None else "")
+        require_loop = self.cfg.get("content", {}).get("require_loop", False)
+        if type(require_loop) is not bool:
+            review["issues"].append("loop requirement configuration is malformed; not publishing")
+            return False, review
+        loop_instruction = ("A loop is required: if loops=false, include a concrete reworded last line in fixes."
+                           if require_loop else
+                           "A loop is optional: record loops accurately, but do not put a missing loop in fixes by itself.")
         user = f"""{trend_context}SOURCE TEXT:\n\"\"\"{source['text'][:self.src_chars]}\"\"\"\n
 SCRIPT TITLE: {script['title']}
 SCRIPT DESCRIPTION: {script.get('description', '')}
 SCRIPT NARRATION (lines marked ASIDE are the narrator's jokes, spoken right after the line above them):
 {narration_list}
 
-Evaluate. Return JSON: {{"factual_errors": ["..."], "misleading_title": true|false, "advertiser_friendly": true|false,
-"policy_concerns": ["..."], "value_add": "<what the viewer learns>", "hook_strength": 0-10, "entertainment": 0-10,
+Evaluate. Verify that the script offers a specific viewer takeaway and an original treatment in its own words, not a bare restatement of the headline or a close copy of source phrasing. If you cannot identify a concrete takeaway, leave value_add empty; if originality is doubtful, say so in policy_concerns or fixes.
+Return JSON: {{"factual_errors": ["..."], "misleading_title": true|false, "advertiser_friendly": true|false,
+"policy_concerns": ["..."], "value_add": "<specific takeaway the viewer learns>", "hook_strength": 0-10, "entertainment": 0-10,
 "score": 0-10, "loops": true|false, "coherence": 0-10{trend_schema}, "fixes": ["..."]}}
-Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; <7 = do not publish.
+Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; below {min_review_score:g} = do not publish.
 "loops": does the LAST line flow naturally back into the FIRST when the Short replays? Judge it by meaning,
 not by shared words - "so the ice keeps bleeding" loops cleanly into "a waterfall that runs blood red".
 A natural loop is a creative choice, not a guaranteed increase in views or averageViewPercentage; do not cite a metric
-benefit. If it does not loop, say so in "fixes" and give the re-worded last line.
+benefit. {loop_instruction}
 coherence — is this ONE story or a list of facts that happen to share a subject? Ask whether the lines could be
 reordered without the script breaking: if they could, it is a list. 8-10 = each line follows from the one before
 (a prince is dying / his pulse betrays him / she is his stepmother / his father divorces her). 4-6 = loosely
 themed, some connective tissue. 0-3 = unrelated facts in a row (Egypt built pyramids / used Nile flooding /
 signed a peace treaty). A list of true facts is accurate and still unwatchable, so score it on structure, not
-truth, and put the re-ordering or the missing causal link in "fixes".
+truth, and put the re-ordering or the missing causal link in "fixes". Need at least {min_coh:g}/10.
 Read EVERY sentence literally, word by word: if its literal meaning is false or garbled (e.g. the wrong subject doing
 the action — "rivers carved warnings" when people carved them; a date or place attached to the wrong thing), list
 it in factual_errors even if the gist is right.
@@ -1124,21 +1312,17 @@ sarcasm. Put an aside in policy_concerns ONLY if it states a new specific fact a
 victims or a tragedy, or is not family-friendly. A joke must never change what the facts say.
 entertainment — BE HARSH, this channel competes with comedians: a list of accurate facts read in a neutral tone is 5
 at most, however interesting. 7 = has a story shape (setup, escalation, payoff) and personality. 8 = also at least one
-genuinely funny or gasp-out-loud moment. 9-10 = you would send it to a friend. If < 8, put a concrete TRUE rewrite
+genuinely funny or gasp-out-loud moment. 9-10 = you would send it to a friend. If entertainment < {min_ent:g}, put a concrete TRUE rewrite
 idea in "fixes" (story tension, comic contrast, a sharper aside, a stronger reveal).
 hook_strength: 9-10 = the first line alone would stop a stranger scrolling (specific, surprising, opens a question the
 video answers); 7-8 = decent; <=6 = generic ('Did you know', 'Here are some facts', topic name, slow setup).
-If hook_strength < 9, put a stronger TRUE first line in "fixes".
+If hook_strength < {min_hook:g}, put a stronger TRUE first line in "fixes".
 Any non-empty "fixes" list means the draft still needs revision; return [] only when it is ready to publish.
 Be internally consistent: if a fix says the last line must be rewritten to loop, "loops" must be false.""" + trend_rubric
         def validate_review(o):
-            score = float(o["score"])
-            assert math.isfinite(score) and 0 <= score <= 10
-            assert isinstance(o.get("fixes"), list) and all(isinstance(x, str) for x in o["fixes"]), (
-                "reviewer must return a fixes array (empty only when no changes are needed)")
-            if topic is not None:
-                alignment = float(o["trend_alignment"])
-                assert math.isfinite(alignment) and 0 <= alignment <= 10
+            schema_issues = reviewer_schema_issues(o, has_trend=topic is not None)
+            if schema_issues:
+                raise AssertionError("reviewer schema invalid: " + "; ".join(schema_issues))
 
         try:
             # A writer grading its own homework agrees with itself. Review runs on a different
@@ -1150,58 +1334,62 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
                               temperature=0.2, validate=validate_review)
             else:                                     # minimal LLM-like object (tests, custom routers)
                 r = self.llm.json(REVIEW_SYSTEM, user, temperature=0.2, validate=validate_review)
-            review["reviewer"] = getattr(self.llm, "last_used", "")
-            review["independent"] = bool(review["reviewer"]) and review["reviewer"] != script.get("_writer_model")
+            reviewer_id = getattr(self.llm, "last_used", "")
+            reviewer_id = reviewer_id if isinstance(reviewer_id, str) else ""
+            review["reviewer"] = reviewer_id
+            writer_model = script.get("_writer_model")
+            review["independent"] = (isinstance(writer_model, str) and bool(writer_model)
+                                      and bool(reviewer_id) and reviewer_id != writer_model)
             if review["reviewer"] and not review["independent"]:
-                log.info("  review ran on the same model as the writer (%s) — no independent reviewer reachable",
-                         review["reviewer"])
-                if self.cfg["compliance"].get("require_independent_review", False):
-                    review["issues"].append("no independent reviewer available — not publishing")
-                    review["unavailable"] = True
-                    return False, review
-        except LLMError as e:
-            log.warning("review LLM unavailable: %s", e)
-            if self.cfg["compliance"].get("require_llm_review", True):
-                # fail closed: a script nobody fact-checked is never published
+                reason = "same model" if writer_model else "writer identity unavailable"
+                log.info("  review is not known to be independent (%s; reviewer=%s)", reason, review["reviewer"])
+            if require_independent_review and not review["independent"]:
+                review["issues"].append("no independent reviewer identity available — not publishing")
                 review["unavailable"] = True
-                review["issues"].append("fact-check unavailable — not publishing an unchecked script")
                 return False, review
-            review["score"] = 7
-            review["issues"].append("llm review unavailable; programmatic checks passed")
-            return True, review
-        score = float(r.get("score", 0))
-        min_hook = float(self.cfg["content"].get("min_hook_score", 0))
-        try:
-            hook = float(r.get("hook_strength", 10))
-        except (TypeError, ValueError):
-            hook = 0.0
+        except Exception as e:  # noqa: BLE001 — any provider/adapter failure blocks publication
+            log.warning("review LLM unavailable or invalid: %s", str(e)[:300])
+            # Fail closed unconditionally. A config switch must not turn a missing or
+            # malformed compliance review into an approval.
+            review["unavailable"] = True
+            review["issues"].append("fact-check unavailable — not publishing an unchecked script")
+            return False, review
+        schema_issues = reviewer_schema_issues(r, has_trend=topic is not None)
+        if schema_issues:
+            log.warning("reviewer returned malformed output: %s", "; ".join(schema_issues)[:500])
+            review["unavailable"] = True
+            review["review_schema_issues"] = schema_issues
+            if isinstance(r, dict):
+                review["fixes"] = actionable_review_fixes(r.get("fixes"))
+            else:
+                review["fixes"] = actionable_review_fixes(None)
+            review["issues"].append("reviewer output was incomplete or malformed — not publishing")
+            review["issues"].extend("reviewer schema: " + issue for issue in schema_issues)
+            return False, review
+        score = float(r["score"])
+        hook = float(r["hook_strength"])
         if hook < min_hook:
             review["issues"].append(f"hook too weak ({hook:.0f}/10, need {min_hook:.0f}) — open with the single most "
                                     "surprising specific fact; no 'Did you know' or slow setup")
-        min_ent = float(self.cfg["content"].get("min_entertainment", 0))
-        try:
-            ent = float(r.get("entertainment", 10))
-        except (TypeError, ValueError):
-            ent = 0.0
+        ent = float(r["entertainment"])
         if ent < min_ent:
             review["issues"].append(f"not entertaining enough ({ent:.0f}/10, need {min_ent:.0f}) — tell it as a story "
                                     "with tension and a payoff, add comic contrast or a sharper aside; facts unchanged")
+        if score < min_review_score:
+            review["issues"].append(
+                f"overall review score too low ({score:.0f}/10, need {min_review_score:.0f}) — address the review's core concerns")
         alignment_ok = True
         alignment = None
         alignment_reason = ""
         if topic is not None:
-            try:
-                alignment = float(r.get("trend_alignment", 0))
-            except (TypeError, ValueError):
-                alignment = 0.0
-            alignment_reason = str(r.get("trend_alignment_reason") or "")[:300]
-            min_alignment = float(self.cfg.get("content", {}).get("min_trend_alignment", 8))
-            alignment_ok = math.isfinite(alignment) and min_alignment <= alignment <= 10
+            alignment = float(r["trend_alignment"])
+            alignment_reason = r["trend_alignment_reason"].strip()[:300]
+            alignment_ok = math.isfinite(alignment) and min_trend_alignment <= alignment <= 10
             review["trend_alignment"] = alignment
             review["trend_alignment_reason"] = alignment_reason
             if not alignment_ok:
                 review["issues"].append(
-                    f"script does not deliver the specific current-trend angle ({alignment:.0f}/10, need {min_alignment:.0f})"
+                    f"script does not deliver the specific current-trend angle ({alignment:.0f}/10, need {min_trend_alignment:.0f})"
                     + (f": {alignment_reason}" if alignment_reason else ""))
         # The loop is judged semantically by the reviewer, because a lexical check rejects good loops
         # (see the note in gates.py). Enforced only when require_loop is on, and it defaults off: it
@@ -1210,12 +1398,8 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
         # either way, so the rate can be read off history before anyone flips the switch.
         # Coherence is a real approval criterion, not telemetry only. A missing or malformed reviewer
         # score fails closed, and the configured min_coherence threshold is checked again in `ok` below.
-        try:
-            coh = float(r.get("coherence", 0))
-        except (TypeError, ValueError):
-            coh = 0.0
+        coh = float(r["coherence"])
         review["coherence"] = coh
-        min_coh = float(self.cfg["content"].get("min_coherence", 0))
         if coh < min_coh:
             review["issues"].append(
                 f"this is a list of facts, not a story ({coh:.0f}/10, need {min_coh:.0f}) — "
@@ -1227,25 +1411,24 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
             review["issues"].append("the last line does not flow back into the first — re-word the payoff to pick up the hook; "
                                     "this is a stylistic criterion, not a guaranteed analytics gain")
 
-        fixes = actionable_review_fixes(r.get("fixes"))
-        reject_open_fixes = bool(self.cfg.get("content", {}).get("reject_open_review_fixes", True))
+        fixes = actionable_review_fixes(r["fixes"])
         fix_issue = ("independent reviewer still requests a rewrite: " + "; ".join(fixes)[:500]
-                     if fixes and reject_open_fixes else "")
+                     if fixes else "")
         if fix_issue:
             review["issues"].append(fix_issue)
+        llm_issues = r.get("issues", [])
+        review_issues = list(review.get("issues") or []) + [x.strip() for x in llm_issues if x.strip()]
         ok = (ent >= min_ent and hook >= min_hook and coh >= min_coh and alignment_ok
-              and score >= self.cfg["compliance"]["quality_gate_min_score"] and not r.get("factual_errors")
-              and not r.get("misleading_title") and r.get("advertiser_friendly", True)
-              and not r.get("policy_concerns") and not fix_issue)
-        prior_issues = list(review.get("issues") or [])
-        llm_issues = r.get("issues") or []
-        if isinstance(llm_issues, str):
-            llm_issues = [llm_issues]
-        review.update(r)
-        review["issues"] = prior_issues + [str(x) for x in llm_issues if str(x).strip()]
+              and score >= min_review_score and not r["factual_errors"]
+              and not r["misleading_title"] and r["advertiser_friendly"]
+              and not r["policy_concerns"] and not fixes and not review_issues)
+        # Preserve only reviewer decisions we explicitly validate. Extra provider keys must not
+        # overwrite orchestration metadata such as reviewer identity, independence, or availability.
+        for key in ("score", "hook_strength", "entertainment", "factual_errors", "misleading_title",
+                    "advertiser_friendly", "policy_concerns", "value_add", "loops"):
+            review[key] = r[key]
+        review["issues"] = review_issues
         review["fixes"] = fixes
-        if fixes and not reject_open_fixes:
-            review["review_fixes_unresolved"] = fixes
         review["coherence"] = coh
         if topic is not None:
             review["trend_alignment"] = alignment

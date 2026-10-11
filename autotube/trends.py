@@ -22,7 +22,7 @@ import math
 import os
 import re
 from datetime import datetime, timedelta, timezone
-from urllib.parse import quote
+from urllib.parse import parse_qs, quote, urlsplit
 
 import feedparser
 
@@ -41,9 +41,14 @@ def _norm_rank(i: int, n: int) -> float:
 
 def _parse_traffic(value: str | int | None) -> int:
     """Parse Google Trends RSS approximate traffic, including 25K+/1.2M+ suffixes."""
-    if isinstance(value, (int, float)):
-        return max(0, int(value))
-    match = re.fullmatch(r"\s*([\d,.]+)\s*([KMB]?)\s*\+?\s*", str(value or "").upper())
+    if isinstance(value, bool):
+        return 0
+    if isinstance(value, int):
+        return max(0, value)
+    if isinstance(value, float):
+        return max(0, int(value)) if math.isfinite(value) and value.is_integer() else 0
+    match = re.fullmatch(r"\s*((?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?)\s*([KMB]?)\s*\+?\s*",
+                         str(value or "").upper())
     if not match:
         return 0
     try:
@@ -52,6 +57,20 @@ def _parse_traffic(value: str | int | None) -> int:
         return 0
     multiplier = {"": 1, "K": 1_000, "M": 1_000_000, "B": 1_000_000_000}[match.group(2)]
     return max(0, int(number * multiplier))
+
+
+def _provider_count(value) -> int | None:
+    """Parse a non-negative API count; Boolean values and coercible garbage are not counts."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value if value >= 0 else None
+    if isinstance(value, str) and re.fullmatch(r"\d+", value.strip()):
+        try:
+            return int(value.strip())
+        except (ValueError, OverflowError):
+            return None
+    return None
 
 
 def google_trends(geo: str) -> list[dict]:
@@ -156,10 +175,12 @@ def youtube_chart(region: str, limit: int = 30) -> list[dict]:
         for i, it in enumerate(items):
             sn = it["snippet"]
             video_id = it.get("id") or ""
+            raw_views = (it.get("statistics") or {}).get("viewCount")
+            views = _provider_count(raw_views)
             out.append({"topic": sn["title"], "source": "youtube_chart", "score": _norm_rank(i, len(items)) * 0.8,
                         "context": sn.get("tags", [])[:8], "yt_category": sn.get("categoryId"),
                         "source_url": f"https://www.youtube.com/watch?v={video_id}" if video_id else "",
-                        "video_id": video_id, "view_count": int(it.get("statistics", {}).get("viewCount") or 0),
+                        "video_id": video_id, "view_count": views if views is not None else 0,
                         "published_at": sn.get("publishedAt") or "", "channel_title": sn.get("channelTitle", ""),
                         "source_rank": i + 1})
     except Exception as e:  # noqa: BLE001
@@ -293,7 +314,11 @@ def youtube_outliers(cfg: dict) -> list[dict]:
     region = cfg["channel"].get("region", "US")
     lang = cfg["channel"].get("language", "en")
     min_views = int(t.get("outlier_min_views", 30000))
-    since = now_utc() - timedelta(hours=float(t.get("outlier_window_hours", 96)))
+    max_outlier_hours = float(t.get("outlier_window_hours", 96))
+    if min_views <= 0 or not math.isfinite(max_outlier_hours) or max_outlier_hours <= 0:
+        log.warning("invalid YouTube outlier thresholds; skipping source")
+        return []
+    since = now_utc() - timedelta(hours=max_outlier_hours)
     out: list[dict] = []
     try:
         from . import youtube
@@ -316,16 +341,26 @@ def youtube_outliers(cfg: dict) -> list[dict]:
         subs: dict[str, int] = {}
         for i in range(0, len(ch_ids), 50):
             for c in yt.channels().list(part="statistics", id=",".join(ch_ids[i:i + 50])).execute().get("items", []):
-                subs[c["id"]] = int(c["statistics"].get("subscriberCount") or 0)
+                count = _provider_count(c.get("statistics", {}).get("subscriberCount"))
+                subs[c["id"]] = count if count is not None else 0
         own = cfg["channel"].get("name", "").lower()
         now = now_utc()
         rows = []
         for v in vids:
             sn, st = v["snippet"], v.get("statistics", {})
-            views = int(st.get("viewCount") or 0)
-            if views < min_views or sn.get("channelTitle", "").lower() == own:
+            views = _provider_count(st.get("viewCount"))
+            if views is None or views < min_views or sn.get("channelTitle", "").lower() == own:
                 continue
-            hours = max(1.0, (now - _parse_ts(sn["publishedAt"])).total_seconds() / 3600)
+            try:
+                published = _parse_ts(sn["publishedAt"])
+                if published.tzinfo is None:
+                    continue
+                age_hours = (now - published.astimezone(timezone.utc)).total_seconds() / 3600
+            except (KeyError, TypeError, ValueError, OverflowError):
+                continue
+            if not math.isfinite(age_hours) or not 0 < age_hours <= max_outlier_hours:
+                continue
+            hours = max(1.0, age_hours)
             s_count = subs.get(sn["channelId"], 0)
             vph = views / hours
             ratio = views / max(s_count, 1000)
@@ -453,11 +488,60 @@ def _signal_is_recent(signal: dict, max_age_hours: float, now: datetime | None =
 
 
 def _evidence_number(value, default: float = 0.0) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return default
     try:
         number = float(value)
         return number if math.isfinite(number) else default
     except (TypeError, ValueError, OverflowError):
         return default
+
+
+def _trend_threshold(cfg: dict, key: str, default: float, *, integer: bool = False) -> float | int | None:
+    """Read a positive numeric threshold without treating Boolean or malformed config as evidence."""
+    raw = cfg.get(key, default)
+    if isinstance(raw, bool):
+        return None
+    number = _evidence_number(raw, float("nan"))
+    if not math.isfinite(number) or number <= 0 or (integer and not number.is_integer()):
+        return None
+    return int(number) if integer else number
+
+
+def _valid_http_source_url(value: str) -> bool:
+    try:
+        parsed = urlsplit(value)
+        return parsed.scheme.lower() in {"http", "https"} and bool(parsed.hostname) \
+            and not parsed.username and not parsed.password
+    except (TypeError, ValueError):
+        return False
+
+
+def _youtube_video_url_matches(source_url: str, video_id: str) -> bool:
+    """A YouTube trend signal must cite the same real video ID recorded in its evidence."""
+    if not isinstance(video_id, str) or not re.fullmatch(r"[A-Za-z0-9_-]{11}", video_id):
+        return False
+    try:
+        parsed = urlsplit(source_url)
+        if parsed.scheme.lower() != "https" or not parsed.hostname or parsed.username or parsed.password:
+            return False
+        host = parsed.hostname.lower().rstrip(".")
+        parts = [part for part in parsed.path.split("/") if part]
+        if host in {"youtu.be", "www.youtu.be"}:
+            cited_id = parts[0] if len(parts) == 1 else ""
+        elif host in {"youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com"}:
+            if parts == ["watch"]:
+                video_ids = parse_qs(parsed.query, keep_blank_values=True).get("v", [])
+                cited_id = video_ids[0] if len(video_ids) == 1 else ""
+            elif len(parts) == 2 and parts[0] in {"shorts", "embed", "live", "v"}:
+                cited_id = parts[1]
+            else:
+                cited_id = ""
+        else:
+            return False
+        return cited_id == video_id
+    except (TypeError, ValueError):
+        return False
 
 
 def has_current_trend_evidence(candidate: dict, min_wikipedia_spike: float = 3.0,
@@ -472,18 +556,19 @@ def has_current_trend_evidence(candidate: dict, min_wikipedia_spike: float = 3.0
     """
     if not isinstance(candidate, dict):
         return False
+    if trend_cfg is not None and not isinstance(trend_cfg, dict):
+        return False
     tcfg = trend_cfg or {}
-    try:
-        wiki_threshold = float(min_wikipedia_spike)
-    except (TypeError, ValueError):
-        wiki_threshold = 3.0
-    min_views = max(1, int(_evidence_number(tcfg.get("outlier_min_views", 30_000), 30_000)))
-    max_outlier_hours = max(0.0, _evidence_number(tcfg.get("outlier_window_hours", 72), 72))
-    min_google_traffic = max(1, int(_evidence_number(tcfg.get("min_google_trend_traffic", 1_000), 1_000)))
-    min_hn_points = max(1, int(_evidence_number(tcfg.get("min_hackernews_points", 10), 10)))
-    max_capture_age = max(0.0, _evidence_number(tcfg.get("trend_evidence_max_age_hours", 36), 36))
-    min_families = max(2, int(_evidence_number(tcfg.get("min_independent_trend_families", 2), 2)))
-    if wiki_threshold <= 0 or max_outlier_hours <= 0 or max_capture_age <= 0:
+    wiki_threshold = _evidence_number(min_wikipedia_spike, float("nan"))
+    min_views = _trend_threshold(tcfg, "outlier_min_views", 30_000, integer=True)
+    max_outlier_hours = _trend_threshold(tcfg, "outlier_window_hours", 72)
+    min_google_traffic = _trend_threshold(tcfg, "min_google_trend_traffic", 1_000, integer=True)
+    min_hn_points = _trend_threshold(tcfg, "min_hackernews_points", 10, integer=True)
+    max_capture_age = _trend_threshold(tcfg, "trend_evidence_max_age_hours", 36)
+    min_families = _trend_threshold(tcfg, "min_independent_trend_families", 2, integer=True)
+    if (not math.isfinite(wiki_threshold) or wiki_threshold <= 0 or min_views is None
+            or max_outlier_hours is None or min_google_traffic is None or min_hn_points is None
+            or max_capture_age is None or min_families is None or min_families < 2):
         return False
 
     signals = candidate.get("signals")
@@ -497,15 +582,32 @@ def has_current_trend_evidence(candidate: dict, min_wikipedia_spike: float = 3.0
         source = str(signal.get("source") or "")
         evidence = signal.get("evidence") if isinstance(signal.get("evidence"), dict) else {}
         source_url = str(signal.get("source_url") or evidence.get("video_url") or "").strip()
-        if not source_url.lower().startswith(("https://", "http://")):
+        if not _valid_http_source_url(source_url):
             continue
 
         if source == "youtube_outliers":
-            views = _evidence_number(evidence.get("views") or evidence.get("view_count"))
-            hours = _evidence_number(evidence.get("hours"))
-            vph = _evidence_number(evidence.get("vph"), views / hours if hours > 0 else 0.0)
-            video_id = str(evidence.get("video_id") or signal.get("video_id") or "").strip()
-            if views >= min_views and 0 < hours <= max_outlier_hours and vph > 0 and video_id:
+            views = _evidence_number(evidence.get("views") or evidence.get("view_count"), float("nan"))
+            hours = _evidence_number(evidence.get("hours"), float("nan"))
+            vph = _evidence_number(evidence.get("vph"), float("nan"))
+            expected_vph = views / hours if math.isfinite(views) and math.isfinite(hours) and hours > 0 else float("nan")
+            measured_rate_agrees = (math.isfinite(expected_vph) and math.isfinite(vph) and vph > 0
+                                    and abs(vph - expected_vph) <= max(1.0, expected_vph * 0.1))
+            raw_published = evidence.get("published_at") or signal.get("published_at")
+            try:
+                published = datetime.fromisoformat(str(raw_published).replace("Z", "+00:00"))
+                if published.tzinfo is None:
+                    raise ValueError("publication timestamp has no timezone")
+                actual_hours = (now - published.astimezone(timezone.utc)).total_seconds() / 3600
+                measured_time_agrees = (math.isfinite(actual_hours) and 0 < actual_hours <= max_outlier_hours
+                                        and abs(hours - max(1.0, actual_hours)) <= 0.11)
+            except (TypeError, ValueError, OverflowError):
+                measured_time_agrees = False
+            evidence_id = str(evidence.get("video_id") or "").strip()
+            signal_id = str(signal.get("video_id") or "").strip()
+            video_id = evidence_id or signal_id
+            ids_agree = not (evidence_id and signal_id) or evidence_id == signal_id
+            if (ids_agree and _youtube_video_url_matches(source_url, video_id) and measured_rate_agrees
+                    and measured_time_agrees and views >= min_views and 0 < hours <= max_outlier_hours):
                 return True
             continue
 
@@ -525,7 +627,8 @@ def has_current_trend_evidence(candidate: dict, min_wikipedia_spike: float = 3.0
 
         if source == "youtube_chart":
             views = _evidence_number(evidence.get("view_count") or evidence.get("views"))
-            if views > 0:
+            video_id = str(evidence.get("video_id") or signal.get("video_id") or "").strip()
+            if views > 0 and _youtube_video_url_matches(source_url, video_id):
                 corroborating_families.add("youtube")
             continue
 

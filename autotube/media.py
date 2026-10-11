@@ -696,6 +696,21 @@ REQUERY_SYSTEM = ("You help an educational video editor find photos in free libr
                   "Return strict JSON only.")
 
 
+def _validate_requery_output(value, allow_empty: bool = False) -> dict:
+    if not isinstance(value, dict):
+        raise ValueError("visual requery response must be an object")
+    shows, queries = value.get("shows"), value.get("queries")
+    if not isinstance(shows, str) or len(shows) > 300 or not isinstance(queries, list) or len(queries) > 3:
+        raise ValueError("visual requery requires concise text and at most three search strings")
+    if allow_empty and not shows.strip() and not queries:
+        return value
+    if not shows.strip() or not queries:
+        raise ValueError("a revised visual request needs at least one search query")
+    if any(not isinstance(query, str) or not query.strip() or len(query) > 120 for query in queries):
+        raise ValueError("visual requery search queries must be non-empty short strings")
+    return value
+
+
 def _requery(llm, subject: str, line: str, want: str, rejected: list[str]) -> tuple[str, list[str]]:
     """Ask for a different, findable shot + searches for a line whose first searches found nothing suitable."""
     user = f"""VIDEO SUBJECT: {subject}
@@ -707,9 +722,9 @@ Suggest ONE different real, photographable shot that literally shows what this l
 its actual parts, place, specimen, artwork, or a real photo/illustration of it) and is LIKELY to exist on Wikimedia
 Commons — e.g. museum specimens, historical photos, scientific illustrations, photos of the actual place/object.
 Return JSON: {{"shows": "...", "queries": ["3 short searches, 2-4 words, each containing the physical noun"]}}"""
-    o = llm.json(REQUERY_SYSTEM, user, temperature=0.4,
-                 validate=lambda o: o["shows"] and isinstance(o["queries"], list) and o["queries"])
-    return str(o["shows"]), [str(q) for q in o["queries"]][:3]
+    o = llm.json(REQUERY_SYSTEM, user, temperature=0.4, validate=_validate_requery_output)
+    _validate_requery_output(o)  # a custom adapter must not skip the schema callback
+    return o["shows"].strip(), [query.strip() for query in o["queries"]]
 
 
 def ahash(path: Path) -> int | None:
@@ -982,14 +997,12 @@ Return JSON: {{"shows": "revised, literal shot request", "queries": ["up to 3 sh
 If no defensible visual can be suggested, return {{"shows": "", "queries": []}} so this shot can remain rejected."""
 
     def validate(o):
-        assert isinstance(o.get("shows"), str)
-        assert isinstance(o.get("queries"), list)
-        if o["shows"].strip():
-            assert any(str(q).strip() for q in o["queries"]), "a revised shot needs a search query"
+        _validate_requery_output(o, allow_empty=True)
 
     result = llm.json(QA_REQUERY_SYSTEM, user, temperature=0.25, validate=validate)
-    shows = str(result.get("shows", "")).strip()
-    queries = [str(q).strip() for q in result.get("queries", []) if str(q).strip()][:3]
+    _validate_requery_output(result, allow_empty=True)  # revalidate custom adapters at the trust boundary
+    shows = result["shows"].strip()
+    queries = [query.strip() for query in result["queries"]]
     return (shows, queries) if shows and queries else ("", [])
 
 

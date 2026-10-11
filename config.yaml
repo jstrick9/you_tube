@@ -154,7 +154,6 @@ content:
   hook_words_max: 12
   body_beat_words: [9, 11]               # enforce the prompted turn/escalation length per segment
   payoff_words: [6, 9]                   # a short factual payoff, not a dangling fragment
-  reject_open_review_fixes: true         # a reviewer-requested rewrite is not an approval
   max_drafts: 4                          # script rewrites allowed (feedback from the fact-checker/hook gate)
   selection_rounds: 3                    # if every pick fails the checks, pick again from the remaining trends
   # Reviewer judges whether the payoff loops back into the hook (semantic, not lexical).
@@ -237,7 +236,6 @@ compliance:
   # deep-sea, aviation engineering, archaeology, the history of medicine). YouTube's advertiser-
   # friendly guidelines are about context and graphicness, not vocabulary.
   blocked_topics: []                    # legacy key, kept empty for backward compatibility
-  require_llm_review: true              # fail closed: never publish a script the fact-checker could not review
   require_independent_review: false     # true = also refuse to publish if the reviewer had to be the writer's model
   quality_gate_min_score: 7              # LLM reviewer score (0-10) required to publish
 

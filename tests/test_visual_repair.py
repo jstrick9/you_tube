@@ -80,6 +80,20 @@ def test_final_qa_feedback_drives_a_fresh_exact_asset_search(monkeypatch, tmp_pa
     assert segment["visual"]["shows"] == visuals["shots"][0]["want"]
 
 
+def test_visual_requery_rejects_malformed_provider_types_even_if_callback_is_ignored():
+    import pytest
+    from autotube import media
+
+    class Malformed:
+        def json(self, *args, **kwargs):
+            return {"shows": "a real close-up", "queries": "not-an-array"}
+
+    with pytest.raises(ValueError):
+        media._requery(Malformed(), "subject", "exact narration", "old shot", [])
+    with pytest.raises(ValueError):
+        media._requery_after_final_qa(Malformed(), "subject", "exact narration", "old shot", "bad asset", "mismatch")
+
+
 def test_final_qa_requery_fails_closed_below_strong_match_threshold(monkeypatch, tmp_path):
     from autotube import media, vision
 
@@ -125,7 +139,8 @@ def test_render_qa_attempts_every_failed_shot_without_short_circuit(monkeypatch,
     from autotube import pipeline
 
     renders, repairs, verify_calls = [], [], []
-    render_result = {"timeline": []}
+    render_result = {"timeline": [{"seg": i, "start": float(i), "end": float(i + 1), "path": f"good-{i}.jpg"}
+                                 for i in range(3)]}
     monkeypatch.setattr(pipeline.render, "render", lambda *a, **k: (renders.append(1), render_result)[1])
 
     failed = {
@@ -138,9 +153,18 @@ def test_render_qa_attempts_every_failed_shot_without_short_circuit(monkeypatch,
         ],
     }
 
+    success = {"passed": True, "frames": [{"timeline_index": i, "seg": i, "path": f"good-{i}.jpg", "t": float(i) + 0.5,
+                                              "shows": "verified subject", "sample": 1, "samples": 1,
+                                              "match": True, "score": 9, "audit_shows": "verified subject",
+                                              "audit_match": True, "audit_score": 9, "judge": "gemini",
+                                              "audit_judge": "gemini"} for i in range(3)],
+               "issues": [], "failed": [], "repairable": False,
+               "meta": {"hook_text_ok": True, "title_ok": True, "visual_variety_ok": True,
+                        "notes": [], "visual_variety_notes": ""}}
+
     def verify(*args, **kwargs):
         verify_calls.append(1)
-        return failed if len(verify_calls) == 1 else {"passed": True, "frames": [], "issues": [], "failed": []}
+        return failed if len(verify_calls) == 1 else success
 
     monkeypatch.setattr(pipeline.qa, "verify", verify)
 
@@ -149,14 +173,17 @@ def test_render_qa_attempts_every_failed_shot_without_short_circuit(monkeypatch,
         return seg == 1  # first and last fail; middle succeeds
 
     monkeypatch.setattr(pipeline.media, "use_alternative", repair)
-    assets = {"tts": {}, "visuals": {"shots": []}, "music": None, "hook_card": "hook",
+    assets = {"tts": {}, "visuals": {"shots": [{"seg": i, "path": f"good-{i}.jpg", "score": 9,
+                                                   "judge": "gemini"} for i in range(3)]},
+              "music": None, "hook_card": "hook",
               "work": tmp_path, "out": tmp_path / "out.mp4", "seed": 1, "fx": [],
               "script": {"segments": [{"text": f"line {i}"} for i in range(3)]},
               "source": {"title": "Topic"}, "title": "Title", "subject": "Topic"}
     writer = type("Writer", (), {"llm": object()})()
 
     _, report = pipeline.render_with_qa(
-        assets, {"qa": {"max_repairs": 1}, "channel": {"name": "Archive 13"}}, writer)
+        assets, {"qa": {"max_repairs": 1}, "media": {"min_match_score": 7},
+                 "channel": {"name": "Archive 13"}}, writer)
 
     assert [seg for seg, _ in repairs] == [0, 1, 2]
     assert all(feedback for _, feedback in repairs)
@@ -191,7 +218,8 @@ def test_render_qa_does_not_repair_after_final_failed_attempt(monkeypatch, tmp_p
     writer = type("Writer", (), {"llm": object()})()
 
     _, report = pipeline.render_with_qa(
-        assets, {"qa": {"max_repairs": 1}, "channel": {"name": "Archive 13"}}, writer)
+        assets, {"qa": {"max_repairs": 1}, "media": {"min_match_score": 7},
+                 "channel": {"name": "Archive 13"}}, writer)
 
     assert len(renders) == 2
     assert len(verify_calls) == 2

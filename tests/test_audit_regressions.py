@@ -21,7 +21,10 @@ class _Rev:
     lite = False
 
     def json(self, *a, **k):
-        return {"score": 9, "hook_strength": 9, "coherence": 8, "fixes": []}
+        return {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8,
+                "loops": True, "factual_errors": [], "misleading_title": False,
+                "advertiser_friendly": True, "policy_concerns": [],
+                "value_add": "A concise explanation of the source-backed mystery.", "fixes": []}
 
 
 def _writer(history=None):
@@ -37,8 +40,10 @@ SRC = {"title": "S", "text": "keepers vanished lighthouse coats door bolted "* 4
 
 def _script(title, aside="Tidy of them."):
     return {"title": title, "segments": [
-        {"text": "Three keepers vanished from a locked lighthouse in nineteen hundred", "evidence": "x"},
-        {"text": "Two coats were gone one still hung by the door", "evidence": "x", "aside": aside}]}
+        {"text": "Three lighthouse keepers vanished from a locked station"},
+        {"text": "Two coats were missing, but one still hung beside the door", "aside": aside},
+        {"text": "The logbook gave no warning or reason to explain their absence"},
+        {"text": "so the locked door never explained their disappearance"}]}
 
 
 # ── Defect 1: the similarity gate was blind inside a single run ─────────────
@@ -58,8 +63,10 @@ def test_a_genuinely_different_second_video_in_the_same_run_still_passes():
     w = _writer()
     assert w.check(_script("T1"), SRC)[0] is True
     other = {"title": "T2", "segments": [
-        {"text": "Roman concrete heals its own cracks when seawater floods them", "evidence": "x"},
-        {"text": "The crystals regrow inside the gap and seal it", "evidence": "x", "aside": "Show off."}]}
+        {"text": "Roman concrete can heal its own cracks when seawater gets in"},
+        {"text": "Saltwater feeds crystals that grow through the damaged stone", "aside": "Show off."},
+        {"text": "They fill the gap until the seawall is sealed again"},
+        {"text": "so the break becomes part of the repair"}]}
     assert w.check(other, {"title": "S2", "text": "roman concrete seawater crystals " * 40})[0] is True
 
 

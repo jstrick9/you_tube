@@ -199,10 +199,10 @@ def check_segment_lengths(segs: list[dict], cfg: dict) -> list[str]:
     """Enforce the beat lengths specified in the writer prompt, counting factual text only.
 
     Asides are optional spoken jokes, not a substitute for the story beat. The global TTS word
-    budget separately counts both text and asides.
+    budget separately counts both text and asides. Production drafts contain exactly 4 or 5 beats.
     """
-    if len(segs) < 4:
-        return []
+    if not isinstance(segs, list) or not 4 <= len(segs) <= 5:
+        return ["script must contain exactly 4 or 5 segments"]
     ccfg = (cfg.get("content", {}) or {})
     body_lo, body_hi = _word_bounds(ccfg, "body_beat_words", (9, 11))
     payoff_lo, payoff_hi = _word_bounds(ccfg, "payoff_words", (6, 9))
@@ -224,10 +224,20 @@ def check_segment_lengths(segs: list[dict], cfg: dict) -> list[str]:
 
 def run_all(script: dict, spoken, cfg: dict) -> list[str]:
     """Every deterministic gate, in one call. Empty list = passed."""
+    if not isinstance(script, dict):
+        return ["script must be a JSON object"]
     ccfg = cfg.get("content", {}) or {}
-    segs = script.get("segments") or []
-    if not segs:
-        return ["script has no segments"]
+    segs = script.get("segments")
+    if not isinstance(segs, list) or not segs:
+        return ["script has no valid segment list"]
+    if any(not isinstance(seg, dict) for seg in segs):
+        return ["every script segment must be a JSON object"]
+    if any(not isinstance(seg.get("text"), str) or not seg["text"].strip() for seg in segs):
+        return ["every script segment must contain non-empty text"]
+    if any("aside" in seg and not isinstance(seg["aside"], str) for seg in segs):
+        return ["script asides must be text"]
+    if not isinstance(script.get("title"), str) or not script["title"].strip():
+        return ["script title must be non-empty text"]
     lo = int(ccfg.get("hook_words_min", 6))
     hi = int(ccfg.get("hook_words_max", 12))
     issues = check_hook(spoken(segs[0]), lo, hi)

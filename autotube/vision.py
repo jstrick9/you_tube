@@ -29,6 +29,46 @@ from .common import font_path, http
 
 log = logging.getLogger("autotube.vision")
 
+
+def _validate_vision_output(value, expected: int) -> dict:
+    """Accept only a complete, indexed, finite relevance verdict for the contact sheet."""
+    if not isinstance(value, dict) or not isinstance(value.get("images"), list):
+        raise ValueError("vision response must contain an images array")
+    items = value["images"]
+    if len(items) != expected:
+        raise ValueError(f"vision response needs exactly {expected} image verdicts")
+    seen = set()
+    for item in items:
+        if not isinstance(item, dict):
+            raise ValueError("each image verdict must be an object")
+        index = item.get("n")
+        score = item.get("score")
+        shows = item.get("shows")
+        legible = item.get("legible")
+        if isinstance(index, bool) or not isinstance(index, int) or not 1 <= index <= expected or index in seen:
+            raise ValueError("image verdict indices must be unique integers in range")
+        if isinstance(score, bool) or not isinstance(score, (int, float)):
+            raise ValueError("image score must be a finite number from 0 to 10")
+        try:
+            score_number = float(score)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ValueError("image score must be a finite number from 0 to 10") from exc
+        if not math.isfinite(score_number) or not 0 <= score_number <= 10:
+            raise ValueError("image score must be a finite number from 0 to 10")
+        if not isinstance(shows, str) or not shows.strip() or len(shows.split()) > 12:
+            raise ValueError("image verdict requires a concise literal description")
+        if not isinstance(legible, bool):
+            raise ValueError("image verdict requires a Boolean legible flag")
+        seen.add(index)
+    if seen != set(range(1, expected + 1)):
+        raise ValueError("image verdict indices must cover the complete contact sheet")
+    # A judge that returns one score for everything is not judging. Seen in production:
+    # 21 of 26 shots scored exactly 10.0, including a bathymetric sonar map.
+    if len(items) >= 4 and len({round(float(item["score"])) for item in items}) == 1:
+        raise ValueError("every image got the same score - separate them using the bands")
+    return value
+
+
 NEGATIVES = [
     "a building", "a house", "a bar or pub", "a shop front", "a street", "a road sign", "a sign with text",
     "a logo", "a page of text", "a document", "a map", "a diagram", "a chart", "a screenshot",
@@ -279,16 +319,7 @@ about to give every image the same score, you are not judging - re-read the band
 Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0, "legible": true}}]}} with one entry per image."""
 
         def validate(o):
-            items = o.get("images")
-            assert isinstance(items, list) and len(items) >= max(1, n - 1), f"need {n} entries in 'images'"
-            for it in items:
-                int(it["n"]), float(it["score"])
-            # A judge that returns one score for everything is not judging. Seen in
-            # production: 21 of 26 shots scored exactly 10.0, including a bathymetric
-            # sonar map, against a rubric that puts charts at 3-0.
-            if len(items) >= 4 and len({round(float(i["score"])) for i in items}) == 1:
-                raise AssertionError(
-                    "every image got the same score - separate them using the bands")
+            _validate_vision_output(o, n)
 
         sheet = contact_sheet([c["_img"] for c in cands])
         out, err = None, None
@@ -296,9 +327,11 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0, "legible
             try:
                 self.calls += 1
                 out = self.llm.vision_json(VISION_SYSTEM, user, [sheet], validate)
+                validate(out)  # adapters that ignore the callback must fail closed too
                 break
             except Exception as e:  # noqa: BLE001  — usually "503 high demand": wait and try again
                 err = e
+                out = None
                 if attempt < len(self.retry_pauses):
                     time.sleep(self.retry_pauses[attempt])
         if out is None:
@@ -344,8 +377,12 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0, "legible
         cands = fetch_thumbs(cands)
         if not cands:
             return []
+        # These fields are judge-owned. Never trust a search/provider payload that happens to
+        # include them; all candidates in this call need a fresh visual verdict.
         for c in cands:
-            c.setdefault("_hash", ahash(c["_img"]))
+            for field in ("vscore", "vshows", "vjudge", "clip", "clip_cos", "_hash", "_emb"):
+                c.pop(field, None)
+            c["_hash"] = ahash(c["_img"])
         clip = self.clip
         if clip:
             clip.score(cands, want, subject)

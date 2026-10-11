@@ -52,8 +52,10 @@ class ReviewLLM:
 
     def json(self, system, user, **kw):
         self.prompts.append(user)
-        o = {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "factual_errors": [], "policy_concerns": [],
-             "misleading_title": False, "advertiser_friendly": True, "fixes": []}
+        o = {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "loops": True,
+             "factual_errors": [], "policy_concerns": [], "misleading_title": False,
+             "advertiser_friendly": True,
+             "value_add": "The viewer learns how hunger stones recorded droughts.", "fixes": []}
         kw.get("validate") and kw["validate"](o)
         return o
 
@@ -152,7 +154,8 @@ def test_selector_asks_for_fitting_formats():
 
         def json(self, system, user, **kw):
             LLM.prompt = user
-            return {"picks": [{"index": 0, "viral_score": 9, "category": "history", "wiki_query": "Hunger stone",
+            return {"picks": [{"index": 0, "viral_score": 9, "category": "history", "risk": "none",
+                               "wiki_query": "Hunger stone",
                                "angle": "the stone warned people drought had returned",
                                "formats": ["creepy_true", "plot_twist", "not_a_format"]}]}
 
@@ -244,9 +247,43 @@ def test_sfx_events_and_track(tmp_path):
 
 def test_narration_check_includes_asides():
     script = {"segments": [seg("People carved stones.", aside="Cheerful bunch.")]}
-    tts = {"segments": [{"text": "People carved stones. Cheerful bunch.", "start": 0, "end": 2,
-                         "words": [{"word": w} for w in "People carved stones Cheerful bunch".split()]}]}
+    tts = {"duration": 2, "segments": [{"text": "People carved stones. Cheerful bunch.", "start": 0, "end": 2,
+                         "words": [{"word": w, "start": i * 0.3, "end": i * 0.3 + 0.2}
+                                   for i, w in enumerate("People carved stones Cheerful bunch".split())]}]}
     assert qa.narration_check(tts, script) == []
+
+
+def test_metadata_fails_closed_to_grounded_fallback_on_malformed_provider_output():
+    class Malformed:
+        def json(self, *args, **kwargs):
+            return {"description": {"invented": "claim"}, "tags": "not an array",
+                    "hashtags": ["#onlyone"], "thumbnail_text": True}
+
+    writer = ScriptWriter.__new__(ScriptWriter)
+    writer.llm = Malformed()  # deliberately ignores the validator callback
+    script = {"title": "The Hunger Stone", "segments": [{"text": "Drought stones warn future generations."}]}
+
+    result = writer.metadata(script, SOURCE)
+
+    assert result["description"] == "Drought stones warn future generations."
+    assert result["tags"] == ["Hunger stone"] and result["hashtags"] == []
+    assert result["thumbnail_text"] == "The Hunger Stone"
+
+
+def test_metadata_accepts_only_a_complete_typed_schema():
+    class Valid:
+        def json(self, *args, validate=None, **kwargs):
+            result = {"description": "A drought stone warns when water levels fall.",
+                      "tags": ["hunger stone", "drought", "river", "Elbe", "history", "Europe", "warning", "hydrology"],
+                      "hashtags": ["#History", "#Archive13", "#Rivers"],
+                      "thumbnail_text": "THE RIVER WARNED"}
+            validate and validate(result)
+            return result
+
+    writer = ScriptWriter.__new__(ScriptWriter)
+    writer.llm = Valid()
+    result = writer.metadata({"title": "The Hunger Stone", "segments": [{"text": "Drought stones warn."}]}, SOURCE)
+    assert len(result["tags"]) == 8 and result["hashtags"] == ["#History", "#Archive13", "#Rivers"]
 
 
 def test_description_has_the_brand_promise():

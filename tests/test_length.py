@@ -126,7 +126,7 @@ def test_script_structure_fits_the_configured_band():
 
     src = Path(__file__).resolve().parent.parent / "autotube" / "scriptwriter.py"
     text = src.read_text()
-    n_lo, n_hi = map(int, re.search(r"Write the script as (\d)-(\d) segments", text).groups())
+    n_lo, n_hi = map(int, re.search(r"Write the script as exactly (\d) or (\d) segments", text).groups())
     # The prompt interpolates these configured ranges; keep both separate and auditable.
     assert "THE TURN, {body_min}-{body_max} factual words" in text
     assert "ESCALATION, each {body_min}-{body_max} factual words" in text

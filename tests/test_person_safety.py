@@ -83,16 +83,40 @@ def test_classifier_outage_means_no_video():
     assert not ok and "unavailable" in reason
 
 
+def test_malformed_safety_verdicts_cannot_allow_a_sensitive_subject():
+    class Incomplete:
+        def json(self, *args, **kwargs):
+            return {"allowed": True, "reason": "safe enough", "angle": ""}
+
+    assert safety.judge("war memorial", "context", "war", Incomplete(), CFG)[0] is False
+
+
+def test_person_verdict_must_explicitly_establish_adulthood_and_public_role():
+    class MissingAdulthood:
+        def json(self, *args, **kwargs):
+            return {"is_public_figure": True, "angle_is_professional": True, "allowed": True,
+                    "reason": "professional news", "safe_angle": "the new album"}
+
+    ok, reason, _ = safety.check_person("Taylor Swift announces an album", "singer", CFG, MissingAdulthood())
+    assert not ok and "unavailable" in reason
+
+
 # ── config ────────────────────────────────────────────────────────────────────
 def test_public_figure_requirement_can_be_relaxed_by_config():
     cfg = {"safety": {"person": {"require_public_figure": False}}}
     assert safety.check_person("Someone", "", cfg, LLM(pub=False, allowed=True))[0]
 
 
-def test_person_config_defaults_survive_yaml_nulls():
+def test_person_config_defaults_survive_yaml_nulls_and_malformed_values():
     p = safety.person_config({"safety": {"person": {"blocked_angles": None}}})
     assert p["blocked_angles"] == safety.PERSON_BLOCKED_ANGLES
     assert safety.person_config({})["require_public_figure"] is True
+
+    malformed = safety.person_config({"safety": {"person": {
+        "require_public_figure": "false", "allow_minors": "true", "blocked_angles": "none"}}})
+    assert malformed["require_public_figure"] is True
+    assert malformed["allow_minors"] is False
+    assert malformed["blocked_angles"] == safety.PERSON_BLOCKED_ANGLES
 
 
 # ── script level ──────────────────────────────────────────────────────────────

@@ -49,7 +49,8 @@ class FakeLLM:
             raise RuntimeError("gemini HTTP 503")
         line = re.search(r'NARRATION LINE: "(.*?)"', user).group(1).lower()
         titles = re.findall(r"^\s+(\d+)\. (\S+) photo", user, re.M)
-        out = {"images": [{"n": int(n), "shows": t, "score": 9 if t in line else 2} for n, t in titles]}
+        out = {"images": [{"n": int(n), "shows": t, "score": 9 if t in line else 2,
+                           "legible": True} for n, t in titles]}
         validate and validate(out)
         return out
 
@@ -183,11 +184,23 @@ def test_narration_check():
     assert qa.narration_check(_tts(["Cats have whiskers.", "They sense air."]), script) == []
     bad = _tts(["Cats have whiskers.", "Dogs bark loudly at night."])
     assert qa.narration_check(bad, script)
+    misplaced = _tts(["Cats have whiskers.", "They sense air."])
+    misplaced["segments"][0]["words"][-1]["end"] = 999
+    assert any("word timings are malformed" in issue for issue in qa.narration_check(misplaced, script))
+
+    overlapping = _tts(["Cats have whiskers.", "They sense air."])
+    overlapping["segments"][0]["words"][1]["start"] = 0.1
+    assert any("word timings are malformed" in issue for issue in qa.narration_check(overlapping, script))
+
+    missing_duration = _tts(["Cats have whiskers.", "They sense air."])
+    missing_duration.pop("duration")
+    assert any("audio duration" in issue for issue in qa.narration_check(missing_duration, script))
 
 
 def test_coverage_check_rejects_unapproved_or_missing():
     tl = [{"seg": 0, "start": 0, "end": 1, "path": "a"}]
-    shots = [{"seg": 0, "score": 9, "judge": "gemini"}, {"seg": 1, "score": 9, "judge": "clip"}]
+    shots = [{"seg": 0, "path": "a", "score": 9, "judge": "gemini"},
+             {"seg": 1, "path": "b", "score": 9, "judge": "clip"}]
     issues = qa.coverage_check(tl, shots, 2, 7)
     assert any("line 2 has no shot" in i for i in issues)
     assert any("wasn't approved" in i for i in issues)
@@ -211,9 +224,20 @@ class QALLM:
         n = len(re.findall(r"^\s+\d+ \| line", user, re.M))
         out = {"frames": [{"n": i + 1, "shows": "x", "match": (i + 1) not in self.bad,
                            "score": 2 if (i + 1) in self.bad else 9, "issue": ""} for i in range(n)],
-               "hook_text_ok": True, "title_ok": True}
+               "hook_text_ok": True, "title_ok": True, "notes": ""}
         validate and validate(out)
         return out
+
+
+def _passing_qa_report(path="a"):
+    return {"passed": True, "issues": [], "failed": [], "repairable": False,
+            "frames": [{"timeline_index": 0, "seg": 0, "path": path, "t": 0.5,
+                        "shows": "verified subject",
+                        "sample": 1, "samples": 1, "match": True, "score": 9,
+                        "audit_shows": "verified subject", "audit_match": True, "audit_score": 9,
+                        "judge": "gemini", "audit_judge": "gemini"}],
+            "meta": {"hook_text_ok": True, "title_ok": True, "visual_variety_ok": True,
+                     "notes": [], "visual_variety_notes": ""}}
 
 
 @pytest.fixture
@@ -228,11 +252,83 @@ def test_final_qa_passes_and_fails_per_frame(tiny_video):
     lines = ["Cats have whiskers.", "They sense air."]
     tts, script = _tts(lines), {"segments": [{"text": x} for x in lines]}
     tl = [{"seg": 0, "start": 0.0, "end": 1.5, "path": "a"}, {"seg": 1, "start": 1.5, "end": 3.0, "path": "b"}]
-    shots = [{"seg": 0, "score": 9, "judge": "g"}, {"seg": 1, "score": 9, "judge": "g"}]
+    shots = [{"seg": 0, "path": "a", "score": 9, "judge": "g"},
+             {"seg": 1, "path": "b", "score": 9, "judge": "g"}]
     ok = qa.verify(tiny_video, tl, shots, tts, script, "T", "HOOK", "Whiskers", QALLM(), CFG)
     assert ok["passed"] and len(ok["frames"]) == 2
     bad = qa.verify(tiny_video, tl, shots, tts, script, "T", "HOOK", "Whiskers", QALLM(bad_frames=[2]), CFG)
     assert not bad["passed"] and bad["failed"] == [(1, "b")]
+
+
+@pytest.mark.parametrize("defect", ["truthy_match", "nan_score", "missing_hook_verdict", "missing_title_verdict", "wrong_frame_number"])
+def test_final_qa_fails_closed_on_malformed_primary_provider_output(tiny_video, monkeypatch, defect):
+    monkeypatch.setattr(qa.time, "sleep", lambda _seconds: None)
+
+    class MalformedPrimary(QALLM):
+        def vision_json(self, system, user, images, validate=None):
+            if "SEQUENCE-LEVEL VISUAL VARIETY REVIEW" in user:
+                return {"visual_variety_ok": True, "repetitive_frames": [], "notes": ""}
+            n = len(re.findall(r"^\s+\d+ \| line", user, re.M))
+            out = {"frames": [{"n": i + 1, "shows": "cat", "match": True, "score": 9, "issue": ""}
+                              for i in range(n)],
+                   "hook_text_ok": True, "title_ok": True, "notes": ""}
+            if defect == "truthy_match":
+                out["frames"][0]["match"] = "false"
+            elif defect == "nan_score":
+                out["frames"][0]["score"] = float("nan")
+            elif defect == "missing_hook_verdict":
+                out.pop("hook_text_ok")
+            elif defect == "missing_title_verdict":
+                out.pop("title_ok")
+            elif defect == "wrong_frame_number":
+                out["frames"][0]["n"] = 0
+            return out  # deliberately ignores the validation callback
+
+    lines = ["Cats have whiskers."]
+    timeline = [{"seg": 0, "start": 0.0, "end": 2.0, "path": "cat.jpg"}]
+    shots = [{"seg": 0, "path": "cat.jpg", "score": 9, "judge": "gemini"}]
+    with pytest.raises(vision.VisionUnavailable, match="no valid vision verdict"):
+        qa.verify(tiny_video, timeline, shots, _tts(lines), {"segments": [{"text": lines[0]}]},
+                  "Cats", "Cats", "Cats", MalformedPrimary(), CFG)
+
+
+def test_sequence_qa_fails_closed_on_truthy_non_boolean_provider_verdict(tiny_video, monkeypatch):
+    monkeypatch.setattr(qa.time, "sleep", lambda _seconds: None)
+
+    class MalformedSequence(QALLM):
+        def vision_json(self, system, user, images, validate=None):
+            if "SEQUENCE-LEVEL VISUAL VARIETY REVIEW" in user:
+                return {"visual_variety_ok": "false", "repetitive_frames": [], "notes": ""}
+            return super().vision_json(system, user, images, validate)
+
+    lines = ["Cats have whiskers."]
+    timeline = [{"seg": 0, "start": 0.0, "end": 2.0, "path": "cat.jpg"}]
+    shots = [{"seg": 0, "path": "cat.jpg", "score": 9, "judge": "gemini"}]
+    with pytest.raises(vision.VisionUnavailable, match="sequence-level visual QA unavailable"):
+        qa.verify(tiny_video, timeline, shots, _tts(lines), {"segments": [{"text": lines[0]}]},
+                  "Cats", "Cats", "Cats", MalformedSequence(), CFG)
+
+
+def test_coverage_requires_the_same_segment_and_media_path_to_be_approved():
+    timeline = [{"seg": 0, "start": 0.0, "end": 2.0, "path": "rendered-final.jpg"}]
+    approved = {"seg": 0, "path": "approved-original.jpg", "score": 9, "judge": "gemini"}
+
+    issues = qa.coverage_check(timeline, [approved], 1, 7)
+
+    assert any("rendered-final.jpg" in issue and "without a selected-shot approval" in issue
+               for issue in issues)
+    approved["path"] = "rendered-final.jpg"
+    assert qa.coverage_check(timeline, [approved], 1, 7) == []
+
+
+def test_coverage_gate_rejects_nan_scores_and_malformed_times():
+    timeline = [{"seg": 0, "start": 0.0, "end": 1.0, "path": "cat.jpg"}]
+    shot = {"seg": 0, "path": "cat.jpg", "score": float("nan"), "judge": "gemini"}
+    issues = qa.coverage_check(timeline, [shot], 1, 7)
+    assert any("wasn't approved" in issue for issue in issues)
+    timeline[0]["end"] = float("nan")
+    assert any("invalid time bounds" in issue for issue in qa.coverage_check(
+        timeline, [{"seg": 0, "path": "cat.jpg", "score": 9, "judge": "g"}], 1, 7))
 
 
 def test_sequence_level_variety_gate_marks_redundant_shots_for_repair(tiny_video):
@@ -267,11 +363,12 @@ def test_render_pipeline_passes_trend_angle_and_linked_evidence_to_final_qa(monk
     from autotube import pipeline
 
     captured = {}
-    monkeypatch.setattr(pipeline.render, "render", lambda *args, **kwargs: {"timeline": []})
+    monkeypatch.setattr(pipeline.render, "render", lambda *args, **kwargs: {
+        "timeline": [{"seg": 0, "start": 0.0, "end": 2.0, "path": "a"}]})
 
     def fake_verify(*args, **kwargs):
         captured.update(kwargs)
-        return {"passed": True, "frames": []}
+        return _passing_qa_report()
 
     monkeypatch.setattr(pipeline.qa, "verify", fake_verify)
     angle = "the animal uses the reef to ambush prey"
@@ -282,8 +379,10 @@ def test_render_pipeline_passes_trend_angle_and_linked_evidence_to_final_qa(monk
         "signals": [{"source": "youtube_outliers", "source_url": url, "captured_at": "2026-10-10T12:00:00Z",
                      "evidence": {"views": 2_000_000, "hours": 20, "vph": 100_000, "breakout": 4.0}}],
     }
-    assets = {"tts": {}, "visuals": {"shots": []}, "music": {}, "hook_card": "Seal ambushes its prey",
-              "script": {"segments": []}, "title": "A seal's hunting trick", "subject": "seal",
+    assets = {"tts": {}, "visuals": {"shots": [{"seg": 0, "path": "a", "score": 9, "judge": "gemini"}]},
+              "music": {}, "hook_card": "Seal ambushes its prey",
+              "script": {"segments": [{"text": "A seal ambushes prey."}]},
+              "title": "A seal's hunting trick", "subject": "seal",
               "work": tmp_path, "out": tmp_path / "render.mp4", "seed": 1, "fx": {}, "topic": topic}
     cfg = {"qa": {"max_repairs": 0}, "channel": {"name": "Archive 13"}}
 
@@ -329,7 +428,7 @@ def test_final_qa_rejects_false_positive_and_supplies_shot_context(tiny_video):
                                "score": 10 if not adversarial else 2,
                                "issue": "modern meeting, not the historical treaty negotiation" if adversarial else ""}
                               for i in range(n)],
-                   "hook_text_ok": True, "title_ok": True}
+                   "hook_text_ok": True, "title_ok": True, "notes": ""}
             validate and validate(out)
             return out
 
@@ -362,7 +461,7 @@ def test_final_qa_outage_raises(tiny_video, monkeypatch):
     monkeypatch.setattr(qa.time, "sleep", lambda s: None)
     lines = ["Cats have whiskers."]
     with pytest.raises(vision.VisionUnavailable):
-        qa.verify(tiny_video, [{"seg": 0, "start": 0, "end": 2, "path": "a"}], [{"seg": 0, "score": 9, "judge": "g"}],
+        qa.verify(tiny_video, [{"seg": 0, "start": 0, "end": 2, "path": "a"}], [{"seg": 0, "path": "a", "score": 9, "judge": "g"}],
                   _tts(lines), {"segments": [{"text": lines[0]}]}, "T", "H", "S", QALLM(down=True), CFG)
 
 

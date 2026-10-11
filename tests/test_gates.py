@@ -61,6 +61,29 @@ def test_hook_length_band():
     assert gates.check_hook("") == ["the hook is empty"]
 
 
+def test_segment_count_is_consistent_with_the_writer_prompt_and_final_gate():
+    body = {"text": "Each concrete new detail raises the stakes and advances the story"}
+    payoff = {"text": "so the final fact completes the original question"}
+    for count in (4, 5):
+        segments = [{"text": "Antarctica has a waterfall that runs blood red"}]
+        segments += [dict(body) for _ in range(count - 2)]
+        segments.append(dict(payoff))
+        assert not any("exactly 4 or 5" in issue for issue in gates.check_segment_lengths(segments, CFG))
+    for count in (3, 6, 8):
+        segments = [{"text": "Antarctica has a waterfall that runs blood red"}]
+        segments += [dict(body) for _ in range(count - 2)]
+        segments.append(dict(payoff))
+        assert any("exactly 4 or 5" in issue for issue in gates.check_segment_lengths(segments, CFG))
+
+
+def test_run_all_rejects_non_object_and_malformed_segment_shapes():
+    assert any("JSON object" in issue for issue in gates.run_all(None, spoken_text, CFG))
+    assert any("JSON object" in issue for issue in gates.run_all(
+        {"title": "T", "segments": ["not an object"]}, spoken_text, CFG))
+    assert any("non-empty text" in issue for issue in gates.run_all(
+        {"title": "T", "segments": [{"text": ""}]}, spoken_text, CFG))
+
+
 def test_segment_lengths_reject_dangling_turn_and_payoff():
     s = _script("Antarctica has a waterfall that runs blood red",
                 "Which is actually the Manicouagan Reservoir's outer rim",
@@ -193,10 +216,16 @@ def test_scriptwriter_flags_a_non_independent_review():
         last_used = "gemini:g-1"
 
         def review_json(self, system, user, avoid=None, **kw):
-            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8, "fixes": []}
+            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8,
+                    "loops": True, "factual_errors": [], "misleading_title": False,
+                    "advertiser_friendly": True, "policy_concerns": [],
+                    "value_add": "A concise explanation of how the hive dries nectar.", "fixes": []}
 
         def json(self, *a, **k):
-            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8, "fixes": []}
+            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8,
+                    "loops": True, "factual_errors": [], "misleading_title": False,
+                    "advertiser_friendly": True, "policy_concerns": [],
+                    "value_add": "A concise explanation of how the hive dries nectar.", "fixes": []}
 
     w = ScriptWriter.__new__(ScriptWriter)
     w.llm, w.src_chars = SameModel(), 4000

@@ -51,15 +51,110 @@ def _norm_tokens(text: str) -> list[str]:
     return re.findall(r"[a-z0-9]+", (text or "").lower().replace("'", ""))
 
 
+def _finite_number(value, low: float, high: float) -> bool:
+    try:
+        return (not isinstance(value, bool) and isinstance(value, (int, float))
+                and math.isfinite(value) and low <= value <= high)
+    except (OverflowError, TypeError, ValueError):
+        return False
+
+
+def _validate_frame_output(value, expected: int, require_video_verdicts: bool = True) -> None:
+    """Reject ambiguous/partial provider verdicts before a rendered frame can be approved."""
+    assert isinstance(value, dict), "vision response must be a JSON object"
+    frames = value.get("frames")
+    assert isinstance(frames, list) and len(frames) == expected, f"need exactly {expected} frame verdicts"
+    seen = set()
+    for frame in frames:
+        assert isinstance(frame, dict), "each frame verdict must be a JSON object"
+        number = frame.get("n")
+        assert type(number) is int and 1 <= number <= expected, "frame number must be an in-range integer"
+        assert number not in seen, "frame numbers must be unique"
+        seen.add(number)
+        assert type(frame.get("match")) is bool, "frame match must be a boolean"
+        assert _finite_number(frame.get("score"), 0, 10), "frame score must be a finite number from 0 to 10"
+        assert isinstance(frame.get("shows"), str) and frame["shows"].strip(), "frame shows must be non-empty text"
+        assert len(frame["shows"].split()) <= 12, "frame shows must be at most 12 words"
+        assert isinstance(frame.get("issue"), str), "frame issue must be text"
+    assert seen == set(range(1, expected + 1)), "frame verdicts must cover every numbered frame"
+    if require_video_verdicts:
+        assert type(value.get("hook_text_ok")) is bool, "hook_text_ok must be a boolean"
+        assert type(value.get("title_ok")) is bool, "title_ok must be a boolean"
+        assert isinstance(value.get("notes"), str), "notes must be text"
+
+
+def _validate_sequence_output(value, expected: int) -> None:
+    assert isinstance(value, dict), "sequence response must be a JSON object"
+    assert type(value.get("visual_variety_ok")) is bool, "need boolean visual_variety_ok"
+    repetitive = value.get("repetitive_frames")
+    assert isinstance(repetitive, list), "need repetitive_frames list"
+    assert all(type(number) is int for number in repetitive), "repetitive frame numbers must be integers"
+    assert len(repetitive) == len(set(repetitive)), "repetitive frame numbers must be unique"
+    assert all(1 <= number <= expected for number in repetitive), "repetitive frame number is out of range"
+    assert isinstance(value.get("notes"), str), "sequence notes must be text"
+    assert not repetitive if value["visual_variety_ok"] else bool(repetitive), (
+        "a failed sequence must identify redundant frames; a passing sequence must have none")
+
+
 def narration_check(tts: dict, script: dict, min_ratio: float = 0.9) -> list[str]:
-    """Speech (word timings) vs the text that was sent to TTS vs the script. Returns a list of problems."""
+    """Speech (word timings) vs the text sent to TTS vs the script; malformed timing data fails closed."""
+    if not _finite_number(min_ratio, 0, 1):
+        return ["narration match threshold is invalid"]
+    if not isinstance(script, dict):
+        return ["script must be an object for final narration QA"]
+    segs = script.get("segments")
+    if not isinstance(segs, list) or not segs:
+        return ["script must contain a non-empty segment list for final narration QA"]
+    if any(not isinstance(seg, dict) or not isinstance(seg.get("text"), str) or not seg["text"].strip()
+           or ("aside" in seg and not isinstance(seg["aside"], str)) for seg in segs):
+        return ["script contains a malformed narration segment"]
+    if (not isinstance(tts, dict) or not isinstance(tts.get("segments"), list)
+            or not _finite_number(tts.get("duration"), 0.1, float("inf"))):
+        return ["narration timing data or audio duration is missing or malformed"]
+    duration = tts["duration"]
+    tts_segs = tts["segments"]
+    if len(tts_segs) != len(segs):
+        return [f"narration has {len(tts_segs)} parts but the script has {len(segs)} lines"]
+
     issues = []
-    segs = script["segments"]
-    if len(tts["segments"]) != len(segs):
-        return [f"narration has {len(tts['segments'])} parts but the script has {len(segs)} lines"]
-    for i, (ts, ss) in enumerate(zip(tts["segments"], segs)):
-        spoken = _norm_tokens(" ".join(w["word"] for w in ts["words"]))
-        sent = _norm_tokens(ts["text"])
+    previous_segment_end = 0.0
+    for i, (ts, ss) in enumerate(zip(tts_segs, segs)):
+        if not isinstance(ts, dict):
+            issues.append(f"line {i + 1}: narration segment is not an object")
+            continue
+        start, end = ts.get("start"), ts.get("end")
+        if (not _finite_number(start, 0, duration) or not _finite_number(end, 0, duration + 0.1)
+                or end <= start or start < previous_segment_end - 0.1):
+            issues.append(f"line {i + 1}: invalid, empty, or overlapping audio timing")
+            continue
+        previous_segment_end = end
+        sent_text = ts.get("text")
+        words = ts.get("words")
+        if not isinstance(sent_text, str) or not isinstance(words, list) or not words:
+            issues.append(f"line {i + 1}: narration text or word timings are missing")
+            continue
+        word_text = []
+        malformed_words = False
+        previous_start = -1.0
+        previous_word_end = start
+        for word in words:
+            if not isinstance(word, dict) or not isinstance(word.get("word"), str) or not word["word"].strip() \
+                    or not _finite_number(word.get("start"), 0, float("inf")) \
+                    or not _finite_number(word.get("end"), 0, float("inf")) \
+                    or word["end"] <= word["start"] or word["start"] < previous_start \
+                    or word["start"] < previous_word_end - 0.1 \
+                    or word["start"] < start - 0.1 or word["start"] >= end + 0.1 \
+                    or word["end"] > end + 0.1:
+                malformed_words = True
+                break
+            previous_start = word["start"]
+            previous_word_end = max(previous_word_end, word["end"])
+            word_text.append(word["word"])
+        if malformed_words:
+            issues.append(f"line {i + 1}: word timings are malformed or out of order")
+            continue
+        spoken = _norm_tokens(" ".join(word_text))
+        sent = _norm_tokens(sent_text)
         written = _norm_tokens(spoken_text(ss))
         r1 = difflib.SequenceMatcher(None, spoken, sent).ratio() if sent else 0
         r2 = difflib.SequenceMatcher(None, sent, written).ratio() if written else 0
@@ -67,21 +162,65 @@ def narration_check(tts: dict, script: dict, min_ratio: float = 0.9) -> list[str
             issues.append(f"line {i + 1}: spoken words differ from the script ({r1:.0%} match)")
         if r2 < 0.8:
             issues.append(f"line {i + 1}: text sent to speech differs from the script ({r2:.0%} match)")
-        if ts["end"] <= ts["start"]:
-            issues.append(f"line {i + 1}: empty audio")
     return issues
 
 
 def coverage_check(timeline: list[dict], shots: list[dict], n_segs: int, min_score: float) -> list[str]:
+    """Validate rendered coverage and selected-image verdicts; bad types/numbers never pass as truthy."""
+    if type(n_segs) is not int or n_segs < 1:
+        return ["script has no valid narration segments for visual coverage"]
+    if not _finite_number(min_score, 7, 10):
+        return ["minimum visual-match score must be a finite number from 7 to 10"]
+    if not isinstance(timeline, list) or not isinstance(shots, list):
+        return ["rendered timeline or selected-shot list is malformed"]
+
     issues = []
-    on_screen = {t["seg"] for t in timeline}
+    on_screen = set()
+    timeline_keys = set()
+    selected_keys = set()
+    for i, entry in enumerate(timeline):
+        if not isinstance(entry, dict):
+            issues.append(f"timeline entry {i + 1} is not an object")
+            continue
+        seg = entry.get("seg")
+        if type(seg) is not int or not 0 <= seg < n_segs:
+            issues.append(f"timeline entry {i + 1} has an invalid segment number")
+            continue
+        path = entry.get("path")
+        if not isinstance(path, str) or not path.strip():
+            issues.append(f"timeline entry {i + 1} has no media path")
+        else:
+            timeline_keys.add((seg, path))
+        start, end = entry.get("start"), entry.get("end")
+        if (not _finite_number(start, 0, float("inf"))
+                or not _finite_number(end, 0, float("inf")) or end <= start):
+            issues.append(f"timeline entry {i + 1} has invalid time bounds")
+        on_screen.add(seg)
     for i in range(n_segs):
         if i not in on_screen:
             issues.append(f"line {i + 1} has no shot on screen")
-    for s in shots:
-        if s.get("judge", "") in ("", "clip") or float(s.get("score") or 0) < min_score:
-            issues.append(f"line {s['seg'] + 1} uses an image that wasn't approved by the vision model "
-                          f"(score {s.get('score')}, judge {s.get('judge') or 'none'})")
+
+    for i, shot in enumerate(shots):
+        if not isinstance(shot, dict):
+            issues.append(f"selected shot {i + 1} is not an object and wasn't approved by the vision model")
+            continue
+        seg = shot.get("seg")
+        if type(seg) is not int or not 0 <= seg < n_segs:
+            issues.append(f"selected shot {i + 1} has an invalid segment number and wasn't approved by the vision model")
+            continue
+        raw_path = shot.get("path")
+        path = str(raw_path) if isinstance(raw_path, (str, Path)) else ""
+        if not path.strip():
+            issues.append(f"line {seg + 1} has no selected media path")
+        else:
+            selected_keys.add((seg, path))
+        score, judge = shot.get("score"), shot.get("judge")
+        if (not _finite_number(score, 0, 10) or not isinstance(judge, str) or not judge.strip()
+                or judge.strip().lower() == "clip" or score < min_score):
+            issues.append(f"line {seg + 1} uses an image that wasn't approved by the vision model "
+                          f"(score {score!r}, judge {judge or 'none'})")
+    for seg, path in sorted(timeline_keys - selected_keys):
+        issues.append(f"line {seg + 1} renders {path!r} without a selected-shot approval record")
     return issues
 
 
@@ -176,7 +315,13 @@ def frame_check(mp4: Path, timeline: list[dict], shots: list[dict], tts: dict, s
     trend_evidence = [str(x)[:220] for x in (trend_evidence or []) if x][:4]
     results, meta = [], {"hook_text_ok": True, "title_ok": True, "notes": [],
                          "trend_angle": str(trend_angle or "")[:400], "trend_evidence": trend_evidence}
-    per_sheet = int(cfg.get("qa", {}).get("frames_per_sheet", 8))
+    qa_cfg = cfg.get("qa", {}) if isinstance(cfg, dict) else {}
+    if not isinstance(qa_cfg, dict):
+        raise VisionUnavailable("final QA thresholds are malformed")
+    per_sheet = qa_cfg.get("frames_per_sheet", 8)
+    qa_min = qa_cfg.get("min_frame_score", 7)
+    if type(per_sheet) is not int or not 1 <= per_sheet <= 32 or not _finite_number(qa_min, 7, 10):
+        raise VisionUnavailable("final QA batch size or frame-score threshold is invalid")
     for b in range(0, len(items), per_sheet):
         batch = items[b:b + per_sheet]
         first = b == 0
@@ -226,28 +371,29 @@ Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "scor
  "hook_text_ok": true, "title_ok": true, "notes": ""}}"""
 
         def validate(o):
-            fr = o.get("frames")
-            assert isinstance(fr, list) and len(fr) == len(batch), f"need exactly {len(batch)} entries in 'frames'"
-            for f in fr:
-                int(f["n"]), float(f["score"]), bool(f["match"])
+            _validate_frame_output(o, len(batch), require_video_verdicts=True)
 
         out, err = None, None
         for attempt in range(len(retry_pauses) + 1):
             try:
                 out = llm.vision_json(QA_SYSTEM, user, [_sheet([it["img"] for it in batch])], validate)
+                validate(out)  # also defend against adapters that ignore the validation callback
                 break
             except Exception as e:  # noqa: BLE001
+                out = None
                 err = e
                 if attempt < len(retry_pauses):
                     time.sleep(retry_pauses[attempt])
         if out is None:
-            raise VisionUnavailable(f"final QA could not reach a vision model: {str(err)[:300]}")
-        primary = {int(f["n"]): f for f in out["frames"]}
+            raise VisionUnavailable(f"final QA received no valid vision verdict: {str(err)[:300]}")
+        primary_judge = str(getattr(llm, "last_used", "") or "")
+        primary = {f["n"]: f for f in out["frames"]}
         audit = {}
+        audit_judges = {}
         # Challenge every positive frame individually. A contact sheet can hide the exact person,
         # event or era mismatch that a batch judge overlooks; the blind second look sees one frame only.
         for j, it in enumerate(batch):
-            if not bool(primary.get(j + 1, {}).get("match")):
+            if primary[j + 1]["match"] is not True:
                 continue
             ctx = it["context"]
             audit_user = f"""ADVERSARIAL SECOND LOOK — INSPECT THIS SINGLE FRAME, NOT A CONTACT SHEET.
@@ -267,18 +413,18 @@ not visually defensible. If uncertain, fail it.
 Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "score": 0-10, "issue": ""}}]}}"""
 
             def validate_single(o):
-                frames = o.get("frames")
-                assert isinstance(frames, list) and len(frames) == 1, "audit must return exactly one frame verdict"
-                assert int(frames[0]["n"]) == 1, "single-frame audit must be numbered 1"
-                float(frames[0]["score"]), bool(frames[0]["match"])
+                _validate_frame_output(o, 1, require_video_verdicts=False)
+                assert o["frames"][0]["n"] == 1, "single-frame audit must be numbered 1"
 
             audit_out, audit_err = None, None
             for attempt in range(len(retry_pauses) + 1):
                 try:
                     audit_out = llm.vision_json(QA_AUDIT_SYSTEM, audit_user,
                                                 [_sheet([it["img"]])], validate_single)
+                    validate_single(audit_out)  # revalidate at the trust boundary
                     break
                 except Exception as e:  # noqa: BLE001
+                    audit_out = None
                     audit_err = e
                     if attempt < len(retry_pauses):
                         time.sleep(retry_pauses[attempt])
@@ -286,29 +432,32 @@ Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "scor
                 raise VisionUnavailable(
                     f"adversarial final-frame audit unavailable: {str(audit_err)[:250]}") from audit_err
             audit[j + 1] = audit_out["frames"][0]
+            audit_judges[j + 1] = str(getattr(llm, "last_used", "") or "")
         for j, it in enumerate(batch):
-            f = primary.get(j + 1, {"match": False, "score": 0, "shows": "", "issue": "no verdict"})
+            f = primary[j + 1]
             a = audit.get(j + 1)
-            match = bool(f.get("match")) and (bool(a.get("match")) if a is not None else False)
-            score = min(float(f.get("score") or 0), float(a.get("score") or 0)) if a is not None else float(f.get("score") or 0)
-            issue = str(f.get("issue", ""))
-            if a is not None and (not a.get("match") or float(a.get("score") or 0) < float(cfg.get("qa", {}).get("min_frame_score", 7))):
-                audit_issue = str(a.get("issue") or "adversarial audit could not confirm this image")
+            match = f["match"] is True and (a["match"] is True if a is not None else False)
+            score = min(f["score"], a["score"]) if a is not None else f["score"]
+            issue = f["issue"]
+            if a is not None and (a["match"] is not True or a["score"] < qa_min):
+                audit_issue = a["issue"] or "adversarial audit could not confirm this image"
                 issue = (issue + "; adversarial audit: " + audit_issue).strip("; ")
-            results.append({"seg": it["seg"], "path": it["path"], "t": it["t"],
+            results.append({"timeline_index": it["k"], "seg": it["seg"], "path": it["path"], "t": it["t"],
                             "sample": it["sample"], "samples": it["samples"], "spoken": it["spoken"][:140],
                             "intended_shot": it["context"]["intended"][:160],
                             "selected_image": it["context"]["selected_description"][:120],
                             "asset_title": it["context"]["asset_title"][:120],
-                            "shows": str(f.get("shows", ""))[:120],
-                            "audit_shows": str(a.get("shows", ""))[:120] if a else "",
+                            "shows": f["shows"][:120],
+                            "audit_shows": a["shows"][:120] if a else "",
+                            "audit_match": a["match"] if a else False,
+                            "audit_score": a["score"] if a else None,
                             "match": match, "score": score, "issue": issue[:200],
-                            "judge": llm.last_used})
+                            "judge": primary_judge, "audit_judge": audit_judges.get(j + 1, "")})
         if first:
-            meta["hook_text_ok"] = bool(out.get("hook_text_ok", True))
-            meta["title_ok"] = bool(out.get("title_ok", True))
-        if out.get("notes"):
-            meta["notes"].append(str(out["notes"])[:200])
+            meta["hook_text_ok"] = out["hook_text_ok"]
+            meta["title_ok"] = out["title_ok"]
+        if out["notes"]:
+            meta["notes"].append(out["notes"][:200])
 
     # Per-frame relevance does not catch a factually correct but monotonous slideshow. Review one
     # representative midpoint from every shot together, in timeline order, and fail the shots the
@@ -345,30 +494,25 @@ that is visually redundant and should be replaced. Do not fail a shot solely bec
 Return strict JSON: {{"visual_variety_ok": true, "repetitive_frames": [], "notes": "short reason"}}"""
 
         def validate_sequence(o):
-            assert isinstance(o.get("visual_variety_ok"), bool), "need boolean visual_variety_ok"
-            repetitive = o.get("repetitive_frames")
-            assert isinstance(repetitive, list), "need repetitive_frames list"
-            numbers = [int(n) for n in repetitive]
-            assert len(numbers) == len(set(numbers)), "repetitive frame numbers must be unique"
-            assert all(1 <= n <= len(sequence_items) for n in numbers), "repetitive frame number is out of range"
-            assert not numbers if o["visual_variety_ok"] else bool(numbers), (
-                "a failed sequence must identify redundant frames; a passing sequence must have none")
+            _validate_sequence_output(o, len(sequence_items))
 
         sequence_out, sequence_err = None, None
         for attempt in range(len(retry_pauses) + 1):
             try:
                 sequence_out = llm.vision_json(QA_SEQUENCE_SYSTEM, sequence_user,
                                                [_sheet([it["img"] for it in sequence_items])], validate_sequence)
+                validate_sequence(sequence_out)  # revalidate adapters that omit callback enforcement
                 break
             except Exception as e:  # noqa: BLE001
+                sequence_out = None
                 sequence_err = e
                 if attempt < len(retry_pauses):
                     time.sleep(retry_pauses[attempt])
         if sequence_out is None:
             raise VisionUnavailable(f"sequence-level visual QA unavailable: {str(sequence_err)[:250]}") from sequence_err
-        repetitive = [int(n) for n in sequence_out["repetitive_frames"]]
-        variety_notes = str(sequence_out.get("notes") or "")[:250]
-        meta["visual_variety_ok"] = bool(sequence_out["visual_variety_ok"])
+        repetitive = sequence_out["repetitive_frames"]
+        variety_notes = sequence_out["notes"][:250]
+        meta["visual_variety_ok"] = sequence_out["visual_variety_ok"]
         meta["visual_variety_notes"] = variety_notes
         if variety_notes:
             meta["notes"].append("visual sequence: " + variety_notes)
@@ -388,11 +532,23 @@ Return strict JSON: {{"visual_variety_ok": true, "repetitive_frames": [], "notes
 def verify(mp4: Path, timeline: list[dict], shots: list[dict], tts: dict, script: dict, title: str, hook: str,
            subject: str, llm, cfg: dict, trend_angle: str = "",
            trend_evidence: list[str] | None = None) -> dict:
-    min_score = float(cfg["media"].get("min_match_score", 7))
-    qa_min = float(cfg.get("qa", {}).get("min_frame_score", 7))
     report = {"passed": False, "issues": [], "frames": [], "failed": [], "repairable": False}
+    if not isinstance(cfg, dict):
+        report["issues"].append("final QA configuration is malformed")
+        return report
+    media_cfg = cfg.get("media", {})
+    qa_cfg = cfg.get("qa", {})
+    if not isinstance(media_cfg, dict) or not isinstance(qa_cfg, dict):
+        report["issues"].append("final QA thresholds are malformed")
+        return report
+    min_score = media_cfg.get("min_match_score", 7)
+    qa_min = qa_cfg.get("min_frame_score", 7)
+    if not _finite_number(min_score, 7, 10) or not _finite_number(qa_min, 7, 10):
+        report["issues"].append("final QA score thresholds must be finite numbers from 7 to 10")
+        return report
     report["issues"] += narration_check(tts, script)
-    report["issues"] += coverage_check(timeline, shots, len(script["segments"]), min_score)
+    segs = script.get("segments") if isinstance(script, dict) else []
+    report["issues"] += coverage_check(timeline, shots, len(segs) if isinstance(segs, list) else 0, min_score)
     if report["issues"]:
         return report                                  # structural problems: don't even spend a vision call
     frames, meta = frame_check(mp4, timeline, shots, tts, script, title, hook, subject, llm, cfg,
