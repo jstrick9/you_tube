@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-11T16:22:09.854747+00:00",
+  "updated": "2026-10-11T16:48:01.205722+00:00",
   "videos_total": 43,
   "videos_7d": 12,
-  "views_7d": 6776,
+  "views_7d": 6780,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -354,7 +354,7 @@
   "retention_segments": {
     "status": "not_available_yet",
     "videos_with_segment_data": 0,
-    "matured_videos_eligible": 32,
+    "matured_videos_eligible": 33,
     "video_coverage": 0.0,
     "segment_metric_rows_reported": 0,
     "segment_rows_in_curve": 0,
@@ -463,17 +463,17 @@
     "interpretation": "Small samples and different trending topics, lanes, and posting times can affect outcomes. Treat these summaries as exploratory; no treatment is auto-selected and no score or retention metric adds a publication veto."
   },
   "average_view_target": {
-    "n": 31,
+    "n": 32,
     "gate_pct": 70.0,
     "metric": "average_view_percentage",
     "passing": 8,
-    "pass_rate": 0.258,
-    "median_avg_view_pct": 56.22,
-    "verdict": "8/31 measured videos clear the internal 70% average-view target (median 56%). This is average watch percentage, not the share of viewers who reached the end."
+    "pass_rate": 0.25,
+    "median_avg_view_pct": 55.41,
+    "verdict": "8/32 measured videos clear the internal 70% average-view target (median 55%). This is average watch percentage, not the share of viewers who reached the end."
   },
   "subscribers": {
     "net_90d": 26,
-    "views_90d": 25430,
+    "views_90d": 25434,
     "per_1k_views": 1.02,
     "videos": 34,
     "denominator_basis": "public_views_fallback",
