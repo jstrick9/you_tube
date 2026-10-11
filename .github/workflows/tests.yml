@@ -34,7 +34,7 @@ jobs:
       # requirements.in and forgets to recompile, the pins silently stop meaning anything.
       - name: Lockfile is in sync with requirements.in
         run: |
-          pipx run uv pip compile requirements.in --python-version 3.12 \
+          pipx run --spec uv==0.13.0 uv pip compile requirements.in --python-version 3.12 \
             --generate-hashes --quiet -o /tmp/check.txt
           if ! diff -q <(grep -v '^#' requirements.txt) <(grep -v '^#' /tmp/check.txt) > /dev/null; then
             echo "::error::requirements.txt is out of date. Run:"
