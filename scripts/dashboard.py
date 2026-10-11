@@ -66,6 +66,16 @@ def main():
     segment_row_coverage = float(segment.get("row_coverage") or 0)
     segment_row_coverage_text = (f"rows with all three metrics {segment_rows_reported}/{segment_rows_expected} "
                                   f"({segment_row_coverage:.0%})" if segment_rows_expected else "all-metric row coverage n/a")
+    curve_refresh = summ.get("retention_curve_refresh") or {}
+    refresh_attempted = int(curve_refresh.get("attempted_videos") or 0)
+    if refresh_attempted:
+        refresh_text = (f"Latest query pass: {int(curve_refresh.get('usable_reports_returned') or 0)}/"
+                        f"{refresh_attempted} usable reports; "
+                        f"{int(curve_refresh.get('reports_with_segment_metrics') or 0)} had event metrics.")
+    else:
+        refresh_text = "No retention-curve queries were due in the latest pass."
+    if curve_refresh.get("note"):
+        refresh_text += " " + str(curve_refresh["note"])
     segment_bins = segment.get("bins") if isinstance(segment.get("bins"), list) else []
     segment_rows = "".join(
         f"<tr><td>{html.escape(str(row.get('from_pct', '–')))}–{html.escape(str(row.get('to_pct', '–')))}%</td>"
@@ -91,6 +101,7 @@ def main():
                     f"{int(segment.get('matured_videos_eligible') or 0)} mature videos covered ({segment_coverage:.0%})</b>"
                     f"<em>Pooled playback events in 5% runtime bins, not unique-viewer percentages or feed swipes; "
                     f"{html.escape(segment_row_coverage_text)}.</em>"
+                    f"<em>{html.escape(refresh_text)}</em>"
                     f"{segment_table}{definitions_details}</div>")
     feed = summ.get("feed_discovery") or {}
     feed_note = feed.get("note") or "Studio feed-exposure metrics are unavailable through this API integration."

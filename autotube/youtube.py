@@ -270,14 +270,17 @@ def summarize_retention_rows(rows: list, column_headers: list | None = None) -> 
             continue
         try:
             elapsed = float(cell(row, "elapsedVideoTimeRatio"))
-            watch_ratio = float(cell(row, "audienceWatchRatio"))
         except (TypeError, ValueError, OverflowError):
             continue
-        if (not math.isfinite(elapsed) or not 0.0 <= elapsed <= 1.0
-                or not math.isfinite(watch_ratio) or watch_ratio < 0):
+        if not math.isfinite(elapsed) or not 0.0 <= elapsed <= 1.0:
             continue
-        curve_rows.append((elapsed, watch_ratio))
         dimension_rows += 1
+        try:
+            watch_ratio = float(cell(row, "audienceWatchRatio"))
+        except (TypeError, ValueError, OverflowError):
+            watch_ratio = None
+        if watch_ratio is not None and math.isfinite(watch_ratio) and watch_ratio >= 0:
+            curve_rows.append((elapsed, watch_ratio))
         counts = [_retention_count(cell(row, metric)) for metric in
                   ("startedWatching", "stoppedWatching", "totalSegmentImpressions")]
         if any(value is None for value in counts):

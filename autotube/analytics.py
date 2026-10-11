@@ -540,27 +540,35 @@ def turn_experiment_summary(uploaded: list[dict], acfg: dict) -> dict:
 
 
 def _retention_curve_due(metrics: dict, now, refresh_days: int = 7) -> bool:
-    # Track attempts separately from successful data: a transient API miss must not delete the last
-    # usable curve or cause a quota-heavy retry on every daily run.
-    checked_at = metrics.get("retention_curve_last_attempt_at")
-    if not isinstance(checked_at, str) or not checked_at:
-        checked_at = metrics.get("retention_curve_checked_at")
+    # Failed/empty first attempts retry after 12 hours so a transient issue doesn't leave retention
+    # blind for a week. Once a usable report has been stored, refresh weekly to bound API calls.
+    successful_at = metrics.get("retention_curve_checked_at")
+    successful = None
+    if isinstance(successful_at, str) and successful_at:
+        try:
+            successful = datetime.fromisoformat(successful_at)
+        except ValueError:
+            pass
+    checked_at = metrics.get("retention_curve_last_attempt_at") or successful_at
     if not isinstance(checked_at, str) or not checked_at:
         return True
     try:
         checked = datetime.fromisoformat(checked_at)
     except ValueError:
-        legacy = metrics.get("retention_curve_checked_at")
-        if checked_at == legacy or not isinstance(legacy, str) or not legacy:
+        if checked_at == successful_at or not isinstance(successful_at, str) or not successful_at:
             return True
         try:
-            checked = datetime.fromisoformat(legacy)
+            checked = datetime.fromisoformat(successful_at)
         except ValueError:
             return True
     if checked.tzinfo is None:
         checked = checked.replace(tzinfo=now.tzinfo)
+    if successful is not None and successful.tzinfo is None:
+        successful = successful.replace(tzinfo=now.tzinfo)
     age = now - checked
-    return age >= timedelta(days=refresh_days) or age < timedelta(0)
+    last_attempt_succeeded = successful is not None and checked <= successful
+    interval = timedelta(days=refresh_days) if last_attempt_succeeded else timedelta(hours=12)
+    return age >= interval or age < timedelta(0)
 
 
 REWARD_SCHEMA_VERSION = 2
@@ -762,8 +770,19 @@ def run(cfg: dict) -> dict:
     if gate.get("verdict"):
         log.info("average-view target: %s", gate["verdict"])
     segment_diag = retention_segment_summary(matured, now)
+    curve_refresh = {
+        "attempted_videos": len(want_curve),
+        "usable_reports_returned": len(curves),
+        "reports_with_segment_metrics": sum(
+            1 for value in curves.values() if value.get("retention_segment_metrics_available") is True),
+        "reports_without_usable_rows": max(0, len(want_curve) - len(curves)),
+        "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query.",
+    }
     turn_diag = turn_experiment_summary(uploaded, acfg)
-    log.info("retention segment metrics: %d/%d mature videos covered; these are playback-segment events, not feed data",
+    log.info("retention curve refresh: %d/%d usable reports, %d with playback-segment metrics",
+             curve_refresh["usable_reports_returned"], curve_refresh["attempted_videos"],
+             curve_refresh["reports_with_segment_metrics"])
+    log.info("retention segment coverage: %d/%d mature videos; these are playback-segment events, not feed data",
              segment_diag["videos_with_segment_data"], segment_diag["matured_videos_eligible"])
     log.info("early-turn experiment: %d assignments; status=%s (telemetry only)",
              turn_diag["assigned_videos"], turn_diag["status"])
@@ -782,6 +801,7 @@ def run(cfg: dict) -> dict:
             key=lambda x: -x["views"])[:10],
         "rejected": [h["video_id"] for h in uploaded if h.get("status") == "rejected"],
         "retention": diag,
+        "retention_curve_refresh": curve_refresh,
         "retention_segments": segment_diag,
         "feed_discovery": feed_discovery_status(),
         "turn_experiment": turn_diag,

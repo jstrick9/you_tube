@@ -157,6 +157,16 @@ def test_retention_report_summarizes_documented_segment_metrics_by_five_percent(
     assert summary["retention_segments_5pct"][-1]["from_pct"] == 95
 
 
+def test_retention_events_survive_null_audience_watch_ratio_rows():
+    summary = summarize_retention_rows([[0.05, None, 2, 3, 4]])
+    assert summary["retention_segment_metrics_available"] is True
+    assert summary["retention_segment_metric_rows"] == 1
+    assert summary["retention_segments_5pct"][0]["started_watching"] == 2
+    assert summary["retention_segments_5pct"][0]["stopped_watching"] == 3
+    assert summary["retention_segments_5pct"][0]["total_segment_impressions"] == 4
+    assert "audience_watch_ratio_curve" not in summary
+
+
 def test_retention_parser_uses_response_column_headers_for_metric_order():
     headers = [
         {"name": "elapsedVideoTimeRatio"}, {"name": "startedWatching"},

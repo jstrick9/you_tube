@@ -71,16 +71,29 @@ def _run(monkeypatch, retention_row, curve_result=None):
     return entry["metrics"], result, query, written
 
 
-def test_retention_curve_refresh_is_weekly_and_keeps_legacy_timestamps():
+def test_failed_curve_refresh_retries_daily_but_usable_legacy_data_refreshes_weekly():
     from datetime import timedelta
 
     now = datetime(2026, 10, 10, 12, tzinfo=timezone.utc)
-    recent = (now - timedelta(days=6)).isoformat()
-    old = (now - timedelta(days=8)).isoformat()
+    recent_attempt = (now - timedelta(hours=6)).isoformat()
+    failed_attempt = (now - timedelta(days=2)).isoformat()
+    recent_success = (now - timedelta(days=6)).isoformat()
     assert analytics._retention_curve_due({}, now)
-    assert not analytics._retention_curve_due({"retention_curve_last_attempt_at": recent}, now)
-    assert analytics._retention_curve_due({"retention_curve_last_attempt_at": old}, now)
-    assert not analytics._retention_curve_due({"retention_curve_checked_at": recent}, now)
+    assert not analytics._retention_curve_due({"retention_curve_last_attempt_at": recent_attempt}, now)
+    assert analytics._retention_curve_due({"retention_curve_last_attempt_at": failed_attempt}, now)
+    assert not analytics._retention_curve_due({"retention_curve_checked_at": recent_success}, now)
+    assert not analytics._retention_curve_due({
+        "retention_curve_checked_at": recent_success, "retention_curve_last_attempt_at": recent_success,
+    }, now)
+    failed_after_success = (now - timedelta(hours=13)).isoformat()
+    assert analytics._retention_curve_due({
+        "retention_curve_checked_at": recent_success,
+        "retention_curve_last_attempt_at": failed_after_success,
+    }, now)
+    assert not analytics._retention_curve_due({
+        "retention_curve_checked_at": recent_success,
+        "retention_curve_last_attempt_at": recent_attempt,
+    }, now)
 
 
 def test_missing_analytics_row_clears_stale_window_values_and_marks_fallback(monkeypatch):
@@ -98,6 +111,9 @@ def test_missing_analytics_row_clears_stale_window_values_and_marks_fallback(mon
     assert metrics["retention_segment_metrics_available"] is True
     assert result["shorts_monetization"]["engaged_views_90d"] == 0
     assert result["shorts_monetization"]["coverage"] == 0.0
+    assert result["retention_curve_refresh"]["attempted_videos"] == 1
+    assert result["retention_curve_refresh"]["usable_reports_returned"] == 0
+    assert result["retention_curve_refresh"]["reports_without_usable_rows"] == 1
     assert "analytics_summary.json" in written
 
 
@@ -121,7 +137,7 @@ def test_successful_retention_refresh_replaces_old_curve_and_records_success_tim
     bins = [{"from_pct": i * 5, "to_pct": (i + 1) * 5,
              "started_watching": 4, "stopped_watching": 5,
              "total_segment_impressions": 6} for i in range(20)]
-    metrics, _, _, _ = _run(monkeypatch, {
+    metrics, result, _, _ = _run(monkeypatch, {
         "a_views": 1200, "engaged_views_90d": 240, "avg_view_pct": 76.5,
     }, curve_result={
         "audience_watch_ratio_curve": [1.0, 0.97, 0.94],
@@ -135,3 +151,8 @@ def test_successful_retention_refresh_replaces_old_curve_and_records_success_tim
     assert metrics["retention_segments_5pct"][0]["started_watching"] == 4
     assert metrics["retention_curve_checked_at"] == "2026-10-10T12:00:00+00:00"
     assert metrics["retention_curve_last_attempt_at"] == "2026-10-10T12:00:00+00:00"
+    assert metrics["retention_segment_metrics_available"] is True
+    refresh = result["retention_curve_refresh"]
+    assert refresh["attempted_videos"] == 1
+    assert refresh["usable_reports_returned"] == 1
+    assert refresh["reports_with_segment_metrics"] == 1
