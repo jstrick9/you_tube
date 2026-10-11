@@ -226,6 +226,83 @@ def average_view_target(matured: list[dict], acfg: dict) -> dict:
             "median_avg_view_pct": round(med, 2), "verdict": verdict}
 
 
+def average_view_watchlist(matured: list[dict], acfg: dict, limit: int = 10) -> dict:
+    """List the lowest measured videos below the channel's internal average-view target.
+
+    Uses the same mature-video cohort and validation as ``average_view_target``. Missing or implausible
+    averageViewPercentage values are omitted rather than converted to zero. Counts are context only;
+    the target remains average percentage watched per playback, not viewer completion.
+    """
+    gate = float(acfg.get("average_view_gate_pct", 70.0))
+    measured = []
+    below = []
+    for h in matured:
+        metrics = h.get("metrics") or {}
+        if not isinstance(metrics, dict):
+            continue
+        pct = clean_view_pct(metrics.get("avg_view_pct"))
+        if pct is None:
+            continue
+        measured.append(pct)
+        if pct >= gate:
+            continue
+
+        choice = h.get("choice") or {}
+        if not isinstance(choice, dict):
+            choice = {}
+        duration = h.get("duration")
+        try:
+            duration = float(duration)
+        except (OverflowError, TypeError, ValueError):
+            duration = None
+        if duration is not None and (not math.isfinite(duration) or duration <= 0):
+            duration = None
+        views = metrics.get("views")
+        engaged_views = metrics.get("engaged_views_90d")
+        try:
+            views = int(views) if views is not None and int(views) >= 0 else None
+        except (OverflowError, TypeError, ValueError):
+            views = None
+        try:
+            engaged_views = (int(engaged_views)
+                             if engaged_views is not None and int(engaged_views) >= 0 else None)
+        except (OverflowError, TypeError, ValueError):
+            engaged_views = None
+        below.append({
+            "id": str(h.get("video_id") or ""),
+            "title": str(h.get("title") or ""),
+            "topic": str(h.get("topic") or ""),
+            "created_at": str(h.get("created_at") or ""),
+            "category": str(choice.get("category") or ""),
+            "format": str(choice.get("format") or ""),
+            "hook_style": str(choice.get("hook_style") or ""),
+            "duration_seconds": round(duration, 1) if duration is not None else None,
+            "avg_view_pct": round(pct, 2),
+            "views": views,
+            "engaged_views_90d": engaged_views,
+        })
+
+    # Show the lowest average-view values first; break ties in favor of videos with more evidence.
+    def sort_key(video: dict) -> tuple[float, int, str]:
+        sample = video["engaged_views_90d"]
+        if sample is None:
+            sample = video["views"]
+        return (video["avg_view_pct"], -(sample if sample is not None else -1), video["id"])
+
+    below.sort(key=sort_key)
+    try:
+        shown = max(0, int(limit))
+    except (OverflowError, TypeError, ValueError):
+        shown = 10
+    return {
+        "gate_pct": gate,
+        "evaluated": len(measured),
+        "below_target": len(below),
+        "shown": min(len(below), shown),
+        "videos": below[:shown],
+    }
+
+
 # Backward-compatible function name only; this is not a YouTube distribution gate.
 distribution_gate = average_view_target
 
@@ -767,6 +844,7 @@ def run(cfg: dict) -> dict:
         log.info("retention: %s", diag["verdict"])
     # Keep the configured average-view goal separate from the relative curve-shape diagnosis.
     gate = average_view_target(matured, acfg)
+    watchlist = average_view_watchlist(matured, acfg)
     if gate.get("verdict"):
         log.info("average-view target: %s", gate["verdict"])
     segment_diag = retention_segment_summary(matured, now)
@@ -793,12 +871,12 @@ def run(cfg: dict) -> dict:
     summary = {
         "updated": now.isoformat(), "videos_total": len(uploaded), "videos_7d": len(last7),
         # Cumulative public views on videos uploaded in the last 7 days, not views earned during that period.
-        "views_7d": sum(h.get("metrics", {}).get("views", 0) for h in last7),
+        "views_7d": sum((h.get("metrics") or {}).get("views", 0) for h in last7),
         "learned_this_run": learned, "strategy": strat.report(),
         "top_videos": sorted(
-            [{"title": h["title"], "id": h["video_id"], "views": h.get("metrics", {}).get("views", 0),
-              "avg_view_pct": h.get("metrics", {}).get("avg_view_pct")} for h in uploaded],
-            key=lambda x: -x["views"])[:10],
+            [{"title": h["title"], "id": h["video_id"], "views": (h.get("metrics") or {}).get("views", 0),
+              "avg_view_pct": (h.get("metrics") or {}).get("avg_view_pct")} for h in uploaded],
+            key=lambda x: -(x["views"] or 0))[:10],
         "rejected": [h["video_id"] for h in uploaded if h.get("status") == "rejected"],
         "retention": diag,
         "retention_curve_refresh": curve_refresh,
@@ -806,6 +884,7 @@ def run(cfg: dict) -> dict:
         "feed_discovery": feed_discovery_status(),
         "turn_experiment": turn_diag,
         "average_view_target": gate,
+        "average_view_watchlist": watchlist,
         # This is an approximate per-video subscriber-conversion trajectory, not the channel's current
         # subscriber total or an eligibility decision. The YPP progress proxy above separately sums engagedViews.
         "subscribers": _subs_progress(uploaded, now),

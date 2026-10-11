@@ -514,5 +514,143 @@
     "share_with_narrator_commentary": 0.929,
     "flags": [],
     "verdict": "looks like a show"
+  },
+  "average_view_watchlist": {
+    "gate_pct": 70.0,
+    "evaluated": 32,
+    "below_target": 24,
+    "shown": 10,
+    "videos": [
+      {
+        "id": "XQjMkyKZPyQ",
+        "title": "Why millions bite open plastic water bags #shorts",
+        "topic": "water is sold in plastic sachets as a cheaper way of transporting and consuming drinking water, particularly in Africa.",
+        "created_at": "2026-09-30T16:55:19.500206+00:00",
+        "category": "food",
+        "format": "would_you_survive",
+        "hook_style": "bold_claim",
+        "duration_seconds": 38.4,
+        "avg_view_pct": 0.67,
+        "views": 1,
+        "engaged_views_90d": 1
+      },
+      {
+        "id": "SlY7iKy1K3o",
+        "title": "CASE #007 — Alcatraz Escape: The Head That Wasn't Real #shorts",
+        "topic": "DUNIA ki Sabse Badi Mystery",
+        "created_at": "2026-10-08T19:36:23.676718+00:00",
+        "category": "mysteries",
+        "format": "ranked_escalation",
+        "hook_style": "you_statement",
+        "duration_seconds": 19.7,
+        "avg_view_pct": 24.1,
+        "views": 78,
+        "engaged_views_90d": 1
+      },
+      {
+        "id": "oTgoKlCkGE0",
+        "title": "How Your Liver Rebuilds Itself #shorts",
+        "topic": "Why is the liver so weirdly regenerative?",
+        "created_at": "2026-09-25T17:00:40.966352+00:00",
+        "category": "science",
+        "format": "backstory",
+        "hook_style": "bold_claim",
+        "duration_seconds": 45.6,
+        "avg_view_pct": 30.05,
+        "views": 1128,
+        "engaged_views_90d": 497
+      },
+      {
+        "id": "Tm86-6r3k6I",
+        "title": "The Strange Origin Story of the Venus Flytrap #shorts",
+        "topic": "Venus flytrap",
+        "created_at": "2026-09-29T01:24:37.729984+00:00",
+        "category": "culture",
+        "format": "backstory",
+        "hook_style": "you_statement",
+        "duration_seconds": 33.3,
+        "avg_view_pct": 36.64,
+        "views": 326,
+        "engaged_views_90d": 58
+      },
+      {
+        "id": "OyHMkwqEOKo",
+        "title": "Can you win chess by losing everything? #shorts",
+        "topic": "In losing chess, a chess variant where the goal is to lose by getting your pieces captured or getting stalemated, it is known that 13 of white's 20 opening moves lead to a forced win for black.",
+        "created_at": "2026-09-25T17:00:44.383783+00:00",
+        "category": "culture",
+        "format": "myth_vs_fact",
+        "hook_style": "question",
+        "duration_seconds": 31.8,
+        "avg_view_pct": 41.37,
+        "views": 1160,
+        "engaged_views_90d": 381
+      },
+      {
+        "id": "kM3myuf1c-Y",
+        "title": "The Surprising History of Barbie and Mattel #shorts",
+        "topic": "a 1963 Barbie outfit \"Barbie Baby-Sits\" came with a bathroom scale set at 50 kg (110 pounds). To scale Barbie is 1.75 m (5'9\"), so this is underweight. It also included a book titled How to Lose Weight which advised \"Don't eat!\"",
+        "created_at": "2026-09-24T18:04:55.259364+00:00",
+        "category": "culture",
+        "format": "myth_vs_fact",
+        "hook_style": "question",
+        "duration_seconds": 35.8,
+        "avg_view_pct": 41.66,
+        "views": 1183,
+        "engaged_views_90d": 602
+      },
+      {
+        "id": "6dO8y_ojGhI",
+        "title": "How Does Canadian Rain Reach the Gulf of Mexico? #shorts",
+        "topic": "parts of Alberta and Saskatchewan, Canada, are actually within the Mississippi River Basin, meaning some water that falls in Canada eventually flows all the way to the Gulf of Mexico.",
+        "created_at": "2026-09-27T15:15:52.827506+00:00",
+        "category": "geography",
+        "format": "backstory",
+        "hook_style": "question",
+        "duration_seconds": 38.4,
+        "avg_view_pct": 45.65,
+        "views": 973,
+        "engaged_views_90d": 540
+      },
+      {
+        "id": "321JPi9-2RY",
+        "title": "FIELD #011 — The fish that lives on land #shorts",
+        "topic": "Paani se bahar chalti hai ye machhli! Mudskipper!",
+        "created_at": "2026-10-08T19:36:21.275907+00:00",
+        "category": "nature",
+        "format": "guess_reveal",
+        "hook_style": "disbelief",
+        "duration_seconds": 17.1,
+        "avg_view_pct": 48.82,
+        "views": 527,
+        "engaged_views_90d": 30
+      },
+      {
+        "id": "SBETRh-FF_I",
+        "title": "Inside the 80 Billion Dollar Grand Inga Dam Project #shorts",
+        "topic": "the proposed Grand Inga Dam in the DR Congo would be the largest power plant ever. With a capacity double that of the Three Gorges Dam, the series of seven dams would be the largest clean energy project ever. At an estimated cost of $80 billion the project remains on hold.",
+        "created_at": "2026-09-27T15:15:50.159261+00:00",
+        "category": "geography",
+        "format": "timeline",
+        "hook_style": "number_first",
+        "duration_seconds": 37.9,
+        "avg_view_pct": 49.19,
+        "views": 475,
+        "engaged_views_90d": 269
+      },
+      {
+        "id": "4WkKoRw9r00",
+        "title": "Which Substance Has the Highest Melting Point? #shorts",
+        "topic": "there is no current universal agreement on what compound has the highest melting point. At extreme temperatures material composition and structure change. A Ta-Hf-C alloy has been confirmed to melt at 4215 C (7619 F). Other candidates are Tantalum Carbide and a carbonitride compound.",
+        "created_at": "2026-09-27T15:15:47.468680+00:00",
+        "category": "science",
+        "format": "facts3",
+        "hook_style": "you_statement",
+        "duration_seconds": 37.3,
+        "avg_view_pct": 50.26,
+        "views": 1179,
+        "engaged_views_90d": 533
+      }
+    ]
   }
 }

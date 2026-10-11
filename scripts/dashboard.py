@@ -4,13 +4,85 @@
 """
 import html
 import json
+import math
 import sys
 from pathlib import Path
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+from autotube.analytics import average_view_watchlist  # noqa: E402
 from autotube.common import load_config, read_json  # noqa: E402
 from autotube.strategy import Strategy  # noqa: E402
+
+
+def _number_label(value, suffix: str = "") -> str:
+    try:
+        number = float(value)
+    except (OverflowError, TypeError, ValueError):
+        return "–"
+    if not math.isfinite(number) or number < 0:
+        return "–"
+    return f"{number:,.1f}{suffix}"
+
+
+def _count_label(value) -> str:
+    try:
+        number = int(value)
+    except (OverflowError, TypeError, ValueError):
+        return "–"
+    return f"{number:,}" if number >= 0 else "–"
+
+
+def _watchlist_card(watchlist: dict, target_gate: float) -> str:
+    gate = _number_label(watchlist.get("gate_pct", target_gate)).removesuffix(".0")
+    try:
+        evaluated = max(0, int(watchlist.get("evaluated") or 0))
+        below = max(0, int(watchlist.get("below_target") or 0))
+    except (OverflowError, TypeError, ValueError):
+        evaluated = below = 0
+    videos = watchlist.get("videos") if isinstance(watchlist.get("videos"), list) else []
+    if not evaluated:
+        summary = "No mature videos with valid average-view data yet."
+    elif not below:
+        summary = f"No videos below {gate}% among {evaluated} measured videos."
+    else:
+        summary = f"{below} of {evaluated} measured videos are below {gate}%."
+
+    rows = []
+    for video in videos:
+        if not isinstance(video, dict):
+            continue
+        title = html.escape(str(video.get("title") or "Untitled"))
+        video_id = str(video.get("id") or "")
+        if video_id:
+            url = html.escape(f"https://www.youtube.com/watch?v={quote(video_id, safe='')}", quote=True)
+            title = f"<a href='{url}' target='_blank' rel='noopener noreferrer'>{title}</a>"
+        topic = html.escape(str(video.get("topic") or "–"))
+        category = html.escape(str(video.get("category") or "–"))
+        video_format = html.escape(str(video.get("format") or "–"))
+        hook_style = html.escape(str(video.get("hook_style") or "–"))
+        pct = _number_label(video.get("avg_view_pct"), "%")
+        duration = _number_label(video.get("duration_seconds"), "s")
+        views = _count_label(video.get("views"))
+        engaged = _count_label(video.get("engaged_views_90d"))
+        rows.append(
+            f"<tr><td>{title}</td><td class=topic>{topic}</td><td><b>{pct}</b></td><td>{duration}</td>"
+            f"<td>{category}</td><td>{video_format}</td><td>{hook_style}</td><td>{views}</td><td>{engaged}</td></tr>")
+    listed = len(rows)
+    if not rows:
+        message = "No measured videos are currently below target." if evaluated else "No measured data yet."
+        rows = [f"<tr><td colspan=9>{html.escape(message)}</td></tr>"]
+    shown_note = (f"Showing the {listed} lowest of {below} under-target videos. "
+                  if below > listed else "Sorted from lowest average-view percentage upward. ")
+    return (f"<div class=card><h3>Videos below the {gate}% average-view target</h3>"
+            f"<b>{html.escape(summary)}</b>"
+            f"<em>{html.escape(shown_note)}Average percentage watched per playback—not viewer completion. "
+            f"Public views and engaged views are separate context counts; low counts can make per-video values noisy; "
+            f"— means unavailable.</em>"
+            f"<div class=table-wrap><table class=watchlist><tr><th>Video</th><th>Topic</th><th>Avg view %</th>"
+            f"<th>Runtime</th><th>Category</th><th>Format</th><th>Hook</th><th>Public views</th>"
+            f"<th>Engaged views (90d)</th></tr>{''.join(rows)}</table></div></div>")
 
 
 def bar(v: float) -> str:
@@ -44,6 +116,26 @@ def main():
     target_card = (f"<div class=card><h3>Internal average-view target</h3>"
                    f"<b>{html.escape(target_summary)}</b>"
                    f"<em>Average percentage watched per playback; not viewer completion or a YouTube distribution rule.</em></div>")
+    watchlist = summ.get("average_view_watchlist")
+    if not isinstance(watchlist, dict):
+        # Older analytics snapshots predate the watchlist field; derive it locally from the same
+        # mature-video cohort so the dashboard updates immediately without waiting for another API run.
+        min_hours = float(cfg.get("analytics", {}).get("evaluate_after_hours", 48))
+        matured = []
+        for video in hist:
+            if not isinstance(video, dict) or video.get("status") in ("withdrawn", "missing"):
+                continue
+            metrics = video.get("metrics") or {}
+            if not isinstance(metrics, dict):
+                continue
+            try:
+                hours_live = float(metrics.get("hours_live") or 0)
+            except (OverflowError, TypeError, ValueError):
+                continue
+            if hours_live >= min_hours:
+                matured.append(video)
+        watchlist = average_view_watchlist(matured, cfg.get("analytics", {}))
+    watchlist_card = _watchlist_card(watchlist, target_gate)
     monetization = summ.get("shorts_monetization") or {}
     engaged_90d = int(monetization.get("engaged_views_90d") or 0)
     coverage = float(monetization.get("coverage") or 0)
@@ -135,11 +227,14 @@ def main():
 .k b{{display:block;font-size:24px}}.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}}
 .card{{background:#1a1d24;border-radius:10px;padding:12px}}.r{{display:grid;grid-template-columns:130px 1fr 90px;gap:8px;align-items:center;margin:4px 0}}
 .b{{background:#2a2f3a;height:8px;border-radius:4px}}.b i{{display:block;height:100%;background:#ffd400;border-radius:4px}}
-em{{color:#999;font-size:12px}}table{{width:100%;border-collapse:collapse;margin-top:16px}}td,th{{padding:6px;border-bottom:1px solid #262a33;text-align:left}}</style>
+em{{color:#999;font-size:12px}}table{{width:100%;border-collapse:collapse;margin-top:16px}}td,th{{padding:6px;border-bottom:1px solid #262a33;text-align:left}}
+.table-wrap{{overflow-x:auto}}.watchlist{{min-width:1050px}}.watchlist .topic{{max-width:280px;white-space:normal}}
+a{{color:#ffd400}}</style>
 <h1>📈 AutoTube — {html.escape(cfg['channel']['name'])}</h1><div style=color:#999>updated {html.escape(summ.get('updated', 'n/a')[:16])}</div>
 <div class=k><div>Videos total<b>{len([h for h in hist if h.get('video_id')])}</b></div><div>Last 7d<b>{summ.get('videos_7d', 0)}</b></div>
 <div>Views on uploads (last 7d)<b>{summ.get('views_7d', 0)}</b></div>{monetization_card}<div>Model updates<b>{Strategy(cfg).state.get('updates', 0)}</b></div></div>
 {target_card}
+{watchlist_card}
 {verdict}
 <h2>Retention and early-turn diagnostics</h2>{diagnostic_cards}
 <h2>What the system has learned</h2><div class=grid>{spark}{strat}</div>

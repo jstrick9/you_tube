@@ -130,6 +130,9 @@ def test_current_analytics_row_replaces_stale_values_and_uses_engaged_velocity(m
     assert metrics["engaged_views_window"] == {"start": "2026-07-13", "end": "2026-10-10"}
     assert result["shorts_monetization"]["engaged_views_90d"] == 240
     assert result["shorts_monetization"]["coverage"] == 1.0
+    # This sample is only 10 hours old; the target/watchlist only use matured videos.
+    assert result["average_view_watchlist"]["evaluated"] == 0
+    assert result["average_view_watchlist"]["below_target"] == 0
     assert "history.json" in written and "analytics_summary.json" in written
 
 
