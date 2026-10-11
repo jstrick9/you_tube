@@ -187,3 +187,8 @@ def test_writer_ignores_stale_or_underpowered_format_pulse(monkeypatch):
     fresh_but_small = {"updated": now.isoformat(), "sample": 4, "hook_style": {"question": 1.0}}
     monkeypatch.setattr(scriptwriter, "read_json", lambda *_args, **_kwargs: fresh_but_small)
     assert scriptwriter.outlier_structure_guidance({"category": "history"}, cfg) == ""
+
+    disabled_cfg = {**cfg, "trends": {**cfg["trends"], "format_pulse": False}}
+    monkeypatch.setattr(scriptwriter, "read_json", lambda *_args, **_kwargs: (_ for _ in ()).throw(
+        AssertionError("disabled format mining must not read stale state")))
+    assert scriptwriter.outlier_structure_guidance({"category": "history"}, disabled_cfg) == ""

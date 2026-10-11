@@ -230,6 +230,9 @@ _FORMAT_DURATION_LABELS = {
 
 def outlier_structure_guidance(topic: dict, cfg: dict) -> str:
     """Return fresh, lane-specific aggregate metadata guidance, never creator examples."""
+    trend_cfg = cfg.get("trends", {}) if isinstance(cfg, dict) else {}
+    if isinstance(trend_cfg, dict) and trend_cfg.get("format_pulse", True) is False:
+        return ""
     pulse = read_json("format_pulse.json", {})
     if not isinstance(pulse, dict):
         return ""
@@ -1108,7 +1111,7 @@ Write the script as exactly 4 or 5 segments. Each beat has a DIFFERENT job — d
   - last segment = PAYOFF, {payoff_min}-{payoff_max} factual words: {loop_rule}
 Leave ONE question deliberately open from the hook until the payoff — the viewer should be unable to stop
 watching without learning the answer. Never answer it in segment 2.
-The TOPIC line is just a trend headline — do NOT repeat its claims or numbers unless the SOURCE TEXT states them.
+The trend subject and angle are discovery labels, not factual sources — do NOT repeat their claims or numbers unless the SOURCE TEXT states them.
 {person_rule}{series_rule}{lane_rule}ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with
 comic timing and personality (reactions, contrast, "and it gets worse"). The facts stay 100% exact; the humour comes
 from HOW you tell them and from the asides, never from changing what happened.
