@@ -57,7 +57,10 @@ def record(res: dict, entry: dict, cfg: dict) -> str:
                 "signals": (topic.get("signals") or [])[:8],
                 "format": (res.get("plan") or {}).get("format"),
                 "hook_style": (res.get("plan") or {}).get("hook_style"),
+                "turn_experiment_id": (res.get("plan") or {}).get("turn_experiment_id"),
+                "turn_variant": (res.get("plan") or {}).get("turn_variant"),
             },
+            "early_turn": entry.get("early_turn"),
             # Where every claim came from, claim by claim. The single most useful section
             # in an appeal, because it answers the accusation directly.
             "grounding": {
@@ -81,6 +84,9 @@ def record(res: dict, entry: dict, cfg: dict) -> str:
                 "score": review.get("score"), "coherence": review.get("coherence"),
                 "trend_alignment": review.get("trend_alignment"),
                 "trend_alignment_reason": review.get("trend_alignment_reason"),
+                "turn_strength": review.get("turn_strength"),
+                "turn_strength_status": review.get("turn_strength_status", "missing"),
+                "turn_strength_reason": review.get("turn_strength_reason", ""),
                 "reviewer": review.get("reviewer"),
                 "independent": review.get("independent"), "issues": review.get("issues"),
             },

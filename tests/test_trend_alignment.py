@@ -110,6 +110,38 @@ def test_strongly_aligned_script_can_pass_the_trend_gate(monkeypatch):
     assert review["trend_alignment"] == 9
 
 
+def test_turn_strength_is_optional_telemetry_and_never_a_publish_gate(monkeypatch):
+    for payload, expected_status, expected_score, expected_reason in (
+        ({}, "missing", None, ""),
+        ({"turn_strength": "great", "turn_strength_reason": 7}, "malformed", None, ""),
+        ({"turn_strength": 8, "turn_strength_reason": "The consequence lands immediately."},
+         "scored", 8.0, "The consequence lands immediately."),
+    ):
+        writer = _writer(monkeypatch, alignment=9)
+        base = writer.llm.json
+
+        def respond(system, user, temperature=None, validate=None, **kwargs):
+            result = base(system, user, temperature=temperature, validate=None, **kwargs)
+            result.update(payload)
+            if validate:
+                validate(result)
+            return result
+
+        writer.llm.json = respond
+        review_topic = _topic()
+        review_topic["_turn_variant"] = "consequence_first"
+        approved, review = writer.check(_script(), _source(), review_topic)
+
+        assert approved
+        assert review["turn_strength_status"] == expected_status
+        assert review["turn_strength"] == expected_score
+        assert review["turn_strength_reason"] == expected_reason
+        assert not any("turn strength" in issue.lower() for issue in review["issues"])
+        assert "optional TELEMETRY ONLY" in writer.llm.prompt
+        assert "turn_strength_reason" in writer.llm.prompt
+        assert "ASSIGNED RANDOMIZED BEAT-TWO TREATMENT (consequence_first)" in writer.llm.prompt
+
+
 def test_configured_review_thresholds_drive_prompt_and_all_score_gates(monkeypatch):
     writer = _writer(monkeypatch, alignment=9)
     writer.cfg["content"].update({

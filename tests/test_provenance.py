@@ -102,9 +102,29 @@ def test_the_record_pins_the_models_used(tmp_archive):
 
 def test_the_record_captures_independence_of_review(tmp_archive):
     provenance.record(_res(), _entry(), CFG)
-    assert _written(tmp_archive)["review"]["independent"] is True
     review = _written(tmp_archive)["review"]
+    assert review["independent"] is True
     assert review["trend_alignment"] == 9 and review["coherence"] == 8
+
+
+def test_the_record_preserves_randomized_turn_assignment_and_optional_telemetry(tmp_archive):
+    res = _res(
+        plan={"format": "creepy_true", "hook_style": "bold_claim",
+              "turn_experiment_id": "early_turn_v1", "turn_variant": "new_surprise_first"},
+        review={"score": 8, "coherence": 8, "trend_alignment": 9,
+                "trend_alignment_reason": "The trend angle is delivered.",
+                "turn_strength": 7, "turn_strength_status": "scored",
+                "turn_strength_reason": "The new fact arrives immediately."},
+    )
+    entry = _entry(early_turn={"turn_start_seconds": 2.2, "turn_start_runtime_pct": 12.1})
+    provenance.record(res, entry, CFG)
+
+    doc = _written(tmp_archive)
+    assert doc["selection"]["turn_experiment_id"] == "early_turn_v1"
+    assert doc["selection"]["turn_variant"] == "new_surprise_first"
+    assert doc["early_turn"]["turn_start_runtime_pct"] == 12.1
+    assert doc["review"]["turn_strength"] == 7
+    assert doc["review"]["turn_strength_reason"] == "The new fact arrives immediately."
 
 
 def test_the_record_does_not_copy_the_source_text(tmp_archive):

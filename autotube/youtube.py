@@ -12,6 +12,7 @@ Quota notes (2026): videos.insert draws from its own "Video Uploads" bucket
 from __future__ import annotations
 
 import logging
+import math
 import os
 import time
 from datetime import datetime
@@ -172,18 +173,21 @@ def retention(ids: list[str], start: str, end: str) -> dict[str, dict]:
 
 
 def retention_curves(ids: list[str], start: str, end: str) -> dict[str, dict]:
-    """Per-video audienceWatchRatio curve across elapsedVideoTimeRatio.
+    """Per-video audience-retention data across elapsedVideoTimeRatio.
 
     The curve helps locate where watch activity drops, but its values are *ratios of segment watches
     to total video views*, not literal percentages of unique viewers remaining. Rewatches can push a
     point above 1.0. We therefore store it as a relative watch-ratio curve and never label the final
-    point as a completion rate.
+    point as a completion rate. The same documented report also returns startedWatching,
+    stoppedWatching, and totalSegmentImpressions, which are playback-segment events/impressions —
+    not Shorts-feed impressions, unique viewers, or viewed-versus-swiped-away measurements.
 
     The elapsedVideoTimeRatio dimension only accepts ONE video per query, so this costs one Analytics
-    call per video. Callers pass only videos that don't already have a curve, so a normal day is a
-    handful of calls.
+    call per video. If the combined query is rejected (for example, by an API/report compatibility
+    issue), retry the ratio-only query so the existing curve diagnosis remains available.
 
-    Returns per video: {audience_watch_ratio_curve, watch_ratio_at_15pct, end_watch_ratio, curve_points}.
+    Segment event counts are grouped into 20 five-percent runtime bins. Partial metric coverage is
+    retained and reported; missing rows are never silently converted into observed zeroes.
     """
     if not ids:
         return {}
@@ -195,18 +199,106 @@ def retention_curves(ids: list[str], start: str, end: str) -> dict[str, dict]:
         return {}
     for vid in ids:
         try:
-            r = ya.reports().query(ids="channel==MINE", startDate=start, endDate=end,
-                                   metrics="audienceWatchRatio", dimensions="elapsedVideoTimeRatio",
-                                   filters=f"video=={vid}", sort="elapsedVideoTimeRatio").execute()
-            rows = [(float(a), float(b)) for a, b in r.get("rows", []) if b is not None]
-            if len(rows) < 5:
-                continue
-            out[vid] = summarize_curve(rows)
+            query = {"ids": "channel==MINE", "startDate": start, "endDate": end,
+                     "dimensions": "elapsedVideoTimeRatio", "filters": f"video=={vid}",
+                     "sort": "elapsedVideoTimeRatio"}
+            try:
+                r = ya.reports().query(
+                    **query,
+                    metrics="audienceWatchRatio,startedWatching,stoppedWatching,totalSegmentImpressions",
+                ).execute()
+                rows = r.get("rows", [])
+            except Exception as combined_error:  # noqa: BLE001 — preserve legacy curve if optional metrics fail
+                log.debug("segment retention metrics unavailable for %s; retrying watch-ratio curve: %s",
+                          vid, str(combined_error)[:120])
+                r = ya.reports().query(**query, metrics="audienceWatchRatio").execute()
+                rows = r.get("rows", [])
+
+            parsed = summarize_retention_rows(rows, r.get("columnHeaders"))
+            if parsed.get("audience_watch_ratio_curve") or parsed.get("retention_segment_metrics_available"):
+                out[vid] = parsed
         except Exception as e:  # noqa: BLE001
             log.debug("retention curve for %s unavailable: %s", vid, str(e)[:120])
     if out:
         log.info("retention curves: %d videos", len(out))
     return out
+
+
+def _retention_count(value) -> int | None:
+    """Parse a documented segment-count metric without treating malformed data as a zero."""
+    if isinstance(value, bool):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if not math.isfinite(number) or number < 0 or not number.is_integer():
+        return None
+    return int(number)
+
+
+def summarize_retention_rows(rows: list, column_headers: list | None = None) -> dict:
+    """Summarize API retention rows without conflating playback segments with feed exposure.
+
+    The Analytics API response's ``columnHeaders`` determine the row order. When they are absent,
+    preserve the query-order fallback: ``elapsedVideoTimeRatio``, ``audienceWatchRatio``,
+    ``startedWatching``, ``stoppedWatching``, ``totalSegmentImpressions``. Segment counts are grouped
+    into 5%-of-runtime bins and coverage accompanies totals so missing fields aren't zeroes.
+    """
+    indexes = {"elapsedVideoTimeRatio": 0, "audienceWatchRatio": 1,
+               "startedWatching": 2, "stoppedWatching": 3, "totalSegmentImpressions": 4}
+    if isinstance(column_headers, list) and column_headers:
+        indexes = {}
+        for i, header in enumerate(column_headers):
+            name = header.get("name") if isinstance(header, dict) else header
+            if isinstance(name, str):
+                indexes[name] = i
+
+    def cell(row, name):
+        index = indexes.get(name)
+        return row[index] if isinstance(index, int) and 0 <= index < len(row) else None
+
+    curve_rows: list[tuple[float, float]] = []
+    bins = [{"from_pct": i * 5, "to_pct": (i + 1) * 5,
+             "started_watching": 0, "stopped_watching": 0,
+             "total_segment_impressions": 0} for i in range(20)]
+    dimension_rows = 0
+    metric_rows = 0
+
+    for row in rows or []:
+        if not isinstance(row, (list, tuple)) or len(row) < 2:
+            continue
+        try:
+            elapsed = float(cell(row, "elapsedVideoTimeRatio"))
+            watch_ratio = float(cell(row, "audienceWatchRatio"))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if (not math.isfinite(elapsed) or not 0.0 <= elapsed <= 1.0
+                or not math.isfinite(watch_ratio) or watch_ratio < 0):
+            continue
+        curve_rows.append((elapsed, watch_ratio))
+        dimension_rows += 1
+        counts = [_retention_count(cell(row, metric)) for metric in
+                  ("startedWatching", "stoppedWatching", "totalSegmentImpressions")]
+        if any(value is None for value in counts):
+            continue
+        metric_rows += 1
+        # The dimension labels each segment by its elapsed-time endpoint. Assign that endpoint to
+        # its containing five-percent bin; the last endpoint (1.0) belongs to 95–100%.
+        bucket = min(19, max(0, math.ceil(elapsed * 20) - 1))
+        bins[bucket]["started_watching"] += counts[0]
+        bins[bucket]["stopped_watching"] += counts[1]
+        bins[bucket]["total_segment_impressions"] += counts[2]
+
+    result = summarize_curve(curve_rows) if len(curve_rows) >= 5 else {}
+    result.update({
+        "retention_segment_metrics_available": metric_rows > 0,
+        "retention_segment_metric_rows": metric_rows,
+        "retention_segment_total_rows": dimension_rows,
+        "retention_segment_metric_coverage": round(metric_rows / dimension_rows, 4) if dimension_rows else 0.0,
+        "retention_segments_5pct": bins if metric_rows else [],
+    })
+    return result
 
 
 def summarize_curve(rows: list[tuple[float, float]]) -> dict:

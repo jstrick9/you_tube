@@ -553,6 +553,31 @@ def _shot_provenance(shots: list[dict]) -> list[dict]:
             for v in shots]
 
 
+def _early_turn_diagnostic(script: dict, tts: dict, duration) -> dict:
+    """Record where beat two starts in the finished Short; missing timing is non-blocking."""
+    script_segments = script.get("segments") if isinstance(script, dict) else None
+    tts_segments = tts.get("segments") if isinstance(tts, dict) else None
+    start = None
+    if isinstance(tts_segments, list) and len(tts_segments) > 1 and isinstance(tts_segments[1], dict):
+        candidate = tts_segments[1].get("start")
+        if _finite_range(candidate, 0, float("inf")):
+            start = float(candidate)
+    runtime_pct = None
+    if start is not None and _finite_range(duration, 0.001, float("inf")):
+        runtime_pct = round(start / float(duration) * 100, 1)
+    turn_words = None
+    if isinstance(script_segments, list) and len(script_segments) > 1 and isinstance(script_segments[1], dict):
+        text = script_segments[1].get("text")
+        if isinstance(text, str):
+            turn_words = len(text.split())
+    return {
+        "turn_segment_index": 2,
+        "turn_start_seconds": round(start, 3) if start is not None else None,
+        "turn_start_runtime_pct": runtime_pct,
+        "turn_factual_word_count": turn_words,
+    }
+
+
 def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
     """Thumbnail, metadata and the run artifact. Only a complete, explicit QA pass can be uploaded."""
     script, source, visuals, out = a["script"], a["source"], a["visuals"], a["out"]
@@ -565,6 +590,7 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
                              out.with_suffix(".jpg"), r["theme"])
     _shots_sheet(visuals, out)
     words = sum(len(spoken_text(x).split()) for x in script["segments"])
+    early_turn = _early_turn_diagnostic(script, a.get("tts") or {}, r.get("duration"))
     meta = {
         "title": a["title"],
         "description": build_description(script, source, visuals["shots"], cfg, a["tts"]["engine"]),
@@ -575,7 +601,7 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
               "source": {k: source[k] for k in ("title", "url")},
               "trend": _trend_provenance(a["topic"]),
               "plan": a["plan"], "tts_engine": a["tts"]["engine"], "duration": r["duration"],
-              "archetype": r.get("archetype"), "words": words,
+              "archetype": r.get("archetype"), "words": words, "early_turn": early_turn,
               "qa": {k: report.get(k) for k in ("passed", "attempt", "issues", "frames", "meta")},
               "shots": _shot_provenance(visuals["shots"]), "timeline": r["timeline"]}
     if report.get("passed") is not True:
@@ -601,7 +627,7 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
     return {"file": out, "thumb": thumb, "meta": meta, "script": script, "source": source,
             "review": a["review"], "topic": a["topic"], "plan": a["plan"], "duration": r["duration"],
             "archetype": r.get("archetype"), "tts_engine": a["tts"]["engine"], "words": words,
-            "series": s_key, "episode": s_num,
+            "early_turn": early_turn, "series": s_key, "episode": s_num,
             "qa": report}
 
 
@@ -728,6 +754,11 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
                        "source": trends.primary_source(res["topic"].get("sources", []))},
             **_history_trend(res["topic"]),
             "review_score": res["review"].get("score"),
+            # Optional reviewer telemetry: stored for later analysis, never part of the publish decision.
+            "turn_strength": res["review"].get("turn_strength"),
+            "turn_strength_status": res["review"].get("turn_strength_status", "missing"),
+            "turn_strength_reason": res["review"].get("turn_strength_reason", ""),
+            "early_turn": res.get("early_turn") or {},
             "trend_alignment": res["review"].get("trend_alignment"),
             "trend_alignment_reason": res["review"].get("trend_alignment_reason"),
             "reviewer": res["review"].get("reviewer"),

@@ -23,7 +23,7 @@ class _Strategy:
         return {}
 
 
-def _run(monkeypatch, retention_row):
+def _run(monkeypatch, retention_row, curve_result=None):
     now = datetime(2026, 10, 10, 12, tzinfo=timezone.utc)
     entry = {
         "video_id": "video-1",
@@ -39,6 +39,12 @@ def _run(monkeypatch, retention_row):
             "avg_view_pct_raw": 3474.0, "avg_view_dur": 18, "subs_gained": 4, "subs_lost": 1, "shares": 2,
             "engaged_views_window": {"start": "2026-07-12", "end": "2026-10-09"},
             "checked_at": "2026-10-09T12:00:00+00:00",
+            "audience_watch_ratio_curve": [1.0, 0.9, 0.8],
+            "retention_segments_5pct": [{"from_pct": 0, "to_pct": 5, "started_watching": 1,
+                                         "stopped_watching": 2, "total_segment_impressions": 3}],
+            "retention_segment_metrics_available": True,
+            "retention_curve_checked_at": "2026-10-01T12:00:00+00:00",
+            "retention_curve_last_attempt_at": "2026-10-01T12:00:00+00:00",
         },
     }
     history = [entry]
@@ -59,9 +65,22 @@ def _run(monkeypatch, retention_row):
         return {"video-1": dict(retention_row)} if retention_row is not None else {}
 
     monkeypatch.setattr(analytics.youtube, "retention", retention)
-    monkeypatch.setattr(analytics.youtube, "retention_curves", lambda *a, **k: {})
+    monkeypatch.setattr(analytics.youtube, "retention_curves", lambda *a, **k: (
+        {"video-1": dict(curve_result)} if curve_result is not None else {}))
     result = analytics.run(load_config())
     return entry["metrics"], result, query, written
+
+
+def test_retention_curve_refresh_is_weekly_and_keeps_legacy_timestamps():
+    from datetime import timedelta
+
+    now = datetime(2026, 10, 10, 12, tzinfo=timezone.utc)
+    recent = (now - timedelta(days=6)).isoformat()
+    old = (now - timedelta(days=8)).isoformat()
+    assert analytics._retention_curve_due({}, now)
+    assert not analytics._retention_curve_due({"retention_curve_last_attempt_at": recent}, now)
+    assert analytics._retention_curve_due({"retention_curve_last_attempt_at": old}, now)
+    assert not analytics._retention_curve_due({"retention_curve_checked_at": recent}, now)
 
 
 def test_missing_analytics_row_clears_stale_window_values_and_marks_fallback(monkeypatch):
@@ -73,6 +92,10 @@ def test_missing_analytics_row_clears_stale_window_values_and_marks_fallback(mon
         assert key not in metrics
     assert metrics["engaged_views_window"] == {"start": "2026-07-13", "end": "2026-10-10"}
     assert metrics["vph_basis"] == "public_views_fallback"
+    assert metrics["retention_curve_checked_at"] == "2026-10-01T12:00:00+00:00"
+    assert metrics["retention_curve_last_attempt_at"] == "2026-10-10T12:00:00+00:00"
+    assert metrics["audience_watch_ratio_curve"] == [1.0, 0.9, 0.8]
+    assert metrics["retention_segment_metrics_available"] is True
     assert result["shorts_monetization"]["engaged_views_90d"] == 0
     assert result["shorts_monetization"]["coverage"] == 0.0
     assert "analytics_summary.json" in written
@@ -92,3 +115,23 @@ def test_current_analytics_row_replaces_stale_values_and_uses_engaged_velocity(m
     assert result["shorts_monetization"]["engaged_views_90d"] == 240
     assert result["shorts_monetization"]["coverage"] == 1.0
     assert "history.json" in written and "analytics_summary.json" in written
+
+
+def test_successful_retention_refresh_replaces_old_curve_and_records_success_time(monkeypatch):
+    bins = [{"from_pct": i * 5, "to_pct": (i + 1) * 5,
+             "started_watching": 4, "stopped_watching": 5,
+             "total_segment_impressions": 6} for i in range(20)]
+    metrics, _, _, _ = _run(monkeypatch, {
+        "a_views": 1200, "engaged_views_90d": 240, "avg_view_pct": 76.5,
+    }, curve_result={
+        "audience_watch_ratio_curve": [1.0, 0.97, 0.94],
+        "watch_ratio_at_15pct": 0.94, "end_watch_ratio": 0.94, "curve_points": 3,
+        "retention_segments_5pct": bins, "retention_segment_metrics_available": True,
+        "retention_segment_metric_rows": 20, "retention_segment_total_rows": 20,
+        "retention_segment_metric_coverage": 1.0,
+    })
+
+    assert metrics["audience_watch_ratio_curve"] == [1.0, 0.97, 0.94]
+    assert metrics["retention_segments_5pct"][0]["started_watching"] == 4
+    assert metrics["retention_curve_checked_at"] == "2026-10-10T12:00:00+00:00"
+    assert metrics["retention_curve_last_attempt_at"] == "2026-10-10T12:00:00+00:00"

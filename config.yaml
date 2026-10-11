@@ -445,6 +445,14 @@ analytics:
   rank_min_spread: 0.35                   # otherwise blend with within-channel percentile rank
   min_views_to_learn: 50                  # minimum engaged views for a video to contribute evidence
 
+  # Randomized early-turn study. The only change is which source-backed idea leads beat two;
+  # each topic remains unique and factual. Turn strength is telemetry, never an approval gate.
+  turn_experiment:
+    enabled: true
+    id: early_turn_v1
+    variants: [consequence_first, new_surprise_first]
+    min_mature_videos_per_variant: 10      # descriptive review threshold, not a publish gate
+
   # ── what the bandit spends its evidence on ──
   # Frozen dimensions rotate for variety but are not learned. With thousands of possible cells and a few
   # videos a day, spreading evidence across every dimension means none of them ever separates; freezing

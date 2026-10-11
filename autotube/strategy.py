@@ -22,6 +22,8 @@ from .common import now_utc, read_json, write_json
 log = logging.getLogger("autotube.strategy")
 
 DIMENSIONS = ("category", "format", "hook_style", "voice", "source", "comment_device")
+TURN_EXPERIMENT_ID = "early_turn_v1"
+TURN_VARIANTS = ("consequence_first", "new_surprise_first")
 HALF_LIFE_DAYS = 45.0   # evidence decays with TIME, not with upload count (see Strategy.age)
 PRIOR = (1.0, 1.0)      # Beta(1,1)
 
@@ -155,9 +157,32 @@ class Strategy:
         return v["a"] / (v["a"] + v["b"])
 
     def plan(self, n: int) -> list[dict]:
-        """Pick n distinct combos. Avoid identical format/voice back-to-back for variety."""
+        """Pick n distinct combos and randomize beat-two treatment within each run.
+
+        The experiment is deliberately separate from the learned bandit: a balanced, shuffled block
+        assigns each planned topic to one of two sourced early-turn treatments. It does not change the
+        topic, facts, approval criteria, or upload decision.
+        """
+        acfg = self.cfg.get("analytics", {}) or {}
+        exp = acfg.get("turn_experiment", {}) if isinstance(acfg, dict) else {}
+        exp = exp if isinstance(exp, dict) else {}
+        configured = exp.get("variants", list(TURN_VARIANTS))
+        enabled = (exp.get("enabled") is True and isinstance(configured, list)
+                   and len(configured) == len(TURN_VARIANTS)
+                   and all(isinstance(variant, str) for variant in configured)
+                   and set(configured) == set(TURN_VARIANTS))
+        experiment_id = exp.get("id", TURN_EXPERIMENT_ID)
+        if not isinstance(experiment_id, str) or not experiment_id.strip():
+            experiment_id = TURN_EXPERIMENT_ID
+        assignments = []
+        if enabled:
+            while len(assignments) < max(0, n):
+                block = list(configured)
+                random.shuffle(block)
+                assignments.extend(block)
+
         plans, used_formats, used_voices = [], set(), set()
-        for _ in range(n):
+        for i in range(max(0, n)):
             fmt = self.sample("format", exclude=used_formats if len(used_formats) < len(self.options()["format"]) - 1 else None)
             used_formats.add(fmt)
             plans.append({
@@ -166,6 +191,8 @@ class Strategy:
                 "voice": self.cfg.get("persona", {}).get("voice") or self.sample(
                     "voice", exclude=used_voices if len(used_voices) < len(self.options()["voice"]) - 1 else None),
                 "comment_device": self.sample("comment_device"),
+                "turn_experiment_id": experiment_id if enabled else None,
+                "turn_variant": assignments[i] if enabled else "standard_escalation",
             })
             used_voices.add(plans[-1]["voice"])
         return plans

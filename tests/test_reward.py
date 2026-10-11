@@ -5,12 +5,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from autotube.analytics import (clean_view_pct, compute_reward, learnable,  # noqa: E402
+from autotube.analytics import (clean_view_pct, compute_reward, feed_discovery_status, learnable,  # noqa: E402
                                 migrate_legacy_retention_metrics, retention_diagnosis,
+                                retention_segment_summary, turn_experiment_summary,
                                 _reset_reward_model, _shorts_progress, _score, _spread)
 from autotube.common import now_utc  # noqa: E402
 from autotube.strategy import PRIOR, Strategy  # noqa: E402
-from autotube.youtube import summarize_curve  # noqa: E402
+from autotube.youtube import summarize_curve, summarize_retention_rows  # noqa: E402
 
 ACFG = {
     "w_retention": 0.65, "w_reach": 0.25, "w_engagement": 0.10,
@@ -80,6 +81,8 @@ def test_implausible_view_percentage_is_discarded():
     assert clean_view_pct(80.3) == 80.3
     assert clean_view_pct(135.0) == 135.0        # plausible repeated playback; not assumed to be automatic looping
     assert clean_view_pct(3474.28) is None       # observed artifact on a 22-view video
+    assert clean_view_pct(float("nan")) is None and clean_view_pct(float("inf")) is None
+    assert clean_view_pct(10 ** 1000) is None
     assert clean_view_pct(0) is None and clean_view_pct(None) is None and clean_view_pct("x") is None
 
 
@@ -138,7 +141,198 @@ def test_retention_query_maps_engaged_views_and_average_view_percentage(monkeypa
     assert requests[0]["dimensions"] == "video"
 
 
+def test_retention_report_summarizes_documented_segment_metrics_by_five_percent():
+    rows = [[i / 100, 1.2, 1, 2, 3] for i in range(1, 101)]
+    summary = summarize_retention_rows(rows)
+
+    assert summary["curve_points"] == 100
+    assert summary["end_watch_ratio"] == 1.2  # not a viewer-completion percentage
+    assert summary["retention_segment_metrics_available"] is True
+    assert summary["retention_segment_metric_rows"] == 100
+    assert summary["retention_segment_metric_coverage"] == 1.0
+    assert summary["retention_segments_5pct"][0] == {
+        "from_pct": 0, "to_pct": 5, "started_watching": 5,
+        "stopped_watching": 10, "total_segment_impressions": 15,
+    }
+    assert summary["retention_segments_5pct"][-1]["from_pct"] == 95
+
+
+def test_retention_parser_uses_response_column_headers_for_metric_order():
+    headers = [
+        {"name": "elapsedVideoTimeRatio"}, {"name": "startedWatching"},
+        {"name": "audienceWatchRatio"}, {"name": "totalSegmentImpressions"},
+        {"name": "stoppedWatching"},
+    ]
+    summary = summarize_retention_rows([[0.05, 11, 0.9, 33, 22]], headers)
+    first = summary["retention_segments_5pct"][0]
+    assert first["started_watching"] == 11
+    assert first["stopped_watching"] == 22
+    assert first["total_segment_impressions"] == 33
+
+
+def test_retention_curve_query_requests_documented_segment_events(monkeypatch):
+    from autotube import youtube
+
+    requests = []
+
+    class Request:
+        def execute(self):
+            return {
+                "columnHeaders": [{"name": "elapsedVideoTimeRatio"}, {"name": "startedWatching"},
+                                  {"name": "audienceWatchRatio"}, {"name": "totalSegmentImpressions"},
+                                  {"name": "stoppedWatching"}],
+                "rows": [[i / 100, 1, 1.1, 3, 2] for i in range(1, 101)],
+            }
+
+    class Reports:
+        def query(self, **kwargs):
+            requests.append(kwargs)
+            return Request()
+
+    class Analytics:
+        def reports(self):
+            return Reports()
+
+    monkeypatch.setattr(youtube, "service", lambda *args: Analytics())
+    result = youtube.retention_curves(["short-1"], "2026-07-12", "2026-10-09")["short-1"]
+
+    assert set(requests[0]["metrics"].split(",")) == {
+        "audienceWatchRatio", "startedWatching", "stoppedWatching", "totalSegmentImpressions",
+    }
+    assert requests[0]["dimensions"] == "elapsedVideoTimeRatio"
+    assert result["retention_segment_metrics_available"] is True
+    assert result["retention_segments_5pct"][0]["started_watching"] == 5
+    assert result["retention_segments_5pct"][0]["stopped_watching"] == 10
+    assert result["retention_segments_5pct"][0]["total_segment_impressions"] == 15
+
+
+def test_combined_segment_query_falls_back_to_legacy_curve_if_optional_metrics_fail(monkeypatch):
+    from autotube import youtube
+
+    queries = []
+
+    class Request:
+        def __init__(self, metrics):
+            self.metrics = metrics
+
+        def execute(self):
+            if self.metrics != "audienceWatchRatio":
+                raise RuntimeError("optional segment metric unavailable")
+            return {"rows": [[i / 10, 0.8] for i in range(1, 11)]}
+
+    class Reports:
+        def query(self, **kwargs):
+            queries.append(kwargs["metrics"])
+            return Request(kwargs["metrics"])
+
+    class Analytics:
+        def reports(self):
+            return Reports()
+
+    monkeypatch.setattr(youtube, "service", lambda *args: Analytics())
+    result = youtube.retention_curves(["short-2"], "2026-07-12", "2026-10-09")["short-2"]
+
+    assert len(queries) == 2
+    assert queries[1] == "audienceWatchRatio"
+    assert "audience_watch_ratio_curve" in result
+    assert result["retention_segment_metrics_available"] is False
+    assert result["retention_segments_5pct"] == []
+
+
+def test_retention_segment_coverage_keeps_missing_rows_missing():
+    rows = [[i / 10, 0.9, i, None if i % 2 else i + 1, i + 2] for i in range(1, 11)]
+    summary = summarize_retention_rows(rows)
+    assert summary["retention_segment_metric_rows"] == 5
+    assert summary["retention_segment_total_rows"] == 10
+    assert summary["retention_segment_metric_coverage"] == 0.5
+
+
+def test_feed_funnel_metrics_are_explicitly_unavailable_not_estimated():
+    status = feed_discovery_status()
+    assert status["shown_in_feed"] is None
+    assert status["viewed_vs_swiped_away"] is None
+    assert "not estimated" in status["note"]
+    assert "in-video retention events" in status["note"]
+
+
+def test_retention_segment_summary_reports_fresh_video_coverage_and_meaning():
+    from datetime import datetime, timezone
+
+    now = datetime(2026, 10, 10, tzinfo=timezone.utc)
+    bins = [{"from_pct": i * 5, "to_pct": (i + 1) * 5,
+             "started_watching": 1, "stopped_watching": 2,
+             "total_segment_impressions": 3} for i in range(20)]
+    videos = [
+        {"status": "public", "metrics": {
+            "retention_curve_checked_at": now.isoformat(),
+            "retention_segment_metrics_available": True,
+            "retention_segment_metric_rows": 20, "retention_segment_total_rows": 20,
+            "retention_segments_5pct": bins,
+        }},
+        {"status": "public", "metrics": {"retention_segment_metrics_available": False}},
+    ]
+    summary = retention_segment_summary(videos, now)
+    assert summary["videos_with_segment_data"] == 1
+    assert summary["video_coverage"] == 0.5
+    assert summary["row_coverage"] == 1.0
+    assert summary["bins"][0]["stopped_watching"] == 2
+    assert "not unique viewers" in summary["meaning"]["started_watching"]
+    assert "not feed swipes" in summary["meaning"]["stopped_watching"]
+    assert "not Shorts-feed impressions" in summary["meaning"]["total_segment_impressions"]
+
+
+def test_turn_experiment_reports_randomized_group_samples_and_retention_relation():
+    from autotube.strategy import TURN_EXPERIMENT_ID, TURN_VARIANTS
+
+    uploaded = []
+    for variant in TURN_VARIANTS:
+        for i, (score, pct) in enumerate(((6, 48.0), (7, 62.0), (8, 81.0))):
+            uploaded.append({
+                "video_id": f"{variant}-{i}", "status": "public",
+                "choice": {"turn_experiment_id": TURN_EXPERIMENT_ID, "turn_variant": variant,
+                           "category": "history_mystery" if variant == TURN_VARIANTS[0] else "science_nature"},
+                "turn_strength": score, "turn_strength_reason": "Beat two pays off immediately.",
+                "early_turn": {"turn_start_runtime_pct": 13.5},
+                "metrics": {"hours_live": 72, "avg_view_pct": pct,
+                            "engaged_views_90d": 500, "views": 600},
+            })
+    # Bad optional telemetry is ignored, while its measured retention remains visible.
+    uploaded.append({
+        "video_id": "bad-telemetry", "status": "public",
+        "choice": {"turn_experiment_id": TURN_EXPERIMENT_ID, "turn_variant": TURN_VARIANTS[0]},
+        "turn_strength": "excellent", "turn_strength_reason": 9,
+        "metrics": {"hours_live": 72, "avg_view_pct": 55.0, "engaged_views_90d": 500},
+    })
+    # Public views alone don't qualify this video's score/retention pair for the relation.
+    uploaded.append({
+        "video_id": "public-views-only", "status": "public",
+        "choice": {"turn_experiment_id": TURN_EXPERIMENT_ID, "turn_variant": TURN_VARIANTS[0]},
+        "turn_strength": 9, "turn_strength_reason": "A clear consequence.",
+        "metrics": {"hours_live": 72, "avg_view_pct": 99.0, "views": 900},
+    })
+    acfg = {
+        "evaluate_after_hours": 48, "average_view_gate_pct": 70.0,
+        "min_views_to_learn": 50,
+        "turn_experiment": {"enabled": True, "id": TURN_EXPERIMENT_ID,
+                            "variants": list(TURN_VARIANTS), "min_mature_videos_per_variant": 10},
+    }
+
+    summary = turn_experiment_summary(uploaded, acfg)
+    first = summary["by_variant"][TURN_VARIANTS[0]]
+    assert summary["assigned_videos"] == 8
+    assert summary["status"] == "collecting"  # no winner declaration from a tiny sample
+    assert first["assigned_videos"] == 5 and first["turn_score_n"] == 4
+    assert first["turn_reason_n"] == 4
+    assert first["turn_telemetry_status_counts"]["missing"] == 1
+    assert first["retention_n"] == 5
+    assert first["turn_strength_vs_average_view_percentage"]["n_pairs"] == 3
+    assert first["turn_strength_vs_average_view_percentage"]["spearman_r"] == 1.0
+    assert "engagedViews" in first["turn_strength_vs_average_view_percentage"]["note"]
+    assert "no score or retention metric adds a publication veto" in summary["interpretation"]
+
+
 def test_public_views_fallback_is_not_mixed_into_engaged_velocity_reward():
+
     pool = {"vph": [20.0, 60.0, 100.0], "avg_pct": [70.0] * 3}
     low = compute_reward(_m(pct=70, vph=1, engaged=None, basis="public_views_fallback"), pool, ACFG)[0]
     high = compute_reward(_m(pct=70, vph=1000, engaged=None, basis="public_views_fallback"), pool, ACFG)[0]

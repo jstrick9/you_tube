@@ -99,6 +99,16 @@ HOOK_RULES = (
     "video answers. BANNED openers: 'Did you know', 'Here are', 'In this video', 'Today we', 'Let's talk about', "
     "'Have you ever wondered', greetings, the channel name, the topic name alone.")
 
+TURN_VARIANT_GUIDE = {
+    "consequence_first": (
+        "Open segment 2's first clause with the most concrete source-backed consequence, cost, exception, "
+        "or reversal of the hook. No lead-in or background before it; do not invent a consequence if the "
+        "source does not support one."),
+    "new_surprise_first": (
+        "Open segment 2's first clause with the next distinct, most surprising source-backed fact, "
+        "before adding explanation. Then connect it to the hook; do not repeat the hook or invent a fact."),
+}
+
 SELECT_SYSTEM = (
     "You are the content strategist for a faceless YouTube Shorts channel whose promise is 'Every file is real. That's the problem.' "
     "— a numbered archive of real, sourced things that should not be possible: unsolved disappearances, "
@@ -271,7 +281,11 @@ def metadata_schema_issues(value) -> list[str]:
 
 
 def reviewer_schema_issues(value, has_trend: bool = False) -> list[str]:
-    """Validate every decision used by the publish gate; never replace missing scores with a pass."""
+    """Validate every decision used by the publish gate; never replace missing scores with a pass.
+
+    Optional turn-strength telemetry is intentionally excluded: absent or malformed diagnostics must
+    not affect approval, and are normalized to unavailable when the review is stored.
+    """
     if not isinstance(value, dict):
         return ["response must be a JSON object"]
     issues = []
@@ -951,6 +965,12 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
         comment_line = (f"LEAVE THEM SOMETHING TO SAY ({_cd}): {_cg} Work this into the PAYOFF line's "
                         f"wording — do NOT add a segment, do not say \"comment below\", \"let me know\" or "
                         f"any call to action, and do not change a single fact to make it land.\n") if _cg else ""
+        turn_variant = plan.get("turn_variant")
+        turn_rule = TURN_VARIANT_GUIDE.get(turn_variant)
+        turn_line = (f"RANDOMIZED EARLY-TURN TREATMENT ({turn_variant}): {turn_rule} This is an ordering-only experiment across distinct current-trend topics. "
+                     "Keep the script original; do not reuse another upload's topic, wording, or substance. Invent no facts and relax no factual, originality, safety, or approval standard. "
+                     "Apply the treatment only when the source supports it.\n"
+                     if turn_rule else "")
         feedback_line = (f"PREVIOUS DRAFT FEEDBACK (fix without changing the facts or trend angle): {str(topic.get('_draft_feedback') or '')[:600]}\n"
                          if topic.get("_draft_feedback") else "")
         user = f"""TOPIC: {topic['topic']}
@@ -960,7 +980,7 @@ history. If the angle names a specific surprise, that surprise IS the video):
 {topic.get('angle') or 'most surprising educational angle'}
 {feedback_line}FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
 {hook_line}
-{comment_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
+{comment_line}{turn_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
 CHANNEL: {self.cfg['channel']['name']}
 {persona_line}
 SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of facts:
@@ -1220,8 +1240,10 @@ Write YouTube metadata for this Short. Return JSON:
             return False, review
 
         rows = []
-        for s in script["segments"]:
-            rows.append(f"- {s['text']}")
+        for i, s in enumerate(script["segments"]):
+            beat = ("HOOK" if i == 0 else "TURN" if i == 1
+                    else "PAYOFF" if i == len(script["segments"]) - 1 else "ESCALATION")
+            rows.append(f"- SEGMENT {i + 1} ({beat}): {s['text']}")
             if s.get("aside"):
                 rows.append(f"    [ASIDE - joke/opinion, not a factual claim] {s['aside']}")
         narration_list = "\n".join(rows)
@@ -1248,6 +1270,12 @@ Observed live evidence:
 The script must deliver the selected angle, not just repeat the trend headline or discuss the broad subject.
 \n"""
         trend_schema = ', "trend_alignment": 0-10, "trend_alignment_reason": "brief evidence-based reason"' if topic is not None else ""
+        turn_variant = (topic or {}).get("_turn_variant") if isinstance(topic, dict) else None
+        turn_rule = TURN_VARIANT_GUIDE.get(turn_variant)
+        turn_context = (f"ASSIGNED RANDOMIZED BEAT-TWO TREATMENT ({turn_variant}): {turn_rule} "
+                        "This is a structure test across distinct topics; preserve the script's originality and factual standards. "
+                        "The turn score requested below is telemetry only: it must not alter approval, the overall score, or fixes.\n\n"
+                        if turn_rule else "")
         content_cfg = self.cfg.get("content", {})
         compliance_cfg = self.cfg.get("compliance", {})
         if not isinstance(content_cfg, dict) or not isinstance(compliance_cfg, dict):
@@ -1283,7 +1311,7 @@ The script must deliver the selected angle, not just repeat the trend headline o
         loop_instruction = ("A loop is required: if loops=false, include a concrete reworded last line in fixes."
                            if require_loop else
                            "A loop is optional: record loops accurately, but do not put a missing loop in fixes by itself.")
-        user = f"""{trend_context}SOURCE TEXT:\n\"\"\"{source['text'][:self.src_chars]}\"\"\"\n
+        user = f"""{trend_context}{turn_context}SOURCE TEXT:\n\"\"\"{source['text'][:self.src_chars]}\"\"\"\n
 SCRIPT TITLE: {script['title']}
 SCRIPT DESCRIPTION: {script.get('description', '')}
 SCRIPT NARRATION (lines marked ASIDE are the narrator's jokes, spoken right after the line above them):
@@ -1292,8 +1320,10 @@ SCRIPT NARRATION (lines marked ASIDE are the narrator's jokes, spoken right afte
 Evaluate. Verify that the script offers a specific viewer takeaway and an original treatment in its own words, not a bare restatement of the headline or a close copy of source phrasing. If you cannot identify a concrete takeaway, leave value_add empty; if originality is doubtful, say so in policy_concerns or fixes.
 Return JSON: {{"factual_errors": ["..."], "misleading_title": true|false, "advertiser_friendly": true|false,
 "policy_concerns": ["..."], "value_add": "<specific takeaway the viewer learns>", "hook_strength": 0-10, "entertainment": 0-10,
-"score": 0-10, "loops": true|false, "coherence": 0-10{trend_schema}, "fixes": ["..."]}}
+"score": 0-10, "loops": true|false, "coherence": 0-10{trend_schema},
+"turn_strength": 0-10 or null, "turn_strength_reason": "one concise explanation or empty string", "fixes": ["..."]}}
 Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; below {min_review_score:g} = do not publish.
+turn_strength is optional TELEMETRY ONLY: score segment 2 (TURN) for immediacy, source-backed escalation and whether it follows its assigned treatment. 0-3 = setup/repetition/delayed, 4-6 = some progress but soft or padded, 7-8 = immediate and clearly escalates, 9-10 = unusually sharp and fully delivered. It must not change approval, the overall score, or "fixes"; do not add a fix solely for this diagnostic. Return null/empty if it cannot be judged. Missing or malformed turn fields are ignored.
 "loops": does the LAST line flow naturally back into the FIRST when the Short replays? Judge it by meaning,
 not by shared words - "so the ice keeps bleeding" loops cleanly into "a waterfall that runs blood red".
 A natural loop is a creative choice, not a guaranteed increase in views or averageViewPercentage; do not cite a metric
@@ -1427,6 +1457,19 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
         for key in ("score", "hook_strength", "entertainment", "factual_errors", "misleading_title",
                     "advertiser_friendly", "policy_concerns", "value_add", "loops"):
             review[key] = r[key]
+        # Optional diagnostic only: deliberately normalized after `ok` is decided, so a missing,
+        # string-valued, NaN, or out-of-range turn score cannot become a new publication veto.
+        raw_turn_strength = r.get("turn_strength")
+        if _valid_review_score(raw_turn_strength):
+            review["turn_strength"] = float(raw_turn_strength)
+            review["turn_strength_status"] = "scored"
+        else:
+            review["turn_strength"] = None
+            review["turn_strength_status"] = (
+                "missing" if "turn_strength" not in r or raw_turn_strength is None else "malformed")
+        raw_turn_reason = r.get("turn_strength_reason")
+        review["turn_strength_reason"] = raw_turn_reason.strip()[:300] if isinstance(raw_turn_reason, str) else ""
+        review["turn_strength_reason_available"] = bool(review["turn_strength_reason"])
         review["issues"] = review_issues
         review["fixes"] = fixes
         review["coherence"] = coh
@@ -1465,7 +1508,10 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
             except LLMError as e:
                 log.warning("script generation failed: %s", e)
                 return None
-            ok, review = self.check(script, source, topic)
+            review_topic = dict(topic)
+            review_topic["_turn_variant"] = plan.get("turn_variant")
+            review_topic["_turn_experiment_id"] = plan.get("turn_experiment_id")
+            ok, review = self.check(script, source, review_topic)
             log.info("  draft %d for %r → ok=%s score=%s issues=%s", attempt + 1, source["title"], ok,
                      review.get("score"), (review.get("issues") or review.get("factual_errors") or [])[:2])
             if ok:

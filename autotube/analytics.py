@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 from . import originality, youtube
 from .common import now_utc, read_json, write_json
-from .strategy import PRIOR, Strategy
+from .strategy import PRIOR, TURN_EXPERIMENT_ID, TURN_VARIANTS, Strategy
 
 log = logging.getLogger("autotube.analytics")
 
@@ -68,9 +68,9 @@ def clean_view_pct(v) -> float | None:
     """
     try:
         v = float(v)
-    except (TypeError, ValueError):
+    except (OverflowError, TypeError, ValueError):
         return None
-    return None if v <= 0 or v > MAX_SANE_VIEW_PCT else v
+    return v if math.isfinite(v) and 0 < v <= MAX_SANE_VIEW_PCT else None
 
 
 def learnable(h: dict, acfg: dict) -> bool:
@@ -288,6 +288,280 @@ def retention_diagnosis(matured: list[dict], acfg: dict) -> dict:
     }
 
 
+def _segment_count(value) -> int | None:
+    if type(value) is not int or value < 0:
+        return None
+    return value
+
+
+def _retention_curve_is_current(metrics: dict, now) -> bool:
+    """Only summarize segment data checked within the local freshness window."""
+    raw = metrics.get("retention_curve_checked_at")
+    if not isinstance(raw, str) or not raw:
+        return False
+    try:
+        checked = datetime.fromisoformat(raw)
+    except ValueError:
+        return False
+    if checked.tzinfo is None:
+        checked = checked.replace(tzinfo=now.tzinfo)
+    age = now - checked
+    return timedelta(0) <= age <= timedelta(days=30)
+
+
+def retention_segment_summary(matured: list[dict], now=None) -> dict:
+    """Aggregate documented playback-segment events, with explicit video/row coverage."""
+    now = now or now_utc()
+    bins = [{"from_pct": i * 5, "to_pct": (i + 1) * 5,
+             "started_watching": 0, "stopped_watching": 0,
+             "total_segment_impressions": 0} for i in range(20)]
+    eligible = [h for h in matured if h.get("status") not in ("withdrawn", "missing", "rejected")]
+    covered = []
+    for h in eligible:
+        metrics = h.get("metrics") or {}
+        if (metrics.get("retention_segment_metrics_available") is True
+                and _retention_curve_is_current(metrics, now)):
+            rows = metrics.get("retention_segments_5pct")
+            if isinstance(rows, list) and len(rows) == 20:
+                covered.append(metrics)
+    reported_rows = expected_rows = 0
+    for metrics in covered:
+        reported_rows += _segment_count(metrics.get("retention_segment_metric_rows")) or 0
+        expected_rows += _segment_count(metrics.get("retention_segment_total_rows")) or 0
+        for i, row in enumerate(metrics["retention_segments_5pct"]):
+            if not isinstance(row, dict):
+                continue
+            for key in ("started_watching", "stopped_watching", "total_segment_impressions"):
+                value = _segment_count(row.get(key))
+                if value is not None:
+                    bins[i][key] += value
+    return {
+        "status": "available" if covered else "not_available_yet",
+        "videos_with_segment_data": len(covered),
+        "matured_videos_eligible": len(eligible),
+        "video_coverage": round(len(covered) / len(eligible), 3) if eligible else 0.0,
+        "segment_metric_rows_reported": reported_rows,
+        "segment_rows_in_curve": expected_rows,
+        "row_coverage": round(reported_rows / expected_rows, 3) if expected_rows else 0.0,
+        "bin_width_pct": 5,
+        "bins": bins if covered else [],
+        "meaning": {
+            "started_watching": "Times a video segment was the first segment seen during a playback; not unique viewers or Shorts-feed starts.",
+            "stopped_watching": "Times a video segment was the last segment seen during a playback; not feed swipes or viewed-versus-swiped-away outcomes.",
+            "total_segment_impressions": "Times a video segment was viewed; repeat views in one playback can count again; not Shorts-feed impressions or 'Shown in feed'.",
+        },
+        "note": "Bins pool event counts across covered videos; counts are not viewer percentages or feed estimates. Row coverage counts rows with all three segment metrics present; missing/null metric rows are not converted to zero.",
+    }
+
+
+def feed_discovery_status() -> dict:
+    """The current supported Analytics API integration cannot query Studio's Shorts-feed funnel."""
+    return {
+        "status": "unavailable_via_youtube_analytics_api",
+        "shown_in_feed": None,
+        "viewed_vs_swiped_away": None,
+        "note": "The Analytics API integration does not expose Studio's 'Shown in feed' or 'Viewed vs swiped away' Shorts metrics. These are not estimated from views, engaged views, or in-video retention events.",
+    }
+
+
+def _rank_values(values: list[float]) -> list[float]:
+    order = sorted(range(len(values)), key=values.__getitem__)
+    ranks = [0.0] * len(values)
+    i = 0
+    while i < len(order):
+        j = i + 1
+        while j < len(order) and values[order[j]] == values[order[i]]:
+            j += 1
+        rank = ((i + 1) + j) / 2.0
+        for k in range(i, j):
+            ranks[order[k]] = rank
+        i = j
+    return ranks
+
+
+def _spearman(xs: list[float], ys: list[float]) -> float | None:
+    """Descriptive Spearman association; too little or constant data yields no coefficient."""
+    if len(xs) != len(ys) or len(xs) < 3:
+        return None
+    x_rank, y_rank = _rank_values(xs), _rank_values(ys)
+    x_mean, y_mean = sum(x_rank) / len(xs), sum(y_rank) / len(ys)
+    numerator = sum((x - x_mean) * (y - y_mean) for x, y in zip(x_rank, y_rank))
+    x_var = sum((x - x_mean) ** 2 for x in x_rank)
+    y_var = sum((y - y_mean) ** 2 for y in y_rank)
+    denominator = math.sqrt(x_var * y_var)
+    return round(numerator / denominator, 3) if denominator else None
+
+
+def _turn_score(h: dict) -> float | None:
+    score = h.get("turn_strength")
+    if isinstance(score, bool) or not isinstance(score, (int, float)):
+        return None
+    try:
+        score = float(score)
+    except (OverflowError, TypeError, ValueError):
+        return None
+    return score if math.isfinite(score) and 0 <= score <= 10 else None
+
+
+def _turn_metrics(rows: list[dict], acfg: dict, gate: float) -> dict:
+    try:
+        maturity_hours = float(acfg.get("evaluate_after_hours", 48))
+    except (TypeError, ValueError, OverflowError):
+        maturity_hours = 48.0
+    mature = []
+    for h in rows:
+        if h.get("status") in ("withdrawn", "missing", "rejected"):
+            continue
+        metrics = h.get("metrics") or {}
+        try:
+            live_hours = float(metrics.get("hours_live", 0))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if math.isfinite(live_hours) and live_hours >= maturity_hours:
+            mature.append(h)
+    scored = [(h, _turn_score(h)) for h in mature]
+    scored = [(h, score) for h, score in scored if score is not None]
+    scored_reasons = sum(1 for h, _ in scored if isinstance(h.get("turn_strength_reason"), str)
+                         and h["turn_strength_reason"].strip())
+    telemetry_status = {"scored": len(scored), "missing": 0, "malformed": 0}
+    for h in mature:
+        if _turn_score(h) is not None:
+            continue
+        status = h.get("turn_strength_status")
+        telemetry_status[status if status in ("missing", "malformed") else "missing"] += 1
+    retention_rows = [(h, clean_view_pct((h.get("metrics") or {}).get("avg_view_pct"))) for h in mature]
+    retention_rows = [(h, pct) for h, pct in retention_rows if pct is not None]
+
+    try:
+        min_engaged_views = float(acfg.get("min_views_to_learn", 50))
+    except (TypeError, ValueError, OverflowError):
+        min_engaged_views = 50.0
+
+    def enough_engaged_traffic(h):
+        value = (h.get("metrics") or {}).get("engaged_views_90d")
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return False
+        try:
+            value = float(value)
+        except (TypeError, ValueError, OverflowError):
+            return False
+        return math.isfinite(value) and value >= min_engaged_views
+
+    pairs = [(score, pct) for h, score in scored
+             if (pct := clean_view_pct((h.get("metrics") or {}).get("avg_view_pct"))) is not None
+             and enough_engaged_traffic(h)]
+    turn_starts = []
+    categories: dict[str, int] = {}
+    for h in rows:
+        choice = h.get("choice") if isinstance(h.get("choice"), dict) else {}
+        category = choice.get("category")
+        if isinstance(category, str) and category:
+            categories[category] = categories.get(category, 0) + 1
+        early = h.get("early_turn") if isinstance(h.get("early_turn"), dict) else {}
+        start_pct = early.get("turn_start_runtime_pct")
+        if isinstance(start_pct, bool) or not isinstance(start_pct, (int, float)):
+            continue
+        try:
+            start_pct = float(start_pct)
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if math.isfinite(start_pct) and 0 <= start_pct <= 100:
+            turn_starts.append(start_pct)
+    return {
+        "assigned_videos": len(rows),
+        "matured_videos": len(mature),
+        "turn_score_n": len(scored),
+        "turn_score_coverage": round(len(scored) / len(mature), 3) if mature else 0.0,
+        "turn_reason_n": scored_reasons,
+        "turn_reason_coverage": round(scored_reasons / len(scored), 3) if scored else 0.0,
+        "turn_telemetry_status_counts": telemetry_status,
+        "median_turn_strength": round(_median([score for _, score in scored]), 2) if scored else None,
+        "retention_n": len(retention_rows),
+        "median_average_view_percentage": round(_median([pct for _, pct in retention_rows]), 2) if retention_rows else None,
+        "over_internal_average_view_target": sum(pct >= gate for _, pct in retention_rows),
+        "turn_start_n": len(turn_starts),
+        "median_turn_start_runtime_pct": round(_median(turn_starts), 2) if turn_starts else None,
+        "turn_strength_vs_average_view_percentage": {
+            "n_pairs": len(pairs), "spearman_r": _spearman([x for x, _ in pairs], [y for _, y in pairs]),
+            "note": "Descriptive association only; uses matured videos with valid turn scores, clean averageViewPercentage, and at least the configured minimum engagedViews. Not a causal claim or publication gate.",
+        },
+        "category_counts": categories,
+    }
+
+
+def turn_experiment_summary(uploaded: list[dict], acfg: dict) -> dict:
+    """Show randomized early-turn assignment, sample sizes, and retention outcomes without gating."""
+    experiment = acfg.get("turn_experiment", {}) if isinstance(acfg, dict) else {}
+    experiment = experiment if isinstance(experiment, dict) else {}
+    experiment_id = experiment.get("id", TURN_EXPERIMENT_ID)
+    experiment_id = experiment_id if isinstance(experiment_id, str) and experiment_id else TURN_EXPERIMENT_ID
+    configured = experiment.get("variants", list(TURN_VARIANTS))
+    variants = list(TURN_VARIANTS)
+    if (isinstance(configured, list) and len(configured) == len(TURN_VARIANTS)
+            and all(isinstance(v, str) for v in configured) and set(configured) == set(TURN_VARIANTS)):
+        variants = configured
+    try:
+        gate = float(acfg.get("average_view_gate_pct", 70.0))
+    except (TypeError, ValueError, OverflowError):
+        gate = 70.0
+    if not math.isfinite(gate):
+        gate = 70.0
+    assigned = []
+    for h in uploaded:
+        choice = h.get("choice") if isinstance(h.get("choice"), dict) else {}
+        if choice.get("turn_experiment_id") == experiment_id and choice.get("turn_variant") in variants:
+            assigned.append(h)
+    by_variant = {}
+    try:
+        ready_n = max(1, int(experiment.get("min_mature_videos_per_variant", 10)))
+    except (TypeError, ValueError, OverflowError):
+        ready_n = 10
+    for variant in variants:
+        rows = [h for h in assigned if h.get("choice", {}).get("turn_variant") == variant]
+        stats = _turn_metrics(rows, acfg, gate)
+        stats["definition"] = {
+            "consequence_first": "Beat two leads with a source-backed consequence, cost, exception, or reversal.",
+            "new_surprise_first": "Beat two leads with the next distinct source-backed surprising fact.",
+        }[variant]
+        by_variant[variant] = stats
+    ready = all(by_variant[v]["retention_n"] >= ready_n for v in variants)
+    all_stats = _turn_metrics(assigned, acfg, gate)
+    return {
+        "experiment_id": experiment_id,
+        "enabled": experiment.get("enabled") is True,
+        "assignment": "Randomized, shuffled two-variant blocks within each production run; each topic remains unique and both variants preserve the same factual/originality and publish criteria.",
+        "status": "minimum_sample_reached_for_descriptive_review" if ready else "collecting",
+        "minimum_mature_retention_videos_per_variant": ready_n,
+        "assigned_videos": len(assigned),
+        "by_variant": by_variant,
+        "all_variants": all_stats,
+        "interpretation": "Small samples and different trending topics, lanes, and posting times can affect outcomes. Treat these summaries as exploratory; no treatment is auto-selected and no score or retention metric adds a publication veto.",
+    }
+
+
+def _retention_curve_due(metrics: dict, now, refresh_days: int = 7) -> bool:
+    # Track attempts separately from successful data: a transient API miss must not delete the last
+    # usable curve or cause a quota-heavy retry on every daily run.
+    checked_at = metrics.get("retention_curve_last_attempt_at")
+    if not isinstance(checked_at, str) or not checked_at:
+        checked_at = metrics.get("retention_curve_checked_at")
+    if not isinstance(checked_at, str) or not checked_at:
+        return True
+    try:
+        checked = datetime.fromisoformat(checked_at)
+    except ValueError:
+        legacy = metrics.get("retention_curve_checked_at")
+        if checked_at == legacy or not isinstance(legacy, str) or not legacy:
+            return True
+        try:
+            checked = datetime.fromisoformat(legacy)
+        except ValueError:
+            return True
+    if checked.tzinfo is None:
+        checked = checked.replace(tzinfo=now.tzinfo)
+    age = now - checked
+    return age >= timedelta(days=refresh_days) or age < timedelta(0)
+
 
 REWARD_SCHEMA_VERSION = 2
 
@@ -373,11 +647,13 @@ def run(cfg: dict) -> dict:
     # 90-day period, and watch quality should describe recent viewers rather than lifetime averages.
     ret = youtube.retention(ids, report_start, today)
     migrate_legacy_retention_metrics(hist)
-    # Retention curves cost one Analytics call per video; fetch only matured videos without one.
+    # One retention-report call per video. Refresh at least weekly, only for matured videos, and
+    # cap each pass to keep quota predictable; the dashboard summarizes only locally fresh curves.
     min_h = cfg["analytics"]["evaluate_after_hours"]
     want_curve = [h["video_id"] for h in uploaded
                   if h.get("metrics", {}).get("hours_live", 0) >= min_h
-                  and not h.get("metrics", {}).get("audience_watch_ratio_curve")][-40:]
+                  and _retention_curve_due(h.get("metrics") or {}, now)][-40:]
+    curve_attempted = set(want_curve)
     curves = youtube.retention_curves(want_curve, report_start, today) if want_curve else {}
     if ids and not stats:
         # Nothing came back at all → treat as an API/auth problem, not mass deletion; change nothing.
@@ -405,7 +681,17 @@ def run(cfg: dict) -> dict:
             metrics.pop(key, None)
         metrics.update(ret.get(h["video_id"], {}))
         metrics["engaged_views_window"] = {"start": report_start, "end": today}
-        h["metrics"].update(curves.get(h["video_id"], {}))
+        if h["video_id"] in curve_attempted:
+            metrics["retention_curve_last_attempt_at"] = now.isoformat()
+            refreshed_curve = curves.get(h["video_id"])
+            if isinstance(refreshed_curve, dict) and refreshed_curve:
+                for key in ("audience_watch_ratio_curve", "watch_ratio_at_15pct", "end_watch_ratio", "curve_points",
+                            "retention_segments_5pct", "retention_segment_metrics_available",
+                            "retention_segment_metric_rows", "retention_segment_total_rows",
+                            "retention_segment_metric_coverage"):
+                    metrics.pop(key, None)
+                metrics.update(refreshed_curve)
+                metrics["retention_curve_checked_at"] = now.isoformat()
         if h["metrics"].get("avg_view_pct") is not None and clean_view_pct(h["metrics"]["avg_view_pct"]) is None:
             log.info("discarding implausible avg_view_pct %.0f%% on %s (%d views)",
                      h["metrics"]["avg_view_pct"], h["video_id"], h["metrics"].get("views", 0))
@@ -475,6 +761,12 @@ def run(cfg: dict) -> dict:
     gate = average_view_target(matured, acfg)
     if gate.get("verdict"):
         log.info("average-view target: %s", gate["verdict"])
+    segment_diag = retention_segment_summary(matured, now)
+    turn_diag = turn_experiment_summary(uploaded, acfg)
+    log.info("retention segment metrics: %d/%d mature videos covered; these are playback-segment events, not feed data",
+             segment_diag["videos_with_segment_data"], segment_diag["matured_videos_eligible"])
+    log.info("early-turn experiment: %d assignments; status=%s (telemetry only)",
+             turn_diag["assigned_videos"], turn_diag["status"])
     write_json("history.json", hist[-int(cfg["analytics"].get("history_keep", 2000)):])
 
     # rolling summary for the dashboard
@@ -490,6 +782,9 @@ def run(cfg: dict) -> dict:
             key=lambda x: -x["views"])[:10],
         "rejected": [h["video_id"] for h in uploaded if h.get("status") == "rejected"],
         "retention": diag,
+        "retention_segments": segment_diag,
+        "feed_discovery": feed_discovery_status(),
+        "turn_experiment": turn_diag,
         "average_view_target": gate,
         # This is an approximate per-video subscriber-conversion trajectory, not the channel's current
         # subscriber total or an eligibility decision. The YPP progress proxy above separately sums engagedViews.

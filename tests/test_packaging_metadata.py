@@ -64,15 +64,20 @@ def test_sidecar_uses_assigned_episode_and_preserves_trend_evidence(tmp_path, mo
                                  "credit": {"title": "Treaty document", "author": "Archive staff",
                                             "license": "Public domain", "source": "archive",
                                             "page": "https://example.test/document", "url": "https://example.test/document"}}]},
-        "review": {"score": 9, "trend_alignment": 9, "trend_alignment_reason": "Covers the discovery"},
-        "plan": {"format": "backstory"},
+        "review": {"score": 9, "trend_alignment": 9, "trend_alignment_reason": "Covers the discovery",
+                   "turn_strength": 8, "turn_strength_status": "scored",
+                   "turn_strength_reason": "The consequence arrives immediately."},
+        "plan": {"format": "backstory", "turn_experiment_id": "early_turn_v1",
+                 "turn_variant": "consequence_first"},
         "topic": topic,
         "out": out,
         "hook_card": "",
         "title": "The treaty that ended a war",
         "series": "unsolved",
         "episode": 0,
-        "tts": {"engine": "edge-tts"},
+        "tts": {"engine": "edge-tts", "segments": [
+            {"start": 0.0}, {"start": 2.4}, {"start": 5.0}, {"start": 8.0},
+        ]},
     }
     render_result = {"first_frame": tmp_path / "first.jpg", "theme": 0, "duration": 18.2,
                      "archetype": "clean", "timeline": [{"seg": 0, "start": 0.0, "end": 2.0,
@@ -99,6 +104,12 @@ def test_sidecar_uses_assigned_episode_and_preserves_trend_evidence(tmp_path, mo
     assert sidecar["trend"]["signals"] == topic["signals"]
     assert sidecar["review"]["trend_alignment"] == 9
     assert sidecar["trend"]["wikipedia_spike"] is None
+    assert sidecar["plan"]["turn_experiment_id"] == "early_turn_v1"
+    assert sidecar["plan"]["turn_variant"] == "consequence_first"
+    assert sidecar["early_turn"]["turn_start_runtime_pct"] == 13.2
+    assert sidecar["review"]["turn_strength"] == 8
+    assert sidecar["review"]["turn_strength_reason"] == "The consequence arrives immediately."
+    assert result["early_turn"] == sidecar["early_turn"]
     assert sidecar["trend"]["viral_score"] == topic["viral_score"]
     assert sidecar["trend"]["why_trending"] == topic["why_trending"]
     assert sidecar["trend"]["evidence"] == topic["context"]
