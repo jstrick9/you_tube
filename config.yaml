@@ -152,6 +152,9 @@ content:
                                          # restores roughly the pass rate the gates were tuned for.
   hook_words_min: 6                      # deterministic gate (autotube/gates.py) — not left to the LLM
   hook_words_max: 12
+  body_beat_words: [9, 11]               # enforce the prompted turn/escalation length per segment
+  payoff_words: [6, 9]                   # a short factual payoff, not a dangling fragment
+  reject_open_review_fixes: true         # a reviewer-requested rewrite is not an approval
   max_drafts: 4                          # script rewrites allowed (feedback from the fact-checker/hook gate)
   selection_rounds: 3                    # if every pick fails the checks, pick again from the remaining trends
   # Reviewer judges whether the payoff loops back into the hook (semantic, not lexical).

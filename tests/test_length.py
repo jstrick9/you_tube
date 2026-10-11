@@ -111,12 +111,10 @@ def test_reveal_pause_counts_toward_the_budget():
 
 # ── the band and the prompt must agree ────────────────────────────────────────
 def test_script_structure_fits_the_configured_band():
-    """The prompt's own rules must be satisfiable inside the word budget the band implies.
+    """The configured per-beat ranges must fit inside the total narration budget.
 
-    These are two numbers in two different files and nothing connected them: at [22, 30] the old
-    "5-6 segments, body 14-22 words" produced 72-112 words against a 78-word target, so most drafts
-    would be rejected and burn retries before the topic was abandoned. Tightening the band without
-    resizing the structure silently breaks generation, so assert they agree.
+    Tightening a global word-count band without resizing the structure silently breaks generation,
+    so assert the hook, body and payoff ranges can satisfy both ends of the validator.
     """
     import re
     from autotube.common import load_config
@@ -129,14 +127,13 @@ def test_script_structure_fits_the_configured_band():
     src = Path(__file__).resolve().parent.parent / "autotube" / "scriptwriter.py"
     text = src.read_text()
     n_lo, n_hi = map(int, re.search(r"Write the script as (\d)-(\d) segments", text).groups())
-    # the middle beats now have distinct jobs (THE TURN, then ESCALATION) but share a word budget;
-    # if they ever diverge this test must be taught the difference rather than silently using one
-    t_lo, t_hi = map(int, re.search(r"THE TURN, (\d+)-(\d+) words", text).groups())
-    b_lo, b_hi = map(int, re.search(r"ESCALATION, each (\d+)-(\d+) words", text).groups())
-    assert (t_lo, t_hi) == (b_lo, b_hi), (
-        f"the turn ({t_lo}-{t_hi}) and escalation ({b_lo}-{b_hi}) budgets differ; "
-        "the arithmetic below assumes they are the same")
-    p_lo, p_hi = map(int, re.search(r"PAYOFF, (\d+)-(\d+) words", text).groups())
+    # The prompt interpolates these configured ranges; keep both separate and auditable.
+    assert "THE TURN, {body_min}-{body_max} factual words" in text
+    assert "ESCALATION, each {body_min}-{body_max} factual words" in text
+    assert "PAYOFF, {payoff_min}-{payoff_max} factual words" in text
+    t_lo, t_hi = map(int, cfg["content"]["body_beat_words"])
+    b_lo, b_hi = t_lo, t_hi
+    p_lo, p_hi = map(int, cfg["content"]["payoff_words"])
     hook_hi = int(cfg["content"]["hook_words_max"])
 
     for n in range(n_lo, n_hi + 1):

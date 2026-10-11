@@ -140,7 +140,7 @@ def cmd_doctor(cfg: dict) -> int:
     if os.environ.get("YT_REFRESH_TOKEN"):
         try:
             from .common import http
-            from .youtube import credentials, service
+            from .youtube import credentials, service, video_status
             creds = credentials()
             info = http().get("https://oauth2.googleapis.com/tokeninfo",
                               params={"access_token": creds.token}, timeout=15).json()
@@ -158,6 +158,20 @@ def cmd_doctor(cfg: dict) -> int:
                 ok = False
                 print("✗ Token works but this Google account has no YouTube channel. Re-authorize and pick the "
                       "account / Brand Account that owns the channel.")
+            status_video_id = os.environ.get("YOUTUBE_STATUS_VIDEO_ID", "").strip()
+            if status_video_id:
+                status = video_status(status_video_id)
+                if status is None:
+                    ok = False
+                    print(f"✗ No video status returned for {status_video_id}; check the ID and channel permissions.")
+                else:
+                    print("Read-only video status:")
+                    print(f"  id: {status['video_id']} | title: {status['title']}")
+                    print(f"  privacy: {status['privacy_status']} | upload: {status['upload_status']} | "
+                          f"publishAt: {status['publish_at'] or 'not scheduled'}")
+                    if status.get("rejection_reason"):
+                        ok = False
+                        print(f"  rejection reason: {status['rejection_reason']}")
         except Exception as e:  # noqa: BLE001
             ok = False
             print("✗ YouTube auth FAILED:", e)

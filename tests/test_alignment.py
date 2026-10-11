@@ -204,6 +204,10 @@ class QALLM:
         if self.down:
             raise RuntimeError("503")
         self.prompts.append((system, user))
+        if "SEQUENCE-LEVEL VISUAL VARIETY REVIEW" in user:
+            out = {"visual_variety_ok": True, "repetitive_frames": [], "notes": ""}
+            validate and validate(out)
+            return out
         n = len(re.findall(r"^\s+\d+ \| line", user, re.M))
         out = {"frames": [{"n": i + 1, "shows": "x", "match": (i + 1) not in self.bad,
                            "score": 2 if (i + 1) in self.bad else 9, "issue": ""} for i in range(n)],
@@ -229,6 +233,33 @@ def test_final_qa_passes_and_fails_per_frame(tiny_video):
     assert ok["passed"] and len(ok["frames"]) == 2
     bad = qa.verify(tiny_video, tl, shots, tts, script, "T", "HOOK", "Whiskers", QALLM(bad_frames=[2]), CFG)
     assert not bad["passed"] and bad["failed"] == [(1, "b")]
+
+
+def test_sequence_level_variety_gate_marks_redundant_shots_for_repair(tiny_video):
+    class RepetitiveSequence(QALLM):
+        def vision_json(self, system, user, images, validate=None):
+            if "SEQUENCE-LEVEL VISUAL VARIETY REVIEW" in user:
+                self.prompts.append((system, user))
+                out = {"visual_variety_ok": False, "repetitive_frames": [2],
+                       "notes": "the second frame repeats the same static aerial composition"}
+                validate and validate(out)
+                return out
+            return super().vision_json(system, user, images, validate)
+
+    lines = ["The lake fills an ancient crater.", "A second view shows the crater rim."]
+    tts, script = _tts(lines), {"segments": [{"text": x} for x in lines]}
+    timeline = [{"seg": 0, "start": 0.0, "end": 1.5, "path": "first-aerial.jpg"},
+                {"seg": 1, "start": 1.5, "end": 3.0, "path": "second-aerial.jpg"}]
+    shots = [{"seg": 0, "path": "first-aerial.jpg", "score": 9, "judge": "g", "kind": "image"},
+             {"seg": 1, "path": "second-aerial.jpg", "score": 9, "judge": "g", "kind": "image"}]
+
+    result = qa.verify(tiny_video, timeline, shots, tts, script, "The crater lake", "A lake in a crater",
+                       "crater lake", RepetitiveSequence(), CFG)
+
+    assert not result["passed"] and result["repairable"]
+    assert result["failed"] == [(1, "second-aerial.jpg")]
+    assert "sequence-level visual review" in result["issues"][0]
+    assert result["meta"]["visual_variety_ok"] is False
 
 
 def test_render_pipeline_passes_trend_angle_and_linked_evidence_to_final_qa(monkeypatch, tmp_path):
@@ -288,6 +319,10 @@ def test_final_qa_rejects_false_positive_and_supplies_shot_context(tiny_video):
     class FirstPassFalsePositive(QALLM):
         def vision_json(self, system, user, images, validate=None):
             self.prompts.append((system, user))
+            if "SEQUENCE-LEVEL VISUAL VARIETY REVIEW" in user:
+                out = {"visual_variety_ok": True, "repetitive_frames": [], "notes": ""}
+                validate and validate(out)
+                return out
             n = len(re.findall(r"^\s+\d+ \| line", user, re.M))
             adversarial = "ADVERSARIAL SECOND LOOK" in user
             out = {"frames": [{"n": i + 1, "shows": "modern climate summit", "match": not adversarial,
@@ -314,7 +349,7 @@ def test_final_qa_rejects_false_positive_and_supplies_shot_context(tiny_video):
                        trend_angle="the actual 1905 treaty negotiations, not a modern summit",
                        trend_evidence=["recent history spike; verified trend record"])
 
-    assert len(llm.prompts) == 2, "a positive first-pass verdict must receive a second adversarial look"
+    assert len(llm.prompts) == 3, "a positive frame gets an adversarial look, then the full sequence is checked for variety"
     assert "CURRENT TREND ANGLE" in llm.prompts[0][1]
     assert 'intended shot: "1905 historic treaty negotiation room"' in llm.prompts[0][1]
     assert 'asset title: "Oxford climate change meeting 2024"' in llm.prompts[0][1]
@@ -366,7 +401,7 @@ def test_script_fact_check_outage_fails_closed(monkeypatch):
     # gate-clean script: the only reason it must fail is that the fact-checker is unreachable
     script = {"title": "Honey facts", "segments": [
         {"text": "Bees visit two million flowers to fill a single jar", "evidence": ev},
-        {"text": "A worker bee makes a twelfth of a teaspoon in her life", "evidence": ev},
+        {"text": "A worker bee makes one twelfth of a teaspoon in life", "evidence": ev},
         # aside on a BODY line, never the hook: asides count toward hook length, and
         # content.min_asides requires the narration to have a voice of its own
         {"text": "The hive fans its wings to dry the nectar down", "evidence": ev,

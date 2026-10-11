@@ -22,16 +22,17 @@ SOURCE = {
 SCRIPT = {
     "title": "The river stones that say weep",
     "segments": [
-        {"text": "If you see me, then weep.",
-         "evidence": "One stone in the Elbe reads 'If you see me, then weep'."},
-        {"text": "Hunger stones were embedded into rivers to warn future generations.",
+        {"text": "The river itself warns you when the drought returns",
+         "evidence": "Hunger stones were embedded into a river to commemorate droughts"},
+        {"text": "That inscription tells river travellers to weep when the stone appears",
          "aside": "Cheerful bunch.",
-         "evidence": "Hunger stones were embedded into a river to commemorate droughts and warn future generations"},
-        {"text": "People carved them during severe droughts.",
+         "evidence": "One stone in the Elbe reads 'If you see me, then weep'"},
+        {"text": "Severe droughts expose these warnings when the riverbed falls into view",
          "evidence": "People carved the stones during severe droughts when the water level was low"},
-        {"text": "The oldest legible marks date from 1616.",
+        {"text": "The oldest legible marks on the stones date from 1616",
          "evidence": "The oldest legible marks date from 1616", "reveal": True},
-        {"text": "And that is why", "evidence": "One stone in the Elbe reads 'If you see me, then weep'."},
+        {"text": "so seeing one means the drought has returned",
+         "evidence": "People carved the stones during severe droughts when the water level was low"},
     ],
 }
 
@@ -93,7 +94,7 @@ def test_missing_coherence_score_fails_closed():
     def without_score(system, user, **kwargs):
         result = {"score": 9, "hook_strength": 9, "entertainment": 8,
                   "factual_errors": [], "misleading_title": False,
-                  "advertiser_friendly": True, "policy_concerns": [], "loops": True}
+                  "advertiser_friendly": True, "policy_concerns": [], "loops": True, "fixes": []}
         if kwargs.get("validate"):
             kwargs["validate"](result)
         return result

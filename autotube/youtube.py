@@ -51,6 +51,26 @@ def service(name: str = "youtube", version: str = "v3"):
     return build(name, version, credentials=credentials(), cache_discovery=False)
 
 
+def video_status(video_id: str) -> dict | None:
+    """Read the current YouTube upload state without mutating the video."""
+    video_id = str(video_id or "").strip()
+    if not video_id:
+        raise ValueError("video_id must not be empty")
+    items = service().videos().list(part="snippet,status", id=video_id, maxResults=1).execute().get("items", [])
+    if not items:
+        return None
+    item = items[0]
+    status = item.get("status") or {}
+    return {
+        "video_id": item.get("id", video_id),
+        "title": (item.get("snippet") or {}).get("title", ""),
+        "privacy_status": status.get("privacyStatus", "unknown"),
+        "upload_status": status.get("uploadStatus", "unknown"),
+        "publish_at": status.get("publishAt"),
+        "rejection_reason": status.get("rejectionReason"),
+    }
+
+
 def upload(video: Path, meta: dict, cfg: dict, publish_at: datetime | None, thumb: Path | None = None) -> str:
     from googleapiclient.errors import HttpError
     from googleapiclient.http import MediaFileUpload

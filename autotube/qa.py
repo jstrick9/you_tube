@@ -41,6 +41,10 @@ QA_AUDIT_SYSTEM = ("You are an adversarial second-look inspector for an educatio
                    "or a prior positive verdict. Check the exact person, event, era, place and setting against the "
                    "narration and intended shot. If relevance is not visually defensible, return match=false. "
                    "Return strict JSON only.")
+QA_SEQUENCE_SYSTEM = ("You are the sequence-level visual pacing inspector for an educational Short. Inspect every tile in "
+                      "chronological order. Do not confuse subject consistency with visual variety: the core subject may "
+                      "recur, but near-identical views/compositions should not dominate the video. Identify redundant "
+                      "shots that should be replaced with a distinct, truthful view or visual type. Return strict JSON only.")
 
 
 def _norm_tokens(text: str) -> list[str]:
@@ -127,6 +131,20 @@ def _shot_context(t: dict, shots: list[dict]) -> dict:
         "asset_page": str(credit.get("page") or credit.get("url") or ""),
         "kind": str(shot.get("kind") or credit.get("kind") or ""),
     }
+
+
+def _sequence_representatives(items: list[dict]) -> list[dict]:
+    """Choose the midpoint of each rendered shot, preserving timeline order for pacing QA."""
+    chosen, seen = [], set()
+    for it in items:
+        if int(it["sample"]) != (int(it["samples"]) + 1) // 2:
+            continue
+        key = (it["seg"], it["path"])
+        if key in seen:
+            continue
+        seen.add(key)
+        chosen.append(it)
+    return chosen
 
 
 def frame_check(mp4: Path, timeline: list[dict], shots: list[dict], tts: dict, script: dict,
@@ -291,6 +309,80 @@ Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "scor
             meta["title_ok"] = bool(out.get("title_ok", True))
         if out.get("notes"):
             meta["notes"].append(str(out["notes"])[:200])
+
+    # Per-frame relevance does not catch a factually correct but monotonous slideshow. Review one
+    # representative midpoint from every shot together, in timeline order, and fail the shots the
+    # sequence judge identifies as redundant so the existing visual-repair path can replace them.
+    sequence_items = _sequence_representatives(items)
+    meta["visual_variety_ok"] = True
+    meta["visual_variety_notes"] = ""
+    if sequence_items:
+        sequence_rows = "\n".join(
+            f'  {j + 1} | line {it["seg"] + 1}/{n_lines} | '
+            f'intended shot: "{it["context"]["intended"] or "not recorded"}" | '
+            f'asset description: "{it["context"]["selected_description"] or "not recorded"}" | '
+            f'narration: "{it["line"]}"'
+            for j, it in enumerate(sequence_items))
+        sequence_user = f"""SEQUENCE-LEVEL VISUAL VARIETY REVIEW
+VIDEO SUBJECT: {subject}
+VIDEO TITLE: {title}
+CURRENT TREND ANGLE: {trend_angle or "not recorded"}
+
+The attached sheet shows one midpoint frame from EACH shot in the finished video, in chronological order, numbered
+1-{len(sequence_items)} in yellow boxes. Assess the whole sequence, not just whether each image is individually relevant.
+The same reservoir, animal, artifact or historical subject may recur; do not demand unrelated imagery. But multiple
+near-identical reservoir aerials, repeated static views, or several frames with the same composition and no new visual
+information make a Short feel like a slideshow, even when each picture is technically relevant. A repeated visual motif
+is fine once or twice when it serves the story; it should not dominate. Prefer truthful variety in scale, angle, action,
+map/diagram, close detail, process or documented context—never a generic or misleading substitute.
+
+SHOT ORDER AND CONTEXT:
+{sequence_rows}
+
+Is the sequence visually varied enough to hold attention while remaining faithful to the subject? If it is, set
+visual_variety_ok=true and repetitive_frames=[]. If it is not, set visual_variety_ok=false and list every numbered frame
+that is visually redundant and should be replaced. Do not fail a shot solely because it shares the video's subject.
+Return strict JSON: {{"visual_variety_ok": true, "repetitive_frames": [], "notes": "short reason"}}"""
+
+        def validate_sequence(o):
+            assert isinstance(o.get("visual_variety_ok"), bool), "need boolean visual_variety_ok"
+            repetitive = o.get("repetitive_frames")
+            assert isinstance(repetitive, list), "need repetitive_frames list"
+            numbers = [int(n) for n in repetitive]
+            assert len(numbers) == len(set(numbers)), "repetitive frame numbers must be unique"
+            assert all(1 <= n <= len(sequence_items) for n in numbers), "repetitive frame number is out of range"
+            assert not numbers if o["visual_variety_ok"] else bool(numbers), (
+                "a failed sequence must identify redundant frames; a passing sequence must have none")
+
+        sequence_out, sequence_err = None, None
+        for attempt in range(len(retry_pauses) + 1):
+            try:
+                sequence_out = llm.vision_json(QA_SEQUENCE_SYSTEM, sequence_user,
+                                               [_sheet([it["img"] for it in sequence_items])], validate_sequence)
+                break
+            except Exception as e:  # noqa: BLE001
+                sequence_err = e
+                if attempt < len(retry_pauses):
+                    time.sleep(retry_pauses[attempt])
+        if sequence_out is None:
+            raise VisionUnavailable(f"sequence-level visual QA unavailable: {str(sequence_err)[:250]}") from sequence_err
+        repetitive = [int(n) for n in sequence_out["repetitive_frames"]]
+        variety_notes = str(sequence_out.get("notes") or "")[:250]
+        meta["visual_variety_ok"] = bool(sequence_out["visual_variety_ok"])
+        meta["visual_variety_notes"] = variety_notes
+        if variety_notes:
+            meta["notes"].append("visual sequence: " + variety_notes)
+        if not meta["visual_variety_ok"]:
+            for number in repetitive:
+                redundant = sequence_items[number - 1]
+                reason = "sequence-level visual review found a repetitive shot"
+                if variety_notes:
+                    reason += ": " + variety_notes
+                for frame in results:
+                    if frame["seg"] == redundant["seg"] and frame["path"] == redundant["path"]:
+                        frame["match"] = False
+                        frame["score"] = 0.0
+                        frame["issue"] = (frame["issue"] + "; " + reason).strip("; ")[:200]
     return results, meta
 
 def verify(mp4: Path, timeline: list[dict], shots: list[dict], tts: dict, script: dict, title: str, hook: str,

@@ -207,6 +207,26 @@ def trend_evidence_summary(candidate: dict) -> str:
     return "Current feed signal(s): " + ", ".join(str(s) for s in sources if s)
 
 
+def actionable_review_fixes(value) -> list[str]:
+    """Normalize the independent reviewer's remaining change requests for the publish gate."""
+    if isinstance(value, str):
+        items = [value]
+    elif isinstance(value, (list, tuple)):
+        items = list(value)
+    elif value is None:
+        return ["reviewer omitted the required fixes list"]
+    else:
+        return ["reviewer returned a malformed fixes list"]
+    no_change = {"", "none", "n/a", "na", "-", "no fixes", "no changes", "no changes needed",
+                 "no edits", "no edits needed", "nothing to change", "nothing to fix"}
+    out = []
+    for item in items:
+        text = str(item or "").strip()
+        if text.lower().strip(" .!?") not in no_change:
+            out.append(text[:300])
+    return out
+
+
 ASIDE_BAD = re.compile(r"\d|\b(hundred|thousand|million|billion|trillion|percent|dozen)s?\b", re.I)
 
 
@@ -710,6 +730,9 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
     def write(self, topic: dict, plan: dict, source: dict) -> dict:
         lo, hi = self.cfg["video"]["target_seconds"]
         words_lo, words_hi = int(lo * 2.6), int(hi * 2.6)
+        ccfg = self.cfg.get("content", {}) or {}
+        body_min, body_max = tuple(ccfg.get("body_beat_words", [9, 11]))
+        payoff_min, payoff_max = tuple(ccfg.get("payoff_words", [6, 9]))
         # A global word count is something a model estimates badly; a per-segment budget is
         # something it can actually hold in mind while writing the line. Overshoot was the
         # single largest cause of abandoned scripts once the quality gates stopped being the
@@ -806,12 +829,12 @@ SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of fact
 {HOOK_RULES}
 Write the script as 4-5 segments. Each beat has a DIFFERENT job — do not write interchangeable body lines:
   - segment 1 = HOOK (see rules), spoken in under 3 seconds;
-  - segment 2 = THE TURN, 9-11 words. This single line decides whether the video is watched, and it is the
+  - segment 2 = THE TURN, {body_min}-{body_max} factual words. This single line decides whether the video is watched, and it is the
     one most often written wrong. It must make the hook BIGGER — a second surprise, or the consequence of the
     first ("which meant...", "except..."). It must NOT be setup, background, a definition, a birth date, a
     founding year, an origin story or any sentence beginning "In 1923..." / "Born in..." / "X is a Y that...".
     The viewer already decided the premise was interesting; explaining it to them is why they leave;
-  - segments 3..N-1 = ESCALATION, each 9-11 words, one concrete new fact each, every line raising the stakes
+  - segments 3..N-1 = ESCALATION, each {body_min}-{body_max} factual words, one concrete new fact each, every line raising the stakes
     above the line before it. Use contrast and consequence ("so", "which meant", "except"). No filler, no repetition;
   - AT LEAST ONE segment's "visual" must show the SUBJECT ITSELF, named explicitly — the object,
     creature, person, document or place the video is about. Ambient scenery ("waves on a beach",
@@ -830,7 +853,7 @@ Write the script as 4-5 segments. Each beat has a DIFFERENT job — do not write
     five children.
     BAD (same subject, no chain): Egypt built pyramids without modern tools / they used the Nile's flooding /
     they signed the first peace treaty.
-  - last segment = PAYOFF, 6-9 words: {loop_rule}
+  - last segment = PAYOFF, {payoff_min}-{payoff_max} factual words: {loop_rule}
 Leave ONE question deliberately open from the hook until the payoff — the viewer should be unable to stop
 watching without learning the answer. Never answer it in segment 2.
 The TOPIC line is just a trend headline — do NOT repeat its claims or numbers unless the SOURCE TEXT states them.
@@ -839,6 +862,9 @@ comic timing and personality (reactions, contrast, "and it gets worse"). The fac
 from HOW you tell them and from the asides, never from changing what happened.
 TOTAL narration (text + asides) MUST be {words_lo}-{words_hi} words — that is about {per_seg} words per segment,
 which is ONE short spoken sentence each, not two. Both ends are rejected: too short AND too long.
+The factual "text" in every turn/escalation must independently contain {body_min}-{body_max} words, and the payoff text
+{payoff_min}-{payoff_max}; asides do not count toward those beat ranges. Every beat must be a complete, grammatical
+sentence. Never end on a fragment such as "All 215 million years ago".
 The ceiling is the hard one. Write the whole thing, then count, then cut until it fits before you answer.
 For each segment give:
   "text": the spoken line (facts),
@@ -1102,10 +1128,14 @@ genuinely funny or gasp-out-loud moment. 9-10 = you would send it to a friend. I
 idea in "fixes" (story tension, comic contrast, a sharper aside, a stronger reveal).
 hook_strength: 9-10 = the first line alone would stop a stranger scrolling (specific, surprising, opens a question the
 video answers); 7-8 = decent; <=6 = generic ('Did you know', 'Here are some facts', topic name, slow setup).
-If hook_strength < 9, put a stronger TRUE first line in "fixes".""" + trend_rubric
+If hook_strength < 9, put a stronger TRUE first line in "fixes".
+Any non-empty "fixes" list means the draft still needs revision; return [] only when it is ready to publish.
+Be internally consistent: if a fix says the last line must be rewritten to loop, "loops" must be false.""" + trend_rubric
         def validate_review(o):
             score = float(o["score"])
             assert math.isfinite(score) and 0 <= score <= 10
+            assert isinstance(o.get("fixes"), list) and all(isinstance(x, str) for x in o["fixes"]), (
+                "reviewer must return a fixes array (empty only when no changes are needed)")
             if topic is not None:
                 alignment = float(o["trend_alignment"])
                 assert math.isfinite(alignment) and 0 <= alignment <= 10
@@ -1197,11 +1227,25 @@ If hook_strength < 9, put a stronger TRUE first line in "fixes".""" + trend_rubr
             review["issues"].append("the last line does not flow back into the first — re-word the payoff to pick up the hook; "
                                     "this is a stylistic criterion, not a guaranteed analytics gain")
 
+        fixes = actionable_review_fixes(r.get("fixes"))
+        reject_open_fixes = bool(self.cfg.get("content", {}).get("reject_open_review_fixes", True))
+        fix_issue = ("independent reviewer still requests a rewrite: " + "; ".join(fixes)[:500]
+                     if fixes and reject_open_fixes else "")
+        if fix_issue:
+            review["issues"].append(fix_issue)
         ok = (ent >= min_ent and hook >= min_hook and coh >= min_coh and alignment_ok
               and score >= self.cfg["compliance"]["quality_gate_min_score"] and not r.get("factual_errors")
               and not r.get("misleading_title") and r.get("advertiser_friendly", True)
-              and not r.get("policy_concerns"))
+              and not r.get("policy_concerns") and not fix_issue)
+        prior_issues = list(review.get("issues") or [])
+        llm_issues = r.get("issues") or []
+        if isinstance(llm_issues, str):
+            llm_issues = [llm_issues]
         review.update(r)
+        review["issues"] = prior_issues + [str(x) for x in llm_issues if str(x).strip()]
+        review["fixes"] = fixes
+        if fixes and not reject_open_fixes:
+            review["review_fixes_unresolved"] = fixes
         review["coherence"] = coh
         if topic is not None:
             review["trend_alignment"] = alignment

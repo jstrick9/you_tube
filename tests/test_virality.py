@@ -164,6 +164,12 @@ def test_trend_evidence_uses_measured_signals_and_distinct_families():
         signal("google_trends", "https://trends.test/page", {"traffic": 1_000})]}, 3.0, cfg)
     assert not trends.has_current_trend_evidence({"signals": [
         signal("google_trends", "", {"traffic": 100_000})]}, 3.0, cfg), "unlinked numbers are not auditable"
+    # Regression for the actual Oct 2026 upload: plausible view/hour numbers with no source URL
+    # must not be treated as verified trend evidence.
+    orphaned_outlier = {"signals": [signal("youtube_outliers", "", {
+        "views": 67_504, "hours": 44.6, "vph": 1_512, "breakout": 67.5,
+    })]}
+    assert not trends.has_current_trend_evidence(orphaned_outlier, 3.0, cfg)
 
     weak_google_reddit = {"signals": [signal("google_trends", "https://trends.test/page", {"traffic": 200}),
                                         signal("reddit_science", "https://reddit.test/a")]}
@@ -276,7 +282,7 @@ def test_weak_hook_is_rejected_and_rewritten():
 
         def json(self, system, user, **kw):
             return {"score": 9, "hook_strength": 6, "coherence": 8, "factual_errors": [], "misleading_title": False,
-                    "advertiser_friendly": True, "policy_concerns": []}
+                    "advertiser_friendly": True, "policy_concerns": [], "fixes": []}
 
     w = ScriptWriter.__new__(ScriptWriter)
     w.cfg, w.llm, w.src_chars = CFG, Rev(), 4000
@@ -286,9 +292,9 @@ def test_weak_hook_is_rejected_and_rewritten():
     # gate-clean script: the ONLY thing wrong with it is the reviewer's hook_strength of 6
     # One aside: content.min_commentary_ratio rejects narration with no narrator voice.
     segs = [{"text": "Bees visit two million flowers to make one jar of honey"},
-            {"text": "A single worker bee makes a twelfth of a teaspoon in her life"},
+            {"text": "A worker bee makes one twelfth of a teaspoon in life"},
             {"text": "The hive beats its wings to dry the nectar into honey", "aside": "Busy little things."},
-            {"text": "Sealed in wax, it never spoils"},
+            {"text": "A wax seal keeps the stored honey from absorbing moisture"},
             {"text": "so the jar in your cupboard could outlive you"}]
     ok, review = w.check({"title": "Honey", "segments": segs}, src)
     assert not ok and any("hook too weak" in i for i in review["issues"])
@@ -299,7 +305,7 @@ def test_titles_are_screened_for_shock_bait_not_vocabulary():
         lite = False
 
         def json(self, system, user, **kw):
-            return {"score": 9, "hook_strength": 9, "coherence": 8}
+            return {"score": 9, "hook_strength": 9, "coherence": 8, "fixes": []}
 
     w = ScriptWriter.__new__(ScriptWriter)
     w.llm, w.src_chars = Rev(), 4000
@@ -310,7 +316,7 @@ def test_titles_are_screened_for_shock_bait_not_vocabulary():
            {"text": "The oldest marking on it is older than anyone alive",
             "aside": "Cheerful bunch."},   # min_commentary_ratio: narration needs a voice
            {"text": "Each line records a season nobody wanted to repeat"},
-           {"text": "so when you can read it, the warning has already arrived"}]
+           {"text": "so by reading it, the drought has already returned"}]
     # This test reuses one body of segments to isolate the title as the only variable.
     # check() now registers each APPROVED script so later videos in the same run are
     # compared against it, which would make the second call collide with the first on

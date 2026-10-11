@@ -55,7 +55,7 @@ BANNED_TITLE = [
 # The viewer came for the surprise promised in the hook and got a history lesson instead. These
 # are the openers that signal exposition rather than escalation, anchored at the start of the line.
 EXPOSITION_OPENERS = [
-    r"born in\b", r"it was born", r"the (story|history|origins?) of\b",
+    r"born in\b", r"it was born", r"which (?:is|was)(?: actually)?\b", r"the (story|history|origins?) of\b",
     r"in (the )?(17|18|19|20)\d\d\b", r"back in\b", r"(it|he|she|they) (was|were) (first )?(built|founded|created|established|discovered|invented|published|opened)\b",
     r"(was|is) (a|an|the) [a-z]+ (who|that|which)\b",
     r"(located|situated|found) in\b", r"((it|this|that|they|he|she) )?dates? back to\b",
@@ -186,6 +186,42 @@ def check_narration(segments: list[dict], spoken) -> list[str]:
     return issues
 
 
+def _word_bounds(ccfg: dict, key: str, default: tuple[int, int]) -> tuple[int, int]:
+    value = ccfg.get(key, default)
+    try:
+        lo, hi = int(value[0]), int(value[1])
+        return (lo, hi) if 0 <= lo <= hi else default
+    except (TypeError, ValueError, IndexError, KeyError):
+        return default
+
+
+def check_segment_lengths(segs: list[dict], cfg: dict) -> list[str]:
+    """Enforce the beat lengths specified in the writer prompt, counting factual text only.
+
+    Asides are optional spoken jokes, not a substitute for the story beat. The global TTS word
+    budget separately counts both text and asides.
+    """
+    if len(segs) < 4:
+        return []
+    ccfg = (cfg.get("content", {}) or {})
+    body_lo, body_hi = _word_bounds(ccfg, "body_beat_words", (9, 11))
+    payoff_lo, payoff_hi = _word_bounds(ccfg, "payoff_words", (6, 9))
+    issues = []
+    for i, seg in enumerate(segs[1:-1], start=1):
+        text = str(seg.get("text") or "") if isinstance(seg, dict) else ""
+        count = len(_words(text))
+        role = "turn" if i == 1 else "escalation"
+        if not body_lo <= count <= body_hi:
+            issues.append(f"segment {i + 1} {role} is {count} words; it must be {body_lo}-{body_hi} factual words. "
+                          "Rewrite the beat as one complete, specific sentence; do not pad it with an aside.")
+    last_text = str((segs[-1] or {}).get("text") or "") if isinstance(segs[-1], dict) else ""
+    last_count = len(_words(last_text))
+    if not payoff_lo <= last_count <= payoff_hi:
+        issues.append(f"final payoff is {last_count} words; it must be {payoff_lo}-{payoff_hi} factual words. "
+                      "End on a complete, concrete answer—not a fragment or a date dangling by itself.")
+    return issues
+
+
 def run_all(script: dict, spoken, cfg: dict) -> list[str]:
     """Every deterministic gate, in one call. Empty list = passed."""
     ccfg = cfg.get("content", {}) or {}
@@ -197,6 +233,7 @@ def run_all(script: dict, spoken, cfg: dict) -> list[str]:
     issues = check_hook(spoken(segs[0]), lo, hi)
     if len(segs) > 2:
         issues += check_turn(spoken(segs[1]))
+    issues += check_segment_lengths(segs, cfg)
     issues += check_closer(spoken(segs[-1]), bool(ccfg.get("loop_ending", True)))
     issues += check_title(script.get("title", ""))
     issues += check_narration(segs, spoken)

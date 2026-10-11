@@ -5,6 +5,11 @@ name: AutoTube check connection
 
 on:
   workflow_dispatch:
+    inputs:
+      video_id:
+        description: "Optional YouTube video ID to inspect read-only"
+        required: false
+        type: string
 
 jobs:
   doctor:
@@ -27,6 +32,7 @@ jobs:
       YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
       YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
       YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+      YOUTUBE_STATUS_VIDEO_ID: ${{ github.event.inputs.video_id }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

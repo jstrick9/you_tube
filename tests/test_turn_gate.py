@@ -55,6 +55,11 @@ def test_the_gate_explains_what_to_write_instead():
     assert "ESCALATE" in msg and "definition" in msg
 
 
+def test_which_is_actually_fragment_is_rejected():
+    msg = check_turn("Which is actually the Manicouagan Reservoir's outer rim")
+    assert msg and "ESCALATE" in msg[0]
+
+
 def test_turn_gate_is_wired_into_run_all():
     def spoken(s):
         return s["text"]

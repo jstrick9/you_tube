@@ -61,6 +61,16 @@ def test_hook_length_band():
     assert gates.check_hook("") == ["the hook is empty"]
 
 
+def test_segment_lengths_reject_dangling_turn_and_payoff():
+    s = _script("Antarctica has a waterfall that runs blood red",
+                "Which is actually the Manicouagan Reservoir's outer rim",
+                "A second concrete fact reveals how the ancient crater formed underwater",
+                closer="All 215 million years ago")
+    issues = gates.run_all(s, spoken_text, CFG)
+    assert any("segment 2" in i and "turn" in i for i in issues), issues
+    assert any("complete, concrete answer" in i for i in issues), issues
+
+
 # ── closers ───────────────────────────────────────────────────────────────────
 def test_cta_closers_break_the_loop():
     for closer in ["Follow for more facts like this",
@@ -112,7 +122,7 @@ def test_a_clean_script_passes_every_gate():
     s = _script("Antarctica has a waterfall that runs blood red",
                 "The colour comes from iron-rich brine trapped under the glacier",
                 "It has been sealed away from sunlight for two million years",
-                closer="so the ice keeps bleeding, and nobody can stop it")
+                closer="so the ice keeps bleeding, unanswered")
     assert gates.run_all(s, spoken_text, CFG) == []
 
 
@@ -183,10 +193,10 @@ def test_scriptwriter_flags_a_non_independent_review():
         last_used = "gemini:g-1"
 
         def review_json(self, system, user, avoid=None, **kw):
-            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8}
+            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8, "fixes": []}
 
         def json(self, *a, **k):
-            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8}
+            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8, "fixes": []}
 
     w = ScriptWriter.__new__(ScriptWriter)
     w.llm, w.src_chars = SameModel(), 4000
@@ -194,7 +204,7 @@ def test_scriptwriter_flags_a_non_independent_review():
     src = {"title": "Bees", "text": "Bees make honey from nectar. " * 30}
     script = {"title": "Honey", "_writer_model": "gemini:g-1", "segments": [
         {"text": "Bees visit two million flowers to fill a single jar"},
-        {"text": "A worker bee makes a twelfth of a teaspoon in her life", "aside": "Busy little things."},
+        {"text": "A worker bee makes one twelfth of a teaspoon in life", "aside": "Busy little things."},
         {"text": "The hive fans its wings to dry the nectar down"},
         {"text": "so the jar in your cupboard will never spoil"}]}
     ok, review = w.check(script, src)

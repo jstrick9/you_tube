@@ -53,7 +53,7 @@ class ReviewLLM:
     def json(self, system, user, **kw):
         self.prompts.append(user)
         o = {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "factual_errors": [], "policy_concerns": [],
-             "misleading_title": False, "advertiser_friendly": True}
+             "misleading_title": False, "advertiser_friendly": True, "fixes": []}
         kw.get("validate") and kw["validate"](o)
         return o
 
@@ -71,11 +71,11 @@ def _script(aside):
         seg("If you see me, then weep."),
         dict(seg("Hunger stones were embedded into a river to warn future generations.", aside=aside),
              evidence="embedded into a river to commemorate droughts and to warn future generations"),
-        dict(seg("People carved the stones during severe droughts."),
+        dict(seg("People carved these stones when severe droughts exposed the riverbeds."),
              evidence="People carved the stones during severe droughts when the water level was low"),
-        dict(seg("The oldest legible marks date from 1616.", reveal=True),
+        dict(seg("Their oldest legible marks still date from 1616 today.", reveal=True),
              evidence="The oldest legible marks date from 1616"),
-        seg("And that is why"),
+        seg("so seeing it means the drought has returned"),
     ]}
 
 

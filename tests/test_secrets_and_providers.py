@@ -18,9 +18,10 @@ CFG = yaml.safe_load((ROOT / "config.yaml").read_text())
 WF = ROOT / ".github" / "workflows"
 
 # Read from the environment but never supplied by CI secrets:
-# local TTS paths, config overrides, and the keyless provider's optional token.
+# local TTS paths/config overrides, the keyless provider's optional token, and the
+# optional read-only video ID passed only to the manual doctor workflow.
 LOCAL_ONLY = {"AUTOTUBE_CONFIG", "AUTOTUBE_TTS", "AUTOTUBE_DEPTH_MODEL",
-              "PIPER_DIR", "PIPER_VOICE", "POLLINATIONS_TOKEN"}
+              "PIPER_DIR", "PIPER_VOICE", "POLLINATIONS_TOKEN", "YOUTUBE_STATUS_VIDEO_ID"}
 
 
 def env_vars_read_by_code() -> set[str]:
@@ -831,6 +832,34 @@ def test_empty_payoff_is_enforced_in_validation():
 
 
 # ── pruning the channel ─────────────────────────────────────────────────────
+def test_video_status_is_read_only_and_reports_scheduled_publish_state(monkeypatch):
+    import autotube.youtube as Y
+
+    calls = {}
+
+    class Request:
+        def execute(self):
+            return {"items": [{"id": "video123", "snippet": {"title": "A scheduled Short"},
+                              "status": {"privacyStatus": "private", "uploadStatus": "processed",
+                                         "publishAt": "2026-10-11T15:38:00Z"}}]}
+
+    class Videos:
+        def list(self, **kwargs):
+            calls.update(kwargs)
+            return Request()
+
+    class Service:
+        def videos(self):
+            return Videos()
+
+    monkeypatch.setattr(Y, "service", lambda: Service())
+    assert Y.video_status("video123") == {
+        "video_id": "video123", "title": "A scheduled Short", "privacy_status": "private",
+        "upload_status": "processed", "publish_at": "2026-10-11T15:38:00Z", "rejection_reason": None,
+    }
+    assert calls == {"part": "snippet,status", "id": "video123", "maxResults": 1}
+
+
 def test_delete_is_dry_run_by_default_and_checks_scope(monkeypatch):
     """Deleting a published video is irreversible, so it defaults to doing nothing.
 
