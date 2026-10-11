@@ -140,7 +140,7 @@ def cmd_doctor(cfg: dict) -> int:
     if os.environ.get("YT_REFRESH_TOKEN"):
         try:
             from .common import http
-            from .youtube import credentials, service, video_status
+            from .youtube import DELETE_SCOPE, credentials, service, video_status
             creds = credentials()
             info = http().get("https://oauth2.googleapis.com/tokeninfo",
                               params={"access_token": creds.token}, timeout=15).json()
@@ -150,6 +150,8 @@ def cmd_doctor(cfg: dict) -> int:
                 has = f"https://www.googleapis.com/auth/{sc}" in granted
                 print(f"  {'✓' if has else '✗'} {sc}{'' if has else '   ← MISSING: re-authorize with this scope'}")
                 ok &= has or sc == "yt-analytics.readonly"
+            can_manage_existing = DELETE_SCOPE in granted or "https://www.googleapis.com/auth/youtube" in granted
+            print(f"  {'✓' if can_manage_existing else '✗'} youtube.force-ssl (modify existing videos)")
             items = service().channels().list(part="snippet,statistics", mine=True).execute().get("items", [])
             if items:
                 it = items[0]
