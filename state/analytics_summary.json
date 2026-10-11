@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-11T02:12:44.167002+00:00",
+  "updated": "2026-10-11T07:47:52.250542+00:00",
   "videos_total": 43,
   "videos_7d": 13,
-  "views_7d": 6745,
+  "views_7d": 6763,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -41,12 +41,12 @@
         },
         {
           "arm": "geography",
-          "mean": 0.407,
+          "mean": 0.408,
           "n": 2
         },
         {
           "arm": "culture",
-          "mean": 0.392,
+          "mean": 0.393,
           "n": 3
         }
       ]
@@ -261,7 +261,7 @@
     {
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
-      "views": 1547,
+      "views": 1562,
       "avg_view_pct": 125.34
     },
     {
@@ -344,6 +344,117 @@
       "to_pct": 20
     }
   },
+  "retention_segments": {
+    "status": "not_available_yet",
+    "videos_with_segment_data": 0,
+    "matured_videos_eligible": 32,
+    "video_coverage": 0.0,
+    "segment_metric_rows_reported": 0,
+    "segment_rows_in_curve": 0,
+    "row_coverage": 0.0,
+    "bin_width_pct": 5,
+    "bins": [],
+    "meaning": {
+      "started_watching": "Times a video segment was the first segment seen during a playback; not unique viewers or Shorts-feed starts.",
+      "stopped_watching": "Times a video segment was the last segment seen during a playback; not feed swipes or viewed-versus-swiped-away outcomes.",
+      "total_segment_impressions": "Times a video segment was viewed; repeat views in one playback can count again; not Shorts-feed impressions or 'Shown in feed'."
+    },
+    "note": "Bins pool event counts across covered videos; counts are not viewer percentages or feed estimates. Row coverage counts rows with all three segment metrics present; missing/null metric rows are not converted to zero."
+  },
+  "feed_discovery": {
+    "status": "unavailable_via_youtube_analytics_api",
+    "shown_in_feed": null,
+    "viewed_vs_swiped_away": null,
+    "note": "The Analytics API integration does not expose Studio's 'Shown in feed' or 'Viewed vs swiped away' Shorts metrics. These are not estimated from views, engaged views, or in-video retention events."
+  },
+  "turn_experiment": {
+    "experiment_id": "early_turn_v1",
+    "enabled": true,
+    "assignment": "Randomized, shuffled two-variant blocks within each production run; each topic remains unique and both variants preserve the same factual/originality and publish criteria.",
+    "status": "collecting",
+    "minimum_mature_retention_videos_per_variant": 10,
+    "assigned_videos": 0,
+    "by_variant": {
+      "consequence_first": {
+        "assigned_videos": 0,
+        "matured_videos": 0,
+        "turn_score_n": 0,
+        "turn_score_coverage": 0.0,
+        "turn_reason_n": 0,
+        "turn_reason_coverage": 0.0,
+        "turn_telemetry_status_counts": {
+          "scored": 0,
+          "missing": 0,
+          "malformed": 0
+        },
+        "median_turn_strength": null,
+        "retention_n": 0,
+        "median_average_view_percentage": null,
+        "over_internal_average_view_target": 0,
+        "turn_start_n": 0,
+        "median_turn_start_runtime_pct": null,
+        "turn_strength_vs_average_view_percentage": {
+          "n_pairs": 0,
+          "spearman_r": null,
+          "note": "Descriptive association only; uses matured videos with valid turn scores, clean averageViewPercentage, and at least the configured minimum engagedViews. Not a causal claim or publication gate."
+        },
+        "category_counts": {},
+        "definition": "Beat two leads with a source-backed consequence, cost, exception, or reversal."
+      },
+      "new_surprise_first": {
+        "assigned_videos": 0,
+        "matured_videos": 0,
+        "turn_score_n": 0,
+        "turn_score_coverage": 0.0,
+        "turn_reason_n": 0,
+        "turn_reason_coverage": 0.0,
+        "turn_telemetry_status_counts": {
+          "scored": 0,
+          "missing": 0,
+          "malformed": 0
+        },
+        "median_turn_strength": null,
+        "retention_n": 0,
+        "median_average_view_percentage": null,
+        "over_internal_average_view_target": 0,
+        "turn_start_n": 0,
+        "median_turn_start_runtime_pct": null,
+        "turn_strength_vs_average_view_percentage": {
+          "n_pairs": 0,
+          "spearman_r": null,
+          "note": "Descriptive association only; uses matured videos with valid turn scores, clean averageViewPercentage, and at least the configured minimum engagedViews. Not a causal claim or publication gate."
+        },
+        "category_counts": {},
+        "definition": "Beat two leads with the next distinct source-backed surprising fact."
+      }
+    },
+    "all_variants": {
+      "assigned_videos": 0,
+      "matured_videos": 0,
+      "turn_score_n": 0,
+      "turn_score_coverage": 0.0,
+      "turn_reason_n": 0,
+      "turn_reason_coverage": 0.0,
+      "turn_telemetry_status_counts": {
+        "scored": 0,
+        "missing": 0,
+        "malformed": 0
+      },
+      "median_turn_strength": null,
+      "retention_n": 0,
+      "median_average_view_percentage": null,
+      "over_internal_average_view_target": 0,
+      "turn_start_n": 0,
+      "median_turn_start_runtime_pct": null,
+      "turn_strength_vs_average_view_percentage": {
+        "n_pairs": 0,
+        "spearman_r": null,
+        "note": "Descriptive association only; uses matured videos with valid turn scores, clean averageViewPercentage, and at least the configured minimum engagedViews. Not a causal claim or publication gate."
+      },
+      "category_counts": {}
+    },
+    "interpretation": "Small samples and different trending topics, lanes, and posting times can affect outcomes. Treat these summaries as exploratory; no treatment is auto-selected and no score or retention metric adds a publication veto."
+  },
   "average_view_target": {
     "n": 31,
     "gate_pct": 70.0,
@@ -355,7 +466,7 @@
   },
   "subscribers": {
     "net_90d": 26,
-    "views_90d": 25392,
+    "views_90d": 25410,
     "per_1k_views": 1.02,
     "videos": 34,
     "denominator_basis": "public_views_fallback",
@@ -366,11 +477,11 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 9610,
+    "engaged_views_90d": 9611,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003203,
+    "expanded_threshold_progress": 0.003204,
     "current_full_threshold_progress": 0.000961,
     "feb_2027_full_threshold_progress": 0.000481,
     "public_videos": 34,
