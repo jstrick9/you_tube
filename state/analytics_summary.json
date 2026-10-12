@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-12T07:57:30.417336+00:00",
+  "updated": "2026-10-12T19:53:43.241119+00:00",
   "videos_total": 43,
   "videos_7d": 12,
-  "views_7d": 6836,
+  "views_7d": 6862,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -11,7 +11,7 @@
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.565,
+          "mean": 0.564,
           "n": 6
         },
         {
@@ -41,12 +41,12 @@
         },
         {
           "arm": "geography",
-          "mean": 0.408,
+          "mean": 0.409,
           "n": 2
         },
         {
           "arm": "culture",
-          "mean": 0.393,
+          "mean": 0.394,
           "n": 3
         }
       ]
@@ -262,13 +262,13 @@
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
       "views": 1562,
-      "avg_view_pct": 118.86000000000001
+      "avg_view_pct": 114.19
     },
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
       "views": 1445,
-      "avg_view_pct": 90.69
+      "avg_view_pct": 90.48
     },
     {
       "title": "Why you are falling through space right now #shorts",
@@ -286,7 +286,7 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1233,
-      "avg_view_pct": 79.99
+      "avg_view_pct": 80.05
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 33,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 33,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -513,7 +513,7 @@
         "hook_style": "you_statement",
         "duration_seconds": 33.3,
         "avg_view_pct": 36.64,
-        "views": 326,
+        "views": 327,
         "engaged_views_90d": 58
       },
       {
@@ -551,9 +551,9 @@
         "format": "ranked_escalation",
         "hook_style": "you_statement",
         "duration_seconds": 19.7,
-        "avg_view_pct": 42.47,
+        "avg_view_pct": 44.41,
         "views": 78,
-        "engaged_views_90d": 24
+        "engaged_views_90d": 26
       },
       {
         "id": "6dO8y_ojGhI",
@@ -611,28 +611,28 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 25494,
-    "per_1k_views": 1.06,
+    "views_90d": 10051,
+    "per_1k_views": 2.69,
     "videos": 34,
-    "denominator_basis": "public_views_fallback",
-    "videos_with_engaged_views": 33,
-    "complete_engaged_view_coverage": false,
+    "denominator_basis": "engaged_views",
+    "videos_with_engaged_views": 34,
+    "complete_engaged_view_coverage": true,
     "days_to_500": 1666.7,
     "days_to_1000": 3333.3
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 9893,
+    "engaged_views_90d": 10051,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003298,
-    "current_full_threshold_progress": 0.000989,
-    "feb_2027_full_threshold_progress": 0.000495,
+    "expanded_threshold_progress": 0.00335,
+    "current_full_threshold_progress": 0.001005,
+    "feb_2027_full_threshold_progress": 0.000503,
     "public_videos": 34,
-    "videos_with_metric": 33,
-    "coverage": 0.971,
-    "complete": false,
+    "videos_with_metric": 34,
+    "coverage": 1.0,
+    "complete": true,
     "note": "Partial if coverage is below 100%; only YouTube Analytics engagedViews count toward this proxy."
   },
   "originality": {
