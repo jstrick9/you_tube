@@ -1,18 +1,18 @@
 {
-  "updated": "2026-10-11T16:48:01.205722+00:00",
+  "updated": "2026-10-11T23:11:19.283187+00:00",
   "videos_total": 43,
   "videos_7d": 12,
-  "views_7d": 6780,
-  "learned_this_run": 0,
+  "views_7d": 6794,
+  "learned_this_run": 1,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 25,
+      "observations": 26,
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.554,
-          "n": 5
+          "mean": 0.565,
+          "n": 6
         },
         {
           "arm": "space",
@@ -53,12 +53,17 @@
     },
     "format": {
       "status": "learning",
-      "observations": 19,
+      "observations": 20,
       "arms": [
         {
           "arm": "scale_shock",
           "mean": 0.554,
           "n": 3
+        },
+        {
+          "arm": "guess_reveal",
+          "mean": 0.546,
+          "n": 1
         },
         {
           "arm": "dumbest_decision",
@@ -81,11 +86,6 @@
           "n": 3
         },
         {
-          "arm": "guess_reveal",
-          "mean": 0.5,
-          "n": 0
-        },
-        {
           "arm": "what_if",
           "mean": 0.5,
           "n": 0
@@ -102,7 +102,7 @@
         },
         {
           "arm": "myth_buster",
-          "mean": 0.455,
+          "mean": 0.456,
           "n": 1
         },
         {
@@ -222,8 +222,13 @@
     },
     "comment_device": {
       "status": "learning",
-      "observations": 8,
+      "observations": 9,
       "arms": [
+        {
+          "arm": "poll",
+          "mean": 0.52,
+          "n": 4
+        },
         {
           "arm": "correction_bait",
           "mean": 0.513,
@@ -245,11 +250,6 @@
           "n": 0
         },
         {
-          "arm": "poll",
-          "mean": 0.496,
-          "n": 3
-        },
-        {
           "arm": "challenge",
           "mean": 0.488,
           "n": 1
@@ -262,7 +262,7 @@
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
       "views": 1562,
-      "avg_view_pct": 125.34
+      "avg_view_pct": 119
     },
     {
       "title": "Why Beavers Bully Trees #shorts",
@@ -274,7 +274,7 @@
       "title": "Why you are falling through space right now #shorts",
       "id": "UvqHvc4mOXM",
       "views": 1397,
-      "avg_view_pct": 63.27
+      "avg_view_pct": 63.49
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -323,7 +323,7 @@
   "retention": {
     "videos": 27,
     "where": "hook",
-    "verdict": "Largest relative watch-ratio drop: 20% of the opening level between 10% and 20% of runtime (opening). This is a ratio-curve change, not a percentage of viewers. Median average view percentage is 56% against the internal 70% target.",
+    "verdict": "Largest relative watch-ratio drop: 20% of the opening level between 10% and 20% of runtime (opening). This is a ratio-curve change, not a percentage of viewers. Median average view percentage is 58% against the internal 70% target.",
     "avg_curve": [
       1.4091,
       1.3129,
@@ -337,7 +337,7 @@
       0.4878,
       0.4297
     ],
-    "median_avg_view_pct": 56.22,
+    "median_avg_view_pct": 57.83,
     "worst_drop": {
       "size_of_opening_ratio": 0.2017,
       "from_pct": 10,
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 33,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 33,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -466,59 +466,15 @@
     "n": 32,
     "gate_pct": 70.0,
     "metric": "average_view_percentage",
-    "passing": 8,
-    "pass_rate": 0.25,
-    "median_avg_view_pct": 55.41,
-    "verdict": "8/32 measured videos clear the internal 70% average-view target (median 55%). This is average watch percentage, not the share of viewers who reached the end."
-  },
-  "subscribers": {
-    "net_90d": 26,
-    "views_90d": 25434,
-    "per_1k_views": 1.02,
-    "videos": 34,
-    "denominator_basis": "public_views_fallback",
-    "videos_with_engaged_views": 33,
-    "complete_engaged_view_coverage": false,
-    "days_to_500": 1730.8,
-    "days_to_1000": 3461.5
-  },
-  "shorts_monetization": {
-    "metric": "engaged_views",
-    "engaged_views_90d": 9611,
-    "expanded_ypp_threshold": 3000000,
-    "current_full_ypp_threshold": 10000000,
-    "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003204,
-    "current_full_threshold_progress": 0.000961,
-    "feb_2027_full_threshold_progress": 0.000481,
-    "public_videos": 34,
-    "videos_with_metric": 33,
-    "coverage": 0.971,
-    "complete": false,
-    "note": "Partial if coverage is below 100%; only YouTube Analytics engagedViews count toward this proxy."
-  },
-  "originality": {
-    "episodes_examined": 14,
-    "window": 25,
-    "mean_pairwise_similarity": 0.0,
-    "max_pairwise_similarity": 0.0,
-    "pairs_over_similarity_limit": 0,
-    "most_common_format": {
-      "name": "creepy_true",
-      "share": 0.286
-    },
-    "most_common_category": {
-      "name": "nature",
-      "share": 0.357
-    },
-    "share_with_narrator_commentary": 0.929,
-    "flags": [],
-    "verdict": "looks like a show"
+    "passing": 9,
+    "pass_rate": 0.281,
+    "median_avg_view_pct": 57.83,
+    "verdict": "9/32 measured videos clear the internal 70% average-view target (median 58%). This is average watch percentage, not the share of viewers who reached the end."
   },
   "average_view_watchlist": {
     "gate_pct": 70.0,
     "evaluated": 32,
-    "below_target": 24,
+    "below_target": 23,
     "shown": 10,
     "videos": [
       {
@@ -532,19 +488,6 @@
         "duration_seconds": 38.4,
         "avg_view_pct": 0.67,
         "views": 1,
-        "engaged_views_90d": 1
-      },
-      {
-        "id": "SlY7iKy1K3o",
-        "title": "CASE #007 — Alcatraz Escape: The Head That Wasn't Real #shorts",
-        "topic": "DUNIA ki Sabse Badi Mystery",
-        "created_at": "2026-10-08T19:36:23.676718+00:00",
-        "category": "mysteries",
-        "format": "ranked_escalation",
-        "hook_style": "you_statement",
-        "duration_seconds": 19.7,
-        "avg_view_pct": 24.1,
-        "views": 78,
         "engaged_views_90d": 1
       },
       {
@@ -600,6 +543,19 @@
         "engaged_views_90d": 602
       },
       {
+        "id": "SlY7iKy1K3o",
+        "title": "CASE #007 — Alcatraz Escape: The Head That Wasn't Real #shorts",
+        "topic": "DUNIA ki Sabse Badi Mystery",
+        "created_at": "2026-10-08T19:36:23.676718+00:00",
+        "category": "mysteries",
+        "format": "ranked_escalation",
+        "hook_style": "you_statement",
+        "duration_seconds": 19.7,
+        "avg_view_pct": 42.47,
+        "views": 78,
+        "engaged_views_90d": 24
+      },
+      {
         "id": "6dO8y_ojGhI",
         "title": "How Does Canadian Rain Reach the Gulf of Mexico? #shorts",
         "topic": "parts of Alberta and Saskatchewan, Canada, are actually within the Mississippi River Basin, meaning some water that falls in Canada eventually flows all the way to the Gulf of Mexico.",
@@ -611,19 +567,6 @@
         "avg_view_pct": 45.65,
         "views": 973,
         "engaged_views_90d": 540
-      },
-      {
-        "id": "321JPi9-2RY",
-        "title": "FIELD #011 — The fish that lives on land #shorts",
-        "topic": "Paani se bahar chalti hai ye machhli! Mudskipper!",
-        "created_at": "2026-10-08T19:36:21.275907+00:00",
-        "category": "nature",
-        "format": "guess_reveal",
-        "hook_style": "disbelief",
-        "duration_seconds": 17.1,
-        "avg_view_pct": 48.82,
-        "views": 527,
-        "engaged_views_90d": 30
       },
       {
         "id": "SBETRh-FF_I",
@@ -650,7 +593,64 @@
         "avg_view_pct": 50.26,
         "views": 1179,
         "engaged_views_90d": 533
+      },
+      {
+        "id": "jnlRW0Ca1o8",
+        "title": "Surprising Facts About the Octopus #shorts",
+        "topic": "Octopus",
+        "created_at": "2026-09-24T18:04:58.142709+00:00",
+        "category": "science",
+        "format": "by_the_numbers",
+        "hook_style": "you_statement",
+        "duration_seconds": 30.6,
+        "avg_view_pct": 51.93,
+        "views": 1283,
+        "engaged_views_90d": 468
       }
     ]
+  },
+  "subscribers": {
+    "net_90d": 27,
+    "views_90d": 25451,
+    "per_1k_views": 1.06,
+    "videos": 34,
+    "denominator_basis": "public_views_fallback",
+    "videos_with_engaged_views": 33,
+    "complete_engaged_view_coverage": false,
+    "days_to_500": 1666.7,
+    "days_to_1000": 3333.3
+  },
+  "shorts_monetization": {
+    "metric": "engaged_views",
+    "engaged_views_90d": 9893,
+    "expanded_ypp_threshold": 3000000,
+    "current_full_ypp_threshold": 10000000,
+    "feb_2027_full_ypp_threshold": 20000000,
+    "expanded_threshold_progress": 0.003298,
+    "current_full_threshold_progress": 0.000989,
+    "feb_2027_full_threshold_progress": 0.000495,
+    "public_videos": 34,
+    "videos_with_metric": 33,
+    "coverage": 0.971,
+    "complete": false,
+    "note": "Partial if coverage is below 100%; only YouTube Analytics engagedViews count toward this proxy."
+  },
+  "originality": {
+    "episodes_examined": 14,
+    "window": 25,
+    "mean_pairwise_similarity": 0.0,
+    "max_pairwise_similarity": 0.0,
+    "pairs_over_similarity_limit": 0,
+    "most_common_format": {
+      "name": "creepy_true",
+      "share": 0.286
+    },
+    "most_common_category": {
+      "name": "nature",
+      "share": 0.357
+    },
+    "share_with_narrator_commentary": 0.929,
+    "flags": [],
+    "verdict": "looks like a show"
   }
 }
