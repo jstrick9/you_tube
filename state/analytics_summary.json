@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-12T19:53:43.241119+00:00",
+  "updated": "2026-10-12T20:26:57.440162+00:00",
   "videos_total": 43,
-  "videos_7d": 12,
-  "views_7d": 6862,
+  "videos_7d": 10,
+  "views_7d": 5424,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 33,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 33,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
