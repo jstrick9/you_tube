@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-12T02:40:44.596892+00:00",
+  "updated": "2026-10-12T07:57:30.417336+00:00",
   "videos_total": 43,
   "videos_7d": 12,
-  "views_7d": 6814,
+  "views_7d": 6836,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -62,7 +62,7 @@
         },
         {
           "arm": "guess_reveal",
-          "mean": 0.546,
+          "mean": 0.545,
           "n": 1
         },
         {
@@ -267,7 +267,7 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1444,
+      "views": 1445,
       "avg_view_pct": 90.69
     },
     {
@@ -611,7 +611,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 25471,
+    "views_90d": 25494,
     "per_1k_views": 1.06,
     "videos": 34,
     "denominator_basis": "public_views_fallback",
