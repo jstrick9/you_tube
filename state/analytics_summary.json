@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-11T23:11:19.283187+00:00",
+  "updated": "2026-10-12T02:40:44.596892+00:00",
   "videos_total": 43,
   "videos_7d": 12,
-  "views_7d": 6794,
-  "learned_this_run": 1,
+  "views_7d": 6814,
+  "learned_this_run": 0,
   "strategy": {
     "category": {
       "status": "learning",
@@ -262,7 +262,7 @@
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
       "views": 1562,
-      "avg_view_pct": 119
+      "avg_view_pct": 118.86000000000001
     },
     {
       "title": "Why Beavers Bully Trees #shorts",
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 33,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 33,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -611,7 +611,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 25451,
+    "views_90d": 25471,
     "per_1k_views": 1.06,
     "videos": 34,
     "denominator_basis": "public_views_fallback",

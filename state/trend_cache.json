@@ -1,5 +1,5 @@
 {
-  "yt_outliers_date": "2026-10-11",
+  "yt_outliers_date": "2026-10-12",
   "yt_outliers": [
     {
       "topic": "Why Your Fingers Can Never Actually Touch",
@@ -9,50 +9,131 @@
       "hook": "question",
       "score": 1.0,
       "context": [
-        "viral Short now: 1,691,619 views in 27h, 21x its channel's subscribers",
-        "Pinch your index finger and thumb together right now. You feel pressure, so your brain tells you two surfaces are making solid contact. But "
+        "viral Short now: 2,220,347 views in 52h, 27x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=aQvq4ajH_oM",
       "video_id": "aQvq4ajH_oM",
       "published_at": "2026-10-09T23:00:12Z",
       "channel_title": "MORGAR | Human History",
       "evidence": {
-        "views": 1691619,
-        "hours": 27.2,
-        "vph": 62167,
-        "breakout": 21.0,
+        "views": 2220347,
+        "hours": 51.7,
+        "vph": 42965,
+        "breakout": 27.4,
         "video_id": "aQvq4ajH_oM",
         "video_url": "https://www.youtube.com/watch?v=aQvq4ajH_oM",
         "published_at": "2026-10-09T23:00:12Z",
         "channel_title": "MORGAR | Human History",
-        "search_query": "history facts"
+        "search_query": "history facts",
+        "duration_seconds": 11
       }
     },
     {
-      "topic": "जनवर क आख क Shape अलग कय हत ह?",
+      "topic": "Why Water Buffaloes Love Disappearing Underwater",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
       "score": 0.9969,
       "context": [
-        "viral Short now: 516,124 views in 63h, 62x its channel's subscribers",
-        "जनवर क आख क Shape अलग कय हत ह? बकर क आख क pupil Horizontal, बलल क Vertical और इसन क Round कय हत ह? जनए Animal Eye और Pupil Shape क पछ छप Evo"
+        "viral Short now: 1,155,257 views in 36h, 25x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=3QZAP6sJXd0",
-      "video_id": "3QZAP6sJXd0",
-      "published_at": "2026-10-08T11:24:08Z",
-      "channel_title": "Knowledge Point IQ",
+      "source_url": "https://www.youtube.com/watch?v=Eky6TP7z3FU",
+      "video_id": "Eky6TP7z3FU",
+      "published_at": "2026-10-10T15:00:28Z",
+      "channel_title": "Events Untold",
       "evidence": {
-        "views": 516124,
-        "hours": 62.8,
-        "vph": 8217,
-        "breakout": 62.3,
-        "video_id": "3QZAP6sJXd0",
-        "video_url": "https://www.youtube.com/watch?v=3QZAP6sJXd0",
-        "published_at": "2026-10-08T11:24:08Z",
-        "channel_title": "Knowledge Point IQ",
-        "search_query": "animal facts"
+        "views": 1155257,
+        "hours": 35.7,
+        "vph": 32385,
+        "breakout": 25.3,
+        "video_id": "Eky6TP7z3FU",
+        "video_url": "https://www.youtube.com/watch?v=Eky6TP7z3FU",
+        "published_at": "2026-10-10T15:00:28Z",
+        "channel_title": "Events Untold",
+        "search_query": "animal facts",
+        "duration_seconds": 11
+      }
+    },
+    {
+      "topic": "नरयल तल लगन वल दख ल",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9939,
+      "context": [
+        "viral Short now: 4,731,883 views in 47h, 1x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=opkjb2IE2Hc",
+      "video_id": "opkjb2IE2Hc",
+      "published_at": "2026-10-10T03:32:05Z",
+      "channel_title": "Vedant Sir",
+      "evidence": {
+        "views": 4731883,
+        "hours": 47.1,
+        "vph": 100366,
+        "breakout": 0.9,
+        "video_id": "opkjb2IE2Hc",
+        "video_url": "https://www.youtube.com/watch?v=opkjb2IE2Hc",
+        "published_at": "2026-10-10T03:32:05Z",
+        "channel_title": "Vedant Sir",
+        "search_query": "science facts",
+        "duration_seconds": 35
+      }
+    },
+    {
+      "topic": "Why Do Farmers Use Bamboo to Scare Monkeys?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9908,
+      "context": [
+        "viral Short now: 877,432 views in 62h, 24x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=BDqFQgshkew",
+      "video_id": "BDqFQgshkew",
+      "published_at": "2026-10-09T12:37:54Z",
+      "channel_title": "Free Farm Secret",
+      "evidence": {
+        "views": 877432,
+        "hours": 62.0,
+        "vph": 14141,
+        "breakout": 24.4,
+        "video_id": "BDqFQgshkew",
+        "video_url": "https://www.youtube.com/watch?v=BDqFQgshkew",
+        "published_at": "2026-10-09T12:37:54Z",
+        "channel_title": "Free Farm Secret",
+        "search_query": "animal facts",
+        "duration_seconds": 30
+      }
+    },
+    {
+      "topic": "Why Do We Yawn ? The Real Science",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9878,
+      "context": [
+        "viral Short now: 227,657 views in 60h, 228x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=wOdx3QvS1eY",
+      "video_id": "wOdx3QvS1eY",
+      "published_at": "2026-10-09T14:18:27Z",
+      "channel_title": "@bioverse",
+      "evidence": {
+        "views": 227657,
+        "hours": 60.4,
+        "vph": 3771,
+        "breakout": 227.7,
+        "video_id": "wOdx3QvS1eY",
+        "video_url": "https://www.youtube.com/watch?v=wOdx3QvS1eY",
+        "published_at": "2026-10-09T14:18:27Z",
+        "channel_title": "@bioverse",
+        "search_query": "science facts",
+        "duration_seconds": 29
       }
     },
     {
@@ -61,79 +142,25 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9938,
+      "score": 0.9847,
       "context": [
-        "viral Short now: 337,961 views in 35h, 30x its channel's subscribers",
-        "పకష దరత కటల వసతద? కమన టలర బరడ (Common Tailorbird) తన మకకత ఆకలన కటట గడన ఎల నరమసతద ఈ KA Facts తలగ Shortల తలసకడ! పరత వడయ చడడ: ఈ Shortక జత చసన R"
+        "viral Short now: 561,058 views in 59h, 48x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=b2mVI32TvKk",
       "video_id": "b2mVI32TvKk",
       "published_at": "2026-10-09T15:20:26Z",
       "channel_title": "KA Facts (తెలుగు)",
       "evidence": {
-        "views": 337961,
-        "hours": 34.9,
-        "vph": 9691,
-        "breakout": 30.4,
+        "views": 561058,
+        "hours": 59.3,
+        "vph": 9455,
+        "breakout": 47.5,
         "video_id": "b2mVI32TvKk",
         "video_url": "https://www.youtube.com/watch?v=b2mVI32TvKk",
         "published_at": "2026-10-09T15:20:26Z",
         "channel_title": "KA Facts (తెలుగు)",
-        "search_query": "animal facts"
-      }
-    },
-    {
-      "topic": "Why Don't Lions Attack Safari Vehicles Even When They Are Right In Front of Them?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9907,
-      "context": [
-        "viral Short now: 564,102 views in 59h, 20x its channel's subscribers",
-        "Why Don't Lions Attack Safari Vehicles Even When They Are Right In Front of Them? Welcome to June Fact! Have you ever wondered why the king "
-      ],
-      "source_url": "https://www.youtube.com/watch?v=lXrwhZt4NuY",
-      "video_id": "lXrwhZt4NuY",
-      "published_at": "2026-10-08T15:15:04Z",
-      "channel_title": "Zoon Fact",
-      "evidence": {
-        "views": 564102,
-        "hours": 59.0,
-        "vph": 9567,
-        "breakout": 19.5,
-        "video_id": "lXrwhZt4NuY",
-        "video_url": "https://www.youtube.com/watch?v=lXrwhZt4NuY",
-        "published_at": "2026-10-08T15:15:04Z",
-        "channel_title": "Zoon Fact",
-        "search_query": "animal facts"
-      }
-    },
-    {
-      "topic": "The Toxic Lady",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9877,
-      "context": [
-        "viral Short now: 706,851 views in 62h, 11x its channel's subscribers",
-        "Topics covered from queries: Gloria Ramirez Gloria Ramirez Toxic Lady Gloria Ramirez Toxic Woman Toxic Lady case Gloria Ramirez 1994 Gloria "
-      ],
-      "source_url": "https://www.youtube.com/watch?v=QRiHGz5hJZc",
-      "video_id": "QRiHGz5hJZc",
-      "published_at": "2026-10-08T11:45:01Z",
-      "channel_title": "RM Here",
-      "evidence": {
-        "views": 706851,
-        "hours": 62.5,
-        "vph": 11316,
-        "breakout": 10.9,
-        "video_id": "QRiHGz5hJZc",
-        "video_url": "https://www.youtube.com/watch?v=QRiHGz5hJZc",
-        "published_at": "2026-10-08T11:45:01Z",
-        "channel_title": "RM Here",
-        "search_query": "unsolved mystery"
+        "search_query": "animal facts",
+        "duration_seconds": 121
       }
     },
     {
@@ -142,241 +169,133 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9846,
+      "score": 0.9816,
       "context": [
-        "viral Short now: 738,331 views in 25h, 1x its channel's subscribers",
-        "The 5 Most Dangerous Places in the World! Educational & Entertainment Purpose: This video has been created for educational and entertainment"
+        "viral Short now: 1,474,415 views in 50h, 2x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=QlykUiyfU3Y",
       "video_id": "QlykUiyfU3Y",
       "published_at": "2026-10-10T01:00:34Z",
       "channel_title": "Unique Fact Official",
       "evidence": {
-        "views": 738331,
-        "hours": 25.2,
-        "vph": 29293,
-        "breakout": 1.1,
+        "views": 1474415,
+        "hours": 49.7,
+        "vph": 29683,
+        "breakout": 2.1,
         "video_id": "QlykUiyfU3Y",
         "video_url": "https://www.youtube.com/watch?v=QlykUiyfU3Y",
         "published_at": "2026-10-10T01:00:34Z",
         "channel_title": "Unique Fact Official",
-        "search_query": "animal facts"
+        "search_query": "animal facts",
+        "duration_seconds": 101
       }
     },
     {
-      "topic": "Chewing gum wall",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9815,
-      "context": [
-        "viral Short now: 94,846 views in 40h, 95x its channel's subscribers",
-        "Chewing gum wall facts in telugu, vr facts in telugu, 10 facts in telugu, 100 facts in telugu, facts in telugu 100, facts in telugu new, fun"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=HK8rXSSP6Q4",
-      "video_id": "HK8rXSSP6Q4",
-      "published_at": "2026-10-09T10:15:37Z",
-      "channel_title": "VSfact",
-      "evidence": {
-        "views": 94846,
-        "hours": 40.0,
-        "vph": 2374,
-        "breakout": 94.8,
-        "video_id": "HK8rXSSP6Q4",
-        "video_url": "https://www.youtube.com/watch?v=HK8rXSSP6Q4",
-        "published_at": "2026-10-09T10:15:37Z",
-        "channel_title": "VSfact",
-        "search_query": "space facts"
-      }
-    },
-    {
-      "topic": "Unbelievable Animal moments ep 2",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "disbelief",
-      "score": 0.9784,
-      "context": [
-        "viral Short now: 243,602 views in 55h, 29x its channel's subscribers",
-        "Disclaimer: All credit goes to the original creators. The images, music, and videos used in this content belong to their rightful owners. If"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=rV3U1JkT4lY",
-      "video_id": "rV3U1JkT4lY",
-      "published_at": "2026-10-08T18:54:32Z",
-      "channel_title": "Amazing Animals Diaries ",
-      "evidence": {
-        "views": 243602,
-        "hours": 55.3,
-        "vph": 4405,
-        "breakout": 29.2,
-        "video_id": "rV3U1JkT4lY",
-        "video_url": "https://www.youtube.com/watch?v=rV3U1JkT4lY",
-        "published_at": "2026-10-08T18:54:32Z",
-        "channel_title": "Amazing Animals Diaries ",
-        "search_query": "animal facts"
-      }
-    },
-    {
-      "topic": "Baby Elephant Facts You Didn't Know",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "you_statement",
-      "score": 0.9753,
-      "context": [
-        "viral Short now: 118,473 views in 67h, 118x its channel's subscribers",
-        "Baby elephant ke ye facts aap ne pehle kabhi nahi suney honge! Paida hote hi 100 kilo ka wazan, sundh par control nahi, aur poora din sundh "
-      ],
-      "source_url": "https://www.youtube.com/watch?v=ymRsR7j5O4w",
-      "video_id": "ymRsR7j5O4w",
-      "published_at": "2026-10-08T07:00:33Z",
-      "channel_title": "MonuFacts",
-      "evidence": {
-        "views": 118473,
-        "hours": 67.2,
-        "vph": 1763,
-        "breakout": 118.5,
-        "video_id": "ymRsR7j5O4w",
-        "video_url": "https://www.youtube.com/watch?v=ymRsR7j5O4w",
-        "published_at": "2026-10-08T07:00:33Z",
-        "channel_title": "MonuFacts",
-        "search_query": "animal facts"
-      }
-    },
-    {
-      "topic": "India Aura% in Every Country",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9722,
-      "context": [
-        "viral Short now: 728,006 views in 36h, 1x its channel's subscribers",
-        "India Aura% in Every Country"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=q4vM7MNn8uA",
-      "video_id": "q4vM7MNn8uA",
-      "published_at": "2026-10-09T14:29:06Z",
-      "channel_title": "Hemu Fos",
-      "evidence": {
-        "views": 728006,
-        "hours": 35.7,
-        "vph": 20376,
-        "breakout": 0.8,
-        "video_id": "q4vM7MNn8uA",
-        "video_url": "https://www.youtube.com/watch?v=q4vM7MNn8uA",
-        "published_at": "2026-10-09T14:29:06Z",
-        "channel_title": "Hemu Fos",
-        "search_query": "history facts"
-      }
-    },
-    {
-      "topic": "Why Did Plague Doctors Wear Those Terrifying Masks?",
+      "topic": "टयर म पहल बर हव कस भर गई?",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "question",
-      "score": 0.9692,
+      "score": 0.9786,
       "context": [
-        "viral Short now: 1,097,633 views in 72h, 2x its channel's subscribers",
-        "During the plague outbreaks of the 17th century, plague doctors wore distinctive masks and protective clothing because they believed disease"
+        "viral Short now: 171,525 views in 69h, 172x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=sVa1S7-LKD8",
-      "video_id": "sVa1S7-LKD8",
-      "published_at": "2026-10-08T02:30:03Z",
-      "channel_title": "Mysterious Media",
+      "source_url": "https://www.youtube.com/watch?v=LCaOG7fG5jo",
+      "video_id": "LCaOG7fG5jo",
+      "published_at": "2026-10-09T06:00:26Z",
+      "channel_title": "Curioso ",
       "evidence": {
-        "views": 1097633,
-        "hours": 71.7,
-        "vph": 15306,
-        "breakout": 1.6,
-        "video_id": "sVa1S7-LKD8",
-        "video_url": "https://www.youtube.com/watch?v=sVa1S7-LKD8",
-        "published_at": "2026-10-08T02:30:03Z",
-        "channel_title": "Mysterious Media",
-        "search_query": "did you know history"
+        "views": 171525,
+        "hours": 68.7,
+        "vph": 2498,
+        "breakout": 171.5,
+        "video_id": "LCaOG7fG5jo",
+        "video_url": "https://www.youtube.com/watch?v=LCaOG7fG5jo",
+        "published_at": "2026-10-09T06:00:26Z",
+        "channel_title": "Curioso ",
+        "search_query": "did you know history",
+        "duration_seconds": 78
       }
     },
     {
-      "topic": "Never Do This When Your Cat Misbehaves!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "disbelief",
-      "score": 0.9661,
-      "context": [
-        "viral Short now: 510,148 views in 45h, 3x its channel's subscribers",
-        "Never Do This When Your Cat Misbehaves!.."
-      ],
-      "source_url": "https://www.youtube.com/watch?v=jp1bDiSoXns",
-      "video_id": "jp1bDiSoXns",
-      "published_at": "2026-10-09T05:30:15Z",
-      "channel_title": "FactswithMighty",
-      "evidence": {
-        "views": 510148,
-        "hours": 44.7,
-        "vph": 11410,
-        "breakout": 2.7,
-        "video_id": "jp1bDiSoXns",
-        "video_url": "https://www.youtube.com/watch?v=jp1bDiSoXns",
-        "published_at": "2026-10-09T05:30:15Z",
-        "channel_title": "FactswithMighty",
-        "search_query": "animal facts"
-      }
-    },
-    {
-      "topic": "How Long Can Animals Survive Without Food? Shocking Facts About Wildlife!",
+      "topic": "తలల పలల ఉనన ఈ రహసయ మక తలస? Amazing Science Facts Telugu.",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.963,
+      "score": 0.9755,
       "context": [
-        "viral Short now: 206,895 views in 62h, 27x its channel's subscribers",
-        "Have you ever wondered how long animals can survive without food? In this video, we reveal shocking facts about how many days or months diff"
+        "viral Short now: 253,306 views in 14h, 4x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=NPvOuZdMCU4",
-      "video_id": "NPvOuZdMCU4",
-      "published_at": "2026-10-08T12:30:30Z",
-      "channel_title": "Thiru Telugu facts",
+      "source_url": "https://www.youtube.com/watch?v=0Gykjqxw6wc",
+      "video_id": "0Gykjqxw6wc",
+      "published_at": "2026-10-11T12:28:45Z",
+      "channel_title": "Limbadritalks",
       "evidence": {
-        "views": 206895,
-        "hours": 61.7,
-        "vph": 3353,
-        "breakout": 27.2,
-        "video_id": "NPvOuZdMCU4",
-        "video_url": "https://www.youtube.com/watch?v=NPvOuZdMCU4",
-        "published_at": "2026-10-08T12:30:30Z",
-        "channel_title": "Thiru Telugu facts",
-        "search_query": "animal facts"
+        "views": 253306,
+        "hours": 14.2,
+        "vph": 17836,
+        "breakout": 4.3,
+        "video_id": "0Gykjqxw6wc",
+        "video_url": "https://www.youtube.com/watch?v=0Gykjqxw6wc",
+        "published_at": "2026-10-11T12:28:45Z",
+        "channel_title": "Limbadritalks",
+        "search_query": "science facts",
+        "duration_seconds": 121
       }
     },
     {
-      "topic": "7 Cat Breeds You Probably Didn’t Know Exist",
+      "topic": "Why Are Giant Boulders Dropped Into the Ocean?",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
-      "hook": "number_first",
-      "score": 0.9599,
+      "hook": "question",
+      "score": 0.9725,
       "context": [
-        "viral Short now: 122,032 views in 26h, 15x its channel's subscribers",
-        "Disclaimer: All credit goes to the original creators. The images, music, and videos used in this content belong to their rightful owners. If"
+        "viral Short now: 174,100 views in 39h, 46x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=x2Ps9RYH_04",
-      "video_id": "x2Ps9RYH_04",
-      "published_at": "2026-10-10T00:30:15Z",
-      "channel_title": "Amazing Animals Diaries ",
+      "source_url": "https://www.youtube.com/watch?v=8wzF0IvnD_g",
+      "video_id": "8wzF0IvnD_g",
+      "published_at": "2026-10-10T11:46:33Z",
+      "channel_title": "Faktozy",
       "evidence": {
-        "views": 122032,
-        "hours": 25.7,
-        "vph": 4746,
-        "breakout": 14.6,
-        "video_id": "x2Ps9RYH_04",
-        "video_url": "https://www.youtube.com/watch?v=x2Ps9RYH_04",
-        "published_at": "2026-10-10T00:30:15Z",
-        "channel_title": "Amazing Animals Diaries ",
-        "search_query": "animal facts"
+        "views": 174100,
+        "hours": 38.9,
+        "vph": 4475,
+        "breakout": 45.8,
+        "video_id": "8wzF0IvnD_g",
+        "video_url": "https://www.youtube.com/watch?v=8wzF0IvnD_g",
+        "published_at": "2026-10-10T11:46:33Z",
+        "channel_title": "Faktozy",
+        "search_query": "ocean facts",
+        "duration_seconds": 24
+      }
+    },
+    {
+      "topic": "Epic Astronomy Events in October 2026! October2026",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9694,
+      "context": [
+        "viral Short now: 85,543 views in 32h, 77x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=7RxeUGsw4fY",
+      "video_id": "7RxeUGsw4fY",
+      "published_at": "2026-10-10T18:13:33Z",
+      "channel_title": "👑VM_ manjiro1",
+      "evidence": {
+        "views": 85543,
+        "hours": 32.5,
+        "vph": 2636,
+        "breakout": 77.1,
+        "video_id": "7RxeUGsw4fY",
+        "video_url": "https://www.youtube.com/watch?v=7RxeUGsw4fY",
+        "published_at": "2026-10-10T18:13:33Z",
+        "channel_title": "👑VM_ manjiro1",
+        "search_query": "space facts",
+        "duration_seconds": 16
       }
     },
     {
@@ -385,25 +304,52 @@
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9568,
+      "score": 0.9663,
       "context": [
-        "viral Short now: 287,850 views in 29h, 4x its channel's subscribers",
-        "If you look at the left wrist of this jacket, there is an actual optical glass window stitched directly into the cuff. It looks like an ecce"
+        "viral Short now: 553,351 views in 54h, 7x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=OnX_qSkrrU8",
       "video_id": "OnX_qSkrrU8",
       "published_at": "2026-10-09T21:07:54Z",
       "channel_title": "MORGAR | Human History",
       "evidence": {
-        "views": 287850,
-        "hours": 29.1,
-        "vph": 9898,
-        "breakout": 3.6,
+        "views": 553351,
+        "hours": 53.5,
+        "vph": 10333,
+        "breakout": 6.8,
         "video_id": "OnX_qSkrrU8",
         "video_url": "https://www.youtube.com/watch?v=OnX_qSkrrU8",
         "published_at": "2026-10-09T21:07:54Z",
         "channel_title": "MORGAR | Human History",
-        "search_query": "history facts"
+        "search_query": "history facts",
+        "duration_seconds": 6
+      }
+    },
+    {
+      "topic": "Never break your parents trust",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "disbelief",
+      "score": 0.9633,
+      "context": [
+        "viral Short now: 728,848 views in 66h, 4x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=CvyI-FCSTfg",
+      "video_id": "CvyI-FCSTfg",
+      "published_at": "2026-10-09T08:30:00Z",
+      "channel_title": "Brain Starting ",
+      "evidence": {
+        "views": 728848,
+        "hours": 66.2,
+        "vph": 11013,
+        "breakout": 3.6,
+        "video_id": "CvyI-FCSTfg",
+        "video_url": "https://www.youtube.com/watch?v=CvyI-FCSTfg",
+        "published_at": "2026-10-09T08:30:00Z",
+        "channel_title": "Brain Starting ",
+        "search_query": "animal facts",
+        "duration_seconds": 80
       }
     },
     {
@@ -412,52 +358,25 @@
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9537,
+      "score": 0.9602,
       "context": [
-        "viral Short now: 106,556 views in 41h, 37x its channel's subscribers",
-        "Жусуп Абдрахманов и трагедия 1932 года: как Кыргызстан пытался спасти беженцев от искусственного голода в Казахстане. В 1932 году Казахстан "
+        "viral Short now: 164,346 views in 66h, 54x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=TK72XUjRNgQ",
       "video_id": "TK72XUjRNgQ",
       "published_at": "2026-10-09T09:00:30Z",
       "channel_title": "EL Taryhy",
       "evidence": {
-        "views": 106556,
-        "hours": 41.2,
-        "vph": 2586,
-        "breakout": 37.4,
+        "views": 164346,
+        "hours": 65.7,
+        "vph": 2503,
+        "breakout": 53.7,
         "video_id": "TK72XUjRNgQ",
         "video_url": "https://www.youtube.com/watch?v=TK72XUjRNgQ",
         "published_at": "2026-10-09T09:00:30Z",
         "channel_title": "EL Taryhy",
-        "search_query": "history facts"
-      }
-    },
-    {
-      "topic": "THE NEXT BLOOD MOON IS COMING!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9506,
-      "context": [
-        "viral Short now: 277,369 views in 62h, 14x its channel's subscribers",
-        "THE NEXT BLOOD MOON IS COMING! The next total lunar eclipse is coming on December 31, 2028! During this spectacular celestial event, Earth’s"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=8hW47mo_aNQ",
-      "video_id": "8hW47mo_aNQ",
-      "published_at": "2026-10-08T12:30:24Z",
-      "channel_title": "Dark Cosmic",
-      "evidence": {
-        "views": 277369,
-        "hours": 61.7,
-        "vph": 4495,
-        "breakout": 13.7,
-        "video_id": "8hW47mo_aNQ",
-        "video_url": "https://www.youtube.com/watch?v=8hW47mo_aNQ",
-        "published_at": "2026-10-08T12:30:24Z",
-        "channel_title": "Dark Cosmic",
-        "search_query": "space facts"
+        "search_query": "history facts",
+        "duration_seconds": 79
       }
     },
     {
@@ -466,187 +385,187 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9476,
+      "score": 0.9572,
       "context": [
-        "viral Short now: 116,151 views in 31h, 16x its channel's subscribers",
-        "This video uses a physical, mechanical model to demonstrate how pixel data is discarded as a digital image’s resolution decreases, causing d"
+        "viral Short now: 202,500 views in 56h, 26x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=KzcpjRwyPbQ",
       "video_id": "KzcpjRwyPbQ",
       "published_at": "2026-10-09T19:00:27Z",
       "channel_title": "Lunow",
       "evidence": {
-        "views": 116151,
-        "hours": 31.2,
-        "vph": 3722,
-        "breakout": 15.6,
+        "views": 202500,
+        "hours": 55.7,
+        "vph": 3637,
+        "breakout": 26.5,
         "video_id": "KzcpjRwyPbQ",
         "video_url": "https://www.youtube.com/watch?v=KzcpjRwyPbQ",
         "published_at": "2026-10-09T19:00:27Z",
         "channel_title": "Lunow",
-        "search_query": "science facts"
+        "search_query": "science facts",
+        "duration_seconds": 25
       }
     },
     {
-      "topic": "Haystacks Slammed the Host",
+      "topic": "Chewing gum wall",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9541,
+      "context": [
+        "viral Short now: 99,531 views in 64h, 100x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=HK8rXSSP6Q4",
+      "video_id": "HK8rXSSP6Q4",
+      "published_at": "2026-10-09T10:15:37Z",
+      "channel_title": "VSfact",
+      "evidence": {
+        "views": 99531,
+        "hours": 64.4,
+        "vph": 1545,
+        "breakout": 99.5,
+        "video_id": "HK8rXSSP6Q4",
+        "video_url": "https://www.youtube.com/watch?v=HK8rXSSP6Q4",
+        "published_at": "2026-10-09T10:15:37Z",
+        "channel_title": "VSfact",
+        "search_query": "space facts",
+        "duration_seconds": 22
+      }
+    },
+    {
+      "topic": "His Kindness Came Back Bigger",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9445,
+      "score": 0.951,
       "context": [
-        "viral Short now: 91,914 views in 65h, 77x its channel's subscribers",
-        "In 1980, wrestler GIANT HAYSTACKS appeared on Good Evening Ulster with TV presenter JACKIE FULLERTON. During a demonstration, Haystacks lift"
+        "viral Short now: 104,213 views in 29h, 24x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=bAPOUZznRo8",
-      "video_id": "bAPOUZznRo8",
-      "published_at": "2026-10-08T08:45:29Z",
-      "channel_title": "LORESTONE || HUMAN HISTORY",
+      "source_url": "https://www.youtube.com/watch?v=ESBzW8SQy14",
+      "video_id": "ESBzW8SQy14",
+      "published_at": "2026-10-10T21:22:46Z",
+      "channel_title": "Moments That Stay",
       "evidence": {
-        "views": 91914,
-        "hours": 65.5,
-        "vph": 1404,
-        "breakout": 76.6,
-        "video_id": "bAPOUZznRo8",
-        "video_url": "https://www.youtube.com/watch?v=bAPOUZznRo8",
-        "published_at": "2026-10-08T08:45:29Z",
-        "channel_title": "LORESTONE || HUMAN HISTORY",
-        "search_query": "history facts"
+        "views": 104213,
+        "hours": 29.3,
+        "vph": 3557,
+        "breakout": 24.0,
+        "video_id": "ESBzW8SQy14",
+        "video_url": "https://www.youtube.com/watch?v=ESBzW8SQy14",
+        "published_at": "2026-10-10T21:22:46Z",
+        "channel_title": "Moments That Stay",
+        "search_query": "history facts",
+        "duration_seconds": 7
       }
     },
     {
-      "topic": "ఒకకసర కటల గడల పటట 2 జతవల! Amazing Animal Facts",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9414,
-      "context": [
-        "viral Short now: 300,080 views in 37h, 3x its channel's subscribers",
-        "మన భమప ఒకకసర లకషల నచ కటల సఖయల గడల ఉతపతత చయగల జతవల ఉననయన తలస? ఈ వడయల అతయధక సఖయల గడల ఉతపతత చస 2 అదభతమన జతవల గరచ తలసకడ! ఇలట Amazing Animal Fact"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=kjg1YDt9cUI",
-      "video_id": "kjg1YDt9cUI",
-      "published_at": "2026-10-09T13:00:05Z",
-      "channel_title": "Nava mysterious ",
-      "evidence": {
-        "views": 300080,
-        "hours": 37.2,
-        "vph": 8064,
-        "breakout": 2.9,
-        "video_id": "kjg1YDt9cUI",
-        "video_url": "https://www.youtube.com/watch?v=kjg1YDt9cUI",
-        "published_at": "2026-10-09T13:00:05Z",
-        "channel_title": "Nava mysterious ",
-        "search_query": "animal facts"
-      }
-    },
-    {
-      "topic": "करड रपय मल फर भ Lighthouse क नकर नह करग Most Dangerous Job",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9383,
-      "context": [
-        "viral Short now: 171,380 views in 43h, 10x its channel's subscribers",
-        "सच, करड रपय क सलर मल लकन तमह समदर क बच बन एक Lighthouse म अकल रहन पड! न मबइल, न नटवरक और न ह कई सथ दन वल! खन-पन भ हलकपटर स पहचग और जब समदर क"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=dNsxfa5zHfs",
-      "video_id": "dNsxfa5zHfs",
-      "published_at": "2026-10-09T07:30:32Z",
-      "channel_title": "FactWala",
-      "evidence": {
-        "views": 171380,
-        "hours": 42.7,
-        "vph": 4013,
-        "breakout": 10.4,
-        "video_id": "dNsxfa5zHfs",
-        "video_url": "https://www.youtube.com/watch?v=dNsxfa5zHfs",
-        "published_at": "2026-10-09T07:30:32Z",
-        "channel_title": "FactWala",
-        "search_query": "ocean facts"
-      }
-    },
-    {
-      "topic": "This Shark Could Have Been Alive Before America Existed",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9352,
-      "context": [
-        "viral Short now: 171,327 views in 27h, 4x its channel's subscribers",
-        "Deep beneath the freezing waters of the Arctic and North Atlantic oceans lives one of the most extraordinary animals on Earth: the Greenland"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=eRf3DQUh2sI",
-      "video_id": "eRf3DQUh2sI",
-      "published_at": "2026-10-09T23:00:30Z",
-      "channel_title": "Events Untold",
-      "evidence": {
-        "views": 171327,
-        "hours": 27.2,
-        "vph": 6297,
-        "breakout": 3.8,
-        "video_id": "eRf3DQUh2sI",
-        "video_url": "https://www.youtube.com/watch?v=eRf3DQUh2sI",
-        "published_at": "2026-10-09T23:00:30Z",
-        "channel_title": "Events Untold",
-        "search_query": "ocean facts"
-      }
-    },
-    {
-      "topic": "The Day the Kaaba Became Almost Empty",
+      "topic": "The Weirdest Ways People Have Died",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9321,
+      "score": 0.948,
       "context": [
-        "viral Short now: 64,397 views in 49h, 64x its channel's subscribers",
-        "For centuries, millions of Muslims have traveled to Mecca for pilgrimage. But in 2020, the COVID-19 pandemic led to unprecedented restrictio"
+        "viral Short now: 84,139 views in 55h, 84x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=yDeUqNWhPEg",
-      "video_id": "yDeUqNWhPEg",
-      "published_at": "2026-10-09T01:19:34Z",
-      "channel_title": "Samarjeet_facts",
+      "source_url": "https://www.youtube.com/watch?v=wdJVq-IEZsU",
+      "video_id": "wdJVq-IEZsU",
+      "published_at": "2026-10-09T19:30:21Z",
+      "channel_title": "World.of.oddities",
       "evidence": {
-        "views": 64397,
-        "hours": 48.9,
-        "vph": 1317,
-        "breakout": 64.4,
-        "video_id": "yDeUqNWhPEg",
-        "video_url": "https://www.youtube.com/watch?v=yDeUqNWhPEg",
-        "published_at": "2026-10-09T01:19:34Z",
-        "channel_title": "Samarjeet_facts",
-        "search_query": "history facts"
+        "views": 84139,
+        "hours": 55.2,
+        "vph": 1525,
+        "breakout": 84.1,
+        "video_id": "wdJVq-IEZsU",
+        "video_url": "https://www.youtube.com/watch?v=wdJVq-IEZsU",
+        "published_at": "2026-10-09T19:30:21Z",
+        "channel_title": "World.of.oddities",
+        "search_query": "did you know history",
+        "duration_seconds": 51
       }
     },
     {
-      "topic": "Are public executions entertainment or justice?",
+      "topic": "WHAT IF BLACK ADAM BROKE BILLY BATSON'S LEG?!",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9449,
+      "context": [
+        "viral Short now: 62,121 views in 34h, 62x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=gmeKk3Jw9u4",
+      "video_id": "gmeKk3Jw9u4",
+      "published_at": "2026-10-10T16:17:03Z",
+      "channel_title": "DAILY SCIENCE ",
+      "evidence": {
+        "views": 62121,
+        "hours": 34.4,
+        "vph": 1806,
+        "breakout": 62.1,
+        "video_id": "gmeKk3Jw9u4",
+        "video_url": "https://www.youtube.com/watch?v=gmeKk3Jw9u4",
+        "published_at": "2026-10-10T16:17:03Z",
+        "channel_title": "DAILY SCIENCE ",
+        "search_query": "science facts",
+        "duration_seconds": 21
+      }
+    },
+    {
+      "topic": "How Silver Surfer Was Really Made",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "question",
-      "score": 0.929,
+      "score": 0.9419,
       "context": [
-        "viral Short now: 271,152 views in 30h, 1x its channel's subscribers",
-        "Why is the U.S. bringing back public executions?"
+        "viral Short now: 106,970 views in 51h, 44x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=9GaGf9tpl3Q",
-      "video_id": "9GaGf9tpl3Q",
-      "published_at": "2026-10-09T20:06:56Z",
-      "channel_title": "Trevor's History Reels",
+      "source_url": "https://www.youtube.com/watch?v=8QTBrW1ghjU",
+      "video_id": "8QTBrW1ghjU",
+      "published_at": "2026-10-09T23:15:03Z",
+      "channel_title": "EPOCH TALES",
       "evidence": {
-        "views": 271152,
-        "hours": 30.1,
-        "vph": 9009,
-        "breakout": 1.4,
-        "video_id": "9GaGf9tpl3Q",
-        "video_url": "https://www.youtube.com/watch?v=9GaGf9tpl3Q",
-        "published_at": "2026-10-09T20:06:56Z",
-        "channel_title": "Trevor's History Reels",
-        "search_query": "history facts"
+        "views": 106970,
+        "hours": 51.4,
+        "vph": 2080,
+        "breakout": 43.8,
+        "video_id": "8QTBrW1ghjU",
+        "video_url": "https://www.youtube.com/watch?v=8QTBrW1ghjU",
+        "published_at": "2026-10-09T23:15:03Z",
+        "channel_title": "EPOCH TALES",
+        "search_query": "history facts",
+        "duration_seconds": 7
+      }
+    },
+    {
+      "topic": "तम Insan नह हत pt82 Find Your Animal Name Facts Shorts",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "you_statement",
+      "score": 0.9388,
+      "context": [
+        "viral Short now: 756,851 views in 44h, 0x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=fVifpGsZmKs",
+      "video_id": "fVifpGsZmKs",
+      "published_at": "2026-10-10T06:44:05Z",
+      "channel_title": "AI Universal Fact",
+      "evidence": {
+        "views": 756851,
+        "hours": 43.9,
+        "vph": 17222,
+        "breakout": 0.2,
+        "video_id": "fVifpGsZmKs",
+        "video_url": "https://www.youtube.com/watch?v=fVifpGsZmKs",
+        "published_at": "2026-10-10T06:44:05Z",
+        "channel_title": "AI Universal Fact",
+        "search_query": "animal facts",
+        "duration_seconds": 31
       }
     },
     {
@@ -655,52 +574,295 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.926,
+      "score": 0.9357,
       "context": [
-        "viral Short now: 394,243 views in 42h, 1x its channel's subscribers",
-        "Why Can’t Ships Throw Every Type of Waste Into the Sea? Have you ever wondered what happens to food waste produced during long sea voyages? "
+        "viral Short now: 638,035 views in 67h, 2x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=SjpTmvASplg",
       "video_id": "SjpTmvASplg",
       "published_at": "2026-10-09T07:53:32Z",
       "channel_title": "Facts Nesar 2.0",
       "evidence": {
-        "views": 394243,
-        "hours": 42.3,
-        "vph": 9315,
-        "breakout": 1.2,
+        "views": 638035,
+        "hours": 66.8,
+        "vph": 9553,
+        "breakout": 1.9,
         "video_id": "SjpTmvASplg",
         "video_url": "https://www.youtube.com/watch?v=SjpTmvASplg",
         "published_at": "2026-10-09T07:53:32Z",
         "channel_title": "Facts Nesar 2.0",
-        "search_query": "ocean facts"
+        "search_query": "ocean facts",
+        "duration_seconds": 30
       }
     },
     {
-      "topic": "Why Are There Two Chinas? The Civil War That Never Ended",
+      "topic": "You Won’t Believe What’s Moving This Grass!",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "you_statement",
+      "score": 0.9327,
+      "context": [
+        "viral Short now: 87,798 views in 27h, 16x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=CQJi9sbxsQQ",
+      "video_id": "CQJi9sbxsQQ",
+      "published_at": "2026-10-11T00:00:25Z",
+      "channel_title": "Cosmic Thrust ",
+      "evidence": {
+        "views": 87798,
+        "hours": 26.7,
+        "vph": 3292,
+        "breakout": 15.9,
+        "video_id": "CQJi9sbxsQQ",
+        "video_url": "https://www.youtube.com/watch?v=CQJi9sbxsQQ",
+        "published_at": "2026-10-11T00:00:25Z",
+        "channel_title": "Cosmic Thrust ",
+        "search_query": "science facts",
+        "duration_seconds": 6
+      }
+    },
+    {
+      "topic": "NASA Astronauts Saw 9/11 Smoke From Space",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9296,
+      "context": [
+        "viral Short now: 30,499 views in 14h, 30x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=DXiF_gFvW54",
+      "video_id": "DXiF_gFvW54",
+      "published_at": "2026-10-11T12:30:27Z",
+      "channel_title": "AstroSpidy",
+      "evidence": {
+        "views": 30499,
+        "hours": 14.2,
+        "vph": 2152,
+        "breakout": 30.5,
+        "video_id": "DXiF_gFvW54",
+        "video_url": "https://www.youtube.com/watch?v=DXiF_gFvW54",
+        "published_at": "2026-10-11T12:30:27Z",
+        "channel_title": "AstroSpidy",
+        "search_query": "space facts",
+        "duration_seconds": 5
+      }
+    },
+    {
+      "topic": "मखय दश स हजर KM दर",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9266,
+      "context": [
+        "viral Short now: 166,222 views in 38h, 8x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=CBLN61p8PvU",
+      "video_id": "CBLN61p8PvU",
+      "published_at": "2026-10-10T12:32:55Z",
+      "channel_title": "prince maps 1k",
+      "evidence": {
+        "views": 166222,
+        "hours": 38.1,
+        "vph": 4359,
+        "breakout": 7.7,
+        "video_id": "CBLN61p8PvU",
+        "video_url": "https://www.youtube.com/watch?v=CBLN61p8PvU",
+        "published_at": "2026-10-10T12:32:55Z",
+        "channel_title": "prince maps 1k",
+        "search_query": "science facts",
+        "duration_seconds": 44
+      }
+    },
+    {
+      "topic": "The Oldest Blue Cheese in the World",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.9235,
+      "context": [
+        "viral Short now: 40,677 views in 25h, 41x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=HBx8NSFebQA",
+      "video_id": "HBx8NSFebQA",
+      "published_at": "2026-10-11T02:07:20Z",
+      "channel_title": "Determinasi Sejarah",
+      "evidence": {
+        "views": 40677,
+        "hours": 24.6,
+        "vph": 1656,
+        "breakout": 40.7,
+        "video_id": "HBx8NSFebQA",
+        "video_url": "https://www.youtube.com/watch?v=HBx8NSFebQA",
+        "published_at": "2026-10-11T02:07:20Z",
+        "channel_title": "Determinasi Sejarah",
+        "search_query": "did you know history",
+        "duration_seconds": 7
+      }
+    },
+    {
+      "topic": "ఒకకసర కటల గడల పటట 2 జతవల! Amazing Animal Facts",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9204,
+      "context": [
+        "viral Short now: 365,600 views in 62h, 3x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=kjg1YDt9cUI",
+      "video_id": "kjg1YDt9cUI",
+      "published_at": "2026-10-09T13:00:05Z",
+      "channel_title": "Nava mysterious ",
+      "evidence": {
+        "views": 365600,
+        "hours": 61.7,
+        "vph": 5927,
+        "breakout": 3.4,
+        "video_id": "kjg1YDt9cUI",
+        "video_url": "https://www.youtube.com/watch?v=kjg1YDt9cUI",
+        "published_at": "2026-10-09T13:00:05Z",
+        "channel_title": "Nava mysterious ",
+        "search_query": "animal facts",
+        "duration_seconds": 31
+      }
+    },
+    {
+      "topic": "The World’s Most Dangerous Job: Deep-Sea Divers Risk Their Lives",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9174,
+      "context": [
+        "viral Short now: 86,137 views in 15h, 4x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=PIQ8XNvpU7M",
+      "video_id": "PIQ8XNvpU7M",
+      "published_at": "2026-10-11T11:26:46Z",
+      "channel_title": "Facts Imran 2.0",
+      "evidence": {
+        "views": 86137,
+        "hours": 15.2,
+        "vph": 5654,
+        "breakout": 3.6,
+        "video_id": "PIQ8XNvpU7M",
+        "video_url": "https://www.youtube.com/watch?v=PIQ8XNvpU7M",
+        "published_at": "2026-10-11T11:26:46Z",
+        "channel_title": "Facts Imran 2.0",
+        "search_query": "ocean facts",
+        "duration_seconds": 31
+      }
+    },
+    {
+      "topic": "आप इसन नह हत pt2 Find Your Animal Name Facts Shorts",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "you_statement",
+      "score": 0.9143,
+      "context": [
+        "viral Short now: 262,430 views in 20h, 0x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=I0AftCGAbE0",
+      "video_id": "I0AftCGAbE0",
+      "published_at": "2026-10-11T06:42:07Z",
+      "channel_title": "AI Universal Fact",
+      "evidence": {
+        "views": 262430,
+        "hours": 20.0,
+        "vph": 13135,
+        "breakout": 0.1,
+        "video_id": "I0AftCGAbE0",
+        "video_url": "https://www.youtube.com/watch?v=I0AftCGAbE0",
+        "published_at": "2026-10-11T06:42:07Z",
+        "channel_title": "AI Universal Fact",
+        "search_query": "animal facts",
+        "duration_seconds": 32
+      }
+    },
+    {
+      "topic": "400-Year-Old Hidden Masterpiece",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "number_first",
+      "score": 0.9113,
+      "context": [
+        "viral Short now: 70,021 views in 38h, 25x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=n8gZq8JRwIc",
+      "video_id": "n8gZq8JRwIc",
+      "published_at": "2026-10-10T13:00:35Z",
+      "channel_title": "History Snap92",
+      "evidence": {
+        "views": 70021,
+        "hours": 37.7,
+        "vph": 1859,
+        "breakout": 24.8,
+        "video_id": "n8gZq8JRwIc",
+        "video_url": "https://www.youtube.com/watch?v=n8gZq8JRwIc",
+        "published_at": "2026-10-10T13:00:35Z",
+        "channel_title": "History Snap92",
+        "search_query": "history facts",
+        "duration_seconds": 7
+      }
+    },
+    {
+      "topic": "How Animals Really Think About Humans",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9082,
+      "context": [
+        "viral Short now: 265,888 views in 42h, 2x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=dD6U808HKhc",
+      "video_id": "dD6U808HKhc",
+      "published_at": "2026-10-10T08:35:31Z",
+      "channel_title": "Connected Mind ",
+      "evidence": {
+        "views": 265888,
+        "hours": 42.1,
+        "vph": 6317,
+        "breakout": 2.2,
+        "video_id": "dD6U808HKhc",
+        "video_url": "https://www.youtube.com/watch?v=dD6U808HKhc",
+        "published_at": "2026-10-10T08:35:31Z",
+        "channel_title": "Connected Mind ",
+        "search_query": "animal facts",
+        "duration_seconds": 30
+      }
+    },
+    {
+      "topic": "Are public executions entertainment or justice?",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "question",
-      "score": 0.9229,
+      "score": 0.9051,
       "context": [
-        "viral Short now: 75,963 views in 71h, 76x its channel's subscribers",
-        "Did you know China and Taiwan never officially ended their civil war? They were once part of the same empire, the Qing Empire. In 1895, afte"
+        "viral Short now: 364,707 views in 55h, 2x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=TGW0H7Sd6Kw",
-      "video_id": "TGW0H7Sd6Kw",
-      "published_at": "2026-10-08T03:20:14Z",
-      "channel_title": "Route Logic",
+      "source_url": "https://www.youtube.com/watch?v=9GaGf9tpl3Q",
+      "video_id": "9GaGf9tpl3Q",
+      "published_at": "2026-10-09T20:06:56Z",
+      "channel_title": "Trevor's History Reels",
       "evidence": {
-        "views": 75963,
-        "hours": 70.9,
-        "vph": 1072,
-        "breakout": 76.0,
-        "video_id": "TGW0H7Sd6Kw",
-        "video_url": "https://www.youtube.com/watch?v=TGW0H7Sd6Kw",
-        "published_at": "2026-10-08T03:20:14Z",
-        "channel_title": "Route Logic",
-        "search_query": "did you know history"
+        "views": 364707,
+        "hours": 54.6,
+        "vph": 6684,
+        "breakout": 1.9,
+        "video_id": "9GaGf9tpl3Q",
+        "video_url": "https://www.youtube.com/watch?v=9GaGf9tpl3Q",
+        "published_at": "2026-10-09T20:06:56Z",
+        "channel_title": "Trevor's History Reels",
+        "search_query": "history facts",
+        "duration_seconds": 155
       }
     },
     {
@@ -709,106 +871,187 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9198,
+      "score": 0.9021,
       "context": [
-        "viral Short now: 274,584 views in 32h, 1x its channel's subscribers",
-        "Грибок Massospora cicadina уникальный паразит, который заражает периодических цикад и изменяет их поведение. Он относится к энтомопатогенным"
+        "viral Short now: 371,117 views in 56h, 2x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=zSw5DORx9lQ",
       "video_id": "zSw5DORx9lQ",
       "published_at": "2026-10-09T18:14:34Z",
       "channel_title": "Znatok",
       "evidence": {
-        "views": 274584,
-        "hours": 32.0,
-        "vph": 8588,
-        "breakout": 1.4,
+        "views": 371117,
+        "hours": 56.4,
+        "vph": 6576,
+        "breakout": 1.8,
         "video_id": "zSw5DORx9lQ",
         "video_url": "https://www.youtube.com/watch?v=zSw5DORx9lQ",
         "published_at": "2026-10-09T18:14:34Z",
         "channel_title": "Znatok",
-        "search_query": "science facts"
+        "search_query": "science facts",
+        "duration_seconds": 26
       }
     },
     {
-      "topic": "This Dog Detected a Hidden Gas Leak!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9167,
-      "context": [
-        "viral Short now: 533,381 views in 41h, 0x its channel's subscribers",
-        "This Dog Detected a Hidden Gas Leak! ______________________________ This dog kept digging at the exact same spot near the sidewalk, and his "
-      ],
-      "source_url": "https://www.youtube.com/watch?v=EjZn5vvyI-w",
-      "video_id": "EjZn5vvyI-w",
-      "published_at": "2026-10-09T09:40:36Z",
-      "channel_title": "Facto Try ",
-      "evidence": {
-        "views": 533381,
-        "hours": 40.5,
-        "vph": 13158,
-        "breakout": 0.1,
-        "video_id": "EjZn5vvyI-w",
-        "video_url": "https://www.youtube.com/watch?v=EjZn5vvyI-w",
-        "published_at": "2026-10-09T09:40:36Z",
-        "channel_title": "Facto Try ",
-        "search_query": "animal facts"
-      }
-    },
-    {
-      "topic": "The Bomb That Stuck to You Not the Enemy",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "you_statement",
-      "score": 0.9136,
-      "context": [
-        "viral Short now: 33,076 views in 11h, 11x its channel's subscribers",
-        "During World War 2, Britain created the Sticky Bomb, which was more dangerous to its own soldiers than the enemy. Its glue was so brutally s"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=CzlLRQsdB1w",
-      "video_id": "CzlLRQsdB1w",
-      "published_at": "2026-10-10T15:30:28Z",
-      "channel_title": "JTM History",
-      "evidence": {
-        "views": 33076,
-        "hours": 10.7,
-        "vph": 3089,
-        "breakout": 11.1,
-        "video_id": "CzlLRQsdB1w",
-        "video_url": "https://www.youtube.com/watch?v=CzlLRQsdB1w",
-        "published_at": "2026-10-10T15:30:28Z",
-        "channel_title": "JTM History",
-        "search_query": "did you know history"
-      }
-    },
-    {
-      "topic": "What's the Slowest Animal on this List?",
+      "topic": "Dog That Flies?!",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.9105,
+      "score": 0.899,
       "context": [
-        "viral Short now: 213,583 views in 32h, 2x its channel's subscribers",
-        ""
+        "viral Short now: 88,267 views in 70h, 43x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=MHjIq96lKZI",
-      "video_id": "MHjIq96lKZI",
-      "published_at": "2026-10-09T18:35:03Z",
-      "channel_title": "The Daily Upturn",
+      "source_url": "https://www.youtube.com/watch?v=DEcezdOIMow",
+      "video_id": "DEcezdOIMow",
+      "published_at": "2026-10-09T04:33:08Z",
+      "channel_title": "factwilly",
       "evidence": {
-        "views": 213583,
-        "hours": 31.6,
-        "vph": 6753,
-        "breakout": 2.2,
-        "video_id": "MHjIq96lKZI",
-        "video_url": "https://www.youtube.com/watch?v=MHjIq96lKZI",
-        "published_at": "2026-10-09T18:35:03Z",
-        "channel_title": "The Daily Upturn",
-        "search_query": "animal facts"
+        "views": 88267,
+        "hours": 70.1,
+        "vph": 1259,
+        "breakout": 43.5,
+        "video_id": "DEcezdOIMow",
+        "video_url": "https://www.youtube.com/watch?v=DEcezdOIMow",
+        "published_at": "2026-10-09T04:33:08Z",
+        "channel_title": "factwilly",
+        "search_query": "animal facts",
+        "duration_seconds": 19
+      }
+    },
+    {
+      "topic": "दनय क ऐस कन-स जल ह,",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.896,
+      "context": [
+        "viral Short now: 690,265 views in 71h, 0x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=LqRij_XvOnc",
+      "video_id": "LqRij_XvOnc",
+      "published_at": "2026-10-09T03:15:22Z",
+      "channel_title": "KM KAMLESH",
+      "evidence": {
+        "views": 690265,
+        "hours": 71.4,
+        "vph": 9664,
+        "breakout": 0.4,
+        "video_id": "LqRij_XvOnc",
+        "video_url": "https://www.youtube.com/watch?v=LqRij_XvOnc",
+        "published_at": "2026-10-09T03:15:22Z",
+        "channel_title": "KM KAMLESH",
+        "search_query": "history facts",
+        "duration_seconds": 12
+      }
+    },
+    {
+      "topic": "करड रपय मल फर भ Lighthouse क नकर नह करग Most Dangerous Job",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.8929,
+      "context": [
+        "viral Short now: 179,323 views in 67h, 11x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=dNsxfa5zHfs",
+      "video_id": "dNsxfa5zHfs",
+      "published_at": "2026-10-09T07:30:32Z",
+      "channel_title": "FactWala",
+      "evidence": {
+        "views": 179323,
+        "hours": 67.2,
+        "vph": 2670,
+        "breakout": 10.9,
+        "video_id": "dNsxfa5zHfs",
+        "video_url": "https://www.youtube.com/watch?v=dNsxfa5zHfs",
+        "published_at": "2026-10-09T07:30:32Z",
+        "channel_title": "FactWala",
+        "search_query": "ocean facts",
+        "duration_seconds": 27
+      }
+    },
+    {
+      "topic": "Death Penalty or Life in Prison?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.8898,
+      "context": [
+        "viral Short now: 59,431 views in 26h, 13x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=ca9Bh9a0Ot8",
+      "video_id": "ca9Bh9a0Ot8",
+      "published_at": "2026-10-11T01:00:34Z",
+      "channel_title": "ARCHIV | HUMAN HISTORY ",
+      "evidence": {
+        "views": 59431,
+        "hours": 25.7,
+        "vph": 2315,
+        "breakout": 12.7,
+        "video_id": "ca9Bh9a0Ot8",
+        "video_url": "https://www.youtube.com/watch?v=ca9Bh9a0Ot8",
+        "published_at": "2026-10-11T01:00:34Z",
+        "channel_title": "ARCHIV | HUMAN HISTORY ",
+        "search_query": "history facts",
+        "duration_seconds": 8
+      }
+    },
+    {
+      "topic": "만약 지금 한국이 북한을 공격한다면?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.8868,
+      "context": [
+        "viral Short now: 59,994 views in 66h, 60x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=9VGlXti1O2k",
+      "video_id": "9VGlXti1O2k",
+      "published_at": "2026-10-09T08:45:24Z",
+      "channel_title": "총균쇠",
+      "evidence": {
+        "views": 59994,
+        "hours": 65.9,
+        "vph": 910,
+        "breakout": 60.0,
+        "video_id": "9VGlXti1O2k",
+        "video_url": "https://www.youtube.com/watch?v=9VGlXti1O2k",
+        "published_at": "2026-10-09T08:45:24Z",
+        "channel_title": "총균쇠",
+        "search_query": "history facts",
+        "duration_seconds": 58
+      }
+    },
+    {
+      "topic": "Top 4 Weirdest Bird Sounds on Earth!",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "number_first",
+      "score": 0.8837,
+      "context": [
+        "viral Short now: 214,828 views in 26h, 0x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=eqFFIOZz1Ow",
+      "video_id": "eqFFIOZz1Ow",
+      "published_at": "2026-10-11T01:00:07Z",
+      "channel_title": "Unique Fact Official",
+      "evidence": {
+        "views": 214828,
+        "hours": 25.7,
+        "vph": 8366,
+        "breakout": 0.3,
+        "video_id": "eqFFIOZz1Ow",
+        "video_url": "https://www.youtube.com/watch?v=eqFFIOZz1Ow",
+        "published_at": "2026-10-11T01:00:07Z",
+        "channel_title": "Unique Fact Official",
+        "search_query": "animal facts",
+        "duration_seconds": 41
       }
     },
     {
@@ -817,268 +1060,25 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "number_first",
-      "score": 0.9075,
+      "score": 0.8807,
       "context": [
-        "viral Short now: 277,765 views in 37h, 2x its channel's subscribers",
-        "TOP 5 LONGEST LIVING CREATURES IN THE OCEANX य ह समदर क 5 ऐस जव, ज सबस लब उमर तक जत ह! 5 Bowhead Whale 4 Greenland Shark 3 Ocean Quahog Clam"
+        "viral Short now: 325,377 views in 61h, 2x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=RrQmUlIDEBE",
       "video_id": "RrQmUlIDEBE",
       "published_at": "2026-10-09T13:20:56Z",
       "channel_title": "JayDoc",
       "evidence": {
-        "views": 277765,
-        "hours": 36.9,
-        "vph": 7535,
-        "breakout": 1.6,
+        "views": 325377,
+        "hours": 61.3,
+        "vph": 5305,
+        "breakout": 1.8,
         "video_id": "RrQmUlIDEBE",
         "video_url": "https://www.youtube.com/watch?v=RrQmUlIDEBE",
         "published_at": "2026-10-09T13:20:56Z",
         "channel_title": "JayDoc",
-        "search_query": "animal facts"
-      }
-    },
-    {
-      "topic": "Mazar Ki Side Mein Khoda Gaya Phir Jo Hua!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9044,
-      "context": [
-        "viral Short now: 550,543 views in 64h, 1x its channel's subscribers",
-        "Mazar Ki Side Mein Khoda Gaya Phir Jo Hua! Credit :- Note:-Full Credit to Owners. All lmages, Picture, Music show in the video belongs to th"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=NwT7ypvrLnQ",
-      "video_id": "NwT7ypvrLnQ",
-      "published_at": "2026-10-08T10:00:27Z",
-      "channel_title": "ALL ISLAMIC 786",
-      "evidence": {
-        "views": 550543,
-        "hours": 64.2,
-        "vph": 8575,
-        "breakout": 1.0,
-        "video_id": "NwT7ypvrLnQ",
-        "video_url": "https://www.youtube.com/watch?v=NwT7ypvrLnQ",
-        "published_at": "2026-10-08T10:00:27Z",
-        "channel_title": "ALL ISLAMIC 786",
-        "search_query": "history facts"
-      }
-    },
-    {
-      "topic": "Did you know that Isaac Newton, Charles Darwin and Stephen Hawking are all buried in the same place?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.9013,
-      "context": [
-        "viral Short now: 352,028 views in 54h, 2x its channel's subscribers",
-        ""
-      ],
-      "source_url": "https://www.youtube.com/watch?v=uRGXctXyPLQ",
-      "video_id": "uRGXctXyPLQ",
-      "published_at": "2026-10-08T20:36:46Z",
-      "channel_title": "MrGee Math",
-      "evidence": {
-        "views": 352028,
-        "hours": 53.6,
-        "vph": 6567,
-        "breakout": 2.1,
-        "video_id": "uRGXctXyPLQ",
-        "video_url": "https://www.youtube.com/watch?v=uRGXctXyPLQ",
-        "published_at": "2026-10-08T20:36:46Z",
-        "channel_title": "MrGee Math",
-        "search_query": "did you know history"
-      }
-    },
-    {
-      "topic": "Earth’s Giant Natural Ring Wasn’t Made by Humans! Lake Manicouagan",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.8982,
-      "context": [
-        "viral Short now: 69,041 views in 70h, 69x its channel's subscribers",
-        "From space, it looks like a giant ring carved into Earth! Lake Manicouagan in Canada is actually the remains of a massive asteroid impact cr"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=OcMzKMvBYGM",
-      "video_id": "OcMzKMvBYGM",
-      "published_at": "2026-10-08T04:30:06Z",
-      "channel_title": "The Space Guide",
-      "evidence": {
-        "views": 69041,
-        "hours": 69.7,
-        "vph": 990,
-        "breakout": 69.0,
-        "video_id": "OcMzKMvBYGM",
-        "video_url": "https://www.youtube.com/watch?v=OcMzKMvBYGM",
-        "published_at": "2026-10-08T04:30:06Z",
-        "channel_title": "The Space Guide",
-        "search_query": "space facts"
-      }
-    },
-    {
-      "topic": "The Firefighter Refused to Ignore Him",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.8951,
-      "context": [
-        "viral Short now: 66,857 views in 29h, 16x its channel's subscribers",
-        "Firefighter Marcos Maia was battling a wildfire in Ribeirão Cascalheira, Mato Grosso, when his team found a thirsty armadillo near the affec"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=fIZuGPpKgFE",
-      "video_id": "fIZuGPpKgFE",
-      "published_at": "2026-10-09T21:38:25Z",
-      "channel_title": "Moments That Stay",
-      "evidence": {
-        "views": 66857,
-        "hours": 28.6,
-        "vph": 2340,
-        "breakout": 15.7,
-        "video_id": "fIZuGPpKgFE",
-        "video_url": "https://www.youtube.com/watch?v=fIZuGPpKgFE",
-        "published_at": "2026-10-09T21:38:25Z",
-        "channel_title": "Moments That Stay",
-        "search_query": "history facts"
-      }
-    },
-    {
-      "topic": "World's Slowest Experiment: Running for 99 Years",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.892,
-      "context": [
-        "viral Short now: 200,836 views in 22h, 1x its channel's subscribers",
-        "World's Slowest Experiment: Running for 99 Years In 1927, Professor Thomas Parnell in Australia set up a strange experiment. Pitch looks lik"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=3HEgbaQyfaE",
-      "video_id": "3HEgbaQyfaE",
-      "published_at": "2026-10-10T04:30:30Z",
-      "channel_title": "informationfact",
-      "evidence": {
-        "views": 200836,
-        "hours": 21.7,
-        "vph": 9253,
-        "breakout": 0.6,
-        "video_id": "3HEgbaQyfaE",
-        "video_url": "https://www.youtube.com/watch?v=3HEgbaQyfaE",
-        "published_at": "2026-10-10T04:30:30Z",
-        "channel_title": "informationfact",
-        "search_query": "science facts"
-      }
-    },
-    {
-      "topic": "Where Pashmina Begins Life With Ladakh’s Changpa Nomads",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.8889,
-      "context": [
-        "viral Short now: 320,529 views in 67h, 3x its channel's subscribers",
-        "Meet the Changpa nomads of Ladakhpastoral families whose seasonal journeys connect portable Rebo homes, high-altitude pastures and the story"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=chukmKeFsjg",
-      "video_id": "chukmKeFsjg",
-      "published_at": "2026-10-08T07:30:07Z",
-      "channel_title": "AAIINFO",
-      "evidence": {
-        "views": 320529,
-        "hours": 66.7,
-        "vph": 4805,
-        "breakout": 3.2,
-        "video_id": "chukmKeFsjg",
-        "video_url": "https://www.youtube.com/watch?v=chukmKeFsjg",
-        "published_at": "2026-10-08T07:30:07Z",
-        "channel_title": "AAIINFO",
-        "search_query": "history facts"
-      }
-    },
-    {
-      "topic": "History क य 3 तसवर दखकर दमग हल जएग!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.8859,
-      "context": [
-        "viral Short now: 106,683 views in 19h, 2x its channel's subscribers",
-        "History क य 3 तसवर दखकर दमग हल जएग! Voice Credit The_Fact Video Types Discover 3 rare historical photos that reveal fascinating stories from"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=b7aZn7OTxqA",
-      "video_id": "b7aZn7OTxqA",
-      "published_at": "2026-10-10T07:28:45Z",
-      "channel_title": "Psycho Fact",
-      "evidence": {
-        "views": 106683,
-        "hours": 18.7,
-        "vph": 5694,
-        "breakout": 2.1,
-        "video_id": "b7aZn7OTxqA",
-        "video_url": "https://www.youtube.com/watch?v=b7aZn7OTxqA",
-        "published_at": "2026-10-10T07:28:45Z",
-        "channel_title": "Psycho Fact",
-        "search_query": "history facts"
-      }
-    },
-    {
-      "topic": "А вы знали это про кока-колу?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.8828,
-      "context": [
-        "viral Short now: 56,862 views in 32h, 20x its channel's subscribers",
-        ""
-      ],
-      "source_url": "https://www.youtube.com/watch?v=MxW1119H4m0",
-      "video_id": "MxW1119H4m0",
-      "published_at": "2026-10-09T18:13:28Z",
-      "channel_title": "LORI",
-      "evidence": {
-        "views": 56862,
-        "hours": 32.0,
-        "vph": 1778,
-        "breakout": 20.0,
-        "video_id": "MxW1119H4m0",
-        "video_url": "https://www.youtube.com/watch?v=MxW1119H4m0",
-        "published_at": "2026-10-09T18:13:28Z",
-        "channel_title": "LORI",
-        "search_query": "did you know history"
-      }
-    },
-    {
-      "topic": "How Deep Sea Fishermen Keep Fish Fresh for Months!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.8797,
-      "context": [
-        "viral Short now: 209,864 views in 38h, 2x its channel's subscribers",
-        "How Deep Sea Fishermen Keep Fish Fresh for Months! Discover how deep-sea fishermen keep tons of fish fresh for months at sea! From packing e"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=V4-W_1FHVP4",
-      "video_id": "V4-W_1FHVP4",
-      "published_at": "2026-10-09T12:30:41Z",
-      "channel_title": "Sajib Fact 1M",
-      "evidence": {
-        "views": 209864,
-        "hours": 37.7,
-        "vph": 5566,
-        "breakout": 1.9,
-        "video_id": "V4-W_1FHVP4",
-        "video_url": "https://www.youtube.com/watch?v=V4-W_1FHVP4",
-        "published_at": "2026-10-09T12:30:41Z",
-        "channel_title": "Sajib Fact 1M",
-        "search_query": "ocean facts"
+        "search_query": "animal facts",
+        "duration_seconds": 70
       }
     }
   ]

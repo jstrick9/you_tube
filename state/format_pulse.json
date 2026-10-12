@@ -1,18 +1,100 @@
 {
-  "updated": "2026-10-11T02:12:51+00:00",
-  "sample": 124,
+  "schema_version": 2,
+  "updated": "2026-10-12T02:40:51+00:00",
+  "sample": 125,
   "hook_style": {
-    "bold_claim": 0.4736,
-    "question": 0.4289,
-    "disbelief": 0.0461,
-    "number_first": 0.0313,
-    "you_statement": 0.02
+    "bold_claim": 0.516,
+    "question": 0.3654,
+    "you_statement": 0.0619,
+    "number_first": 0.0381,
+    "disbelief": 0.0185
+  },
+  "title_hook_style": {
+    "bold_claim": 0.516,
+    "question": 0.3654,
+    "you_statement": 0.0619,
+    "number_first": 0.0381,
+    "disbelief": 0.0185
   },
   "videos": {
-    "question": 49,
-    "bold_claim": 59,
-    "disbelief": 6,
-    "you_statement": 5,
-    "number_first": 5
-  }
+    "question": 46,
+    "bold_claim": 66,
+    "disbelief": 1,
+    "you_statement": 6,
+    "number_first": 6
+  },
+  "duration_sample": 125,
+  "duration_bands": {
+    "21_40s": 0.4577,
+    "le_20s": 0.2407,
+    "over_60s": 0.2144,
+    "41_60s": 0.0872
+  },
+  "by_lane": {
+    "history_mystery": {
+      "sample": 42,
+      "hook_style": {
+        "question": 0.6361,
+        "bold_claim": 0.34,
+        "number_first": 0.0133,
+        "you_statement": 0.0105
+      },
+      "title_hook_style": {
+        "question": 0.6361,
+        "bold_claim": 0.34,
+        "number_first": 0.0133,
+        "you_statement": 0.0105
+      },
+      "videos": {
+        "question": 20,
+        "bold_claim": 20,
+        "number_first": 1,
+        "you_statement": 1
+      },
+      "duration_sample": 42,
+      "duration_bands": {
+        "le_20s": 0.6114,
+        "over_60s": 0.2232,
+        "41_60s": 0.0908,
+        "21_40s": 0.0746
+      }
+    },
+    "science_nature": {
+      "sample": 83,
+      "hook_style": {
+        "bold_claim": 0.5699,
+        "question": 0.2825,
+        "you_statement": 0.0777,
+        "number_first": 0.0457,
+        "disbelief": 0.0241
+      },
+      "title_hook_style": {
+        "bold_claim": 0.5699,
+        "question": 0.2825,
+        "you_statement": 0.0777,
+        "number_first": 0.0457,
+        "disbelief": 0.0241
+      },
+      "videos": {
+        "question": 26,
+        "bold_claim": 46,
+        "disbelief": 1,
+        "you_statement": 5,
+        "number_first": 5
+      },
+      "duration_sample": 83,
+      "duration_bands": {
+        "21_40s": 0.5751,
+        "over_60s": 0.2117,
+        "le_20s": 0.1271,
+        "41_60s": 0.0862
+      }
+    }
+  },
+  "aggregate_basis": "YouTube title-pattern labels and official video duration metadata; views/hour weighted",
+  "not_measured": [
+    "spoken_hook",
+    "beat_count",
+    "caption_density"
+  ]
 }
