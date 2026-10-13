@@ -378,6 +378,39 @@ media:
   # Pixazo-generated visuals are off by default for factual Archive 13 footage; media.gather also suppresses
   # the provider whenever compliance.contains_synthetic_media is false, even if it is accidentally listed here.
   sources: [commons_video, nasa_video, archive_video, pexels_video, pexels, wikimedia, openverse]
+  # Runway Dev is a paid last-resort illustration route, not a research/trend source. It runs only
+  # after licensed candidates and one real-media requery fail. Account terms, the current API schema,
+  # and pricing are unverified here; the false confirmations keep all paid generation dormant.
+  # Runway-hosted Veo is a distinct partner route; do not use Google's direct Gemini API terms for it.
+  # After account/schema/pricing review, available routes run automatically; hosted Veo stays excluded
+  # until its separate terms are confirmed. At most one insert is selected per Short, with no rerolls.
+  # Every selected insert is labelled/disclosed and must pass final-render QA.
+  runway_dev:
+    enabled: true
+    account_terms_confirmed: false
+    account_terms_reviewed_on: ""
+    api_schema_confirmed: false                 # reconfirm current endpoint/payload before the first paid call
+    api_schema_reviewed_on: ""
+    pricing_confirmed: false                    # reconfirm model rates and credit conversion before the first paid call
+    pricing_reviewed_on: ""
+    hosted_veo_terms_confirmed: false
+    hosted_veo_terms_reviewed_on: ""
+    daily_credit_budget: 280                 # $2.80/day at $0.01/credit; a pair costs at most 140 credits
+    max_generated_shots_per_video: 1
+    task_timeout_seconds: 300
+    poll_interval_seconds: 5
+    models:
+      - id: gen4.5
+        enabled: true
+        duration: 5
+        ratio: "720:1280"
+        max_credits: 60                       # 5s × 12 credits/s, reference estimate; verify before enabling
+      - id: veo3.1_fast
+        enabled: true
+        duration: 8
+        ratio: "1080:1920"                    # intended native portrait; confirm current schema before enabling
+        audio: false                          # must remain false; the pipeline uses its own narration/music
+        max_credits: 80                       # 8s × 10 credits/s, no-audio reference; verify before enabling
   prefer_video: true                     # a verified clip beats an equally good still (motion holds attention)
   video_bonus: 1.0
   # Ranking nudge toward assets that fill a 9:16 frame without upscaling (see media.shape_bonus).

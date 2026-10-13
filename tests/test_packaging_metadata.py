@@ -123,3 +123,64 @@ def test_sidecar_uses_assigned_episode_and_preserves_trend_evidence(tmp_path, mo
     assert history_trend["viral_score"] == topic["viral_score"]
     assert history_trend["why_trending"] == topic["why_trending"]
     assert history_trend["trend_evidence"] == topic["context"][:2]
+
+
+def test_package_sets_per_video_synthetic_flag_and_records_runway_provenance(tmp_path, monkeypatch):
+    cfg = load_config()
+    out = tmp_path / "generated-insert.mp4"
+    out.write_bytes(b"placeholder")
+    monkeypatch.setattr(pipeline.render, "thumbnail", lambda *args, **kwargs: tmp_path / "thumb.jpg")
+    monkeypatch.setattr(pipeline, "_shots_sheet", lambda *args, **kwargs: None)
+    monkeypatch.setattr(pipeline, "read_json", lambda *args, **kwargs: [])
+
+    credit = {
+        "title": "AI-generated illustration (veo3.1_fast)", "author": "Runway Dev generated media",
+        "license": "AI-generated; account terms confirmed", "source": "Runway Dev API (veo3.1_fast)",
+        "url": "runway://task/example", "page": "https://docs.dev.runwayml.com/api/",
+        "synthetic": True, "provider": "Runway Dev API", "model": "veo3.1_fast",
+        "api_version": "2024-11-06", "task_id": "example-task",
+        "prompt": "A visibly stylized fossil illustration.", "generated_at": "2026-10-13T00:00:00+00:00",
+        "ratio": "1080:1920", "audio": False, "requested_duration_seconds": 8,
+        "actual_duration_seconds": 8.0, "output_width": 1080, "output_height": 1920,
+        "credits_reserved": 80, "estimated_cost_credits": 80, "actual_cost_credits": 80,
+        "estimated_cost_usd": 0.8, "file_sha256": "b" * 64,
+        "rights_confirmation": {"runway_account_terms_confirmed": True,
+                                "hosted_veo_terms_confirmed": True,
+                                "terms_url": "https://runway.com/terms-of-use"},
+    }
+    clip = tmp_path / "generated-clip.mp4"
+    assets = {
+        "script": {"title": "The fossil in stone", "description": "A sourced fossil fact.",
+                   "segments": [{"text": "A fossil is trapped in stone."}], "tags": [], "hashtags": ["#science"]},
+        "source": {"title": "Fossil formation", "url": "https://example.test/fossils", "also": []},
+        "visuals": {"shots": [{"seg": 0, "path": clip, "kind": "video", "synthetic": True,
+                                 "score": 9, "judge": "gemini", "shows": "a fossil illustration",
+                                 "want": "a stylized fossil", "credit": credit}]},
+        "review": {"score": 9}, "plan": {}, "topic": {"topic": "Fossil formation"},
+        "out": out, "hook_card": "", "title": "A fossil in stone", "tts": {"engine": "test"},
+        "series": None, "episode": 0,
+    }
+    render_result = {"first_frame": tmp_path / "frame.jpg", "theme": 0, "duration": 3.0,
+                     "timeline": [{"seg": 0, "start": 0.0, "end": 2.0, "path": str(clip)}]}
+    frames = [{"timeline_index": 0, "seg": 0, "path": str(clip), "t": t,
+               "sample": i, "samples": 3, "match": True, "score": 9,
+               "shows": "a clearly stylized fossil", "audit_shows": "a clearly stylized fossil",
+               "audit_match": True, "audit_score": 9, "judge": "gemini", "audit_judge": "gemini"}
+              for i, t in enumerate((0.25, 1.0, 1.75), start=1)]
+    report = {"passed": True, "attempt": 1, "issues": [], "failed": [], "repairable": False,
+              "frames": frames, "meta": {"hook_text_ok": True, "title_ok": True,
+                                           "visual_variety_ok": True, "notes": [],
+                                           "visual_variety_notes": ""}}
+
+    result = pipeline.package(assets, render_result, report, cfg)
+    sidecar = json.loads(out.with_suffix(".json").read_text())
+
+    assert result["meta"]["contains_synthetic_media"] is True
+    assert "not archival footage" in result["meta"]["description"]
+    assert sidecar["contains_synthetic_media"] is True
+    generation = sidecar["shots"][0]["generation"]
+    assert generation["model"] == "veo3.1_fast"
+    assert generation["task_id"] == "example-task"
+    assert generation["prompt"] == credit["prompt"]
+    assert generation["file_sha256"] == "b" * 64
+    assert generation["rights_confirmation"]["hosted_veo_terms_confirmed"] is True

@@ -137,6 +137,32 @@ def compose_frame(src: Path, dst: Path, W: int, H: int) -> Path:
     return dst
 
 
+def _draw_ai_illustration_badge(draw, scale: float, alpha: int = 255) -> None:
+    x, y = round(30 * scale), round(58 * scale)
+    w, h = round(460 * scale), round(88 * scale)
+    draw.rounded_rectangle((x, y, x + w, y + h), radius=max(4, round(10 * scale)),
+                           fill=(0, 0, 0, alpha) if alpha < 255 else (0, 0, 0))
+    font = ImageFont.truetype(font_path("Anton-Regular.ttf"), max(12, round(42 * scale)))
+    draw.text((round(54 * scale), round(68 * scale)), "AI ILLUSTRATION", font=font, fill="white")
+
+
+def label_ai_illustration(path: Path) -> Path:
+    """Mark a synthetic still/poster so the provenance is visible in thumbnails too."""
+    with Image.open(path) as source:
+        im = source.convert("RGB")
+        _draw_ai_illustration_badge(ImageDraw.Draw(im), im.width / 1080.0)
+        im.save(path, "JPEG", quality=92)
+    return path
+
+
+def ai_illustration_overlay(path: Path, W: int, H: int) -> Path:
+    """Create a transparent badge image for FFmpeg builds without the optional drawtext filter."""
+    overlay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    _draw_ai_illustration_badge(ImageDraw.Draw(overlay), W / 1080.0, alpha=205)
+    overlay.save(path, "PNG")
+    return path
+
+
 # ── captions (ASS) ────────────────────────────────────────────────────────────
 def _ts(t: float) -> str:
     t = max(0.0, t)
@@ -481,21 +507,27 @@ def poster_frame(clip: Path, out: Path) -> Path:
     return out
 
 
-def video_chain(i: int, aspect: float, W: int, H: int, fps: int) -> str:
+def video_chain(i: int, aspect: float, W: int, H: int, fps: int, synthetic: bool = False) -> str:
     """Same framing rule as a still: the clip fills the whole 9:16 frame (cover crop, biased slightly high).
 
-    Only an extreme panorama keeps the inset-over-blurred-bed layout.
+    Only an extreme panorama keeps the inset-over-blurred-bed layout. Synthetic footage gets an
+    on-screen illustration badge in the rendered pixels, not just in metadata.
     """
     if aspect <= MAX_COVER_ASPECT:
         # crop toward the upper third of a tall source: subjects/horizons almost never sit dead centre
-        return (f"[{i}:v]fps={fps},setpts=PTS-STARTPTS,scale={W}:{H}:force_original_aspect_ratio=increase,"
-                f"crop={W}:{H}:(iw-{W})/2:(ih-{H})*{COVER_BIAS_Y:.2f},setsar=1")
-    fw, fh = W, max(2, int(W / aspect) // 2 * 2)
-    y = int(H * 0.44 - fh / 2)
-    return (f"[{i}:v]fps={fps},setpts=PTS-STARTPTS,setsar=1,split=2[va{i}][vb{i}];"
-            f"[va{i}]scale={W // 4}:{H // 4}:force_original_aspect_ratio=increase,crop={W // 4}:{H // 4},"
-            f"boxblur=10:2,colorchannelmixer=rr=0.40:gg=0.40:bb=0.40,scale={W}:{H},setsar=1[vbg{i}];"
-            f"[vb{i}]scale={fw}:{fh},setsar=1[vfg{i}];[vbg{i}][vfg{i}]overlay=(W-w)/2:{y}")
+        chain = (f"[{i}:v]fps={fps},setpts=PTS-STARTPTS,scale={W}:{H}:force_original_aspect_ratio=increase,"
+                 f"crop={W}:{H}:(iw-{W})/2:(ih-{H})*{COVER_BIAS_Y:.2f},setsar=1")
+    else:
+        fw, fh = W, max(2, int(W / aspect) // 2 * 2)
+        y = int(H * 0.44 - fh / 2)
+        chain = (f"[{i}:v]fps={fps},setpts=PTS-STARTPTS,setsar=1,split=2[va{i}][vb{i}];"
+                 f"[va{i}]scale={W // 4}:{H // 4}:force_original_aspect_ratio=increase,crop={W // 4}:{H // 4},"
+                 f"boxblur=10:2,colorchannelmixer=rr=0.40:gg=0.40:bb=0.40,scale={W}:{H},setsar=1[vbg{i}];"
+                 f"[vb{i}]scale={fw}:{fh},setsar=1[vfg{i}];[vbg{i}][vfg{i}]overlay=(W-w)/2:{y}")
+    if not synthetic:
+        return chain
+    base, badge = f"base{i}", f"badge{i}"
+    return chain + f",null[{base}];[{i + 1}:v]format=rgba[{badge}];[{base}][{badge}]overlay=0:0"
 
 
 def shot_plan(visuals: list[dict], n_segs: int) -> list[dict]:
@@ -530,7 +562,8 @@ def _kenburns(mo: str, nf: int) -> tuple[str, str, str]:
 
 
 def build_video_track(frames: list[Path], clip_aspect: dict, clip_src: dict, durs: list[float], motions: list[str],
-                      transitions: list[str], total: float, W: int, H: int, fps: int, work: Path) -> Path:
+                      transitions: list[str], total: float, W: int, H: int, fps: int, work: Path,
+                      illustrative_shots: set[int] | None = None) -> Path:
     """Silent picture track, built piece by piece so memory stays flat however many clips there are.
 
     1. every shot is rendered on its own at exactly its frame count (+ the crossfade overlap);
@@ -548,9 +581,16 @@ def build_video_track(frames: list[Path], clip_aspect: dict, clip_src: dict, dur
         nf = max(2, offs[i + 1] - offs[i] + (X if i < n - 1 else 0))
         out = work / f"shot{i:02d}.mp4"
         if i in clip_aspect:
-            chain = video_chain(0, clip_aspect[i], W, H, fps)
-            _ff(["-stream_loop", "-1", "-i", str(clip_src[i]), "-filter_complex",
-                 chain + f",format=yuv420p[v]", "-map", "[v]", "-frames:v", str(nf)] + enc + [str(out)], f"shot {i}")
+            synthetic = i in (illustrative_shots or set())
+            chain = video_chain(0, clip_aspect[i], W, H, fps, synthetic=synthetic)
+            args = ["-stream_loop", "-1", "-i", str(clip_src[i])]
+            if synthetic:
+                badge = work / "ai_illustration_overlay.png"
+                if not badge.exists():
+                    ai_illustration_overlay(badge, W, H)
+                args += ["-loop", "1", "-i", str(badge)]
+            _ff(args + ["-filter_complex", chain + f",format=yuv420p[v]", "-map", "[v]",
+                        "-frames:v", str(nf)] + enc + [str(out)], f"shot {i}")
         else:
             z, x, y = _kenburns(motions[i % len(motions)], nf)
             _ff(["-i", str(frames[i]), "-vf", f"scale={cw}:{ch},setsar=1,zoompan=z='{z}':x='{x}':y='{y}':d={nf}:"
@@ -602,6 +642,11 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
     durs = [seg_durs[v["seg"]] / per_seg[v["seg"]] for v in shots]
 
     frames, clip_aspect, clip_src = [], {}, {}
+    illustrative_shots = {
+        i for i, shot in enumerate(shots)
+        if shot.get("synthetic") is True
+        or (isinstance(shot.get("credit"), dict) and shot["credit"].get("synthetic") is True)
+    }
     animate = bool(cfg["video"].get("animate_stills", True)) and motion.available()
     moves: list[str] = []
     for i, v in enumerate(shots):
@@ -625,7 +670,10 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
                 clip_src[i] = clip
             except Exception as e:  # noqa: BLE001
                 log.warning("2.5D motion failed for shot %d (%s) — Ken Burns instead", i, str(e)[:120])
-        frames.append(compose_frame(still, work / f"frame{i:02d}.jpg", W, H))
+        frame = compose_frame(still, work / f"frame{i:02d}.jpg", W, H)
+        if i in illustrative_shots:
+            frame = label_ai_illustration(frame)
+        frames.append(frame)
 
     emph_col = THEMES[EMPH_FOR[theme_idx]]["hi"]      # keyword colour clearly different from the karaoke highlight
     # an archetype that drops the end stamp must also drop its sound effect, or the audio keeps
@@ -650,7 +698,7 @@ def render(tts: dict, visuals: list[dict], music_wav: Path | None, hook_text: st
         motions.append(rng.choice([m for m in ("in", "out", "left", "right", "up") if not motions or m != motions[-1]]))
     trans = ["fade", "smoothleft", "smoothup", "circleopen", "fadeblack", "slideleft", "zoomin"]
     track = build_video_track(frames, clip_aspect, clip_src, durs, motions, [rng.choice(trans) for _ in range(n)],
-                              total, W, H, fps, work)
+                              total, W, H, fps, work, illustrative_shots=illustrative_shots)
 
     cmd = [ffmpeg_bin(), "-y", "-loglevel", "error", "-stats", "-i", str(track)]
     cmd += ["-i", str(tts["audio"])]

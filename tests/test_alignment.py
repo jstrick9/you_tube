@@ -135,6 +135,114 @@ def test_line_without_match_requeries_then_skips_topic(patched, tmp_path):
         media.gather(SRC, s, CFG, tmp_path, llm=llm)
 
 
+def test_runway_is_last_resort_after_licensed_requery_and_marks_the_insert(patched, tmp_path, monkeypatch):
+    import autotube.runway as runway
+
+    cfg = copy.deepcopy(CFG)
+    cfg["media"]["min_distinct_images"] = 3
+    patched["q-cat"] = [cand("cat", 20)]
+    patched["q-stone"] = [cand("street", 21)]
+    patched["q-stone-alt"] = [cand("building", 22)]
+    patched["q-paw"] = [cand("paw", 23)]
+    events = []
+    real_search = media._candidates_for
+
+    def observed_search(queries, *args, **kwargs):
+        events.append(("search", list(queries)))
+        return real_search(queries, *args, **kwargs)
+
+    monkeypatch.setattr(media, "_candidates_for", observed_search)
+    generated = cand("stone", 24)
+    generated.update({"kind": "video", "synthetic": True, "title": "stone photo 24 — AI illustration",
+                      "license": "AI-generated (Runway Dev)", "author": "Runway Dev",
+                      "source": "Runway Dev API (gen4.5)", "provider": "Runway Dev API",
+                      "model": "gen4.5", "task_id": "mock-task", "prompt": "stylized stone",
+                      "file_sha256": "a" * 64})
+
+    def fake_generate(self, prompt, work):
+        events.append(("generate", prompt))
+        return [generated]
+
+    monkeypatch.setattr(runway.RunwayDev, "generate_candidates", fake_generate)
+    lines = segs(("a cat face", "q-cat"), ("a stone sits below the river", "q-stone"),
+                 ("a cat paw", "q-paw"))
+    llm = FakeLLM(requery={"shows": "stone beneath water", "queries": ["q-stone-alt"]})
+
+    visuals = media.gather(SRC, lines, cfg, tmp_path, llm=llm)
+
+    synthetic = [shot for shot in visuals["shots"] if shot.get("synthetic")]
+    assert len(synthetic) == 1 and synthetic[0]["seg"] == 1
+    assert synthetic[0]["credit"]["model"] == "gen4.5"
+    assert synthetic[0]["credit"]["task_id"] == "mock-task"
+    assert "AI illustration" in synthetic[0]["credit"]["title"]
+    generate_positions = [index for index, (kind, _value) in enumerate(events) if kind == "generate"]
+    requery_positions = [index for index, (kind, queries) in enumerate(events)
+                         if kind == "search" and queries == ["q-stone-alt"]]
+    assert len(generate_positions) == 1 and len(requery_positions) == 1
+    assert requery_positions[0] < generate_positions[0]
+    prompt = events[generate_positions[0]][1]
+    assert "non-photorealistic" in prompt and "eyewitness image" in prompt
+
+
+def test_runway_waits_for_a_completed_licensed_requery_before_paid_generation(patched, tmp_path, monkeypatch):
+    import autotube.runway as runway
+
+    events = []
+
+    def unavailable_requery(*args, **kwargs):
+        raise RuntimeError("requery unavailable")
+
+    def generate(self, prompt, work):
+        events.append((prompt, work))
+        return []
+
+    monkeypatch.setattr(media, "_requery", unavailable_requery)
+    monkeypatch.setattr(runway.RunwayDev, "generate_candidates", generate)
+    with pytest.raises(media.NoVisualMatch):
+        media.gather(SRC, segs(("a stone under water", "q-stone")), CFG, tmp_path, llm=FakeLLM())
+    assert events == []
+
+
+def test_qa_repair_updates_synthetic_flag_from_the_replacement_asset(tmp_path, monkeypatch):
+    from autotube import pipeline
+
+    original = tmp_path / "failed.jpg"
+    generated_replacement = tmp_path / "generated-repair.jpg"
+    licensed_replacement = tmp_path / "licensed-repair.jpg"
+    cand("failed", 60)["_img"].save(original)
+    cand("stone", 61)["_img"].save(generated_replacement)
+    cand("stone", 62)["_img"].save(licensed_replacement)
+
+    def use_local_candidate(candidate, *args, **kwargs):
+        return Path(candidate["_replacement_path"])
+
+    monkeypatch.setattr(media, "_usable", use_local_candidate)
+    generated = {"url": "runway://task/repair", "title": "AI-generated illustration (gen4.5)",
+                 "author": "Runway Dev", "license": "AI-generated", "source": "Runway Dev API",
+                 "synthetic": True, "provider": "Runway Dev API", "model": "gen4.5",
+                 "task_id": "repair-task", "file_sha256": "a" * 64,
+                 "_replacement_path": str(generated_replacement), "vscore": 9,
+                 "vshows": "a stylized stone illustration", "vjudge": "fake:vision", "kind": "video"}
+    shot = {"seg": 0, "path": original, "synthetic": False,
+            "credit": {"title": "old licensed photo", "author": "a", "license": "CC BY",
+                       "source": "Wikimedia", "url": "https://example.test/old"}}
+    visuals = {"shots": [shot], "alts": {0: [generated]}, "need": {0: 4.0}, "max_mb": 90}
+
+    assert media.use_alternative(visuals, 0, str(original), tmp_path)
+    assert shot["synthetic"] is True and shot["credit"]["synthetic"] is True
+    assert pipeline._shot_provenance([shot])[0]["generation"]["task_id"] == "repair-task"
+
+    licensed = {"url": "https://example.test/stone.jpg", "title": "stone photo", "author": "a",
+                "license": "CC BY", "source": "Wikimedia", "synthetic": False,
+                "_replacement_path": str(licensed_replacement), "vscore": 9,
+                "vshows": "stone", "vjudge": "fake:vision", "kind": "image"}
+    visuals["alts"][0] = [licensed]
+    current_path = str(shot["path"])
+    assert media.use_alternative(visuals, 0, current_path, tmp_path)
+    assert shot["synthetic"] is False and shot["credit"].get("synthetic") is not True
+    assert "generation" not in pipeline._shot_provenance([shot])[0]
+
+
 def test_requery_can_rescue_a_line(patched, tmp_path):
     patched["q-cat"] = [cand("cat", 1), cand("cat", 2)]
     patched["q-nerve"] = [cand("building", 9)]
@@ -252,10 +360,16 @@ def test_final_qa_passes_and_fails_per_frame(tiny_video):
     lines = ["Cats have whiskers.", "They sense air."]
     tts, script = _tts(lines), {"segments": [{"text": x} for x in lines]}
     tl = [{"seg": 0, "start": 0.0, "end": 1.5, "path": "a"}, {"seg": 1, "start": 1.5, "end": 3.0, "path": "b"}]
-    shots = [{"seg": 0, "path": "a", "score": 9, "judge": "g"},
+    shots = [{"seg": 0, "path": "a", "score": 9, "judge": "g", "synthetic": True,
+              "credit": {"synthetic": True, "title": "AI-generated illustration (gen4.5)"}},
              {"seg": 1, "path": "b", "score": 9, "judge": "g"}]
-    ok = qa.verify(tiny_video, tl, shots, tts, script, "T", "HOOK", "Whiskers", QALLM(), CFG)
+    llm = QALLM()
+    ok = qa.verify(tiny_video, tl, shots, tts, script, "T", "HOOK", "Whiskers", llm, CFG)
     assert ok["passed"] and len(ok["frames"]) == 2
+    prompts = "\n".join(user for _system, user in llm.prompts)
+    assert "synthetic generated illustration: yes" in prompts
+    assert "unmistakably stylized and non-photorealistic" in prompts
+    assert "AI ILLUSTRATION" in prompts
     bad = qa.verify(tiny_video, tl, shots, tts, script, "T", "HOOK", "Whiskers", QALLM(bad_frames=[2]), CFG)
     assert not bad["passed"] and bad["failed"] == [(1, "b")]
 

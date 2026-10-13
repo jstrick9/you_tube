@@ -19,8 +19,10 @@ import hashlib
 import time
 import html
 import logging
+import math
 import os
 import re
+import shutil
 import subprocess
 from pathlib import Path
 from urllib.parse import quote
@@ -513,6 +515,25 @@ def choose_window(samples, fps: float, need: float, ref=None, t_ref: float | Non
 
 
 def _download_video(asset: dict, dest_dir: Path, max_mb: float) -> Path | None:
+    # Runway outputs are downloaded and validated immediately, then kept locally so the
+    # short-lived signed output URL never has to be fetched again or saved in metadata.
+    local = asset.get("_local_path")
+    if local:
+        local_path = Path(local)
+        if not local_path.exists() or local_path.stat().st_size > max_mb * 1_000_000:
+            log.info("      generated video missing or over size limit: %s", asset.get("title", "")[:50])
+            return None
+        h = hashlib.md5(str(asset.get("url") or local_path).encode()).hexdigest()[:12]
+        dest = dest_dir / f"src_{h}.video"
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        if not dest.exists():
+            try:
+                shutil.copyfile(local_path, dest)
+            except OSError as exc:
+                log.info("      local generated-video copy failed: %s", str(exc)[:80])
+                dest.unlink(missing_ok=True)
+                return None
+        return dest
     for url in asset.get("variants") or [asset["url"]]:
         h = hashlib.md5(url.encode()).hexdigest()[:12]
         dest = dest_dir / f"src_{h}.video"
@@ -760,6 +781,22 @@ def too_similar(a: int | None, b: int | None, max_distance: int = 8) -> bool:
     return bin(a ^ b).count("1") <= max_distance
 
 
+def _runway_illustration_prompt(want: str) -> str:
+    """Request a clearly illustrative insert, never a faux archival or scientific record."""
+    concept = re.sub(r"[\x00-\x1f<>]", " ", str(want or "")).strip()
+    concept = re.sub(r"\s+", " ", concept)[:300] or "the relevant educational concept"
+    prompt = (
+        "Create a clearly stylized, non-photorealistic educational illustration with gentle, restrained motion. "
+        "It must look unmistakably like an illustration, never like archival footage, a documentary recording, "
+        "an eyewitness image, or proof. Depict only the general object or concept below in isolation; do not "
+        "recreate a real event, named person, historical scene, experiment result, specimen photograph, or "
+        "scientific measurement. Do not invent labels, numbers, maps, logos, signatures, readable text, or "
+        "specific factual details. No real-person faces, celebrities, copyrighted characters, or imitation of "
+        "a named artist or channel. Visual concept: " + concept + ". Portrait 9:16 composition."
+    )
+    return prompt[:1000]
+
+
 def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
            seg_durs: list[float] | None = None) -> dict:
     """Pick visually VERIFIED shots for every narration line.
@@ -773,6 +810,7 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
     Returns {"shots": [...], "alts": {seg: [verified spare candidates]}, "calls": n}.
     """
     from . import vision
+    from .runway import RunwayDev
 
     mcfg = cfg["media"]
     compliance = cfg.get("compliance", {}) or {}
@@ -788,6 +826,13 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
     video_bonus = float(mcfg.get("video_bonus", 1.0)) if mcfg.get("prefer_video", True) else 0.0
     shape_w = float(mcfg.get("shape_bonus", 1.0))
     max_mb = float(mcfg.get("max_video_mb", 90))
+    runway_cfg = mcfg.get("runway_dev", {}) if isinstance(mcfg.get("runway_dev"), dict) else {}
+    try:
+        max_runway_shots = max(0, min(1, int(runway_cfg.get("max_generated_shots_per_video", 1))))
+    except (TypeError, ValueError, OverflowError):
+        max_runway_shots = 0
+    runway_attempts = 0
+    runway_provider = RunwayDev(cfg)
     need_by_seg: dict[int, float] = {}
     work.mkdir(parents=True, exist_ok=True)
 
@@ -866,6 +911,7 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
         shots.append({"path": p, "credit": credit, "seg": i, "score": c["vscore"], "shows": c.get("vshows", ""),
                       "judge": c.get("vjudge", ""), "want": want, "reused": reused,
                       "kind": c.get("kind", "image"), "poster": c.get("_poster"), "window": c.get("window"),
+                      "synthetic": bool(c.get("synthetic") or credit.get("synthetic")),
                       "crop_q": round(crop_quality(c.get("w"), c.get("h")), 2)})
         log.info("    seg %d ← %.1f/10 [%s]%s %s  (%s)", i, c["vscore"], c.get("vjudge"), " (repeat)" if reused else "",
                  c.get("vshows", "")[:70], c["title"][:45])
@@ -886,13 +932,14 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
         seg_len = seg_durs[i] if seg_durs and i < len(seg_durs) else 4.0
         need_by_seg[i] = round(seg_len / want_n + 0.45, 2)        # + crossfade overlap and a little slack
 
-        def place(good, want):
-            """Put up to want_n approved, usable, not-yet-shown images on this line; return (got, spares)."""
+        def place(good, want, limit=None):
+            """Place approved, usable assets; an explicit limit caps generated inserts at one."""
+            target_n = want_n if limit is None else max(0, min(want_n, int(limit)))
             got, spare, dup, bad = 0, [], 0, 0
             for c in good:
                 if is_used(c):
                     dup += 1
-                elif got < want_n:
+                elif got < target_n:
                     if add_shot(c, i, want):
                         got += 1
                     else:
@@ -915,18 +962,68 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
         judged = judge_line(canon(_candidates_for(queries, sources, allowed, min_w)) + common, want, seg["text"])
         good = rank(judged)
         got, spare = place(good, want)
+        requery_want = None
+        requery_completed = False
+        is_cta = i == len(segments) - 1 and CTA_RE.search(seg["text"])
         if not got and llm is not None and mcfg.get("requery", True):
             try:
                 want2, q2 = _requery(llm, subject, seg["text"], want, [c.get("vshows", "") for c in judged])
+                requery_want = want2
                 log.info("    seg %d: no usable match for %r → retrying with %r %s", i, want[:50], want2[:50], q2)
                 judged2 = judge_line(canon(_candidates_for(q2, sources, allowed, min_w)), want2, seg["text"])
                 good2 = rank(judged2)
                 got, spare = place(good2, want2)
+                licensed_sources = {"commons_video", "nasa_video", "archive_video", "pexels_video",
+                                    "pexels", "wikimedia", "openverse"}
+                requery_completed = bool(q2 and any(source_name in licensed_sources for source_name in sources))
                 judged = sorted(judged + judged2, key=lambda c: -c["vscore"])
             except vision.VisionUnavailable:
                 raise
             except Exception as e:  # noqa: BLE001
                 log.info("    seg %d: requery failed: %s", i, str(e)[:120])
+
+        # Paid generation is a last-resort illustration only: licensed archive searches and
+        # one requery have already failed. It is never used for the sign-off shot, and only
+        # one generated shot may enter a Short. Both configured Runway models are judged
+        # automatically; at equal relevance, the lower-cost result wins. No rerolls.
+        if (not got and requery_completed and not is_cta
+                and runway_attempts < max_runway_shots):
+            runway_attempts += 1
+            runway_want = requery_want or want
+            old_need = need_by_seg[i]
+            need_by_seg[i] = round(float(seg_len) + 0.45, 2)  # one generated clip can cover this line
+            try:
+                prompt = _runway_illustration_prompt(runway_want)
+                generated = runway_provider.generate_candidates(prompt, work)
+                if generated:
+                    generated_judged = judge_line(generated, runway_want, seg["text"])
+                    generated_good = [c for c in generated_judged if c["vscore"] >= min_score]
+
+                    def generated_cost(candidate):
+                        for field in ("actual_cost_credits", "estimated_cost_credits", "credits_reserved"):
+                            value = candidate.get(field)
+                            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                                continue
+                            try:
+                                amount = float(value)
+                            except (TypeError, ValueError, OverflowError):
+                                continue
+                            if math.isfinite(amount) and amount >= 0:
+                                return amount
+                        return float("inf")
+
+                    generated_good.sort(key=lambda c: (-float(c["vscore"]), generated_cost(c),
+                                                       -shape_bonus(c, shape_w)))
+                    got, generated_spare = place(generated_good, runway_want, limit=1)
+                    spare.extend(generated_spare)
+                    judged = sorted(judged + generated_judged, key=lambda c: -c["vscore"])
+                if not got:
+                    need_by_seg[i] = old_need
+            except vision.VisionUnavailable:
+                raise
+            except Exception as e:  # noqa: BLE001 — generation remains supplemental
+                need_by_seg[i] = old_need
+                log.info("    seg %d: Runway illustration unavailable: %s", i, str(e)[:120])
         if not got:
             best = f"{judged[0]['vscore']:.0f}/10 ({judged[0].get('vshows', '')[:60]})" if judged else "none"
             raise NoVisualMatch(f"line {i + 1} has no image that shows it (best: {best}): {seg['text'][:80]!r}")
@@ -1029,7 +1126,8 @@ def _activate_qa_candidate(visuals: dict, seg: int, bad_path: str, work: Path,
     shot.update({"path": p, "credit": credit, "score": candidate["vscore"],
                  "shows": candidate.get("vshows", ""), "judge": candidate.get("vjudge", ""),
                  "reused": False, "kind": candidate.get("kind", "image"),
-                 "poster": candidate.get("_poster"), "window": candidate.get("window")})
+                 "poster": candidate.get("_poster"), "window": candidate.get("window"),
+                 "synthetic": bool(candidate.get("synthetic") or credit.get("synthetic"))})
     if want:
         shot["want"] = want
     log.info("    QA repair: seg %d → %s", seg, candidate.get("vshows", "")[:70])

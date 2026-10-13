@@ -269,6 +269,7 @@ def _shot_context(t: dict, shots: list[dict]) -> dict:
         "asset_source": str(credit.get("source") or ""),
         "asset_page": str(credit.get("page") or credit.get("url") or ""),
         "kind": str(shot.get("kind") or credit.get("kind") or ""),
+        "synthetic": shot.get("synthetic") is True or credit.get("synthetic") is True,
     }
 
 
@@ -332,6 +333,7 @@ def frame_check(mp4: Path, timeline: list[dict], shots: list[dict], tts: dict, s
             f'selected image description: "{it["context"]["selected_description"] or "not recorded"}" | '
             f'asset title: "{it["context"]["asset_title"] or "not recorded"}" | '
             f'asset source/page: "{(it["context"]["asset_source"] + " " + it["context"]["asset_page"]).strip() or "not recorded"}" | '
+            f'synthetic generated illustration: {"yes" if it["context"]["synthetic"] else "no"} | '
             f'while on screen the narrator says: "{it["spoken"]}" (full factual line: "{it["line"]}")'
             for j, it in enumerate(batch))
         extra = (f'\nFrame 1 also shows the on-screen hook text "{hook}". Is that text accurate for this video, and '
@@ -346,8 +348,9 @@ TREND SIGNAL CONTEXT (discovery evidence, not factual source text):
 The attached sheet shows {len(batch)} frames from the finished vertical video, numbered 1-{len(batch)} (number in the
 yellow box at each frame's bottom-left). For video assets, several samples from the same clip are listed separately.
 Ignore the burned-in captions, the small channel name at the top, the progress bar, the hook title box, big animated
-numbers, a "PROVEN" stamp / source card, countdown digits, a white flash and the blurred background fill — judge the
-MAIN PHOTO. The narrator sometimes adds a short joke after a line; judge the photo against the factual "full line".
+numbers, a "PROVEN" stamp / source card, the "AI ILLUSTRATION" disclosure badge, countdown digits, a white flash and
+the blurred background fill — judge the MAIN PHOTO. The narrator sometimes adds a short joke after a line; judge the
+photo against the factual "full line".
 The story sequence must preserve the specific trend angle, not merely share the broad subject; each frame must still
 match the exact narration and intended shot, and trend evidence itself never proves a factual claim.
 
@@ -355,7 +358,10 @@ For EACH frame, compare the visible main photo against all of: (1) the factual n
 and (3) the selected asset description and provenance shown below. The descriptions and asset metadata are clues, not
 proof: the pixels must actually fit. A historically named asset can still be the wrong battle, person, meeting, era,
 or setting. If the image only shares a broad topic keyword but depicts an irrelevant event or modern substitute for
-a named historical scene, mark it match=false.
+a named historical scene, mark it match=false. For any row marked "synthetic generated illustration: yes", also require
+the main scene to look unmistakably stylized and non-photorealistic, like an illustration or animation—not like archival
+footage, an eyewitness image, a documentary recording, or proof. If it looks photographic or could be mistaken for a
+real record, fail that frame even when its subject is relevant.
 
 {rows}
 
@@ -402,6 +408,7 @@ CURRENT TREND ANGLE: {trend_angle or "not recorded"}
   1 | line {it['seg'] + 1}/{n_lines}, sample {it['sample']}/{it['samples']} at {it['t']:.2f}s | intended shot: "{ctx['intended'] or 'not recorded'}"
 Selected image description: "{ctx['selected_description'] or 'not recorded'}"
 Asset title/source: "{ctx['asset_title'] or 'not recorded'}" / "{ctx['asset_source'] or 'not recorded'} {ctx['asset_page']}"
+Synthetic generated illustration: {"yes" if ctx["synthetic"] else "no"}
 Exact narration while this frame is visible: "{it['spoken']}"
 Full factual line: "{it['line']}"
 
@@ -409,7 +416,9 @@ The attached image is the actual rendered frame. Independently try to DISPROVE t
 show the correct named subject, person, event, place and historical era. Do not trust asset titles, the selected-image
 description, or a prior positive decision. A generic meeting is not proof of a specific treaty negotiation; a modern
 photo of unrelated leaders is not a historical scene. Mark match=false if the scene is irrelevant, misleading, or
-not visually defensible. If uncertain, fail it.
+not visually defensible. If "Synthetic generated illustration" is yes, it must also look unmistakably stylized and
+non-photorealistic; fail it if an ordinary viewer could mistake it for archival footage, an eyewitness image, or a
+real documentary record. If uncertain, fail it.
 Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "score": 0-10, "issue": ""}}]}}"""
 
             def validate_single(o):

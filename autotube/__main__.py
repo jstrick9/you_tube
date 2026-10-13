@@ -102,11 +102,14 @@ def cmd_doctor(cfg: dict) -> int:
     from .llm import KEYED_PROVIDERS
     keys = sorted(set(KEYED_PROVIDERS.values()) | {
         "CLOUDFLARE_ACCOUNT_ID",      # Cloudflare needs the account id as well as the token
-        "PEXELS_API_KEY", "YOUTUBE_API_KEY",
+        "PEXELS_API_KEY", "RUNWAYML_API_SECRET", "YOUTUBE_API_KEY",
         "YT_CLIENT_ID", "YT_CLIENT_SECRET", "YT_REFRESH_TOKEN",
         "NTFY_TOPIC", "DISCORD_WEBHOOK_URL"})
     for k in keys:
         print(f"  {k:22s} {'set' if os.environ.get(k) else '-'}")
+    from .runway import RunwayDev
+    _, runway_status = RunwayDev(cfg).readiness()
+    print("Runway Dev visuals:", runway_status)
     try:
         r = LLM(cfg).json("Reply with JSON only.", 'Return {"ok": true}', temperature=0)
         print("LLM:", r)

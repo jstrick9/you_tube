@@ -164,6 +164,12 @@ def clean_description(text: str, limit: int = 4900) -> str:
 
 def build_description(script: dict, source: dict, visuals: list[dict], cfg: dict, tts_engine: str) -> str:
     tags = " ".join(h if h.startswith("#") else f"#{h}" for h in script.get("hashtags", [])[:3])
+    synthetic_visuals = any(
+        isinstance(shot, dict) and (shot.get("synthetic") is True
+                                    or (isinstance(shot.get("credit"), dict)
+                                        and shot["credit"].get("synthetic") is True))
+        for shot in visuals
+    )
     catch = (cfg.get("persona") or {}).get("catchphrase")
     parts = [
         script.get("description", "").strip(),
@@ -172,9 +178,12 @@ def build_description(script: dict, source: dict, visuals: list[dict], cfg: dict
         f"📚 Source: {source['title']} — {source['url']}",
         *[f"📚 Also: {a['title']} — {a['url']}" for a in source.get("also", [])[:4]],
     ]
-    if cfg["compliance"].get("ai_disclosure_in_description", True):
+    if cfg["compliance"].get("ai_disclosure_in_description", True) or synthetic_visuals:
         parts += ["", "ℹ️ This video was researched from the cited source and produced with AI-assisted "
                       "scripting and a synthetic narrator voice. Facts are checked against the source before publishing."]
+    if synthetic_visuals:
+        parts += ["AI-generated visual illustration(s) are clearly labelled on screen. They are illustrative only, "
+                  "not archival footage, eyewitness material, documentary evidence, or a source for factual claims."]
     parts += ["", "🖼️ Image & video credits:", media.credits_text(visuals),
               "🎵 Music: original, procedurally generated for this video.", "",
               f"Follow {cfg['channel'].get('handle') or cfg['channel']['name']} for a surprising fact, with sources, every day!", "", f"{tags} #shorts"]
@@ -572,11 +581,24 @@ def _history_trend(topic: dict) -> dict:
 
 
 def _shot_provenance(shots: list[dict]) -> list[dict]:
-    return [{"seg": v["seg"], "kind": v.get("kind", "image"), "window": v.get("window"),
-             "score": v.get("score"), "judge": v.get("judge"), "shows": v.get("shows"),
-             "want": v.get("want"), "reused": v.get("reused", False),
-             "image": v["credit"].get("title"), "page": v["credit"].get("page")}
-            for v in shots]
+    rows = []
+    generated_fields = (
+        "provider", "model", "api_version", "task_id", "prompt", "generated_at", "ratio", "audio",
+        "requested_duration_seconds", "actual_duration_seconds", "output_width", "output_height",
+        "credits_reserved", "estimated_cost_credits", "actual_cost_credits", "estimated_cost_usd",
+        "file_sha256", "rights_confirmation",
+    )
+    for shot in shots:
+        credit = shot.get("credit") if isinstance(shot.get("credit"), dict) else {}
+        synthetic = shot.get("synthetic") is True or credit.get("synthetic") is True
+        row = {"seg": shot["seg"], "kind": shot.get("kind", "image"), "window": shot.get("window"),
+               "score": shot.get("score"), "judge": shot.get("judge"), "shows": shot.get("shows"),
+               "want": shot.get("want"), "reused": shot.get("reused", False),
+               "image": credit.get("title"), "page": credit.get("page"), "synthetic": synthetic}
+        if synthetic:
+            row["generation"] = {key: credit.get(key) for key in generated_fields if key in credit}
+        rows.append(row)
+    return rows
 
 
 def _early_turn_diagnostic(script: dict, tts: dict, duration) -> dict:
@@ -617,17 +639,26 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
     _shots_sheet(visuals, out)
     words = sum(len(spoken_text(x).split()) for x in script["segments"])
     early_turn = _early_turn_diagnostic(script, a.get("tts") or {}, r.get("duration"))
+    contains_synthetic = bool(
+        (cfg.get("compliance") or {}).get("contains_synthetic_media", False)
+        or any(shot.get("synthetic") is True
+               or (isinstance(shot.get("credit"), dict)
+                   and shot["credit"].get("synthetic") is True)
+               for shot in visuals.get("shots", []) if isinstance(shot, dict))
+    )
     meta = {
         "title": a["title"],
         "description": build_description(script, source, visuals["shots"], cfg, a["tts"]["engine"]),
         "tags": list(dict.fromkeys([t.strip("#") for t in script.get("tags", [])] + ["shorts", "facts"]))[:25],
+        "contains_synthetic_media": contains_synthetic,
     }
     record = {"meta": meta, "script": script, "review": a["review"],
               "series": a.get("series"), "episode": a.get("episode"),
               "source": {k: source[k] for k in ("title", "url")},
               "trend": _trend_provenance(a["topic"]),
               "plan": a["plan"], "tts_engine": a["tts"]["engine"], "duration": r["duration"],
-              "archetype": r.get("archetype"), "words": words, "early_turn": early_turn,
+              "archetype": r.get("archetype"), "contains_synthetic_media": contains_synthetic,
+              "words": words, "early_turn": early_turn,
               "qa": {k: report.get(k) for k in ("passed", "attempt", "issues", "frames", "meta")},
               "shots": _shot_provenance(visuals["shots"]), "timeline": r["timeline"]}
     if report.get("passed") is not True:

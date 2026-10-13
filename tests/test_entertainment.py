@@ -291,6 +291,22 @@ def test_description_has_the_brand_promise():
     assert "Every file is real. That's the problem." in d and "Source: Hunger stone" in d
 
 
+def test_generated_visual_is_disclosed_even_if_generic_ai_description_is_disabled():
+    import copy
+
+    cfg = copy.deepcopy(CFG)
+    cfg["compliance"]["ai_disclosure_in_description"] = False
+    shot = {"seg": 0, "synthetic": True,
+            "credit": {"synthetic": True, "title": "AI-generated illustration (gen4.5)",
+                       "author": "Runway Dev", "license": "AI-generated", "source": "Runway Dev API",
+                       "url": "runway://task/example"}}
+    description = build_description({"description": "About hunger stones.", "hashtags": ["#history"]},
+                                    SOURCE, [shot], cfg, "edge")
+    assert "AI-generated visual illustration(s) are clearly labelled on screen" in description
+    assert "not archival footage, eyewitness material, documentary evidence" in description
+    assert "Every file is real. That's the problem." in description
+
+
 def test_fit_avoids_repeating_a_format_in_one_run(monkeypatch):
     s = _strategy()
     monkeypatch.setattr(s, "formats_in_season", lambda month=None: [f for f in CFG["content"]["formats"]
