@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-13T17:40:27.708127+00:00",
+  "updated": "2026-10-13T23:27:04.305947+00:00",
   "videos_total": 43,
-  "videos_7d": 10,
-  "views_7d": 5429,
+  "videos_7d": 8,
+  "views_7d": 2928,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -310,7 +310,7 @@
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
       "views": 1179,
-      "avg_view_pct": 50.25999999999999
+      "avg_view_pct": 50.35000000000001
     },
     {
       "title": "Can you win chess by losing everything? #shorts",
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 34,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 34,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -469,27 +469,29 @@
     "passing": 10,
     "pass_rate": 0.303,
     "median_avg_view_pct": 59.43,
-    "verdict": "10/33 measured videos clear the internal 70% average-view target (median 59%). This is average watch percentage, not the share of viewers who reached the end."
+    "learning_qualified": {
+      "minimum_sample_views": 50,
+      "sample_basis": "engaged_views_90d; public views are used only when engaged views are unavailable",
+      "n": 28,
+      "passing": 8,
+      "pass_rate": 0.286,
+      "median_avg_view_pct": 57.83
+    },
+    "provisional_n": 5,
+    "provisional_below_target": 3,
+    "verdict": "10/33 measured videos clear the internal 70% average-view target (median 59%). This is average watch percentage, not the share of viewers who reached the end. 28/33 meet the configured ≥50-view learning sample; 5 low- or unknown-sample reading(s) are provisional."
   },
   "average_view_watchlist": {
     "gate_pct": 70.0,
+    "minimum_sample_views": 50,
     "evaluated": 33,
     "below_target": 23,
+    "qualified_evaluated": 28,
+    "qualified_below_target": 20,
+    "provisional_evaluated": 5,
+    "provisional_below_target": 3,
     "shown": 10,
     "videos": [
-      {
-        "id": "XQjMkyKZPyQ",
-        "title": "Why millions bite open plastic water bags #shorts",
-        "topic": "water is sold in plastic sachets as a cheaper way of transporting and consuming drinking water, particularly in Africa.",
-        "created_at": "2026-09-30T16:55:19.500206+00:00",
-        "category": "food",
-        "format": "would_you_survive",
-        "hook_style": "bold_claim",
-        "duration_seconds": 38.4,
-        "avg_view_pct": 0.67,
-        "views": 1,
-        "engaged_views_90d": 1
-      },
       {
         "id": "oTgoKlCkGE0",
         "title": "How Your Liver Rebuilds Itself #shorts",
@@ -501,7 +503,10 @@
         "duration_seconds": 45.6,
         "avg_view_pct": 30.05,
         "views": 1128,
-        "engaged_views_90d": 497
+        "engaged_views_90d": 497,
+        "sample_size": 497,
+        "sample_basis": "engaged_views_90d",
+        "sample_qualified": true
       },
       {
         "id": "Tm86-6r3k6I",
@@ -513,8 +518,11 @@
         "hook_style": "you_statement",
         "duration_seconds": 33.3,
         "avg_view_pct": 36.64,
-        "views": 327,
-        "engaged_views_90d": 58
+        "views": 329,
+        "engaged_views_90d": 58,
+        "sample_size": 58,
+        "sample_basis": "engaged_views_90d",
+        "sample_qualified": true
       },
       {
         "id": "OyHMkwqEOKo",
@@ -527,7 +535,10 @@
         "duration_seconds": 31.8,
         "avg_view_pct": 41.37,
         "views": 1160,
-        "engaged_views_90d": 381
+        "engaged_views_90d": 381,
+        "sample_size": 381,
+        "sample_basis": "engaged_views_90d",
+        "sample_qualified": true
       },
       {
         "id": "kM3myuf1c-Y",
@@ -540,20 +551,10 @@
         "duration_seconds": 35.8,
         "avg_view_pct": 41.66,
         "views": 1183,
-        "engaged_views_90d": 602
-      },
-      {
-        "id": "SlY7iKy1K3o",
-        "title": "CASE #007 — Alcatraz Escape: The Head That Wasn't Real #shorts",
-        "topic": "DUNIA ki Sabse Badi Mystery",
-        "created_at": "2026-10-08T19:36:23.676718+00:00",
-        "category": "mysteries",
-        "format": "ranked_escalation",
-        "hook_style": "you_statement",
-        "duration_seconds": 19.7,
-        "avg_view_pct": 44.41,
-        "views": 78,
-        "engaged_views_90d": 26
+        "engaged_views_90d": 602,
+        "sample_size": 602,
+        "sample_basis": "engaged_views_90d",
+        "sample_qualified": true
       },
       {
         "id": "6dO8y_ojGhI",
@@ -566,7 +567,10 @@
         "duration_seconds": 38.4,
         "avg_view_pct": 45.65,
         "views": 973,
-        "engaged_views_90d": 540
+        "engaged_views_90d": 540,
+        "sample_size": 540,
+        "sample_basis": "engaged_views_90d",
+        "sample_qualified": true
       },
       {
         "id": "SBETRh-FF_I",
@@ -579,7 +583,10 @@
         "duration_seconds": 37.9,
         "avg_view_pct": 49.19,
         "views": 475,
-        "engaged_views_90d": 269
+        "engaged_views_90d": 269,
+        "sample_size": 269,
+        "sample_basis": "engaged_views_90d",
+        "sample_qualified": true
       },
       {
         "id": "4WkKoRw9r00",
@@ -590,9 +597,12 @@
         "format": "facts3",
         "hook_style": "you_statement",
         "duration_seconds": 37.3,
-        "avg_view_pct": 50.26,
+        "avg_view_pct": 50.35,
         "views": 1179,
-        "engaged_views_90d": 533
+        "engaged_views_90d": 534,
+        "sample_size": 534,
+        "sample_basis": "engaged_views_90d",
+        "sample_qualified": true
       },
       {
         "id": "jnlRW0Ca1o8",
@@ -605,14 +615,49 @@
         "duration_seconds": 30.6,
         "avg_view_pct": 51.93,
         "views": 1283,
-        "engaged_views_90d": 468
+        "engaged_views_90d": 468,
+        "sample_size": 468,
+        "sample_basis": "engaged_views_90d",
+        "sample_qualified": true
+      },
+      {
+        "id": "lUA-2zrFHGc",
+        "title": "The Only Governor Of Two Different States #shorts",
+        "topic": "Sam Houston is the only person in US history to serve as the governor of two different states (Tennessee and Texas), and he also served as the President of the Republic of Texas.",
+        "created_at": "2026-09-26T14:37:04.673832+00:00",
+        "category": "history",
+        "format": "facts3",
+        "hook_style": "number_first",
+        "duration_seconds": 29.7,
+        "avg_view_pct": 52.19,
+        "views": 915,
+        "engaged_views_90d": 315,
+        "sample_size": 315,
+        "sample_basis": "engaged_views_90d",
+        "sample_qualified": true
+      },
+      {
+        "id": "YBTo7-MaCDc",
+        "title": "FIELD #004 — Why the brain has three definitions #shorts",
+        "topic": ": The prefrontal cortex being fully developed at age 25 is a myth.",
+        "created_at": "2026-10-06T23:53:22.786592+00:00",
+        "category": "science",
+        "format": "sounds_fake",
+        "hook_style": "bold_claim",
+        "duration_seconds": 19.6,
+        "avg_view_pct": 52.78,
+        "views": 512,
+        "engaged_views_90d": 120,
+        "sample_size": 120,
+        "sample_basis": "engaged_views_90d",
+        "sample_qualified": true
       }
     ]
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10050,
-    "per_1k_views": 2.69,
+    "views_90d": 10070,
+    "per_1k_views": 2.68,
     "videos": 34,
     "denominator_basis": "engaged_views",
     "videos_with_engaged_views": 34,
@@ -622,13 +667,13 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10050,
+    "engaged_views_90d": 10070,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.00335,
-    "current_full_threshold_progress": 0.001005,
-    "feb_2027_full_threshold_progress": 0.000503,
+    "expanded_threshold_progress": 0.003357,
+    "current_full_threshold_progress": 0.001007,
+    "feb_2027_full_threshold_progress": 0.000504,
     "public_videos": 34,
     "videos_with_metric": 34,
     "coverage": 1.0,
