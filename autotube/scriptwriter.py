@@ -13,7 +13,7 @@ from .common import now_utc, read_json
 from .llm import LLM, LLMError
 from .research import ground, unsupported_numbers
 from .strategy import Strategy
-from .trends import has_current_trend_evidence, primary_source
+from .trends import has_current_trend_evidence, lane_of, primary_source
 
 log = logging.getLogger("autotube.script")
 
@@ -441,6 +441,20 @@ def tidy(script: dict, fmt: str = "", max_asides: int = 2) -> dict:
     return script
 
 
+def _subject_terms(subject: str, stop: set[str]) -> set[str]:
+    """Distinctive subject words, excluding standalone calendar years.
+
+    Years can anchor an event but are not depictable objects. Requiring a frame to
+    literally name "2026" rejected valid astronomy visuals for titles such as
+    "2026 in astronomy"; the actual subject word must still be shown and spoken.
+    """
+    from .originality import tokens
+
+    base = re.sub(r"\(.*?\)", " ", subject or "")
+    return {t for t in tokens(base) if len(t) > 3 and t not in stop
+            and not re.fullmatch(r"(?:1[0-9]{3}|20[0-9]{2}|21[0-9]{2})", t)}
+
+
 def names_subject(script: dict, subject: str) -> bool:
     """Does any shot actually depict the thing the video is about?
 
@@ -460,7 +474,7 @@ def names_subject(script: dict, subject: str) -> bool:
 
     stop = {"the", "a", "an", "of", "and", "in", "on", "at", "for", "with", "to",
             "incident", "mystery", "case", "story", "effect", "phenomenon", "signal"}
-    key = {t for t in tokens(subject) if len(t) > 3 and t not in stop}
+    key = _subject_terms(subject, stop)
     if not key:
         return True          # nothing distinctive to require; do not block the video
     # Every distinctive word, not any one of them. "Montauk Monster" reduced to a
@@ -588,8 +602,7 @@ def narration_names_subject(script: dict, subject: str) -> bool:
     stop = {"the", "a", "an", "of", "and", "in", "on", "at", "for", "with", "to",
             "incident", "mystery", "case", "story", "effect", "phenomenon", "signal",
             "accident", "escape", "project", "experiment"}
-    base = _re.sub(r"\(.*?\)", " ", subject or "")
-    key = {t for t in tokens(base) if len(t) > 3 and t not in stop}
+    key = _subject_terms(subject, stop)
     if not key:
         return True
     said = set()
@@ -808,10 +821,35 @@ class ScriptWriter:
                     and all(isinstance(source, str) and source for source in candidate["sources"])
                     and _finite_in_range(candidate.get("score"), 0, 1))
 
+        lane_specs = trend_cfg.get("lanes") or {}
+        if not isinstance(lane_specs, dict) or not lane_specs:
+            log.warning("approved content lanes are missing or malformed; no topics selected")
+            return []
+        approved_lanes = set(lane_specs)
+
+        def in_editorial_scope(candidate):
+            source_lane = candidate.get("lane")
+            if source_lane and source_lane not in approved_lanes:
+                return False
+            # A YouTube-chart category is direct metadata, not a model interpretation.
+            # Sports, gaming and news/politics trends cannot be relabelled into our lanes.
+            for signal in candidate.get("signals") or []:
+                if not isinstance(signal, dict) or signal.get("source") != "youtube_chart":
+                    continue
+                evidence = signal.get("evidence") or {}
+                if isinstance(evidence, dict) and str(evidence.get("yt_category", "")) in {"17", "20", "25"}:
+                    return False
+            return True
+
         eligible = [c for c in candidates if valid_candidate(c)
                     and has_current_trend_evidence(c, min_wiki_spike, trend_cfg)]
+        live_count = len(eligible)
+        eligible = [c for c in eligible if in_editorial_scope(c)]
+        if live_count != len(eligible):
+            log.info("excluding %d live candidate(s) outside the approved history/mystery or science/nature scope",
+                     live_count - len(eligible))
         if len(eligible) < len(candidates):
-            log.info("excluding %d candidate(s) without a qualifying live trend signal",
+            log.info("excluding %d candidate(s) without qualifying live evidence or approved scope",
                      len(candidates) - len(eligible))
         pool = [c for c in eligible if c["topic_key"] not in recent and c["topic_key"] not in exclude
                 and c["score"] >= ccfg["min_trend_score"] * 0.5][:80]
@@ -840,6 +878,10 @@ class ScriptWriter:
                       "unsettling creatures, odd history, unexplained sounds) are extra viral now; favour them, never gore.")
         user = f"""TODAY: {today:%A %B %d, %Y}. (Consider seasonal interest in the coming week, e.g. holidays, events.){season}
 CHANNEL NICHE: {self.cfg['channel']['niche']}
+HARD EDITORIAL SCOPE: use ONLY the two approved lanes: history_mystery (historical evidence, unresolved past events,
+archaeology, strange documented history) and science_nature (science, space, animals, natural phenomena, geography).
+Sports/leagues/teams/rules, gaming, current news/politics, celebrity gossip and unrelated entertainment are out of scope.
+Do not relabel an off-scope trend as "culture", "history" or "science" just to make it fit; return fewer picks or none.
 CATEGORIES (learned audience preference 0-1 from our own analytics, favor higher): {json.dumps(weights)}
 RECENTLY COVERED (avoid): {', '.join(list(recent)[:40]) or 'none'}
 
@@ -938,6 +980,11 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                 cat = p.get("category")
                 if not isinstance(cat, str) or cat not in cats:
                     dropped.append(f"{c['topic'][:40]} (invalid category)")
+                    continue
+                selected_lane = lane_of(self.cfg, cat)
+                source_lane = c.get("lane")
+                if not selected_lane or (source_lane and source_lane != selected_lane):
+                    dropped.append(f"{c['topic'][:40]} (category does not match its approved source lane)")
                     continue
                 raw_formats = p.get("formats")
                 if not isinstance(raw_formats, list) or any(not isinstance(f, str) for f in raw_formats):
@@ -1356,7 +1403,16 @@ Write YouTube metadata for this Short. Return JSON:
                 signals.append(" | ".join(x for x in (source_name, context_text, measured) if x))
             evidence_text = "\n".join(f"- {x[:280]}" for x in signals) or "; ".join(
                 str(x) for x in (topic.get("context") or [])[:3] if x)
-            trend_context = f"""CURRENT TREND CONTEXT (editorial alignment check; NOT factual source material):
+            approved_lane = lane_of(self.cfg, str(topic.get("category") or ""))
+            lane_remit = {
+                "history_mystery": "historical evidence, unresolved past events, archaeology, strange documented history",
+                "science_nature": "science, space, animals, natural phenomena, geography",
+            }.get(approved_lane, "no approved lane matched this category")
+            trend_context = f"""APPROVED EDITORIAL LANE: {approved_lane or 'invalid'} — {lane_remit}.
+This is a hard channel-scope boundary. Sports rules/results, gaming, current news/politics, celebrity gossip and unrelated
+entertainment are not in scope; only a clear, source-backed history/mystery or science/nature subject fits. If this script
+falls outside the approved lane, put a concrete scope correction in fixes so it cannot be approved.
+CURRENT TREND CONTEXT (editorial alignment check; NOT factual source material):
 Trend headline: {str(topic.get('topic') or '')[:200]}
 Selected specific angle: {trend_angle[:400]}
 Why this topic is rising: {str(topic.get('why_trending') or '')[:300]}

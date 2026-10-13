@@ -21,6 +21,32 @@ from .common import load_config, setup_logging
 log = logging.getLogger("autotube")
 
 
+def _write_github_summary(produced: int, target: int, failed_uploads: int = 0,
+                          rate_limited: set[str] | None = None, dry_run: bool = False) -> None:
+    """Make partial/zero-output green runs explicit in GitHub Actions' run summary."""
+    path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if not path:
+        return
+    failed = produced < target or failed_uploads > 0
+    lines = ["## AutoTube production result",
+             f"- Mode: {'render-only dry run' if dry_run else 'production'}",
+             f"- Videos rendered: {produced} / {target}",
+             f"- Upload failures: {failed_uploads}"]
+    if failed:
+        lines.extend(["- Outcome: **incomplete**; no verification or quality gate was bypassed."])
+        if rate_limited:
+            lines.append("- HTTP 429 responses observed: " + ", ".join(sorted(rate_limited)))
+        lines.append("- Follow-up: automated top-up slots remain configured to re-check missing daily output; "
+                     "GitHub may delay scheduled events.")
+    else:
+        lines.append("- Outcome: complete.")
+    try:
+        with open(path, "a", encoding="utf-8") as summary:
+            summary.write("\n".join(lines) + "\n")
+    except OSError as exc:
+        log.warning("could not write GitHub Actions summary: %s", str(exc)[:180])
+
+
 def notify(cfg: dict, title: str, msg: str, ok: bool = True) -> None:
     from .common import http
     if (ok and not cfg["notify"].get("on_success")) or (not ok and not cfg["notify"].get("on_failure")):
@@ -241,13 +267,19 @@ def main(argv=None) -> int:
 
     from . import llm as llm_mod
     from . import pipeline
-    if a.top_up and not a.count:
+    if a.top_up:
         left = pipeline.remaining_today(cfg, upload=not a.dry_run and cfg["upload"]["enabled"])
         if left == 0:
             print("Today's videos are already done — nothing to do (top-up run).")
             return 0
-        log.info("top-up: %d video(s) still needed today", left)
-        a.count = left
+        if a.count is not None and a.count <= 0:
+            log.error("top-up count must be a positive integer")
+            return 2
+        # Even an explicitly counted retry is capped by remaining daily capacity. This
+        # makes concurrent/delayed scheduled runs safe and prevents manual retries from
+        # exceeding the target.
+        a.count = left if a.count is None else min(a.count, left)
+        log.info("top-up: %d video(s) still needed today (capped to remaining slots)", a.count)
     try:
         res = pipeline.run(cfg, a.count, upload=False if a.dry_run else None, keep_work=a.keep_work)
     except Exception as e:  # noqa: BLE001
@@ -256,25 +288,30 @@ def main(argv=None) -> int:
         return 1
     lines = [f"• {r['meta']['title']} → {r['entry'].get('video_id', r['entry']['status'])}" for r in res]
     want = a.count or cfg["schedule"]["videos_per_day"]
-    notify(cfg, f"AutoTube: {len(res)}/{want} videos", "\n".join(lines) or "no videos produced",
-           ok=len(res) > 0)
-    print("\n".join(lines))
     failed_uploads = [r for r in res if str(r["entry"].get("status", "")).startswith("upload_failed")]
-    if res and not failed_uploads:
-        return 0
-    # A run that produced nothing because every provider was rate limited is not a
-    # broken build - it is a free tier doing what free tiers do, and it clears by
-    # itself. Reporting it as a failure put five red runs on one day next to the real
-    # ones, which is how a red X stops being read at all. The alert still fires with
-    # ok=False so the channel not publishing is never silent; only the exit code
-    # changes, so CI red keeps meaning "the code is wrong".
-    if not res:
-        limited = llm_mod.rate_limited()
+    limited = llm_mod.rate_limited() if len(res) < want else set()
+    incomplete = len(res) < want or bool(failed_uploads)
+    message = "\n".join(lines) or "no videos produced"
+    if incomplete:
         if limited:
-            log.warning("no videos produced: every provider was rate limited (%s). "
-                        "Not failing the run — free-tier quota resets on its own; the "
-                        "next scheduled run retries.", ", ".join(sorted(limited)))
-            return 0
+            message += "\nHTTP 429 responses were observed from: " + ", ".join(sorted(limited))
+        message += "\nNo unverified output was forced through the quality gates; automated top-up retries remain configured."
+    notify(cfg, f"AutoTube: {len(res)}/{want} videos", message, ok=not incomplete)
+    print("\n".join(lines))
+    _write_github_summary(len(res), want, len(failed_uploads), limited, a.dry_run)
+    if res and not incomplete:
+        return 0
+    # A green Actions conclusion must not imply a video exists. Keep a rate-limited
+    # run non-red so scheduled recovery can continue, but spell out that 429s are only
+    # one observed failure class; topic, other provider, validation and vision failures
+    # may also have prevented output. The run summary and failure alert retain the fact
+    # that production was incomplete.
+    if incomplete and limited:
+        log.warning("production incomplete (%d/%d videos rendered); HTTP 429 responses were observed from %s. "
+                    "Other provider, topic, script or vision failures may also have contributed. "
+                    "Not failing this run so the scheduled top-up can retry.",
+                    len(res), want, ", ".join(sorted(limited)))
+        return 0
     return 1
 
 

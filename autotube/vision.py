@@ -4,13 +4,12 @@ Why: file titles lie. "Whiskers" finds a bar called *Satan's Whiskers* and a str
 called *Whiskers Lane*. Every image that reaches a video must be *looked at* and
 confirmed to show what the narration is talking about.
 
-Two judges, both free:
+Two judges, both free-tier or local:
   1. CLIP (open_clip ViT-B-32, runs locally on the CPU) – fast image↔text similarity.
-     Used to pre-rank dozens of candidates, and as the fallback judge.
-  2. A vision LLM (Gemini free tier via GEMINI_API_KEY; Groq/OpenRouter if keyed) –
-     sees a numbered contact sheet of the best candidates and scores each 0-10
-     against the exact narration line, rejecting same-name buildings, signs, logos,
-     text/maps/diagrams, watermarks, etc.
+     Used to pre-rank candidates, and as the fallback ranker.
+  2. A vision LLM (Gemini, Cloudflare or NVIDIA, depending on the live route) –
+     sees a numbered contact sheet and scores each image against the narration. If no
+     configured vision model returns a valid verdict, strict mode stops production.
 
 `Judge.score()` sets on each candidate: vscore (0-10), vshows (what it depicts), vjudge.
 """
@@ -249,6 +248,16 @@ class _Clip:
 # ── the judge ─────────────────────────────────────────────────────────────────
 class VisionUnavailable(RuntimeError):
     """No vision model could give a verdict. In strict mode nothing unverified is ever used → stop, retry later."""
+
+
+def _vision_error_summary(error: Exception, limit: int = 420) -> str:
+    """Keep provider/model and the actual failure detail in strict-gate diagnostics."""
+    lines = [line.strip() for line in str(error).splitlines() if line.strip()]
+    lines = [line for line in lines if line.lower() != "all llm providers failed:"]
+    summary = " | ".join(lines[:6])
+    return summary[:limit] or f"{type(error).__name__}: vision provider call failed"
+
+
 VISION_SYSTEM = ("You are a strict photo editor for an educational short-video channel. You check whether candidate "
                  "images really show what the narration is talking about. Judge ONLY the pixels, never file names. "
                  "Return strict JSON only.")
@@ -267,9 +276,8 @@ class Judge:
         self.strict = bool(m.get("require_llm_verdict", True))
         self.calls = 0
         self.fail_streak = 0
-        # Gemini is the only vision provider and its free tier rate-limits per minute, so a
-        # 429 here is usually a wait, not an outage. Backing off past the quota window is
-        # far cheaper than discarding a script that is already written and verified.
+        # Vision providers can rate-limit per minute; bounded backoff gives transient
+        # 429s a chance to clear, while the strict gate still discards anything unverified.
         self.retry_pauses = [15, 45, 90, 150] if self.strict else [15, 45]
         self.llm_failed = False
 
@@ -335,8 +343,7 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0, "legible
                 if attempt < len(self.retry_pauses):
                     time.sleep(self.retry_pauses[attempt])
         if out is None:
-            codes = re.findall(r"^\s*(\S+?):vision: .*?(HTTP \d{3}|no \w+_API_KEY|\w+Error)", str(err), re.M)
-            summary = ", ".join(f"{m} {c}" for m, c in dict(codes).items()) or str(err)[:300]
+            summary = _vision_error_summary(err)
             if self.strict:
                 raise VisionUnavailable(f"vision model unavailable after {len(self.retry_pauses) + 1} tries: {summary}")
             self.fail_streak += 1

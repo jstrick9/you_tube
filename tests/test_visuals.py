@@ -100,6 +100,24 @@ def test_vision_adapter_that_skips_validator_cannot_return_nan_verdict():
         judge.score(_cands(1), "an artifact", "This is an artifact.", "Artifact")
 
 
+def test_strict_vision_error_retains_provider_validation_detail():
+    import pytest
+
+    class BrokenVision:
+        last_used = "nvidia:vision"
+
+        def vision_available(self):
+            return True
+
+        def vision_json(self, *args, **kwargs):
+            raise RuntimeError("All LLM providers failed:\n  nvidia:model:vision: ValueError: response lacked images array")
+
+    judge = vision.Judge({"media": {"clip": False}}, BrokenVision())
+    judge.retry_pauses = []
+    with pytest.raises(vision.VisionUnavailable, match="response lacked images array"):
+        judge.score(_cands(1), "an artifact", "This is an artifact.", "Artifact")
+
+
 def test_no_judge_means_no_verdict():
     import pytest
     j = vision.Judge({"media": {"clip": False}}, FakeLLM([9, 9], fail=True))       # strict (default)

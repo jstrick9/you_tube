@@ -307,14 +307,11 @@ research:
 
 llm:
   # Providers are tried in order; any provider without a key is skipped.
-  # All have free tiers. Pollinations needs no key at all (last-resort fallback).
+  # Pollinations is an optional last-resort fallback. Its token is passed when configured;
+  # anonymous HTTP 402 responses are retired for the current run rather than retried.
   providers: [groq, gemini, cerebras, mistral, cloudflare, nvidia, pollinations]
-  # Groq writes first, deliberately. Gemini is the ONLY vision-capable provider here
-  # (Groq serves no vision model and there is no OpenRouter key), and image verification
-  # is a hard gate - if it cannot run, the video is correctly thrown away. Letting Gemini
-  # also do every script burned its free-tier quota on text and then 429'd the vision
-  # call, losing the whole run. Text has three providers to fall back on; vision has one,
-  # so the scarce capability gets the quota.
+  # Provider availability is checked in the live run, not inferred from a catalogue. Keep
+  # the text/vision routes separate so a text-heavy run cannot consume the vision budget.
   gemini_models: [gemini-flash-lite-latest, gemini-flash-latest, gemini-3.1-flash-lite, gemini-3-flash-preview]
   # Live run 2026-10-03 (workflow_dispatch 37109430187) showed ALL THREE previous Groq
   # models failing: both gpt-oss models are reasoning models and reject Groq's
@@ -331,13 +328,13 @@ llm:
   cerebras_review_models: [gpt-oss-120b, llama-3.3-70b]
   mistral_models: [mistral-small-latest, ministral-8b-latest]
   mistral_review_models: [mistral-small-latest]
-  cloudflare_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "@cf/deepseek-ai/deepseek-v4-flash-0731"]
+  # Run #103 (2026-10-13) returned HTTP 403 for the DeepSeek candidate; keep the
+  # Llama model that reached generation and remove the inaccessible model from failover.
+  cloudflare_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast"]
   cloudflare_review_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast"]
-  # Vision is the hard gate - if no vision model answers, the video is discarded - and
-  # until now Gemini was the only provider that could serve it. That single point of
-  # failure ended two of the last three full runs with a 429 after the script had
-  # already been written and verified. Cloudflare's free tier carries vision models, so
-  # one key removes the dependency. Ids are a guess; `doctor` checks them.
+  # Vision is a hard gate: if no configured model returns a valid verdict, the video is
+  # discarded. Multiple provider families are configured so one vision quota does not
+  # become a single point of failure; provider errors remain visible in strict diagnostics.
   # Ordered by what the live probe actually did, not by what the catalogue lists.
   # llama-4-scout is genuinely multimodal and ungated. llava-1.5 authenticates but
   # returns empty content for a JSON instruction - it is too weak to follow the format
@@ -346,7 +343,8 @@ llm:
   cloudflare_vision_models: ["@cf/meta/llama-4-scout-17b-16e-instruct"]
   # NVIDIA NIM: free tier, no card, 130+ models including vision. Ids are a guess that
   # `doctor` will confirm or replace - four providers have now shipped a wrong model id.
-  nvidia_models: [google/gemma-4-31b-it, google/gemma-3-12b-it]
+  # Run #103 (2026-10-13) confirmed Gemma 3 returns HTTP 404; Gemma 4 generated text.
+  nvidia_models: [google/gemma-4-31b-it]
   nvidia_review_models: [google/gemma-4-31b-it]
   nvidia_vision_models: [meta/llama-3.2-90b-vision-instruct]
   pollinations_models: [openai-fast, openai]

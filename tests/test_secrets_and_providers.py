@@ -18,11 +18,10 @@ ROOT = Path(__file__).resolve().parent.parent
 CFG = yaml.safe_load((ROOT / "config.yaml").read_text())
 WF = ROOT / ".github" / "workflows"
 
-# Read from the environment but never supplied by CI secrets:
-# local TTS paths/config overrides, the keyless provider's optional token, and the
-# optional read-only video ID passed only to the manual doctor workflow.
+# Environment values that are not repository secrets: local config/TTS overrides,
+# the optional read-only doctor ID, and GitHub's runtime-only step-summary path.
 LOCAL_ONLY = {"AUTOTUBE_CONFIG", "AUTOTUBE_TTS", "AUTOTUBE_DEPTH_MODEL",
-              "PIPER_DIR", "PIPER_VOICE", "POLLINATIONS_TOKEN", "YOUTUBE_STATUS_VIDEO_ID"}
+              "PIPER_DIR", "PIPER_VOICE", "YOUTUBE_STATUS_VIDEO_ID", "GITHUB_STEP_SUMMARY"}
 
 
 def env_vars_read_by_code() -> set[str]:
@@ -199,11 +198,34 @@ def test_rate_limited_runs_are_not_reported_as_broken_builds():
     src = (ROOT / "autotube" / "__main__.py").read_text()
     assert "rate_limited()" in src, "the run must distinguish rate limiting from failure"
     assert "notify(" in src, "a rate-limited run must still alert; it just must not go red"
+    assert "every provider was rate limited" not in src, "mixed provider/script failures must not be mislabeled"
+    assert "_write_github_summary" in src, "a green Actions run must visibly report zero/partial output"
 
     before = L.rate_limited()
     L.note_rate_limited("groq:openai/gpt-oss-20b")
     assert "groq:openai/gpt-oss-20b" in L.rate_limited()
     assert L.rate_limited() >= before
+
+
+def test_http_402_retires_a_model_without_repeating_it_or_waiting(monkeypatch):
+    """HTTP 402 is not a transient 429; retrying the same model just burns the run budget."""
+    import pytest
+    import autotube.llm as L
+
+    calls = []
+
+    def payment_required(model, system, user, temperature):
+        calls.append(model)
+        raise L.LLMError("HTTP 402: payment or entitlement required")
+
+    monkeypatch.setitem(L.PROVIDERS, "pollinations", (payment_required, "pollinations_models"))
+    monkeypatch.setattr(L.time, "sleep", lambda *_: pytest.fail("HTTP 402 must not sleep/retry"))
+    router = L.LLM({"llm": {"providers": ["pollinations"],
+                              "pollinations_models": ["openai-fast", "openai"], "temperature": 0.1}})
+    with pytest.raises(L.LLMError):
+        router.json("json", "{}", attempts_per_model=3)
+    assert calls == ["openai-fast", "openai"], "each model should be tried once, then fail over"
+    assert "pollinations:openai-fast" in router._dead
 
 
 def test_provider_errors_keep_enough_body_to_act_on():
@@ -746,6 +768,12 @@ def test_rejects_the_all_ambient_shotlist_actually_published():
     # Must never block a video whose subject has no distinctive word to require.
     assert names_subject(published, "The Mystery")
 
+    astronomy = {"segments": [{"visual": {"shows": "astronomy event with Orion constellation",
+                                             "queries": ["astronomy event", "Orion constellation"]}}]}
+    assert names_subject(astronomy, "2026"), "a calendar year is not a depictable object"
+    assert names_subject(astronomy, "2026 in astronomy"), "the actual subject must still be shown"
+    assert not names_subject(astronomy, "2026 in astronomy discoveries"),         "ignoring the year must not weaken the distinctive-subject gate"
+
 
 def _validator_ready(script):
     """Give semantic-gate fixtures the separate required output-shape fields they are not testing."""
@@ -1266,6 +1294,10 @@ def test_script_must_say_what_it_is_about():
     # Parenthetical qualifiers must not make the requirement impossible.
     assert narration_names_subject({"segments": [{"text": "Jonathan is 193 years old."}]},
                                    "Jonathan (tortoise)")
+    assert narration_names_subject({"segments": [{"text": "Astronomy in 2026 brings a rare eclipse."}]},
+                                   "2026 in astronomy")
+    assert not narration_names_subject({"segments": [{"text": "Astronomy brings a rare eclipse."}]},
+                                       "2026 in comet sightings")
 
 
 def test_rejects_the_escalation_ladder_reused_across_videos():
@@ -1619,3 +1651,37 @@ def test_the_run_keeps_a_reserve_so_it_never_starts_work_it_cannot_finish():
         f"{step_cap}-minute producer step")
     assert step_cap < cap, "the job needs time after production for artifact/state finalization"
     assert reserve >= 40, "the reserve must exceed the observed 20-40 minute per-topic range"
+
+
+def test_actions_summary_marks_no_output_incomplete(tmp_path, monkeypatch):
+    from autotube.__main__ import _write_github_summary
+
+    summary = tmp_path / "summary.md"
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
+    _write_github_summary(0, 2, 0, {"mistral:model"})
+    text = summary.read_text()
+    assert "0 / 2" in text and "incomplete" in text
+    assert "HTTP 429" in text and "scheduled events" in text
+    assert "no verification or quality gate was bypassed" in text
+
+
+def test_manual_top_up_caps_requested_count_to_missing_daily_slots(monkeypatch):
+    import copy
+    import autotube.__main__ as cli
+    from autotube import pipeline
+
+    cfg = copy.deepcopy(CFG)
+    monkeypatch.setattr(cli, "load_config", lambda *_: cfg)
+    monkeypatch.setattr(pipeline, "remaining_today", lambda *a, **k: 1)
+    calls = []
+
+    def fake_run(config, count, **kwargs):
+        calls.append(count)
+        return [{"meta": {"title": "A safe retry"},
+                 "entry": {"video_id": "video123", "status": "scheduled"}}]
+
+    monkeypatch.setattr(pipeline, "run", fake_run)
+    monkeypatch.setattr(cli, "notify", lambda *a, **k: None)
+    monkeypatch.setattr(cli, "_write_github_summary", lambda *a, **k: None)
+    assert cli.main(["run", "--count", "2", "--top-up", "--dry-run"]) == 0
+    assert calls == [1], "an explicit retry count must never exceed remaining capacity"

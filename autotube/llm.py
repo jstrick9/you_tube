@@ -1,8 +1,7 @@
-"""Free-tier LLM router with automatic failover.
+"""Configurable LLM router with automatic, per-run provider/model failover.
 
-Order (configurable): Gemini (Google AI Studio free key) → Groq (free key) →
-OpenRouter ':free' models (free key) → Pollinations (no key, last resort).
-Any provider without credentials is skipped. Every call asks for strict JSON
+Providers are tried in the order in config.yaml; missing keys, permanent HTTP errors,
+and payment-required models are skipped for that run. Every call asks for strict JSON
 and is parsed defensively, so a flaky model never crashes the pipeline.
 """
 from __future__ import annotations
@@ -401,6 +400,13 @@ class LLM:
                             self._dead.add(tag)
                             break
 
+                        if "HTTP 402" in msg:
+                            # Payment/entitlement failures will not improve by repeating the
+                            # same request. Retire this model for the current run, then allow
+                            # the router to try a different configured model/provider.
+                            log.warning("retiring %s for this run after HTTP 402: %s", tag, msg[:180])
+                            self._dead.add(tag)
+                            break
                         if "HTTP 404" in msg or "HTTP 400" in msg or "HTTP 401" in msg or "HTTP 403" in msg:
                             # Retiring a model for the rest of the run is right - a 400 will
                             # not fix itself - but it was silent, and a model skipped via
@@ -430,7 +436,7 @@ class LLM:
                             self._dead.add(tag)
                             break
                         if not last_try:
-                            if "HTTP 429" in msg or "HTTP 402" in msg:
+                            if "HTTP 429" in msg:
                                 time.sleep(_retry_after(msg, 6 + 6 * attempt))
                             elif re.search(r"HTTP 50[0234]", msg):      # overloaded / transient
                                 time.sleep(8 + 8 * attempt)

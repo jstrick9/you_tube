@@ -551,7 +551,7 @@ def _signal_record(row: dict, captured_at: str) -> dict:
     """Compact, serializable evidence that can be audited after the temporary run is gone."""
     evidence = dict(row.get("evidence") or {}) if isinstance(row.get("evidence"), dict) else {}
     for key in ("traffic", "views", "view_count", "spike", "source_rank", "source_date", "points",
-                "video_id", "published_at", "channel_title"):
+                "video_id", "published_at", "channel_title", "yt_category", "lane"):
         if row.get(key) not in (None, ""):
             evidence.setdefault(key, row[key])
     context = [str(x)[:280] for x in (row.get("context") or [])[:3] if x]

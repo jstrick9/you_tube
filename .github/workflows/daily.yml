@@ -29,6 +29,10 @@ on:
         description: "Render only, don't upload"
         type: boolean
         default: false
+      top_up:
+        description: "Only create videos still missing today (safe retry; never overfills the daily target)"
+        type: boolean
+        default: false
 
 concurrency:
   group: autotube
@@ -55,6 +59,7 @@ jobs:
       CLOUDFARE_API_TOKEN: ${{ secrets.CLOUDFARE_API_TOKEN }}
       CLOUDFARE_ACCOUNT_ID: ${{ secrets.CLOUDFARE_ACCOUNT_ID }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      POLLINATIONS_TOKEN: ${{ secrets.POLLINATIONS_TOKEN }}
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
       YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
@@ -128,8 +133,8 @@ jobs:
             echo "::notice::Dry run (render only): YouTube secrets incomplete or dry_run selected."
             ARGS="$ARGS --dry-run"
           fi
-          # scheduled runs use --top-up: they only make the videos still missing today, so the backup never duplicates
-          if [ "${{ github.event_name }}" = "schedule" ]; then ARGS="$ARGS --top-up"; fi
+          # Scheduled runs and explicit retries use --top-up so a delayed/overlapping run cannot exceed the daily target.
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.top_up }}" = "true" ]; then ARGS="$ARGS --top-up"; fi
           python -m autotube run $ARGS
 
       - name: Keep rendered videos for 7 days (download from the run page)

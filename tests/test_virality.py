@@ -92,6 +92,31 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     assert "Willie Mays" not in llm.prompt                                               # no Wikipedia-only fallback
 
 
+def test_selector_rejects_known_off_lane_youtube_chart_topics_before_provider_call():
+    sports = {
+        "topic": "NFL overtime rules", "topic_key": "nfl overtime rules",
+        "source": "google_trends", "sources": ["google_trends", "youtube_chart"],
+        "score": 0.95, "signals": [
+            signal("google_trends", "https://trends.test/nfl", {"traffic": 50_000}),
+            signal("youtube_chart", "https://www.youtube.com/watch?v=abcdefghijk",
+                   {"view_count": 80_000, "video_id": "abcdefghijk", "yt_category": 17}),
+        ],
+    }
+    llm = LLMPicks([])
+    assert ScriptWriter(CFG, llm, Strat()).select_topics([sports], 1, set()) == []
+    assert llm.prompt == "", "explicit sports chart metadata should be filtered before selection"
+
+
+def test_selector_rejects_category_that_conflicts_with_explicit_trend_lane():
+    candidate = cands()[2]
+    candidate["lane"] = "science_nature"
+    llm = LLMPicks([{"index": 0, "viral_score": 9, "category": "history", "risk": "none",
+                     "wiki_query": "Octopus", "angle": "its arms taste prey before it reaches the mouth",
+                     "formats": ["sounds_fake"]}])
+    assert ScriptWriter(CFG, llm, Strat()).select_topics([candidate], 1, set()) == []
+    assert "HARD EDITORIAL SCOPE" in llm.prompt
+
+
 def test_selector_rejects_configuration_that_weakens_viral_floor():
     import copy
 
@@ -178,6 +203,14 @@ def test_selection_outage_returns_nothing_not_guesses():
             raise LLMError("down")
 
     assert ScriptWriter(CFG, Down([]), Strat()).select_topics(cands(), 2, set()) == []
+
+
+def test_signal_record_preserves_source_lane_and_youtube_category():
+    row = {"topic": "NFL rules", "source": "youtube_chart", "lane": "science_nature",
+           "yt_category": "17"}
+    saved = trends._signal_record(row, common.now_utc().isoformat())
+    assert saved["evidence"]["yt_category"] == "17"
+    assert saved["evidence"]["lane"] == "science_nature"
 
 
 def test_trend_evidence_uses_measured_signals_and_distinct_families():
