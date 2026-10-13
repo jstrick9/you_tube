@@ -515,7 +515,13 @@ def _subject_forms(term: str) -> set[str]:
     """A small plural/singular bridge; it must not turn the subject gate into fuzzy matching."""
     forms = {term}
     if len(term) > 4:
-        if term.endswith("ies"):
+        if term.endswith("ing") and len(term) > 6:
+            stem = term[:-3]
+            if len(stem) > 2 and stem[-1] == stem[-2] and stem[-1] in "bdgmnprt":
+                stem = stem[:-1]
+            forms.add(stem)
+            forms.add(stem[:-1] + "ies" if stem.endswith("y") else stem + "s")
+        elif term.endswith("ies"):
             forms.add(term[:-3] + "y")
         elif term.endswith("y"):
             forms.add(term[:-1] + "ies")

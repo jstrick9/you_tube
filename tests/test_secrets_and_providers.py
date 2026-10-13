@@ -769,7 +769,7 @@ def test_rejects_the_all_ambient_shotlist_actually_published():
     assert names_subject(plural_shown, "Mudskipper"), "ordinary singular/plural wording should still identify the subject"
     # Generic article framing is not the depictable subject; this title's subject is banking.
     banking = {"segments": [{"visual": {"shows": "an old bank counter with a handwritten ledger",
-                                          "queries": ["banking ledger", "historic bank branch"]}}]}
+                                          "queries": ["antique bank ledger", "historic bank branch"]}}]}
     assert names_subject(banking, "History of banking")
 
     # Must never block a video whose subject has no distinctive word to require.
@@ -1305,10 +1305,10 @@ def test_script_must_say_what_it_is_about():
                                    "2026 in astronomy")
     assert narration_names_subject({"segments": [{"text": "Mudskippers crawl across the mud."}]},
                                    "Mudskipper")
-    assert narration_names_subject({"segments": [{"text": "Banking spread from ledger-keeping to formal banks."}]},
+    assert narration_names_subject({"segments": [{"text": "Banks spread from ledger-keeping to formal finance."}]},
                                    "History of banking")
     from autotube.scriptwriter import names_subject_in_opening
-    assert names_subject_in_opening({"segments": [{"text": "Banking relied on handwritten ledgers."}]},
+    assert names_subject_in_opening({"segments": [{"text": "Banks relied on handwritten ledgers."}]},
                                     "History of banking")
     assert not narration_names_subject({"segments": [{"text": "Astronomy brings a rare eclipse."}]},
                                        "2026 in comet sightings")
