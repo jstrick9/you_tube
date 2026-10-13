@@ -148,8 +148,11 @@ content:
                                          # Was 7. Same recalibration: independent scores ran 5/10 x24, 6/10 x19,
                                          # 4/10 x9, 3/10 x2. 6 keeps a real floor (3-5/10 still rejected) and
                                          # restores roughly the pass rate the gates were tuned for.
-  hook_words_min: 6                      # deterministic gate (autotube/gates.py) — not left to the LLM
-  hook_words_max: 12
+  hook_words_min: 6                      # internal creative guardrails, not YouTube thresholds
+  # Oct 13 retention summary: median averageViewPercentage was below target and the largest
+  # relative watch-ratio drop was at 10–20% runtime. Test a shorter opening so the turn arrives
+  # sooner; this is an experiment, not a claim about the recommendation system.
+  hook_words_max: 9
   body_beat_words: [9, 11]               # enforce the prompted turn/escalation length per segment
   payoff_words: [6, 9]                   # a short factual payoff, not a dangling fragment
   max_drafts: 4                          # script rewrites allowed (feedback from the fact-checker/hook gate)

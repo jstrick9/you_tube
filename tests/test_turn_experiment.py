@@ -71,6 +71,10 @@ def test_writer_prompt_renders_assigned_treatment_without_changing_facts(monkeyp
     assert "RANDOMIZED EARLY-TURN TREATMENT (consequence_first)" in writer.llm.prompt
     assert "first clause" in writer.llm.prompt and "source-backed consequence" in writer.llm.prompt
     assert "Keep the script original; do not reuse another upload's topic" in writer.llm.prompt
+    assert "6-9 words" in writer.llm.prompt
+    assert "spoken question is" in writer.llm.prompt and "optional" in writer.llm.prompt
+    assert "segment 2 (THE TURN)" in writer.llm.prompt
+    assert "open a question that only the end" not in writer.llm.prompt
 
 
 def test_early_turn_timing_is_recorded_as_runtime_location_not_feed_data():

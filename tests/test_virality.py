@@ -6,7 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from autotube import common, trends  # noqa: E402
-from autotube.scriptwriter import ScriptWriter  # noqa: E402
+from autotube.scriptwriter import ScriptWriter, names_subject_in_opening, retention_guidance  # noqa: E402
 
 CFG = common.load_config()
 
@@ -203,6 +203,42 @@ def test_selection_outage_returns_nothing_not_guesses():
             raise LLMError("down")
 
     assert ScriptWriter(CFG, Down([]), Strat()).select_topics(cands(), 2, set()) == []
+
+
+def test_fresh_retention_data_guides_opening_without_becoming_a_platform_claim():
+    now = common.now_utc()
+    summary = {
+        "updated": now.isoformat(),
+        "average_view_target": {"n": 33, "median_avg_view_pct": 59.4, "gate_pct": 70.0},
+        "retention": {"videos": 27, "where": "hook",
+                      "worst_drop": {"from_pct": 10, "to_pct": 20}},
+    }
+    guidance = retention_guidance(CFG, summary, now)
+    assert "10-20% of runtime" in guidance
+    assert "6-9 words" in guidance and "subject by beat two" in guidance
+    assert "not a YouTube ranking rule" in guidance and "not viewer-survival percentages" in guidance
+
+    stale = dict(summary, updated=(now - timedelta(days=15)).isoformat())
+    assert not retention_guidance(CFG, stale, now), "stale retention should not guide current scripts"
+    low_sample = {**summary, "average_view_target": {"n": 4, "median_avg_view_pct": 50, "gate_pct": 70}}
+    assert not retention_guidance(CFG, low_sample, now), "small samples should not be promoted to channel guidance"
+
+
+def test_subject_is_named_by_the_hook_or_early_turn():
+    early = {"segments": [
+        {"text": "Some fish spend three quarters of life on land."},
+        {"text": "Mudskippers crawl on their fins across the mud."},
+        {"text": "They can stay out of water for hours."},
+    ]}
+    delayed = {"segments": [
+        {"text": "Some fish spend three quarters of life on land."},
+        {"text": "They crawl and leap across the muddy shore."},
+        {"text": "The mudskipper can breathe through its skin."},
+    ]}
+    assert names_subject_in_opening(early, "Mudskipper")
+    assert not names_subject_in_opening(delayed, "Mudskipper")
+    assert names_subject_in_opening({"segments": [{"text": "Astronomy in 2026 is remarkable."}]},
+                                    "2026 in astronomy")
 
 
 def test_signal_record_preserves_source_lane_and_youtube_category():
@@ -484,7 +520,7 @@ def test_weak_hook_is_rejected_and_rewritten():
     src = {"title": "X", "text": "Bees make honey. " * 50}
     # gate-clean script: the ONLY thing wrong with it is the reviewer's hook_strength of 6
     # One aside: content.min_commentary_ratio rejects narration with no narrator voice.
-    segs = [{"text": "Bees visit two million flowers to make one jar of honey"},
+    segs = [{"text": "Bees need two million flowers for one honey jar"},
             {"text": "A worker bee makes one twelfth of a teaspoon in life"},
             {"text": "The hive beats its wings to dry the nectar into honey", "aside": "Busy little things."},
             {"text": "A wax seal keeps the stored honey from absorbing moisture"},
@@ -507,7 +543,7 @@ def test_titles_are_screened_for_shock_bait_not_vocabulary():
     w.llm, w.src_chars = Rev(), 4000
     w.cfg = {**CFG, "content": dict(CFG["content"], require_grounding=False)}
     src = {"title": "Hunger stone", "text": "stones during the Thirty Years War " * 40}
-    seg = [{"text": "Carved during the Thirty Years War, this stone still warns us"},
+    seg = [{"text": "The Thirty Years War stone still warns us"},
            {"text": "It only appears when the river drops to a record low"},
            {"text": "The oldest marking on it is older than anyone alive",
             "aside": "Cheerful bunch."},   # min_commentary_ratio: narration needs a voice

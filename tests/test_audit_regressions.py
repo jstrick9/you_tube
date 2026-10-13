@@ -63,7 +63,7 @@ def test_a_genuinely_different_second_video_in_the_same_run_still_passes():
     w = _writer()
     assert w.check(_script("T1"), SRC)[0] is True
     other = {"title": "T2", "segments": [
-        {"text": "Roman concrete can heal its own cracks when seawater gets in"},
+        {"text": "Seawater lets Roman concrete heal its cracks"},
         {"text": "Saltwater feeds crystals that grow through the damaged stone", "aside": "Show off."},
         {"text": "They fill the gap until the seawall is sealed again"},
         {"text": "so the break becomes part of the repair"}]}

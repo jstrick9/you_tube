@@ -764,6 +764,13 @@ def test_rejects_the_all_ambient_shotlist_actually_published():
         {"visual": {"shows": "the Montauk Monster carcass on the sand",
                     "queries": ["montauk monster carcass"]}}]}
     assert names_subject(shown, "Montauk Monster")
+    plural_shown = {"segments": [{"visual": {"shows": "mudskippers crawling over wet mud",
+                                               "queries": ["mudskippers mud", "mudskipper close up"]}}]}
+    assert names_subject(plural_shown, "Mudskipper"), "ordinary singular/plural wording should still identify the subject"
+    # Generic article framing is not the depictable subject; this title's subject is banking.
+    banking = {"segments": [{"visual": {"shows": "an old bank counter with a handwritten ledger",
+                                          "queries": ["banking ledger", "historic bank branch"]}}]}
+    assert names_subject(banking, "History of banking")
 
     # Must never block a video whose subject has no distinctive word to require.
     assert names_subject(published, "The Mystery")
@@ -1296,6 +1303,13 @@ def test_script_must_say_what_it_is_about():
                                    "Jonathan (tortoise)")
     assert narration_names_subject({"segments": [{"text": "Astronomy in 2026 brings a rare eclipse."}]},
                                    "2026 in astronomy")
+    assert narration_names_subject({"segments": [{"text": "Mudskippers crawl across the mud."}]},
+                                   "Mudskipper")
+    assert narration_names_subject({"segments": [{"text": "Banking spread from ledger-keeping to formal banks."}]},
+                                   "History of banking")
+    from autotube.scriptwriter import names_subject_in_opening
+    assert names_subject_in_opening({"segments": [{"text": "Banking relied on handwritten ledgers."}]},
+                                    "History of banking")
     assert not narration_names_subject({"segments": [{"text": "Astronomy brings a rare eclipse."}]},
                                        "2026 in comet sightings")
 

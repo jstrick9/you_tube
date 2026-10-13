@@ -95,10 +95,11 @@ HOOK_GUIDE = {
                   "(e.g. '<wild true fact>. Seriously.') — the fact itself comes first, never a vague 'this sounds fake'."),
 }
 HOOK_RULES = (
-    "HOOK RULES (a specific opening can earn attention; there is no fixed viewer-retention cutoff): 6-12 words; lead with the most surprising, specific "
-    "true detail (a number, a contradiction, an impossible-sounding fact); open a question that only the end of the "
-    "video answers. BANNED openers: 'Did you know', 'Here are', 'In this video', 'Today we', 'Let's talk about', "
-    "'Have you ever wondered', greetings, the channel name, the topic name alone.")
+    "HOOK RULES (internal creative targets, not a platform threshold): {hook_min}-{hook_max} words; one short, self-contained line that "
+    "makes sense without the title. Name the specific subject or concrete object/event and lead with its most surprising "
+    "source-backed detail (a number, contradiction or impossible-sounding fact). Create curiosity without a vague pronoun, "
+    "preamble or forced literal question; obey the assigned lane's hook style. BANNED openers: 'Did you know', 'Here are', "
+    "'In this video', 'Today we', 'Let's talk about', 'Have you ever wondered', greetings, the channel name, or the topic name alone.")
 
 TURN_VARIANT_GUIDE = {
     "consequence_first": (
@@ -307,6 +308,61 @@ def outlier_structure_guidance(topic: dict, cfg: dict) -> str:
     )
 
 
+def retention_guidance(cfg: dict, summary: dict | None = None, now=None) -> str:
+    """Turn fresh channel retention measurements into cautious writing guidance, not a platform rule."""
+    data = read_json("analytics_summary.json", {}) if summary is None else summary
+    if not isinstance(data, dict):
+        return ""
+    raw_updated = data.get("updated")
+    try:
+        updated = datetime.fromisoformat(str(raw_updated).replace("Z", "+00:00"))
+        if updated.tzinfo is None:
+            return ""
+        reference = now or now_utc()
+        if reference.tzinfo is None:
+            return ""
+        age = reference.astimezone(timezone.utc) - updated.astimezone(timezone.utc)
+    except (TypeError, ValueError, OverflowError):
+        return ""
+    if age < -timedelta(minutes=5) or age > timedelta(days=14):
+        return ""
+
+    target_summary = data.get("average_view_target")
+    target_summary = target_summary if isinstance(target_summary, dict) else {}
+    curve = data.get("retention")
+    curve = curve if isinstance(curve, dict) else {}
+    try:
+        n_views = int(target_summary.get("n", 0))
+        median = float(target_summary.get("median_avg_view_pct", curve.get("median_avg_view_pct")))
+        target = float(target_summary.get("gate_pct", cfg.get("analytics", {}).get("target_avg_view_pct", 70)))
+        n_curves = int(curve.get("videos", 0))
+    except (TypeError, ValueError, OverflowError):
+        return ""
+    if (n_views < 10 or n_curves < 10 or not math.isfinite(median) or not math.isfinite(target)
+            or not 0 <= median <= 400 or not 0 < target <= 400):
+        return ""
+    drop = curve.get("worst_drop")
+    drop = drop if isinstance(drop, dict) else {}
+    start, end = drop.get("from_pct"), drop.get("to_pct")
+    if (type(start) is not int or type(end) is not int or not 0 <= start < end <= 100
+            or curve.get("where") != "hook" or start >= 20 or end > 30):
+        return ""
+
+    ccfg = cfg.get("content", {}) if isinstance(cfg, dict) else {}
+    hook_min, hook_max = ccfg.get("hook_words_min", 6), ccfg.get("hook_words_max", 9)
+    details = (f"median average view percentage {median:.0f}% against the internal {target:.0f}% target "
+               f"(n={n_views}) and the largest relative watch-ratio decline at {start}-{end}% of runtime "
+               f"(n={n_curves} curves)")
+    return (
+        "CHANNEL RETENTION LEARNING (fresh internal observations, not a YouTube ranking rule): " + details + ". "
+        f"Treat this only as a writing hypothesis: keep the hook {hook_min}-{hook_max} words, make it clear without "
+        "the title, identify the specific subject by beat two, and let beat two deliver a distinct source-backed "
+        "surprise or consequence immediately. Do not add a preamble, repeat the hook, invent stakes, or withhold "
+        "basic context. Watch-ratio curves are not viewer-survival percentages or feed-swipe data; never state this "
+        "analytics note in the video.\n"
+    )
+
+
 def actionable_review_fixes(value) -> list[str]:
     """Normalize the independent reviewer's remaining change requests for the publish gate."""
     if isinstance(value, str):
@@ -455,6 +511,25 @@ def _subject_terms(subject: str, stop: set[str]) -> set[str]:
             and not re.fullmatch(r"(?:1[0-9]{3}|20[0-9]{2}|21[0-9]{2})", t)}
 
 
+def _subject_forms(term: str) -> set[str]:
+    """A small plural/singular bridge; it must not turn the subject gate into fuzzy matching."""
+    forms = {term}
+    if len(term) > 4:
+        if term.endswith("ies"):
+            forms.add(term[:-3] + "y")
+        elif term.endswith("y"):
+            forms.add(term[:-1] + "ies")
+        elif term.endswith("s") and not term.endswith("ss"):
+            forms.add(term[:-1])
+        else:
+            forms.add(term + "s")
+    return forms
+
+
+def _matched_subject_terms(key: set[str], observed: set[str]) -> set[str]:
+    return {term for term in key if _subject_forms(term) & observed}
+
+
 def names_subject(script: dict, subject: str) -> bool:
     """Does any shot actually depict the thing the video is about?
 
@@ -473,7 +548,7 @@ def names_subject(script: dict, subject: str) -> bool:
     from .originality import tokens
 
     stop = {"the", "a", "an", "of", "and", "in", "on", "at", "for", "with", "to",
-            "incident", "mystery", "case", "story", "effect", "phenomenon", "signal"}
+            "incident", "mystery", "case", "story", "history", "effect", "phenomenon", "signal"}
     key = _subject_terms(subject, stop)
     if not key:
         return True          # nothing distinctive to require; do not block the video
@@ -485,7 +560,7 @@ def names_subject(script: dict, subject: str) -> bool:
     for seg in script.get("segments", []):
         vis = seg.get("visual") or {}
         blob = " ".join([str(vis.get("shows", ""))] + [str(q) for q in (vis.get("queries") or [])])
-        if len(key & set(tokens(blob))) >= need:
+        if len(_matched_subject_terms(key, set(tokens(blob)))) >= need:
             return True
     return False
 
@@ -576,8 +651,8 @@ def payoff_is_a_question(last: str) -> bool:
 
     One script closed "The Hittite Empire or the Nile's floods - which won?", which
     passes an emptiness check because it carries content words, yet answers nothing
-    and leaves the viewer with homework instead of a reason to replay. The hook asks;
-    the last line answers.
+    and leaves the viewer with homework instead of a reason to replay. The opening creates
+    a curiosity gap; the last line must resolve it with a fact.
     """
     return (last or "").strip().endswith("?")
 
@@ -600,7 +675,7 @@ def narration_names_subject(script: dict, subject: str) -> bool:
     from .originality import tokens
 
     stop = {"the", "a", "an", "of", "and", "in", "on", "at", "for", "with", "to",
-            "incident", "mystery", "case", "story", "effect", "phenomenon", "signal",
+            "incident", "mystery", "case", "story", "history", "effect", "phenomenon", "signal",
             "accident", "escape", "project", "experiment"}
     key = _subject_terms(subject, stop)
     if not key:
@@ -608,7 +683,28 @@ def narration_names_subject(script: dict, subject: str) -> bool:
     said = set()
     for seg in script.get("segments", []):
         said |= set(tokens(spoken_text(seg)))
-    return bool(key & said)
+    return bool(_matched_subject_terms(key, said))
+
+
+def names_subject_in_opening(script: dict, subject: str, max_segments: int = 2) -> bool:
+    """Is the actual subject named by the hook or the early turn, not introduced after viewers leave?"""
+    from .originality import tokens
+
+    stop = {"the", "a", "an", "of", "and", "in", "on", "at", "for", "with", "to",
+            "incident", "mystery", "case", "story", "history", "effect", "phenomenon", "signal",
+            "accident", "escape", "project", "experiment"}
+    key = _subject_terms(subject, stop)
+    if not key:
+        return True
+    segments = script.get("segments", []) if isinstance(script, dict) else []
+    if not isinstance(segments, list):
+        return False
+    observed = set()
+    for seg in segments[:max(1, int(max_segments))]:
+        if isinstance(seg, dict):
+            aside = seg.get("aside") if isinstance(seg.get("aside"), str) else ""
+            observed.update(tokens(str(seg.get("text") or "") + " " + aside))
+    return bool(_matched_subject_terms(key, observed))
 
 
 ESCALATION_TEMPLATE = ("weird:", "weirder:", "weirdest:", "completely unhinged:",
@@ -1042,7 +1138,9 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                 "rhetorical lead-in like 'and that is exactly why we have to ask...', which ends "
                 "the video on nothing. No 'follow for more', no goodbye.")
         else:
-            loop_rule = "answer the hook's question with the final surprising fact + a natural 'Follow for more.'"
+            loop_rule = (
+                "finish on a new, surprising source-backed fact or outcome that completes the concrete curiosity gap; "
+                "no call to action")
         persona = self.cfg.get("persona") or {}
         max_asides = int(persona.get("max_asides", 2)) if persona.get("asides", True) else 0
         # The series remit, so episodes conform to the show's promise rather than merely
@@ -1128,7 +1226,8 @@ CHANNEL: {self.cfg['channel']['name']}
 SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of facts:
 \"\"\"{source['text'][:self.src_chars]}\"\"\"
 
-{HOOK_RULES}
+{HOOK_RULES.format(hook_min=ccfg.get('hook_words_min', 6), hook_max=ccfg.get('hook_words_max', 9))}
+{retention_guidance(self.cfg)}
 Write the script as exactly 4 or 5 segments. Each beat has a DIFFERENT job — do not write interchangeable body lines:
   - segment 1 = HOOK (see rules), spoken in under 3 seconds;
   - segment 2 = THE TURN, {body_min}-{body_max} factual words. This single line decides whether the video is watched, and it is the
@@ -1142,9 +1241,9 @@ Write the script as exactly 4 or 5 segments. Each beat has a DIFFERENT job — d
     creature, person, document or place the video is about. Ambient scenery ("waves on a beach",
     "a sunset", "a forest") is backdrop, not evidence: a viewer who is promised a nightmare and
     shown a sunset leaves. If the subject genuinely cannot be pictured, this is the wrong topic.
-  - segment 1 (after the hook) must NOT resolve or deflate the hook. No "it's not aliens, it's just
-    physics", no "experts say it was only a raccoon" this early. Deepen the puzzle or raise the stakes;
-    the answer belongs in the payoff. Resolving it here ends the video at three seconds.
+  - segment 2 (THE TURN) must NOT resolve or deflate the entire hook. Reward early attention with a new
+    source-backed fact, consequence or reversal, but save the final answer/twist for the payoff. Do not bury
+    the subject under background, and do not use a vague tease that only makes sense after the title.
   - order the body so each line is more surprising than the last. The best fact goes LAST, never mid-script.
   - ONE STORY, not a list of facts about a subject. Each line must follow from the one before it - because of
     it, despite it, or revealing what it really meant. A viewer should never be able to reorder your lines
@@ -1156,8 +1255,9 @@ Write the script as exactly 4 or 5 segments. Each beat has a DIFFERENT job — d
     BAD (same subject, no chain): Egypt built pyramids without modern tools / they used the Nile's flooding /
     they signed the first peace treaty.
   - last segment = PAYOFF, {payoff_min}-{payoff_max} factual words: {loop_rule}
-Leave ONE question deliberately open from the hook until the payoff — the viewer should be unable to stop
-watching without learning the answer. Never answer it in segment 2.
+Create ONE concrete curiosity gap from the source-backed hook and close it in the payoff; a spoken question is
+optional. Segment 2 must add new value, not repeat the hook or explain basic background. Do not withhold the
+subject's identity just to manufacture suspense.
 The trend subject and angle are discovery labels, not factual sources — do NOT repeat their claims or numbers unless the SOURCE TEXT states them.
 {person_rule}{series_rule}{lane_rule}ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with
 comic timing and personality (reactions, contrast, "and it gets worse"). The facts stay 100% exact; the humour comes
@@ -1238,6 +1338,9 @@ Return JSON:
                 f"the script never says {subject_for_visuals!r} out loud — it hides behind "
                 "'some fish' or 'a creature'. Name it: the specific noun is what makes a "
                 "fact land instead of sounding like filler")
+            assert names_subject_in_opening(o, subject_for_visuals, max_segments=2), (
+                f"the opening two beats never name {subject_for_visuals!r}; name the specific subject by beat two "
+                "so viewers understand the file before the story escalates")
             _esc = uses_escalation_template(o)
             assert _esc < 2, (
                 "stop using the 'Weird: / Weirder: / Completely unhinged:' ladder — it is a "
@@ -1249,8 +1352,8 @@ Return JSON:
                 f"the hook opens with {_b!r}, which is filler every channel uses. Open on the "
                 "surprising fact itself - the detail, the number, the contradiction")
             assert not payoff_is_a_question(spoken_text(segs[-1])), (
-                "the last line asks a question instead of answering one. The hook asks; the "
-                "payoff answers. End on the fact, not on homework for the viewer")
+                "the last line asks a question instead of delivering a payoff. Close the concrete curiosity gap "
+                "with a new source-backed fact; do not leave homework for the viewer")
             canned = [a for sg in segs if (a := sg.get("aside")) and aside_is_generic(a)]
             assert not canned, (
                 f"aside {canned[0]!r} is canned filler that would fit any video. React to "
@@ -1495,8 +1598,9 @@ entertainment — BE HARSH, this channel competes with comedians: a list of accu
 at most, however interesting. 7 = has a story shape (setup, escalation, payoff) and personality. 8 = also at least one
 genuinely funny or gasp-out-loud moment. 9-10 = you would send it to a friend. If entertainment < {min_ent:g}, put a concrete TRUE rewrite
 idea in "fixes" (story tension, comic contrast, a sharper aside, a stronger reveal).
-hook_strength: 9-10 = the first line alone would stop a stranger scrolling (specific, surprising, opens a question the
-video answers); 7-8 = decent; <=6 = generic ('Did you know', 'Here are some facts', topic name, slow setup).
+hook_strength: 9-10 = the first line is concise, specific and surprising, and by beat two the viewer can name the
+subject without relying on the title; 7-8 = decent; <=6 = vague, overlong, generic, or slow setup. A literal question
+is optional; clarity and an immediate source-backed reason to keep watching are not.
 If hook_strength < {min_hook:g}, put a stronger TRUE first line in "fixes".
 Any non-empty "fixes" list means the draft still needs revision; return [] only when it is ready to publish.
 Be internally consistent: if a fix says the last line must be rewritten to loop, "loops" must be false.""" + trend_rubric

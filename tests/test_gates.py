@@ -51,13 +51,13 @@ def test_good_hooks_pass():
     for hook in ["Antarctica has a waterfall that runs blood red",
                  "A teaspoon of neutron star weighs 6 billion tons",
                  "Your stomach lining replaces itself every four days",
-                 "One California tree was already old when Egypt built pyramids"]:
+                 "This California tree predates Egypt's pyramids"]:
         assert gates.check_hook(hook) == [], f"false positive on: {hook} -> {gates.check_hook(hook)}"
 
 
 def test_hook_length_band():
     assert any("word" in i for i in gates.check_hook("Volcanoes"))
-    assert any("12" in i for i in gates.check_hook(" ".join(["word"] * 20)))
+    assert any("9" in i for i in gates.check_hook(" ".join(["word"] * 20)))
     assert gates.check_hook("") == ["the hook is empty"]
 
 
@@ -232,7 +232,7 @@ def test_scriptwriter_flags_a_non_independent_review():
     w.cfg = {**cfg, "content": dict(cfg["content"], require_grounding=False)}
     src = {"title": "Bees", "text": "Bees make honey from nectar. " * 30}
     script = {"title": "Honey", "_writer_model": "gemini:g-1", "segments": [
-        {"text": "Bees visit two million flowers to fill a single jar"},
+        {"text": "Bees visit two million flowers for one honey jar"},
         {"text": "A worker bee makes one twelfth of a teaspoon in life", "aside": "Busy little things."},
         {"text": "The hive fans its wings to dry the nectar down"},
         {"text": "so the jar in your cupboard will never spoil"}]}

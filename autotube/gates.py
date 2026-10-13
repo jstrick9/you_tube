@@ -103,7 +103,7 @@ def _words(text: str) -> list[str]:
     return [w for w in re.split(r"\s+", text.strip()) if w]
 
 
-def check_hook(hook: str, lo: int = 6, hi: int = 12) -> list[str]:
+def check_hook(hook: str, lo: int = 6, hi: int = 9) -> list[str]:
     """A specific opening can help earn attention; no fixed viewer-retention cutoff is assumed."""
     issues = []
     hook = (hook or "").strip()
@@ -239,7 +239,7 @@ def run_all(script: dict, spoken, cfg: dict) -> list[str]:
     if not isinstance(script.get("title"), str) or not script["title"].strip():
         return ["script title must be non-empty text"]
     lo = int(ccfg.get("hook_words_min", 6))
-    hi = int(ccfg.get("hook_words_max", 12))
+    hi = int(ccfg.get("hook_words_max", 9))
     issues = check_hook(spoken(segs[0]), lo, hi)
     if len(segs) > 2:
         issues += check_turn(spoken(segs[1]))

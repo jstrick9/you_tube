@@ -499,7 +499,7 @@ def test_script_fact_check_outage_fails_closed(monkeypatch):
     ev = "Honey is a sweet substance made by bees."
     # gate-clean script: the only reason it must fail is that the fact-checker is unreachable
     script = {"title": "Honey facts", "segments": [
-        {"text": "Bees visit two million flowers to fill a single jar", "evidence": ev},
+        {"text": "Bees visit two million flowers for one honey jar", "evidence": ev},
         {"text": "A worker bee makes one twelfth of a teaspoon in life", "evidence": ev},
         # aside on a BODY line, never the hook: asides count toward hook length, and
         # content.min_asides requires the narration to have a voice of its own
