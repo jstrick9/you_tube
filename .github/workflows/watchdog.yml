@@ -1,0 +1,50 @@
+# Catch a dropped or heavily delayed daily production cron before the next four-hour top-up.
+# This runner stays lightweight; it dispatches the daily workflow only when videos remain and
+# the production workflow has no active or recent attempt. Publishing still uses the existing
+# safe top-up cap and the same factual, originality, safety, and visual gates.
+name: AutoTube schedule watchdog
+
+on:
+  schedule:
+    - cron: "35 10 * * *"        # 18 minutes after the 10:17 UTC main run
+    - cron: "5 0,12,16,20 * * *" # 18 minutes after each 4-hour top-up (UTC)
+
+concurrency:
+  group: autotube-watchdog
+  cancel-in-progress: false
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install lightweight preflight dependency
+        run: pip install -q pyyaml==6.0.3
+
+      - name: Check today's remaining target
+        id: need
+        env:
+          AUTOTUBE_UPLOAD_CONFIGURED: ${{ secrets.YT_REFRESH_TOKEN != '' && secrets.YT_CLIENT_ID != '' && secrets.YT_CLIENT_SECRET != '' }}
+        run: python scripts/needed_today.py
+
+      - name: Recover a missed or late production run
+        if: steps.need.outputs.needed != '0'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_API_URL: ${{ github.api_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          NEEDED: ${{ steps.need.outputs.needed }}
+        run: python scripts/recover_missed_run.py

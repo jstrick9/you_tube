@@ -20,6 +20,8 @@ on:
     # retries were competing with each other for the quota they all needed.
     # Four slots still give several independent chances against a dropped cron, which is what these are for.
     - cron: "47 11-23/4 * * *"    # top-ups 11:47, 15:47, 19:47, 23:47 UTC (only fill what's missing)
+    # A separate lightweight watchdog runs 18 minutes later; it dispatches a safe top-up only when
+    # the expected run is still absent and no active/recent production attempt exists.
   workflow_dispatch:
     inputs:
       count:
@@ -40,6 +42,7 @@ concurrency:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   produce:
@@ -83,8 +86,10 @@ jobs:
       # with nothing to do ends in seconds instead of spending free Actions minutes on the heavy install.
       - name: Anything left to make today?
         id: need
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          if [ "${{ github.event_name }}" = "schedule" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.top_up }}" = "true" ]; then
             pip install -q pyyaml==6.0.3 && python scripts/needed_today.py   # pinned; full install stays below
           else
             echo "needed=manual" >> "$GITHUB_OUTPUT"
