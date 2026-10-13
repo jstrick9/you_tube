@@ -5,7 +5,7 @@ from autotube.analytics import average_view_watchlist
 from scripts import dashboard
 
 
-def _video(video_id, pct, *, views=100, engaged=40, title=None):
+def _video(video_id, pct, *, views=100, engaged=100, title=None):
     return {
         "video_id": video_id,
         "title": title or f"Video {video_id}",
@@ -41,6 +41,24 @@ def test_watchlist_lists_only_valid_under_target_videos_lowest_first():
     assert result["videos"][0]["avg_view_pct"] == 31.25
     assert result["videos"][0]["duration_seconds"] == 17.5
     assert result["videos"][0]["engaged_views_90d"] == 180
+
+
+def test_watchlist_separates_provisional_rows_and_prioritizes_learning_grade_evidence():
+    videos = [
+        _video("provisional", 10.0, views=400, engaged=5),
+        _video("qualified", 45.0, views=300, engaged=300),
+        _video("public-fallback", 60.0, views=80, engaged=None),
+    ]
+
+    result = average_view_watchlist(videos, {"average_view_gate_pct": 70.0, "min_views_to_learn": 50})
+
+    assert result["evaluated"] == 3 and result["below_target"] == 3
+    assert result["qualified_evaluated"] == 2 and result["qualified_below_target"] == 2
+    assert result["provisional_evaluated"] == 1 and result["provisional_below_target"] == 1
+    assert [video["id"] for video in result["videos"]] == ["qualified", "public-fallback", "provisional"]
+    assert result["videos"][0]["sample_qualified"] is True
+    assert result["videos"][1]["sample_basis"] == "public_views_fallback"
+    assert result["videos"][2]["sample_qualified"] is False
 
 
 def test_watchlist_counts_all_under_target_rows_but_caps_displayed_rows():
@@ -92,7 +110,8 @@ def test_dashboard_shows_under_target_details_and_escapes_video_text(monkeypatch
     page = _render_dashboard(monkeypatch, tmp_path, [], summary)
 
     assert "Videos below the 70% average-view target" in page
-    assert "1 of 1 measured videos are below 70%" in page
+    assert "1 of 1 sample-qualified videos are below 70%" in page
+    assert "Evidence sample" in page and "Sample-qualified" in page
     assert "Engaged views (90d)" in page
     assert "https://www.youtube.com/watch?v=abc_123" in page
     assert "&lt;script&gt;alert(&#x27;x&#x27;)&lt;/script&gt;" in page
@@ -111,4 +130,6 @@ def test_dashboard_falls_back_to_existing_history_snapshot(monkeypatch, tmp_path
     page = _render_dashboard(monkeypatch, tmp_path, [video], summary)
 
     assert "Older under-target video" in page
-    assert "1 of 1 measured videos are below 70%" in page
+    assert "1 of 1 sample-qualified videos are below 70%" in page
+    assert "Qualified: 0/1" in page and "all readings: 0/1" in page
+    assert "No averageViewPercentage" not in page

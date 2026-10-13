@@ -476,7 +476,7 @@ analytics:
   target_engagement: 0.06                 # internal (likes + 3*comments) / raw public views target
   rank_min_videos: 40                     # below this many mature videos, score against absolute targets
   rank_min_spread: 0.35                   # otherwise blend with within-channel percentile rank
-  min_views_to_learn: 50                  # minimum engaged views for a video to contribute evidence
+  min_views_to_learn: 50                  # minimum engaged views (public-view fallback only if unavailable); smaller averages stay provisional
 
   # Randomized early-turn study. The only change is which source-backed idea leads beat two;
   # each topic remains unique and factual. Turn strength is telemetry, never an approval gate.
@@ -492,7 +492,7 @@ analytics:
   # voice and hook_style makes category and format converge several times faster. Unfreeze once the
   # channel is doing real volume.
   frozen_dimensions: [voice, hook_style, source]
-  min_observations: 8                     # a dimension is sampled at random until it has this much evidence
+  min_observations: 8                     # random sampling continues until currently configured arms collectively reach this floor; retired arms do not count
 
 notify:
   # Optional free push notifications via ntfy.sh (no account) or a Discord webhook.

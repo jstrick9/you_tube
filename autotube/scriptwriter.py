@@ -332,9 +332,21 @@ def retention_guidance(cfg: dict, summary: dict | None = None, now=None) -> str:
     target_summary = target_summary if isinstance(target_summary, dict) else {}
     curve = data.get("retention")
     curve = curve if isinstance(curve, dict) else {}
+    qualified = target_summary.get("learning_qualified")
+    qualified = qualified if isinstance(qualified, dict) else None
     try:
-        n_views = int(target_summary.get("n", 0))
-        median = float(target_summary.get("median_avg_view_pct", curve.get("median_avg_view_pct")))
+        if qualified is not None:
+            n_views = int(qualified.get("n", 0))
+            median_value = qualified.get("median_avg_view_pct")
+            minimum_sample = int(qualified.get("minimum_sample_views", 50))
+            provisional_n = int(target_summary.get("provisional_n", 0))
+            sample_detail = (f"sample-qualified at ≥{minimum_sample} engaged views (public views used only "
+                             f"when engaged-view data is unavailable; {provisional_n} low- or unknown-sample values excluded)")
+        else:  # older summaries have no sample-qualified cohort; retain the previous guarded fallback
+            n_views = int(target_summary.get("n", 0))
+            median_value = target_summary.get("median_avg_view_pct", curve.get("median_avg_view_pct"))
+            sample_detail = "sample-count qualification not available in this older summary"
+        median = float(median_value)
         target = float(target_summary.get("gate_pct", cfg.get("analytics", {}).get("target_avg_view_pct", 70)))
         n_curves = int(curve.get("videos", 0))
     except (TypeError, ValueError, OverflowError):
@@ -352,8 +364,8 @@ def retention_guidance(cfg: dict, summary: dict | None = None, now=None) -> str:
     ccfg = cfg.get("content", {}) if isinstance(cfg, dict) else {}
     hook_min, hook_max = ccfg.get("hook_words_min", 6), ccfg.get("hook_words_max", 9)
     details = (f"median average view percentage {median:.0f}% against the internal {target:.0f}% target "
-               f"(n={n_views}) and the largest relative watch-ratio decline at {start}-{end}% of runtime "
-               f"(n={n_curves} curves)")
+               f"(n={n_views}; {sample_detail}) and the largest relative watch-ratio decline at "
+               f"{start}-{end}% of runtime (n={n_curves} curves)")
     return (
         "CHANNEL RETENTION LEARNING (fresh internal observations, not a YouTube ranking rule): " + details + ". "
         f"Treat this only as a writing hypothesis: keep the hook {hook_min}-{hook_max} words, make it clear without "

@@ -209,7 +209,11 @@ def test_fresh_retention_data_guides_opening_without_becoming_a_platform_claim()
     now = common.now_utc()
     summary = {
         "updated": now.isoformat(),
-        "average_view_target": {"n": 33, "median_avg_view_pct": 59.4, "gate_pct": 70.0},
+        "average_view_target": {
+            "n": 33, "median_avg_view_pct": 59.4, "gate_pct": 70.0, "provisional_n": 5,
+            "learning_qualified": {"n": 28, "passing": 8, "minimum_sample_views": 50,
+                                    "median_avg_view_pct": 58.3},
+        },
         "retention": {"videos": 27, "where": "hook",
                       "worst_drop": {"from_pct": 10, "to_pct": 20}},
     }
@@ -217,11 +221,20 @@ def test_fresh_retention_data_guides_opening_without_becoming_a_platform_claim()
     assert "10-20% of runtime" in guidance
     assert "6-9 words" in guidance and "subject by beat two" in guidance
     assert "not a YouTube ranking rule" in guidance and "not viewer-survival percentages" in guidance
+    assert "n=28" in guidance and "sample-qualified at ≥50 engaged views" in guidance
+    assert "5 low- or unknown-sample values excluded" in guidance
+
+    legacy = {**summary, "average_view_target": {"n": 28, "median_avg_view_pct": 58.3, "gate_pct": 70}}
+    legacy_guidance = retention_guidance(CFG, legacy, now)
+    assert "n=28; sample-count qualification not available in this older summary" in legacy_guidance
 
     stale = dict(summary, updated=(now - timedelta(days=15)).isoformat())
     assert not retention_guidance(CFG, stale, now), "stale retention should not guide current scripts"
-    low_sample = {**summary, "average_view_target": {"n": 4, "median_avg_view_pct": 50, "gate_pct": 70}}
-    assert not retention_guidance(CFG, low_sample, now), "small samples should not be promoted to channel guidance"
+    low_sample = {**summary, "average_view_target": {
+        "n": 33, "median_avg_view_pct": 59.4, "gate_pct": 70,
+        "learning_qualified": {"n": 4, "minimum_sample_views": 50, "median_avg_view_pct": 50},
+    }}
+    assert not retention_guidance(CFG, low_sample, now), "small sample-qualified cohorts should not guide scripts"
 
 
 def test_subject_is_named_by_the_hook_or_early_turn():

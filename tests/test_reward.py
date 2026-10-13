@@ -92,6 +92,12 @@ def test_low_traffic_videos_are_not_evidence():
     assert learnable({"metrics": {"views": 500}}, ACFG)  # labeled public-view fallback for API gaps
 
 
+def test_malformed_engaged_view_counts_do_not_unlock_learning_or_fall_back_to_public_views():
+    for malformed in (True, 49.9, "50 views", -1, float("inf")):
+        assert not learnable({"metrics": {"views": 10000, "engaged_views_90d": malformed}}, ACFG)
+    assert learnable({"metrics": {"engaged_views_90d": 50.0}}, ACFG)
+
+
 def test_legacy_completion_curve_is_renamed_not_kept_as_a_viewer_percentage():
     history = [{"metrics": {"completion": 0.42, "hook_retention": 0.8,
                              "curve": [1.2] * 11, "swipe_point": 0.5}}]
@@ -426,6 +432,37 @@ def test_sampling_is_random_until_there_is_evidence(monkeypatch):
     s.state["arms"]["category"]["history"].update({"a": 9.0, "b": 1.0, "n": 1})   # 1 lucky video
     picks = {s.sample("category") for _ in range(60)}
     assert picks == {"history", "science"}, "must not chase a posterior built on one observation"
+
+
+def test_stale_arms_neither_clear_active_evidence_floor_nor_appear_in_report(monkeypatch):
+    state = {"arms": {
+        "category": {
+            "history": {"a": 99.0, "b": 1.0, "n": 1},
+            "science": {"a": 1.0, "b": 99.0, "n": 1},
+            "retired_category": {"a": 100.0, "b": 1.0, "n": 100},
+        },
+        "format": {"retired_format": {"a": 100.0, "b": 1.0, "n": 100}},
+    }, "updates": 102}
+    monkeypatch.setattr("autotube.strategy.read_json", lambda *a, **k: state)
+    s = Strategy(_cfg(min_observations=4, cold_start_min=0, frozen_dimensions=[]))
+
+    assert s.observations("category") == 2
+    category = s.report()["category"]
+    assert category["status"] == "exploring (2/4)"
+    assert category["observations"] == 2
+    assert {arm["arm"] for arm in category["arms"]} == {"history", "science"}
+    assert {arm["arm"] for arm in s.report()["format"]["arms"]} == {"facts3", "backstory"}
+
+    def unexpected_posterior(*_args):
+        raise AssertionError("retired-arm observations must not trigger posterior sampling")
+
+    monkeypatch.setattr("autotube.strategy.random.betavariate", unexpected_posterior)
+    assert s.sample("category") in {"history", "science"}
+
+    # Once the current options themselves reach the configured floor, the dimension can learn.
+    s.state["arms"]["category"]["history"]["n"] = 2
+    s.state["arms"]["category"]["science"]["n"] = 2
+    assert s.report()["category"]["status"] == "learning"
 
 
 # --- Cold start -------------------------------------------------------------

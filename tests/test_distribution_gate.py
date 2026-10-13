@@ -80,6 +80,26 @@ def test_gate_threshold_is_configurable_in_percentage_points():
     assert average_view_target(vids, {"average_view_gate_pct": 55.0})["passing"] == 2
 
 
+def test_target_keeps_low_sample_readings_visible_but_excludes_them_from_learning_cohort():
+    videos = [
+        {"metrics": {"avg_view_pct": 65.0, "engaged_views_90d": 100, "views": 500}},
+        {"metrics": {"avg_view_pct": 75.0, "engaged_views_90d": 49, "views": 200}},
+        {"metrics": {"avg_view_pct": 80.0, "views": 60}},  # public-view fallback only when engaged is absent
+        {"metrics": {"avg_view_pct": 10.0, "engaged_views_90d": 0, "views": 500}},
+        {"metrics": {"avg_view_pct": 99.0, "engaged_views_90d": True, "views": 1000}},
+    ]
+
+    result = average_view_target(videos, {"average_view_gate_pct": 70.0, "min_views_to_learn": 50})
+
+    assert result["n"] == 5 and result["passing"] == 3  # all valid measurements remain visible
+    assert result["learning_qualified"] == {
+        "minimum_sample_views": 50,
+        "sample_basis": "engaged_views_90d; public views are used only when engaged views are unavailable",
+        "n": 2, "passing": 1, "pass_rate": 0.5, "median_avg_view_pct": 72.5,
+    }
+    assert result["provisional_n"] == 3 and result["provisional_below_target"] == 1
+
+
 # ── loop verdict (judged by the reviewer, not by a regex) ────────────────────
 def test_loop_is_judged_semantically_not_lexically():
     """A deterministic version was tried and removed: it rejected clean loops.

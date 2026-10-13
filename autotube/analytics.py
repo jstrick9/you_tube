@@ -73,13 +73,48 @@ def clean_view_pct(v) -> float | None:
     return v if math.isfinite(v) and 0 < v <= MAX_SANE_VIEW_PCT else None
 
 
+def _nonnegative_count(value) -> int | None:
+    """Parse an integer count without accepting Booleans, fractions, or coercible garbage."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        count = value
+    elif isinstance(value, float) and math.isfinite(value) and value.is_integer():
+        count = int(value)
+    elif isinstance(value, str) and value.strip().isdigit():
+        try:
+            count = int(value.strip())
+        except (OverflowError, ValueError):
+            return None
+    else:
+        return None
+    return count if count >= 0 else None
+
+
+def _learning_sample_size(metrics: dict) -> tuple[int | None, str]:
+    """Return the strict sample count and its basis without coercing malformed values."""
+    if not isinstance(metrics, dict):
+        return None, "unknown"
+    engaged = metrics.get("engaged_views_90d")
+    if engaged is not None:
+        return _nonnegative_count(engaged), "engaged_views_90d"
+    return _nonnegative_count(metrics.get("views")), "public_views_fallback"
+
+
+def _minimum_learning_views(acfg: dict) -> int:
+    try:
+        value = acfg.get("min_views_to_learn", 50)
+        if isinstance(value, bool):
+            return 50
+        return max(0, int(value))
+    except (OverflowError, TypeError, ValueError):
+        return 50
+
+
 def learnable(h: dict, acfg: dict) -> bool:
     """Is there enough engaged-view traffic for these Shorts metrics to mean anything?"""
-    m = h.get("metrics") or {}
-    n = m.get("engaged_views_90d")
-    if n is None:  # migration / Analytics API outage; retain a clearly weaker public-view fallback
-        n = m.get("views") or 0
-    return int(n) >= int(acfg.get("min_views_to_learn", 50))
+    count, _basis = _learning_sample_size(h.get("metrics") or {})
+    return count is not None and count >= _minimum_learning_views(acfg)
 
 
 def compute_reward(m: dict, pools: dict, acfg: dict) -> tuple[float, dict]:
@@ -193,21 +228,51 @@ def _subs_progress(uploaded: list[dict], now) -> dict:
 
 
 def average_view_target(matured: list[dict], acfg: dict) -> dict:
-    """Measure the channel against its *internal* average-view target.
+    """Report all valid averages while separating low-sample readings from learning evidence.
 
-    YouTube's Analytics API does not expose a simple percentage of unique viewers who finished a
-    Short. ``averageViewPercentage`` is the closest directly queryable watch-through proxy: average
-    percentage watched per playback. The 70% threshold is this channel's target, not a published
-    YouTube distribution rule. ``audienceWatchRatio`` is a segment-watch ratio and must not be used
-    as a completion rate.
+    YouTube's Analytics API does not expose the share of unique viewers who finished a Short.
+    ``averageViewPercentage`` is the mean percentage of the video watched per playback, not a viewer
+    completion rate. The 70% threshold is this channel's target, not a published YouTube distribution
+    rule. ``audienceWatchRatio`` is a segment-watch ratio and must not be used as a completion rate.
+    Values below ``min_views_to_learn`` remain visible but are marked provisional.
     """
     gate = float(acfg.get("average_view_gate_pct", 70.0))
-    values = [pct for h in matured
-              if (pct := clean_view_pct(h.get("metrics", {}).get("avg_view_pct"))) is not None]
-    if not values:
-        return {"n": 0, "gate_pct": gate, "metric": "average_view_percentage",
-                "verdict": "no average view percentage data yet"}
+    minimum = _minimum_learning_views(acfg)
+    observed: list[tuple[float, int | None, str]] = []
+    for h in matured:
+        metrics = h.get("metrics") if isinstance(h, dict) else None
+        if not isinstance(metrics, dict):
+            continue
+        pct = clean_view_pct(metrics.get("avg_view_pct"))
+        if pct is None:
+            continue
+        sample_size, sample_basis = _learning_sample_size(metrics)
+        observed.append((pct, sample_size, sample_basis))
+
+    values = [pct for pct, _sample, _basis in observed]
+    qualified = [pct for pct, sample, _basis in observed
+                 if sample is not None and sample >= minimum]
+    provisional = [pct for pct, sample, _basis in observed
+                   if sample is None or sample < minimum]
     passing = [v for v in values if v >= gate]
+    qualified_passing = [v for v in qualified if v >= gate]
+    qualified_median = _median(qualified)
+    learning = {
+        "minimum_sample_views": minimum,
+        "sample_basis": "engaged_views_90d; public views are used only when engaged views are unavailable",
+        "n": len(qualified),
+        "passing": len(qualified_passing),
+        "pass_rate": round(len(qualified_passing) / len(qualified), 3) if qualified else None,
+        "median_avg_view_pct": round(qualified_median, 2) if qualified_median is not None else None,
+    }
+    provisional_under = sum(pct < gate for pct in provisional)
+    if not values:
+        return {
+            "n": 0, "gate_pct": gate, "metric": "average_view_percentage",
+            "learning_qualified": learning, "provisional_n": 0, "provisional_below_target": 0,
+            "verdict": "no average view percentage data yet",
+        }
+
     med = _median(values) or 0.0
     rate = len(passing) / len(values)
     if len(passing) == len(values):
@@ -221,29 +286,44 @@ def average_view_target(matured: list[dict], acfg: dict) -> dict:
         verdict = (f"0/{len(values)} measured videos clear the internal {gate:.0f}% average-view target "
                    f"(median {med:.0f}%). This is average watch percentage, not the share of viewers "
                    f"who reached the end; use the curve only to locate relative drop-offs.")
-    return {"n": len(values), "gate_pct": gate, "metric": "average_view_percentage",
-            "passing": len(passing), "pass_rate": round(rate, 3),
-            "median_avg_view_pct": round(med, 2), "verdict": verdict}
+    if provisional:
+        verdict += (f" {len(qualified)}/{len(values)} meet the configured ≥{minimum}-view learning sample; "
+                    f"{len(provisional)} low- or unknown-sample reading(s) are provisional.")
+    return {
+        "n": len(values), "gate_pct": gate, "metric": "average_view_percentage",
+        "passing": len(passing), "pass_rate": round(rate, 3),
+        "median_avg_view_pct": round(med, 2), "learning_qualified": learning,
+        "provisional_n": len(provisional), "provisional_below_target": provisional_under,
+        "verdict": verdict,
+    }
 
 
 def average_view_watchlist(matured: list[dict], acfg: dict, limit: int = 10) -> dict:
-    """List the lowest measured videos below the channel's internal average-view target.
+    """List under-target videos and identify readings below the learning sample threshold.
 
-    Uses the same mature-video cohort and validation as ``average_view_target``. Missing or implausible
-    averageViewPercentage values are omitted rather than converted to zero. Counts are context only;
-    the target remains average percentage watched per playback, not viewer completion.
+    Uses the same mature-video cohort and validation as ``average_view_target``. Every valid average
+    remains visible; sample-qualified videos sort before provisional low-traffic readings so the
+    action list does not mistake a one-view outlier for a reliable channel signal.
     """
     gate = float(acfg.get("average_view_gate_pct", 70.0))
+    minimum = _minimum_learning_views(acfg)
     measured = []
     below = []
+    qualified_evaluated = provisional_evaluated = 0
     for h in matured:
-        metrics = h.get("metrics") or {}
+        metrics = h.get("metrics") if isinstance(h, dict) else None
         if not isinstance(metrics, dict):
             continue
         pct = clean_view_pct(metrics.get("avg_view_pct"))
         if pct is None:
             continue
         measured.append(pct)
+        sample_size, sample_basis = _learning_sample_size(metrics)
+        sample_qualified = sample_size is not None and sample_size >= minimum
+        if sample_qualified:
+            qualified_evaluated += 1
+        else:
+            provisional_evaluated += 1
         if pct >= gate:
             continue
 
@@ -257,17 +337,8 @@ def average_view_watchlist(matured: list[dict], acfg: dict, limit: int = 10) -> 
             duration = None
         if duration is not None and (not math.isfinite(duration) or duration <= 0):
             duration = None
-        views = metrics.get("views")
-        engaged_views = metrics.get("engaged_views_90d")
-        try:
-            views = int(views) if views is not None and int(views) >= 0 else None
-        except (OverflowError, TypeError, ValueError):
-            views = None
-        try:
-            engaged_views = (int(engaged_views)
-                             if engaged_views is not None and int(engaged_views) >= 0 else None)
-        except (OverflowError, TypeError, ValueError):
-            engaged_views = None
+        views = _nonnegative_count(metrics.get("views"))
+        engaged_views = _nonnegative_count(metrics.get("engaged_views_90d"))
         below.append({
             "id": str(h.get("video_id") or ""),
             "title": str(h.get("title") or ""),
@@ -280,24 +351,34 @@ def average_view_watchlist(matured: list[dict], acfg: dict, limit: int = 10) -> 
             "avg_view_pct": round(pct, 2),
             "views": views,
             "engaged_views_90d": engaged_views,
+            "sample_size": sample_size,
+            "sample_basis": sample_basis,
+            "sample_qualified": sample_qualified,
         })
 
-    # Show the lowest average-view values first; break ties in favor of videos with more evidence.
-    def sort_key(video: dict) -> tuple[float, int, str]:
-        sample = video["engaged_views_90d"]
-        if sample is None:
-            sample = video["views"]
-        return (video["avg_view_pct"], -(sample if sample is not None else -1), video["id"])
+    # Put sample-qualified results first, then show lower-volume observations as provisional.
+    # Within each group, the lowest average-view values come first; ties favor larger samples.
+    def sort_key(video: dict) -> tuple[int, float, int, str]:
+        sample = video["sample_size"]
+        return (0 if video["sample_qualified"] else 1, video["avg_view_pct"],
+                -(sample if sample is not None else -1), video["id"])
 
     below.sort(key=sort_key)
+    qualified_below = sum(1 for video in below if video["sample_qualified"])
+    provisional_below = len(below) - qualified_below
     try:
         shown = max(0, int(limit))
     except (OverflowError, TypeError, ValueError):
         shown = 10
     return {
         "gate_pct": gate,
+        "minimum_sample_views": minimum,
         "evaluated": len(measured),
         "below_target": len(below),
+        "qualified_evaluated": qualified_evaluated,
+        "qualified_below_target": qualified_below,
+        "provisional_evaluated": provisional_evaluated,
+        "provisional_below_target": provisional_below,
         "shown": min(len(below), shown),
         "videos": below[:shown],
     }

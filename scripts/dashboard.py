@@ -11,7 +11,7 @@ from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from autotube.analytics import average_view_watchlist  # noqa: E402
+from autotube.analytics import average_view_target, average_view_watchlist  # noqa: E402
 from autotube.common import load_config, read_json  # noqa: E402
 from autotube.strategy import Strategy  # noqa: E402
 
@@ -39,10 +39,25 @@ def _watchlist_card(watchlist: dict, target_gate: float) -> str:
     try:
         evaluated = max(0, int(watchlist.get("evaluated") or 0))
         below = max(0, int(watchlist.get("below_target") or 0))
+        qualified_evaluated = max(0, int(watchlist.get("qualified_evaluated") or 0))
+        qualified_below = max(0, int(watchlist.get("qualified_below_target") or 0))
+        provisional_evaluated = max(0, int(watchlist.get("provisional_evaluated") or 0))
+        provisional_below = max(0, int(watchlist.get("provisional_below_target") or 0))
+        minimum = max(0, int(watchlist.get("minimum_sample_views", 50) or 50))
     except (OverflowError, TypeError, ValueError):
-        evaluated = below = 0
+        evaluated = below = qualified_evaluated = qualified_below = 0
+        provisional_evaluated = provisional_below = minimum = 0
     videos = watchlist.get("videos") if isinstance(watchlist.get("videos"), list) else []
-    if not evaluated:
+    if "qualified_evaluated" in watchlist:
+        if qualified_evaluated:
+            summary = (f"{qualified_below} of {qualified_evaluated} sample-qualified videos are below {gate}%; "
+                       f"{provisional_below} additional under-target reading(s) are provisional.")
+        elif evaluated:
+            summary = (f"No readings meet the {minimum}-view learning sample yet; "
+                       f"{provisional_below} under-target reading(s) are provisional.")
+        else:
+            summary = "No mature videos with valid average-view data yet."
+    elif not evaluated:
         summary = "No mature videos with valid average-view data yet."
     elif not below:
         summary = f"No videos below {gate}% among {evaluated} measured videos."
@@ -66,23 +81,31 @@ def _watchlist_card(watchlist: dict, target_gate: float) -> str:
         duration = _number_label(video.get("duration_seconds"), "s")
         views = _count_label(video.get("views"))
         engaged = _count_label(video.get("engaged_views_90d"))
+        sample_status = ("Sample-qualified" if video.get("sample_qualified") is True
+                         else "Provisional" if video.get("sample_qualified") is False else "Sample n/a")
+        sample_basis = {"engaged_views_90d": "engaged", "public_views_fallback": "public fallback"}.get(
+            video.get("sample_basis"), "unknown")
+        sample_size = _count_label(video.get("sample_size"))
+        evidence = html.escape(f"{sample_status} · {sample_basis} n={sample_size}")
         rows.append(
             f"<tr><td>{title}</td><td class=topic>{topic}</td><td><b>{pct}</b></td><td>{duration}</td>"
-            f"<td>{category}</td><td>{video_format}</td><td>{hook_style}</td><td>{views}</td><td>{engaged}</td></tr>")
+            f"<td>{category}</td><td>{video_format}</td><td>{hook_style}</td><td>{views}</td><td>{engaged}</td>"
+            f"<td>{evidence}</td></tr>")
     listed = len(rows)
     if not rows:
         message = "No measured videos are currently below target." if evaluated else "No measured data yet."
-        rows = [f"<tr><td colspan=9>{html.escape(message)}</td></tr>"]
-    shown_note = (f"Showing the {listed} lowest of {below} under-target videos. "
-                  if below > listed else "Sorted from lowest average-view percentage upward. ")
+        rows = [f"<tr><td colspan=10>{html.escape(message)}</td></tr>"]
+    shown_note = (f"Showing the {listed} lowest of {below} under-target videos, with qualified rows first. "
+                  if below > listed else "Sample-qualified rows come first; provisional values follow. ")
     return (f"<div class=card><h3>Videos below the {gate}% average-view target</h3>"
             f"<b>{html.escape(summary)}</b>"
             f"<em>{html.escape(shown_note)}Average percentage watched per playback—not viewer completion. "
-            f"Public views and engaged views are separate context counts; low counts can make per-video values noisy; "
+            f"The learning sample is ≥{minimum} engaged views, using public views only if engaged views are unavailable. "
+            f"Below-floor or unknown-sample rows stay visible as provisional context; they do not guide learning. "
             f"— means unavailable.</em>"
             f"<div class=table-wrap><table class=watchlist><tr><th>Video</th><th>Topic</th><th>Avg view %</th>"
             f"<th>Runtime</th><th>Category</th><th>Format</th><th>Hook</th><th>Public views</th>"
-            f"<th>Engaged views (90d)</th></tr>{''.join(rows)}</table></div></div>")
+            f"<th>Engaged views (90d)</th><th>Evidence sample</th></tr>{''.join(rows)}</table></div></div>")
 
 
 def bar(v: float) -> str:
@@ -105,36 +128,66 @@ def main():
             for a in d["arms"]) + "</div>" for dim, d in rep.items())
     ret = summ.get("retention") or {}
     curve = ret.get("avg_curve") or []
-    target = summ.get("average_view_target") or {}
+    acfg = cfg.get("analytics", {})
+    min_hours = float(acfg.get("evaluate_after_hours", 48))
+    matured = []
+    for video in hist:
+        if not isinstance(video, dict) or video.get("status") in ("withdrawn", "missing"):
+            continue
+        metrics = video.get("metrics") or {}
+        if not isinstance(metrics, dict):
+            continue
+        try:
+            hours_live = float(metrics.get("hours_live") or 0)
+        except (OverflowError, TypeError, ValueError):
+            continue
+        if hours_live >= min_hours:
+            matured.append(video)
+
+    target = summ.get("average_view_target")
+    target = target if isinstance(target, dict) else {}
+    # Upgrade a legacy snapshot locally so the dashboard immediately separates learning-grade
+    # observations from low-sample readings instead of waiting for the next Analytics refresh.
+    if "learning_qualified" not in target and matured:
+        derived = average_view_target(matured, acfg)
+        if derived.get("n"):
+            target = derived
     target_n = int(target.get("n") or 0)
     target_gate = float(target.get("gate_pct") or 70.0)
-    if target_n:
+    learning = target.get("learning_qualified")
+    if isinstance(learning, dict):
+        qualified_n = int(learning.get("n") or 0)
+        provisional_n = int(target.get("provisional_n", max(0, target_n - qualified_n)) or 0)
+        minimum = int(learning.get("minimum_sample_views", acfg.get("min_views_to_learn", 50)))
+        if qualified_n:
+            qualified_passing = int(learning.get("passing") or 0)
+            qualified_median = _number_label(learning.get("median_avg_view_pct"), "%")
+            raw_passing = int(target.get("passing") or 0)
+            raw_median = _number_label(target.get("median_avg_view_pct"), "%")
+            target_summary = (f"Qualified: {qualified_passing}/{qualified_n} at or above {target_gate:.0f}% · "
+                              f"median {qualified_median}; all readings: {raw_passing}/{target_n} · "
+                              f"median {raw_median}; {provisional_n} provisional")
+        elif target_n:
+            raw_passing = int(target.get("passing") or 0)
+            raw_median = _number_label(target.get("median_avg_view_pct"), "%")
+            target_summary = (f"No sample-qualified data yet; all readings: {raw_passing}/{target_n} at or above "
+                              f"{target_gate:.0f}% · median {raw_median}; "
+                              f"{provisional_n} provisional (<{minimum} views).")
+        else:
+            target_summary = "No averageViewPercentage data yet"
+    elif target_n:
         target_summary = (f"{int(target.get('passing') or 0)}/{target_n} measured videos at or above "
-                          f"{target_gate:.0f}% · median {float(target.get('median_avg_view_pct') or 0):.1f}%")
+                          f"{target_gate:.0f}% · median {_number_label(target.get('median_avg_view_pct'), '%')}")
     else:
         target_summary = "No averageViewPercentage data yet"
     target_card = (f"<div class=card><h3>Internal average-view target</h3>"
                    f"<b>{html.escape(target_summary)}</b>"
-                   f"<em>Average percentage watched per playback; not viewer completion or a YouTube distribution rule.</em></div>")
+                   f"<em>Average percentage watched per playback; not viewer completion or a YouTube distribution rule. "
+                   f"The sample-qualified cohort uses ≥{int(acfg.get('min_views_to_learn', 50))} engaged views, "
+                   f"with public views only if engaged views are unavailable.</em></div>")
     watchlist = summ.get("average_view_watchlist")
-    if not isinstance(watchlist, dict):
-        # Older analytics snapshots predate the watchlist field; derive it locally from the same
-        # mature-video cohort so the dashboard updates immediately without waiting for another API run.
-        min_hours = float(cfg.get("analytics", {}).get("evaluate_after_hours", 48))
-        matured = []
-        for video in hist:
-            if not isinstance(video, dict) or video.get("status") in ("withdrawn", "missing"):
-                continue
-            metrics = video.get("metrics") or {}
-            if not isinstance(metrics, dict):
-                continue
-            try:
-                hours_live = float(metrics.get("hours_live") or 0)
-            except (OverflowError, TypeError, ValueError):
-                continue
-            if hours_live >= min_hours:
-                matured.append(video)
-        watchlist = average_view_watchlist(matured, cfg.get("analytics", {}))
+    if not isinstance(watchlist, dict) or "qualified_evaluated" not in watchlist:
+        watchlist = average_view_watchlist(matured, acfg)
     watchlist_card = _watchlist_card(watchlist, target_gate)
     monetization = summ.get("shorts_monetization") or {}
     engaged_90d = int(monetization.get("engaged_views_90d") or 0)

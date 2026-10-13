@@ -96,7 +96,9 @@ class Strategy:
 
     # ── sampling ──────────────────────────────────────────────────────────────
     def observations(self, dim: str) -> int:
-        return sum(v.get("n", 0) for v in self.state["arms"].get(dim, {}).values())
+        """Evidence on currently configured options only; retired arms cannot clear the learning floor."""
+        current = self.state.get("arms", {}).get(dim, {})
+        return sum(current.get(option, {}).get("n", 0) for option in self.options().get(dim, []))
 
     def pulse_weights(self, dim: str, keys: list[str]) -> list[float] | None:
         """External title-pattern mix from outlier metadata (trends.format_pulse), not actual hooks.
@@ -114,11 +116,17 @@ class Strategy:
         return w if sum(w) > 0 else None
 
     def sample(self, dim: str, exclude: set[str] | None = None) -> str:
-        opts = self.options()[dim]
-        arms = {k: v for k, v in self.state["arms"][dim].items()
-                if k in opts and k not in (exclude or set())}
+        opts = list(dict.fromkeys(self.options().get(dim, [])))
+        if not opts:
+            raise ValueError(f"No active options configured for strategy dimension {dim!r}")
+        stored = self.state.setdefault("arms", {}).setdefault(dim, {})
+        for option in opts:
+            stored.setdefault(option, {"a": PRIOR[0], "b": PRIOR[1], "n": 0})
+        # Only current options participate. Retired options may remain in the saved file for
+        # provenance, but they cannot be selected or satisfy active-dimension evidence thresholds.
+        arms = {k: stored[k] for k in opts if k not in (exclude or set())}
         if not arms:
-            arms = {k: v for k, v in self.state["arms"][dim].items() if k in opts} or self.state["arms"][dim]
+            arms = {k: stored[k] for k in opts}
         # A frozen dimension, or one with too little evidence to tell its arms apart, is chosen at
         # random rather than by a posterior built from noise. Thompson sampling on 3 observations is
         # not exploration, it is superstition.
@@ -241,11 +249,16 @@ class Strategy:
 
     def report(self) -> dict:
         out = {}
-        for dim, arms in self.state["arms"].items():
-            n = sum(v.get("n", 0) for v in arms.values())
+        stored_arms = self.state.get("arms", {})
+        for dim, options in self.options().items():
+            # A report is a view of the current strategy, not an archive of obsolete config.
+            arms = stored_arms.get(dim, {})
+            current = {option: arms.get(option, {"a": PRIOR[0], "b": PRIOR[1], "n": 0})
+                       for option in dict.fromkeys(options)}
+            n = sum(v.get("n", 0) for v in current.values())
             status = ("frozen" if dim in self.frozen
                       else "learning" if n >= self.min_obs else f"exploring ({n}/{self.min_obs})")
             out[dim] = {"status": status, "observations": n, "arms": sorted(
-                [{"arm": k, "mean": round(v["a"] / (v["a"] + v["b"]), 3), "n": v["n"]} for k, v in arms.items()],
-                key=lambda x: -x["mean"])}
+                [{"arm": k, "mean": round(v["a"] / (v["a"] + v["b"]), 3), "n": v.get("n", 0)}
+                 for k, v in current.items()], key=lambda x: -x["mean"])}
         return out
