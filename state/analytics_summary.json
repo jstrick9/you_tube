@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-13T03:54:27.327255+00:00",
+  "updated": "2026-10-13T08:24:51.866802+00:00",
   "videos_total": 43,
   "videos_7d": 10,
   "views_7d": 5429,
@@ -67,7 +67,7 @@
         },
         {
           "arm": "dumbest_decision",
-          "mean": 0.542,
+          "mean": 0.541,
           "n": 1
         },
         {
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 34,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 34,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -611,7 +611,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10051,
+    "views_90d": 10050,
     "per_1k_views": 2.69,
     "videos": 34,
     "denominator_basis": "engaged_views",
@@ -622,7 +622,7 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10051,
+    "engaged_views_90d": 10050,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
