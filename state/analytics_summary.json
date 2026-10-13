@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-12T20:26:57.440162+00:00",
+  "updated": "2026-10-13T03:54:27.327255+00:00",
   "videos_total": 43,
   "videos_7d": 10,
-  "views_7d": 5424,
+  "views_7d": 5429,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -20,18 +20,18 @@
           "n": 1
         },
         {
+          "arm": "animals",
+          "mean": 0.487,
+          "n": 2
+        },
+        {
           "arm": "mysteries",
           "mean": 0.486,
           "n": 1
         },
         {
-          "arm": "animals",
-          "mean": 0.486,
-          "n": 2
-        },
-        {
           "arm": "history",
-          "mean": 0.478,
+          "mean": 0.479,
           "n": 5
         },
         {
@@ -107,7 +107,7 @@
         },
         {
           "arm": "backstory",
-          "mean": 0.42,
+          "mean": 0.421,
           "n": 5
         }
       ]
@@ -251,7 +251,7 @@
         },
         {
           "arm": "challenge",
-          "mean": 0.488,
+          "mean": 0.489,
           "n": 1
         }
       ]
@@ -354,7 +354,7 @@
   "retention_segments": {
     "status": "not_available_yet",
     "videos_with_segment_data": 0,
-    "matured_videos_eligible": 33,
+    "matured_videos_eligible": 34,
     "video_coverage": 0.0,
     "segment_metric_rows_reported": 0,
     "segment_rows_in_curve": 0,
@@ -463,17 +463,17 @@
     "interpretation": "Small samples and different trending topics, lanes, and posting times can affect outcomes. Treat these summaries as exploratory; no treatment is auto-selected and no score or retention metric adds a publication veto."
   },
   "average_view_target": {
-    "n": 32,
+    "n": 33,
     "gate_pct": 70.0,
     "metric": "average_view_percentage",
-    "passing": 9,
-    "pass_rate": 0.281,
-    "median_avg_view_pct": 57.83,
-    "verdict": "9/32 measured videos clear the internal 70% average-view target (median 58%). This is average watch percentage, not the share of viewers who reached the end."
+    "passing": 10,
+    "pass_rate": 0.303,
+    "median_avg_view_pct": 59.43,
+    "verdict": "10/33 measured videos clear the internal 70% average-view target (median 59%). This is average watch percentage, not the share of viewers who reached the end."
   },
   "average_view_watchlist": {
     "gate_pct": 70.0,
-    "evaluated": 32,
+    "evaluated": 33,
     "below_target": 23,
     "shown": 10,
     "videos": [
