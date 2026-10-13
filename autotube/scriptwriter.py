@@ -7,11 +7,12 @@ import math
 import re
 from datetime import datetime, timedelta, timezone
 
-from . import gates, originality, safety, series
+from . import gates, originality, safety, series, run_report
 from . import lanes
 from .common import now_utc, read_json
 from .llm import LLM, LLMError
 from .research import ground, unsupported_numbers
+from .recovery import MAX_SCRIPT_DRAFTS, RecoveryBudgets, bounded_attempts
 from .strategy import Strategy
 from .trends import has_current_trend_evidence, lane_of, primary_source
 
@@ -1740,8 +1741,13 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
         return ok, review
 
     def produce(self, topic: dict, plan: dict, max_attempts: int | None = None) -> tuple[dict, dict, dict] | None:
-        """Ground → write → check (rewrite with feedback). Returns (script, source, review) or None."""
+        """Ground → write → check with a hard-capped script-only rewrite budget."""
+        receipt = run_report.current_receipt()
+        if receipt:
+            receipt.set_stage("script_research")
         if len(_angle_terms(str(topic.get("angle") or ""), str(topic.get("topic") or ""))) < 2:
+            if receipt:
+                receipt.note_failure("script_research", "trend_angle_insufficient")
             log.info("skip %r: no specific current-trend angle to deliver", topic.get("topic"))
             return None
         source = ground(topic["topic"], topic.get("wiki_query"), self.lang,
@@ -1749,36 +1755,51 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
                         blocked=self.cfg["compliance"].get("blocked_topics"),
                         cfg=self.cfg, llm=self.llm)
         if not source:
+            if receipt:
+                receipt.note_failure("script_research", "source_grounding_failed")
             return None
         topic["wiki_title"] = source["title"]
-        # Ask the archive before asking the model. A subject with no free image will
-        # fail the shot gate after a full draft-and-review cycle, every time.
         if not subject_is_depictable(source["title"], self.cfg, source):
+            if receipt:
+                receipt.note_failure("script_research", "no_depictable_source_asset")
             log.info("  ✗ no free image of %r exists — skipping before writing", source["title"])
             return None
+        configured = RecoveryBudgets.from_config(self.cfg).script_drafts
+        max_attempts = configured if max_attempts is None else bounded_attempts(
+            max_attempts, configured, MAX_SCRIPT_DRAFTS, 1)
         feedback = ""
-        max_attempts = max_attempts or int(self.cfg["content"].get("max_drafts", 4))
         for attempt in range(max_attempts):
+            if receipt:
+                receipt.set_stage("script_draft")
             try:
                 t = dict(topic)
                 if feedback:
-                    # Keep rejection feedback separate: appending it to the trend angle can
-                    # contaminate the phrase-match gate and make an off-angle rewrite pass.
                     t["_draft_feedback"] = feedback
                 script = self.write(t, plan, source)
             except LLMError as e:
+                if receipt:
+                    receipt.note_failure("script_draft", run_report.classify_failure("script", str(e)),
+                                         exception_type=type(e).__name__, attempt=attempt + 1)
                 log.warning("script generation failed: %s", e)
                 return None
             review_topic = dict(topic)
             review_topic["_turn_variant"] = plan.get("turn_variant")
             review_topic["_turn_experiment_id"] = plan.get("turn_experiment_id")
+            if receipt:
+                receipt.set_stage("script_review")
             ok, review = self.check(script, source, review_topic)
             log.info("  draft %d for %r → ok=%s score=%s issues=%s", attempt + 1, source["title"], ok,
                      review.get("score"), (review.get("issues") or review.get("factual_errors") or [])[:2])
             if ok:
                 return script, source, review
             if review.get("unavailable"):
+                if receipt:
+                    receipt.note_failure("script_review", "independent_review_unavailable", attempt=attempt + 1)
                 return None
             feedback = "; ".join((review.get("issues") or []) + (review.get("factual_errors") or [])
                                  + (review.get("policy_concerns") or []) + (review.get("fixes") or []))[:600]
+            if attempt + 1 < max_attempts and receipt:
+                receipt.note_retry("script_review", attempt + 1, max_attempts, "rewrite_with_review_feedback")
+            elif receipt:
+                receipt.note_failure("script_review", "script_quality_rejected", attempt=attempt + 1)
         return None

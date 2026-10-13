@@ -17,18 +17,32 @@ import time
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from . import media, music, qa, render, trends
+from . import media, music, qa, render, trends, run_report
 from . import series as series_mod
 from . import originality, provenance
 from .vision import VisionUnavailable
 from .target import daily_target
 from .common import OUTPUT_DIR, WORK_DIR, now_utc, read_json, slugify, write_json
 from .llm import LLM
+from .recovery import RecoveryBudgets
 from .scriptwriter import ScriptWriter, spoken_text, trend_evidence_summary
 from .strategy import Strategy
 from .tts import synthesize
 
 log = logging.getLogger("autotube.pipeline")
+
+
+def _report_stage(stage: str) -> None:
+    receipt = run_report.current_receipt()
+    if receipt:
+        receipt.set_stage(stage)
+
+
+def _report_failure(stage: str, category: str, exc: Exception | None = None, attempt: int | None = None) -> None:
+    receipt = run_report.current_receipt()
+    if receipt:
+        receipt.note_failure(stage, category, exception_type=type(exc).__name__ if exc else None,
+                             attempt=attempt)
 
 
 def _slot_key(ts) -> str:
@@ -259,8 +273,10 @@ def effects_plan(script: dict, plan: dict, source: dict, cfg: dict) -> dict:
 def produce_assets(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict,
                    idx: int, run_id: str) -> dict | None:
     """Script → narration → visuals → music. Everything needed to render, or None to skip the topic."""
+    _report_stage("script_research")
     produced = writer.produce(topic, plan)
     if not produced:
+        _report_failure("script_research", "script_or_grounding_rejected")
         log.info("  ✗ could not produce a verified script for %r", topic["topic"])
         return None
     script, source, review = produced
@@ -269,19 +285,24 @@ def produce_assets(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict,
     work.mkdir(parents=True, exist_ok=True)
     seed = int(hashlib.md5(f"{run_id}{slug}".encode()).hexdigest()[:8], 16)
 
+    _report_stage("tts")
     tts, _gaps = fit_length(script, plan, cfg, work, synthesize)
     if tts is None:
+        _report_failure("tts", "shorts_duration_gate")
         return None
 
+    _report_stage("visuals")
     tsegs = tts["segments"]
     starts = [x["start"] for x in tsegs] + [tts["duration"]]
     seg_durs = [starts[i + 1] - starts[i] for i in range(len(tsegs))]
     try:
         visuals = media.gather(source, script["segments"], cfg, work / "img", llm=writer.llm, seg_durs=seg_durs)
     except media.NoVisualMatch as e:
+        _report_failure("visuals", "no_verified_visual_match", e)
         log.info("  ✗ visuals: %s — skipping topic", e)
         return None
 
+    _report_stage("music")
     mus = music.generate(tts["duration"] + 1, work / "music.wav", seed) if cfg["video"]["background_music"] else None
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     title = script["title"].strip()
@@ -478,13 +499,12 @@ def _repair_failed_shots(a: dict, cfg: dict, writer: ScriptWriter, report: dict)
 
 def render_with_qa(a: dict, cfg: dict, writer: ScriptWriter) -> tuple[dict, dict]:
     """Render and verify the finished MP4; repair only when another QA pass remains."""
-    # Clamped at zero so the loop always runs at least once: `r` is bound inside it and used
-    # afterwards, so a negative max_repairs in config would not disable repairs — it would raise
-    # NameError after a perfectly successful render.
-    repairs = max(0, int(cfg.get("qa", {}).get("max_repairs", 2)))
+    # Enforce the stage-specific hard ceiling even if config is accidentally raised.
+    repairs = RecoveryBudgets.from_config(cfg).visual_repairs
     report: dict = {"passed": False}
     r: dict = {}
     for attempt in range(repairs + 1):
+        _report_stage("render_qa")
         r = render.render(a["tts"], a["visuals"]["shots"], a["music"], a["hook_card"],
                           cfg["channel"]["name"], cfg, a["work"], a["out"], a["seed"], fx=a["fx"])
         report = _normalize_qa_report(
@@ -502,12 +522,18 @@ def render_with_qa(a: dict, cfg: dict, writer: ScriptWriter) -> tuple[dict, dict
             break
         log.info("  ✗ final QA attempt %d: %s", attempt + 1, "; ".join(report["issues"])[:500])
         if not _qa_repairable(report):
+            _report_failure("render_qa", "final_qa_nonrepairable", attempt=attempt + 1)
             break                    # structural or malformed reports cannot be repaired by guessing at a shot
         if attempt >= repairs:
+            _report_failure("render_qa", "visual_repair_budget_exhausted", attempt=attempt + 1)
             log.warning("  final QA attempt failed; leaving the rendered frames unchanged and unverified")
             break                    # every replacement must get a fresh render and QA pass
         if not _repair_failed_shots(a, cfg, writer, report):
+            _report_failure("render_qa", "no_verified_shot_replacement", attempt=attempt + 1)
             break
+        receipt = run_report.current_receipt()
+        if receipt:
+            receipt.note_retry("visual_repair", attempt + 1, repairs + 1, "replace_rejected_shots_and_rerender")
     return r, report
 
 
@@ -632,35 +658,43 @@ def package(a: dict, r: dict, report: dict, cfg: dict) -> dict | None:
 
 
 def make_one(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict, idx: int, run_id: str) -> dict | None:
+    _report_stage("topic_validation")
     if not isinstance(cfg, dict) or not isinstance(topic, dict) or not isinstance(plan, dict):
+        _report_failure("topic_validation", "malformed_topic_plan_or_config")
         log.warning("refusing malformed topic, plan, or configuration")
         return None
     trend_cfg = cfg.get("trends") or {}
     content_cfg = cfg.get("content") or {}
     if not isinstance(trend_cfg, dict) or not isinstance(content_cfg, dict):
+        _report_failure("topic_validation", "malformed_trend_or_content_config")
         log.warning("refusing malformed trend or content configuration")
         return None
     min_wiki_raw = trend_cfg.get("min_wikipedia_spike", 3.0)
     min_viral_raw = content_cfg.get("min_viral_score", 7)
     if (not _finite_range(min_viral_raw, 7, 10) or not _finite_range(min_wiki_raw, 0, float("inf"))
             or min_wiki_raw <= 0):
+        _report_failure("topic_validation", "invalid_trend_or_viral_threshold")
         log.warning("refusing invalid trend or viral-potential threshold configuration")
         return None
     min_wiki_spike = float(min_wiki_raw)
     min_viral = float(min_viral_raw)
     viral_raw = topic.get("viral_score")
     if not _finite_range(viral_raw, 0, 10):
+        _report_failure("topic_validation", "invalid_viral_score")
         log.info("  ✗ refusing topic with invalid viral score")
         return None
     viral_score = float(viral_raw)
     if not isinstance(topic.get("topic"), str) or not topic["topic"].strip() \
             or not isinstance(topic.get("angle"), str) or not topic["angle"].strip():
+        _report_failure("topic_validation", "missing_topic_or_trend_angle")
         log.info("  ✗ refusing topic without a name and a specific current-trend angle")
         return None
     if not trends.has_current_trend_evidence(topic, min_wiki_spike, trend_cfg):
+        _report_failure("topic_validation", "current_trend_evidence_missing")
         log.info("  ✗ refusing topic %r without a qualifying live trend signal", topic.get("topic"))
         return None
     if viral_score < min_viral:
+        _report_failure("topic_validation", "below_viral_potential_floor")
         log.info("  ✗ refusing topic %r below the viral-potential floor (%.1f/%.1f)",
                  topic.get("topic"), viral_score, min_viral)
         return None
@@ -677,6 +711,12 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     run_id = now_utc().strftime("%Y%m%d-%H%M")
     n = count or daily_target(cfg)
     do_upload = cfg["upload"]["enabled"] if upload is None else upload
+    budgets = RecoveryBudgets.from_config(cfg)
+    receipt = run_report.current_receipt()
+    if receipt:
+        receipt.set_target(n)
+        receipt.set_retry_budgets(budgets.report())
+        receipt.set_stage("initialization")
     # Start the soft budget at pipeline entry so trend selection and initialization also
     # consume wall-clock. The outer Actions timeout remains the final hard ceiling.
     deadline = time.monotonic() + 60 * float(cfg["schedule"].get("max_run_minutes", 300))
@@ -685,15 +725,22 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     writer = ScriptWriter(cfg, llm, strat)
 
     # 1. trends
+    _report_stage("trends")
     recent = trends.recent_topics(cfg["content"]["dedupe_days"])
     cands = trends.collect(cfg)
+    if not cands:
+        _report_failure("trends", "no_live_trend_candidates")
+    _report_stage("topic_selection")
     picks = writer.select_topics(cands, n, recent) if cands else []
+    if cands and not picks:
+        _report_failure("topic_selection", "no_eligible_trending_topics")
     tried: set[str] = set()
     rounds = 1
     plans = strat.plan(n)
     log.info("topic queue: %s", [p["topic"][:40] for p in picks[: n + 4]])
 
     # 2. produce
+    _report_stage("topic_production")
     series_mod.reset()          # episode numbers are per-run unique, see series._ISSUED
     results, used_titles, used_formats = [], set(), set()
     pi = 0
@@ -702,47 +749,77 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
         if vision_down:
             break
         plan = plans[i]
+        slot_attempts = 0
         while True:
+            if not llm.has_available_provider():
+                _report_failure("script", "all_text_providers_circuit_open_or_unusable")
+                break
+            if slot_attempts >= budgets.topics_per_video:
+                _report_failure("topic_selection", "topic_attempt_budget_exhausted", attempt=slot_attempts)
+                log.warning("topic retry budget exhausted for slot %d (%d topics)", i + 1, slot_attempts)
+                break
             if pi >= len(picks):
-                # every pick so far failed the accuracy/visual checks → pick again from the remaining live trends
-                if rounds >= int(cfg["content"].get("selection_rounds", 3)) or not cands or time.monotonic() > deadline:
+                if rounds >= budgets.selection_rounds or not cands or time.monotonic() > deadline:
+                    _report_failure("topic_selection", "selection_round_budget_exhausted")
                     break
+                receipt = run_report.current_receipt()
+                if receipt:
+                    receipt.set_stage("topic_selection")
+                    receipt.note_retry("topic_selection", rounds, budgets.selection_rounds,
+                                       "select_fresh_live_candidates")
                 rounds += 1
                 more = writer.select_topics(cands, n - len(results), recent, exclude=tried)
                 if not more:
+                    _report_failure("topic_selection", "no_more_eligible_trending_topics")
                     break
                 log.info("selection round %d: %d more viral picks", rounds, len(more))
                 picks += more
-            # Do not start work too close to the soft deadline: one topic can take
-            # 20-40 minutes of drafting, vision and rendering. The configured 45-minute
-            # reserve exceeds that observed range; the workflow timeout is the final cap.
             reserve = 60 * float(cfg["schedule"].get("topic_reserve_minutes", 45))
             if time.monotonic() > deadline - reserve:
+                _report_failure("topic_production", "soft_deadline_reserve_reached")
                 log.warning("time budget reached (within %.0f min reserve) — stopping with %d videos",
                             reserve / 60, len(results))
                 break
             topic = picks[pi]
             pi += 1
+            slot_attempts += 1
             tried.add(topic.get("topic_key", ""))
+            if receipt:
+                receipt.set_topic(topic, i + 1)
             topic["category"] = topic.get("category") or random.choice(cfg["channel"]["categories"])
             fitted = strat.fit(plan, topic, used_formats)
             try:
                 res = make_one(cfg, writer, topic, fitted, i + 1, run_id)
             except VisionUnavailable as e:
+                _report_failure("visuals", "vision_unavailable", e, slot_attempts)
+                if receipt:
+                    receipt.note_topic("rejected", category="vision_unavailable")
                 log.error("  ✗ %s — stopping this run (nothing unverified is published; the next run retries)", e)
                 vision_down = True
                 break
             except Exception as e:  # noqa: BLE001
+                stage = receipt.current_stage if receipt else "topic_production"
+                category = run_report.classify_failure(stage, str(e))
+                _report_failure(stage, category, e, slot_attempts)
                 log.exception("  ✗ failed on %r: %s", topic["topic"], e)
                 res = None
             if res and res["source"]["title"] not in used_titles:
                 used_titles.add(res["source"]["title"])
                 used_formats.add(res["plan"]["format"])
                 results.append(res)
+                if receipt:
+                    receipt.note_topic("accepted")
+                    receipt.data["produced_count"] = len(results)
                 break
+            if res:
+                _report_failure("topic_production", "duplicate_source_in_run", attempt=slot_attempts)
+            if receipt:
+                failure = receipt.last_failure or {}
+                receipt.note_topic("rejected", category=failure.get("category", "topic_not_produced"))
     log.info("produced %d/%d videos", len(results), n)
 
     # 3. upload (scheduled)
+    _report_stage("upload")
     hist = read_json("history.json", [])
     slots = publish_slots(cfg, len(results), taken_slots(hist))
     for res, slot in zip(results, slots):
@@ -776,6 +853,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             "llm": llm.last_used,
         }
         if not _qa_pass_is_explicit(res):
+            _report_failure("upload", "explicit_final_qa_pass_missing")
             log.error("refusing to upload %s: final QA did not pass", res["file"].name)
             continue
         if do_upload:
@@ -783,7 +861,12 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             try:
                 entry["video_id"] = youtube.upload(res["file"], res["meta"], cfg, slot, res["thumb"])
                 entry["status"] = "scheduled"
+                if receipt:
+                    receipt.data["scheduled_count"] = int(receipt.data.get("scheduled_count", 0)) + 1
             except Exception as e:  # noqa: BLE001
+                _report_failure("upload", run_report.classify_failure("upload", str(e)), e)
+                if receipt:
+                    receipt.data["upload_failure_count"] = int(receipt.data.get("upload_failure_count", 0)) + 1
                 log.error("upload failed: %s", e)
                 entry["status"] = f"upload_failed: {str(e)[:200]}"
         else:
@@ -805,6 +888,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             hist.append(entry)   # dry runs never touch history (no dedupe / slot side effects)
     if do_upload:
         write_json("history.json", hist[-int(cfg.get("analytics", {}).get("history_keep", 2000)):])
+    _report_stage("cleanup")
     if not keep_work:
         shutil.rmtree(WORK_DIR / run_id, ignore_errors=True)
     return results

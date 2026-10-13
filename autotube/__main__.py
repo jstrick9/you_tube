@@ -16,9 +16,14 @@ import logging
 import os
 import sys
 
+from . import run_report
 from .common import load_config, setup_logging
 
 log = logging.getLogger("autotube")
+
+
+def _receipt_run_id(now) -> str:
+    return f"{now.strftime('%Y%m%d-%H%M%S')}-{os.getpid()}"
 
 
 def _write_github_summary(produced: int, target: int, failed_uploads: int = 0,
@@ -270,6 +275,13 @@ def main(argv=None) -> int:
     if a.top_up:
         left = pipeline.remaining_today(cfg, upload=not a.dry_run and cfg["upload"]["enabled"])
         if left == 0:
+            receipt = run_report.RunReceipt(_receipt_run_id(pipeline.now_utc()), 0,
+                                            upload=not a.dry_run and cfg["upload"]["enabled"],
+                                            dry_run=a.dry_run)
+            receipt.set_stage("preflight")
+            receipt.data["top_up"] = True
+            receipt.data["outcome"] = "already_satisfied"
+            receipt.persist()
             print("Today's videos are already done — nothing to do (top-up run).")
             return 0
         if a.count is not None and a.count <= 0:
@@ -280,15 +292,28 @@ def main(argv=None) -> int:
         # exceeding the target.
         a.count = left if a.count is None else min(a.count, left)
         log.info("top-up: %d video(s) still needed today (capped to remaining slots)", a.count)
+    want = a.count or pipeline.daily_target(cfg)
+    receipt = run_report.RunReceipt(_receipt_run_id(pipeline.now_utc()), want,
+                                    upload=not a.dry_run and cfg["upload"]["enabled"],
+                                    dry_run=a.dry_run)
+    receipt.data["top_up"] = bool(a.top_up)
+    receipt_token = run_report.activate(receipt)
     try:
         res = pipeline.run(cfg, a.count, upload=False if a.dry_run else None, keep_work=a.keep_work)
+        failed_uploads = [r for r in res if str(r["entry"].get("status", "")).startswith("upload_failed")]
+        scheduled_count = sum(1 for r in res if r["entry"].get("status") == "scheduled")
+        receipt.data["rate_limited_models"] = sorted(llm_mod.rate_limited())[:40]
+        receipt.finish(len(res), want, scheduled_count, len(failed_uploads))
     except Exception as e:  # noqa: BLE001
+        receipt.fail(e)
+        receipt.persist()
+        run_report.deactivate(receipt_token)
         log.exception("run failed")
         notify(cfg, "AutoTube run FAILED", str(e)[:800], ok=False)
         return 1
+    receipt.persist()
+    run_report.deactivate(receipt_token)
     lines = [f"• {r['meta']['title']} → {r['entry'].get('video_id', r['entry']['status'])}" for r in res]
-    want = a.count or cfg["schedule"]["videos_per_day"]
-    failed_uploads = [r for r in res if str(r["entry"].get("status", "")).startswith("upload_failed")]
     limited = llm_mod.rate_limited() if len(res) < want else set()
     incomplete = len(res) < want or bool(failed_uploads)
     message = "\n".join(lines) or "no videos produced"

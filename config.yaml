@@ -155,8 +155,9 @@ content:
   hook_words_max: 9
   body_beat_words: [9, 11]               # enforce the prompted turn/escalation length per segment
   payoff_words: [6, 9]                   # a short factual payoff, not a dangling fragment
-  max_drafts: 4                          # script rewrites allowed (feedback from the fact-checker/hook gate)
-  selection_rounds: 3                    # if every pick fails the checks, pick again from the remaining trends
+  max_drafts: 4                          # script drafts per topic; hard-capped at 4 by recovery policy
+  selection_rounds: 3                    # live-topic reselection rounds; hard-capped at 3
+  max_topic_attempts_per_video: 6         # different live-trending topics per desired slot, hard-capped at 6
   # Reviewer judges whether the payoff loops back into the hook (semantic, not lexical).
   # Recorded on every script; off as a hard gate until its false-positive rate is known.
   require_loop: false
@@ -405,7 +406,7 @@ qa:
   # re-search using the frame-specific failure, then re-check; never relax the gate or publish a rejected render.
   min_frame_score: 7
   repair_min_match_score: 8                  # stronger pre-render match required for a QA-triggered replacement
-  max_repairs: 2
+  max_repairs: 2                               # per-render visual repairs; hard-capped at 2
   frames_per_sheet: 8
 
 upload:

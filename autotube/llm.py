@@ -13,20 +13,27 @@ import os
 import random
 import re
 import time
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from typing import Any
 
+from . import run_report
 from .common import http
+from .provider_health import (DEFAULT_402_COOLDOWN_SECONDS, DEFAULT_429_COOLDOWN_SECONDS,
+                              ProviderCircuitBreakers)
 
 log = logging.getLogger("autotube.llm")
 
 
-def _retry_after(msg: str, default: float) -> float:
+def _retry_after(msg: str, default: float, retry_after_seconds: float | None = None) -> float:
     """Honour a Retry-After the provider actually told us, when it is sane.
 
     Guessing 6 seconds against a provider asking for 2 wastes the run's time budget; guessing 6
     against one asking for 60 just fails again. Capped so a hostile or broken header cannot stall
     the whole run.
     """
+    if isinstance(retry_after_seconds, (int, float)) and retry_after_seconds >= 0:
+        return max(1.0, min(45.0, float(retry_after_seconds)))
     m = re.search(r'retry[-_ ]?after["\s:]+(\d+(?:\.\d+)?)', msg, re.I)
     if m:
         try:
@@ -54,8 +61,41 @@ def advertised_retry(msg: str) -> float:
     return secs / 1000.0 if m.group(2) else secs
 
 
+def _retry_after_header(value: str | None) -> float | None:
+    """Parse standard Retry-After delay-seconds or HTTP-date without guessing at resets."""
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        seconds = float(text)
+        if seconds > 100_000_000:  # tolerate providers that send an epoch timestamp in this header
+            seconds -= datetime.now(timezone.utc).timestamp()
+        return max(0.0, seconds)
+    except ValueError:
+        pass
+    try:
+        parsed = parsedate_to_datetime(text)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return max(0.0, (parsed.astimezone(timezone.utc) - datetime.now(timezone.utc)).total_seconds())
+    except (TypeError, ValueError, OverflowError):
+        pass
+    # Providers such as Groq expose reset windows as "1m12.5s" or "250ms".
+    compact = re.fullmatch(r"(?:(\d+(?:\.\d+)?)h)?(?:(\d+(?:\.\d+)?)m)?"
+                           r"(?:(\d+(?:\.\d+)?)(ms|s))?", text, re.I)
+    if compact and any(compact.groups()):
+        hours, minutes, tail, unit = compact.groups()
+        seconds = float(hours or 0) * 3600 + float(minutes or 0) * 60 + float(tail or 0)
+        return seconds / 1000 if unit and unit.lower() == "ms" else seconds
+    return None
+
+
 class LLMError(RuntimeError):
-    pass
+    def __init__(self, message: str, status_code: int | None = None,
+                 retry_after_seconds: float | None = None):
+        super().__init__(message)
+        self.status_code = status_code
+        self.retry_after_seconds = retry_after_seconds
 
 
 def _extract_json(text: str) -> Any:
@@ -143,11 +183,10 @@ def _gemini(model: str, system: str, user: str, temperature: float, images: list
         # Same treatment as the OpenAI-compatible path: keep enough of the body to see
         # whether a 429 is a per-minute wait or a spent daily quota, and record it so the
         # run can tell "rate limited" apart from "broken".
-        if r.status_code == 429:
-            note_rate_limited(model)
         hint = r.headers.get("retry-after")
         raise LLMError(f"gemini {model} HTTP {r.status_code}"
-                       + (f" (retry after {hint})" if hint else "") + f": {r.text[:600]}")
+                       + (f" (retry after {hint})" if hint else "") + f": {r.text[:600]}",
+                       status_code=r.status_code, retry_after_seconds=_retry_after_header(hint))
     data = r.json()
     try:
         return "".join(p.get("text", "") for p in data["candidates"][0]["content"]["parts"])
@@ -190,12 +229,12 @@ def _openai_compatible(base: str, key: str | None, model: str, system: str, user
         # matters: a 429 body says whether the limit is per-minute or per-day and when it
         # resets, and that is the difference between "wait 30 seconds" and "the quota is
         # gone until tomorrow, stop retrying". Keep the retry hint too.
-        if r.status_code == 429:
-            note_rate_limited(f"{model}")
         detail = r.text[:600]
         hint = r.headers.get("retry-after") or r.headers.get("x-ratelimit-reset-requests")
+        retry_after = _retry_after_header(hint)
         raise LLMError(f"{base} {model} HTTP {r.status_code}"
-                       + (f" (retry after {hint})" if hint else "") + f": {detail}")
+                       + (f" (retry after {hint})" if hint else "") + f": {detail}",
+                       status_code=r.status_code, retry_after_seconds=retry_after)
     data = r.json()
     try:
         content = data["choices"][0]["message"].get("content") or ""
@@ -314,14 +353,54 @@ class LLM:
         self.order = self.cfg.get("providers", list(PROVIDERS))
         self.temperature = float(self.cfg.get("temperature", 0.8))
         self._dead: set[str] = set()   # provider/model combos that hard-failed this run
+        self._blocked_providers: set[str] = set()
+        self.circuits = ProviderCircuitBreakers()
         self.last_used = ""
         keyed = KEYED_PROVIDERS
         # "lite" = only the keyless fallback is available → callers send smaller prompts
         self.lite = not any(_provider_key(p) for p in self.order if p in keyed)
+        receipt = run_report.current_receipt()
+        for provider, row in self.circuits.snapshot().items():
+            if row.get("reason") == "rate_limited":
+                note_rate_limited(f"{provider}:provider_cooldown")
+            if receipt:
+                receipt.note_provider_event(provider, row.get("status_code"), "cooldown_skip",
+                                            row.get("blocked_until"))
+
+    def _breaker(self) -> ProviderCircuitBreakers:
+        if not hasattr(self, "circuits"):
+            self.circuits = ProviderCircuitBreakers()
+        return self.circuits
+
+    def _provider_open(self, provider: str) -> bool:
+        return provider in getattr(self, "_blocked_providers", set()) or self._breaker().is_open(provider)
+
+    def _open_provider(self, provider: str, status: int | None, reason: str, seconds: float,
+                       retry_after: float | None = None) -> None:
+        if not hasattr(self, "_blocked_providers"):
+            self._blocked_providers = set()
+        self._blocked_providers.add(provider)
+        until = self._breaker().open(provider, status, reason, seconds, retry_after)
+        receipt = run_report.current_receipt()
+        if receipt:
+            receipt.note_provider_event(provider, status, "circuit_open", until, retry_after)
+        log.warning("provider %s circuit open until %s (%s)", provider, until, reason)
+
+    def has_available_provider(self) -> bool:
+        """Whether another configured text provider can still be attempted this run."""
+        dead = getattr(self, "_dead", set())
+        for provider in self.order:
+            if provider not in PROVIDERS or self._provider_open(provider):
+                continue
+            _, models_key = PROVIDERS[provider]
+            models = self.cfg.get(models_key, []) or []
+            if (provider == "pollinations" or _provider_key(provider)) and any(
+                    f"{provider}:{model}" not in dead for model in models):
+                return True
+        return False
 
     def vision_available(self) -> bool:
-        keyed = KEYED_PROVIDERS
-        return any(_provider_key(p) and self._vision_models(p)
+        return any(_provider_key(p) and self._vision_models(p) and not self._provider_open(p)
                    for p in self.cfg.get("vision_providers", ["gemini", "groq", "openrouter"]))
 
     def _vision_models(self, pname: str) -> list[str]:
@@ -371,10 +450,22 @@ class LLM:
         """
         temp = self.temperature if temperature is None else temperature
         errors = []
+        if not hasattr(self, "_dead"):
+            self._dead = set()
+        if not hasattr(self, "_blocked_providers"):
+            self._blocked_providers = set()
+        circuits = self._breaker()
+        receipt = run_report.current_receipt()
         for pname in (order or self.order):
+            if self._provider_open(pname):
+                until = circuits.blocked_until(pname)
+                errors.append(f"{pname}: provider circuit open until {until or 'end of this run'}")
+                continue
             fn, models_key = PROVIDERS[pname]
             models = models_of(pname) if models_of else self.cfg.get(models_key, [])
             for model in models:
+                if self._provider_open(pname):
+                    break
                 tag = f"{pname}:{model}" + (":vision" if images else "")
                 if tag in self._dead or (avoid and tag == avoid):
                     continue
@@ -388,60 +479,77 @@ class LLM:
                         obj = _extract_json(raw)
                         if validate:
                             validate(obj)
+                        circuits.note_success(pname)
                         self.last_used = tag
                         log.debug("LLM ok via %s", tag)
-                        if avoid:            # a review call: say who graded it
+                        if avoid:
                             log.info("  reviewed by %s (writer was %s)", tag, avoid)
                         return obj
                     except LLMError as e:
                         msg = str(e)
                         errors.append(f"{tag}: {msg[:160]}")
+                        status = e.status_code or (int(m.group(1)) if (m := re.search(r"HTTP\s+(\d{3})", msg)) else None)
+                        retry_after = e.retry_after_seconds
+                        if retry_after is None:
+                            retry_after = advertised_retry(msg) or None
                         if msg.startswith("no ") and "_API_KEY" in msg:
                             self._dead.add(tag)
                             break
-
-                        if "HTTP 402" in msg:
-                            # Payment/entitlement failures will not improve by repeating the
-                            # same request. Retire this model for the current run, then allow
-                            # the router to try a different configured model/provider.
-                            log.warning("retiring %s for this run after HTTP 402: %s", tag, msg[:180])
+                        if status == 402:
                             self._dead.add(tag)
+                            self._open_provider(pname, status, "billing_or_entitlement",
+                                                max(DEFAULT_402_COOLDOWN_SECONDS, retry_after or 0), retry_after)
                             break
-                        if "HTTP 404" in msg or "HTTP 400" in msg or "HTTP 401" in msg or "HTTP 403" in msg:
-                            # Retiring a model for the rest of the run is right - a 400 will
-                            # not fix itself - but it was silent, and a model skipped via
-                            # `continue` appends no error. A provider could therefore die on
-                            # its first call inside a request that then succeeded elsewhere,
-                            # and every later call would skip it with no trace at all. That is
-                            # how the reviewer was lost without a single Groq line in the log.
+                        if status == 429:
+                            note_rate_limited(f"{pname}:{model}")
+                            # Never retry earlier than the provider's stated wait. If it
+                            # exceeds our bounded in-run wait, open a persisted cooldown.
+                            if retry_after is not None and retry_after > 45:
+                                self._dead.add(tag)
+                                self._open_provider(pname, status, "rate_limited",
+                                                    retry_after, retry_after)
+                                break
+                            if not last_try:
+                                time.sleep(_retry_after(msg, 6 + 6 * attempt, retry_after))
+                                continue
+                            self._dead.add(tag)
+                            self._open_provider(pname, status, "rate_limited",
+                                                max(DEFAULT_429_COOLDOWN_SECONDS, retry_after or 0), retry_after)
+                            break
+                        if status in (401, 403):
+                            self._dead.add(tag)
+                            self._blocked_providers.add(pname)
+                            if receipt:
+                                receipt.note_provider_event(pname, status, "provider_skipped_auth")
+                            log.warning("skipping provider %s for this run after HTTP %d", pname, status)
+                            break
+                        if status == 404 or status == 400:
+                            self._dead.add(tag)
                             log.warning("retiring %s for this run: %s", tag, msg[:200])
-                            self._dead.add(tag)
                             break
-                        # Only back off if we are going to try this model again. Sleeping on the
-                        # final attempt just delayed the failover: 12s per rate-limited model,
-                        # across every model of every provider, out of a 120-minute run budget.
-                        # A quota window measured in minutes cannot be waited out inside a
-                        # run. Five models each sleeping the 45s cap and retrying, across
-                        # every topic, is how one run reached 51 minutes without producing
-                        # anything. Believe the provider and stop asking.
-                        #
-                        # 120s, not 60: sleeps are capped at 45s but there are several
-                        # attempts, so a window of a minute or two genuinely can be ridden
-                        # out. At 60 a model with 64s left was retired, costing an
-                        # independent reviewer it would have supplied moments later.
-                        if "HTTP 429" in msg and advertised_retry(msg) > 120:
-                            log.warning("retiring %s for this run: rate limited for another "
-                                        "%.0fs, longer than the run can wait", tag,
-                                        advertised_retry(msg))
-                            self._dead.add(tag)
+                        if status is not None and 500 <= status <= 599:
+                            if receipt:
+                                receipt.note_provider_event(pname, status, "transient_failure")
+                            if retry_after is not None and retry_after > 45:
+                                self._dead.add(tag)
+                                self._open_provider(pname, status, "transient_retry_after",
+                                                    retry_after, retry_after)
+                                break
+                            opened = circuits.note_5xx(pname, status)
+                            if opened:
+                                self._blocked_providers.add(pname)
+                                if receipt:
+                                    row = circuits._entries.get(pname, {})
+                                    receipt.note_provider_event(pname, status, "circuit_open",
+                                                                row.get("blocked_until"))
+                                log.warning("skipping provider %s after repeated HTTP 5xx failures", pname)
+                                break
+                            if not last_try:
+                                time.sleep(_retry_after(msg, 8 + 8 * attempt, retry_after))
+                                continue
                             break
                         if not last_try:
-                            if "HTTP 429" in msg:
-                                time.sleep(_retry_after(msg, 6 + 6 * attempt))
-                            elif re.search(r"HTTP 50[0234]", msg):      # overloaded / transient
-                                time.sleep(8 + 8 * attempt)
-                            else:
-                                time.sleep(1.5)
+                            time.sleep(1.5)
                     except Exception as e:  # validation or network
                         errors.append(f"{tag}: {type(e).__name__}: {str(e)[:160]}")
                         if isinstance(e, AssertionError):

@@ -100,6 +100,7 @@ jobs:
           fi
 
       - name: Install
+        id: install
         if: steps.need.outputs.needed != '0'
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core > /dev/null
@@ -133,6 +134,7 @@ jobs:
         run: python -m autotube analytics || true
 
       - name: Produce & schedule today's videos
+        id: production
         if: steps.need.outputs.needed != '0'
         timeout-minutes: 350
         run: |
@@ -146,7 +148,18 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.top_up }}" = "true" ]; then ARGS="$ARGS --top-up"; fi
           python -m autotube run $ARGS
 
-      - name: Keep rendered videos for 7 days (download from the run page)
+      - name: Ensure every Actions run has a production receipt
+        if: always()
+        env:
+          AUTOTUBE_NEEDED: ${{ steps.need.outputs.needed }}
+          AUTOTUBE_REQUESTED_COUNT: ${{ github.event.inputs.count }}
+          AUTOTUBE_TOP_UP: ${{ github.event_name == 'schedule' || github.event.inputs.top_up == 'true' }}
+          AUTOTUBE_NEED_OUTCOME: ${{ steps.need.outcome }}
+          AUTOTUBE_INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          AUTOTUBE_PRODUCTION_OUTCOME: ${{ steps.production.outcome }}
+        run: python scripts/fallback_run_report.py
+
+      - name: Keep videos and production receipts for 7 days (download from the run page)
         if: always()
         uses: actions/upload-artifact@v4
         with:

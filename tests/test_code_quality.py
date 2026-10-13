@@ -133,8 +133,9 @@ def test_retry_after_is_honoured_and_bounded():
     assert _retry_after("HTTP 429 retry-after: soon", 6) == 6          # unparseable
 
 
-def test_no_backoff_sleep_after_the_final_attempt(monkeypatch):
-    """Sleeping then giving up only delays failover; it never buys another try."""
+def test_provider_circuit_stops_retries_after_final_429_without_final_sleep(monkeypatch,
+                                                                            memory_provider_circuits):
+    """A provider-level 429 circuit stops sibling-model calls once that provider is unavailable."""
     from autotube import llm
 
     slept = []
@@ -149,13 +150,17 @@ def test_no_backoff_sleep_after_the_final_attempt(monkeypatch):
     client.order = ["fake"]
     client.temperature = 0.7
     client._dead = set()
+    client._blocked_providers = set()
+    client.circuits = memory_provider_circuits()
     client.last_used = None
 
     with pytest.raises(llm.LLMError):
         client.json("sys", "user", attempts_per_model=2)
 
-    # 2 models x 2 attempts = 4 failures, but only the non-final attempt of each model may sleep
-    assert len(slept) == 2, f"slept {len(slept)} times, expected 2 (one per model): {slept}"
+    # The first model gets one retry and one short wait; its second 429 opens the
+    # provider circuit, so the sibling model is not called and the final attempt never sleeps.
+    assert len(slept) == 1, f"slept {len(slept)} times, expected one bounded retry: {slept}"
+    assert client.circuits.is_open("fake")
 
 
 # ── history / analytics windows ──────────────────────────────────────────────

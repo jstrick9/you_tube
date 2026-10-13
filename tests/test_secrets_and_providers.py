@@ -5,6 +5,7 @@ a secret that exists but is never passed into the job, and a "reviewer" that tur
 to be the same model that wrote the script.
 """
 import copy
+import json
 import os
 import re
 import sys
@@ -19,9 +20,10 @@ CFG = yaml.safe_load((ROOT / "config.yaml").read_text())
 WF = ROOT / ".github" / "workflows"
 
 # Environment values that are not repository secrets: local config/TTS overrides,
-# the optional read-only doctor ID, and GitHub's runtime-only step-summary path.
+# optional read-only IDs, and GitHub-provided runtime metadata/summary paths.
 LOCAL_ONLY = {"AUTOTUBE_CONFIG", "AUTOTUBE_TTS", "AUTOTUBE_DEPTH_MODEL",
-              "PIPER_DIR", "PIPER_VOICE", "YOUTUBE_STATUS_VIDEO_ID", "GITHUB_STEP_SUMMARY"}
+              "PIPER_DIR", "PIPER_VOICE", "YOUTUBE_STATUS_VIDEO_ID", "GITHUB_STEP_SUMMARY",
+              "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT"}
 
 
 def env_vars_read_by_code() -> set[str]:
@@ -207,8 +209,9 @@ def test_rate_limited_runs_are_not_reported_as_broken_builds():
     assert L.rate_limited() >= before
 
 
-def test_http_402_retires_a_model_without_repeating_it_or_waiting(monkeypatch):
-    """HTTP 402 is not a transient 429; retrying the same model just burns the run budget."""
+def test_http_402_opens_provider_circuit_without_repeating_sibling_models(
+        monkeypatch, memory_provider_circuits):
+    """HTTP 402 is provider billing/entitlement state, not a model-specific transient."""
     import pytest
     import autotube.llm as L
 
@@ -224,8 +227,9 @@ def test_http_402_retires_a_model_without_repeating_it_or_waiting(monkeypatch):
                               "pollinations_models": ["openai-fast", "openai"], "temperature": 0.1}})
     with pytest.raises(L.LLMError):
         router.json("json", "{}", attempts_per_model=3)
-    assert calls == ["openai-fast", "openai"], "each model should be tried once, then fail over"
+    assert calls == ["openai-fast"], "billing/entitlement failure must stop sibling-model calls"
     assert "pollinations:openai-fast" in router._dead
+    assert router.circuits.is_open("pollinations")
 
 
 def test_provider_errors_keep_enough_body_to_act_on():
@@ -251,14 +255,12 @@ def test_a_long_quota_window_retires_the_model_instead_of_sleeping():
 
     import re as _re
     src = (ROOT / "autotube" / "llm.py").read_text()
-    m = _re.search(r"advertised_retry\(msg\)\s*>\s*(\d+)", src)
+    m = _re.search(r"retry_after\s*>\s*(\d+)", src)
     assert m, "long quota windows must retire the model rather than pace retries"
-    # Sleeps are capped at 45s across a few attempts, so a window of a minute or two is
-    # genuinely waitable and should not retire a model; anything past a few minutes is not.
+    # In-run waits are capped at 45s. Longer provider guidance opens a cooldown instead
+    # of retrying early and violating Retry-After.
     threshold = int(m.group(1))
-    assert 90 <= threshold <= 300, (
-        f"retirement threshold {threshold}s: below ~90s it discards models that would "
-        f"have come back within the backoff ladder, above ~300s it stalls the run")
+    assert threshold == 45, f"Retry-After > {threshold}s must defer rather than retry early"
 
 
 def test_top_up_cadence_stays_within_free_tier_budget():
@@ -1679,11 +1681,14 @@ def test_actions_summary_marks_no_output_incomplete(tmp_path, monkeypatch):
     assert "no verification or quality gate was bypassed" in text
 
 
-def test_manual_top_up_caps_requested_count_to_missing_daily_slots(monkeypatch):
+def test_manual_top_up_caps_requested_count_to_missing_daily_slots(tmp_path, monkeypatch):
     import copy
     import autotube.__main__ as cli
-    from autotube import pipeline
+    from autotube import common, pipeline
 
+    monkeypatch.setattr(common, "OUTPUT_DIR", tmp_path / "output")
+    monkeypatch.setattr(common, "STATE_DIR", tmp_path / "state")
+    monkeypatch.delenv("GITHUB_RUN_ID", raising=False)
     cfg = copy.deepcopy(CFG)
     monkeypatch.setattr(cli, "load_config", lambda *_: cfg)
     monkeypatch.setattr(pipeline, "remaining_today", lambda *a, **k: 1)
@@ -1699,3 +1704,7 @@ def test_manual_top_up_caps_requested_count_to_missing_daily_slots(monkeypatch):
     monkeypatch.setattr(cli, "_write_github_summary", lambda *a, **k: None)
     assert cli.main(["run", "--count", "2", "--top-up", "--dry-run"]) == 0
     assert calls == [1], "an explicit retry count must never exceed remaining capacity"
+    reports = list((tmp_path / "output").glob("run-report-*.json"))
+    assert len(reports) == 1
+    receipt = json.loads(reports[0].read_text())
+    assert receipt["target_count"] == 1 and receipt["produced_count"] == 1
