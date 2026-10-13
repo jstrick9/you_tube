@@ -27,6 +27,9 @@ def test_watchdog_schedule_covers_each_daily_and_top_up_slot():
     assert "17 10 * * *" in daily_crons
     assert "47 11-23/4 * * *" in daily_crons
     assert watchdog_crons == ["35 10 * * *", "5 0,12,16,20 * * *"]
+    first_step = daily["jobs"]["produce"]["steps"][0]
+    assert first_step["uses"] == "actions/checkout@v4"
+    assert first_step["with"]["ref"] == "main", "queued top-ups must read the latest committed target"
 
 
 def test_scheduled_slots_resolve_the_daily_and_top_up_crons_in_utc():

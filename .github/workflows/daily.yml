@@ -71,7 +71,11 @@ jobs:
       NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
     steps:
+      # Runs may wait behind concurrency. Re-read main after the lock is acquired so a safe top-up
+      # always sees the prior attempt's committed history instead of the queued event's stale SHA.
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: actions/setup-python@v5
         with:
