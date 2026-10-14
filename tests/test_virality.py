@@ -158,15 +158,30 @@ def test_selector_rejects_known_off_lane_youtube_chart_topics_before_provider_ca
 
 
 def test_selector_rejects_sports_trend_context_even_if_the_model_could_relabel_it():
-    candidate = {
-        "topic": "Dortmund", "topic_key": "dortmund", "source": "google_trends",
-        "sources": ["google_trends"], "score": 0.95,
-        "context": ["Borussia Dortmund advance in the UEFA Champions League"],
-        "signals": [signal("google_trends", "https://trends.test/dortmund", {"traffic": 25_000})],
-    }
-    llm = LLMPicks([])
-    assert ScriptWriter(CFG, llm, Strat()).select_topics([candidate], 1, set()) == []
-    assert llm.prompt == "", "out-of-scope sports context must be filtered before model selection"
+    candidates = [
+        {
+            "topic": "Dortmund", "topic_key": "dortmund", "source": "google_trends",
+            "sources": ["google_trends"], "score": 0.95,
+            "context": ["Borussia Dortmund advance in the UEFA Champions League"],
+            "signals": [signal("google_trends", "https://trends.test/dortmund", {"traffic": 25_000})],
+        },
+        {
+            "topic": "canadiens vs capitals", "topic_key": "canadiens vs capitals",
+            "source": "google_trends", "sources": ["google_trends"], "score": 0.95,
+            "context": ["FAQ: How to watch Wednesday's Canadiens-Capitals game"],
+            "signals": [signal("google_trends", "https://trends.test/canadiens", {"traffic": 25_000})],
+        },
+        {
+            "topic": "new york city vs inter miami", "topic_key": "new york city vs inter miami",
+            "source": "google_trends", "sources": ["google_trends"], "score": 0.95,
+            "context": ["LIVE MATCH: Inter Miami vs. NYCFC: Match Preview & Start Time for 2026"],
+            "signals": [signal("google_trends", "https://trends.test/inter-miami", {"traffic": 25_000})],
+        },
+    ]
+    for candidate in candidates:
+        llm = LLMPicks([])
+        assert ScriptWriter(CFG, llm, Strat()).select_topics([candidate], 1, set()) == []
+        assert llm.prompt == "", "out-of-scope sports context must be filtered before model selection"
 
 
 def test_selector_rejects_category_that_conflicts_with_explicit_trend_lane():
@@ -445,6 +460,21 @@ def test_trend_evidence_uses_measured_signals_and_distinct_families():
     verified_but_mislabeled = {"signals": [signal(
         "google_trends", "https://trends.test/page", {"traffic": 5_000})], "sources": ["evergreen"]}
     assert trends.has_current_trend_evidence(verified_but_mislabeled, 3.0, cfg)
+
+
+def test_youtube_outlier_age_is_compared_to_capture_time_not_later_attempt_time(monkeypatch):
+    captured_at = common.now_utc()
+    published_at = (captured_at - timedelta(hours=48)).isoformat()
+    later_attempt = captured_at + timedelta(minutes=10)
+    evidence = {"views": 250_000, "hours": 48, "vph": round(250_000 / 48),
+                "video_id": "abcdefghijk", "published_at": published_at}
+    candidate = {"signals": [signal(
+        "youtube_outliers", "https://www.youtube.com/watch?v=abcdefghijk", evidence,
+        captured_at=captured_at.isoformat())]}
+    monkeypatch.setattr(trends, "now_utc", lambda: later_attempt)
+
+    assert trends.has_current_trend_evidence(candidate, 3.0, CFG["trends"]), (
+        "a valid fallback candidate must not age out merely because an earlier script attempt took ten minutes")
 
 
 def test_trend_gate_rejects_boolean_evidence_and_malformed_thresholds():

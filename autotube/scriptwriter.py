@@ -57,8 +57,8 @@ FORMAT_GUIDE = {
 }
 
 # Explicit competition/league and team identifiers prevent a model from relabelling
-# football or other sports trends as history or culture. Generic words like "match" or
-# "field" are intentionally absent to avoid suppressing unrelated science topics.
+# football or other sports trends as history or culture. Generic "match" and "field"
+# words only count when tied to an explicit matchup or sport, avoiding unrelated science topics.
 _SPORTS_TREND_MARKER = re.compile(
     r"\b(?:borussia|bundesliga|champions\s+league|uefa|fifa|premier\s+league|la\s+liga|serie\s+a|"
     r"football\s+club|soccer\s+club|football\s+team|soccer\s+team|sports?\s+club|"
@@ -66,6 +66,21 @@ _SPORTS_TREND_MARKER = re.compile(
     r"formula\s*1|f1|copa\s+(?:america|libertadores)|grand\s+slam|wimbledon|ipl|atp|wta|"
     r"real\s+madrid|bayern\s+munich|manchester\s+(?:united|city)|liverpool\s+(?:fc|football)|"
     r"arsenal\s+fc|chelsea\s+fc|juventus|fc\s+barcelona|barcelona\s+fc)\b", re.I)
+_SPORTS_MATCHUP = re.compile(r"\b(?:vs\.?|versus)\b", re.I)
+_SPORTS_FIXTURE_CONTEXT = re.compile(
+    r"\b(?:game|match|matchup|fixture|how\s+to\s+watch|start\s+time|preview|playoffs?|"
+    r"tournament|kick[ -]?off|score|standings|bracket|league|season|championship|finals?)\b", re.I)
+_SPORTS_KIND = re.compile(
+    r"\b(?:baseball|basketball|hockey|soccer|football|cricket|rugby|tennis|golf|boxing|"
+    r"volleyball|softball|lacrosse|wrestling|motorsport)\b", re.I)
+
+
+def _is_sports_trend(text: str) -> bool:
+    """Catch explicit competitions and source-context-confirmed live fixtures."""
+    if _SPORTS_TREND_MARKER.search(text):
+        return True
+    fixture = bool(_SPORTS_FIXTURE_CONTEXT.search(text))
+    return fixture and bool(_SPORTS_MATCHUP.search(text) or _SPORTS_KIND.search(text))
 
 # formats whose structure centres on one big reveal (gets the riser, flash and a beat of silence)
 REVEAL_FORMATS = {"guess_reveal", "plot_twist", "myth_buster", "sounds_fake", "ranked_escalation", "creepy_true",
@@ -992,7 +1007,7 @@ class ScriptWriter:
                         trend_context.append(str(item["topic"]))
                     if isinstance(item.get("context"), list):
                         trend_context.extend(str(value) for value in item["context"] if value)
-            if _SPORTS_TREND_MARKER.search(" ".join(trend_context)):
+            if _is_sports_trend(" ".join(trend_context)):
                 return False
             # A YouTube-chart category is direct metadata, not a model interpretation.
             # Sports, gaming and news/politics trends cannot be relabelled into our lanes.

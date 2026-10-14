@@ -829,13 +829,26 @@ def has_current_trend_evidence(candidate: dict, min_wikipedia_spike: float = 3.0
             measured_rate_agrees = (math.isfinite(expected_vph) and math.isfinite(vph) and vph > 0
                                     and abs(vph - expected_vph) <= max(1.0, expected_vph * 0.1))
             raw_published = evidence.get("published_at") or signal.get("published_at")
+            raw_captured = signal.get("captured_at")
             try:
                 published = datetime.fromisoformat(str(raw_published).replace("Z", "+00:00"))
+                captured = datetime.fromisoformat(str(raw_captured).replace("Z", "+00:00"))
                 if published.tzinfo is None:
                     raise ValueError("publication timestamp has no timezone")
-                actual_hours = (now - published.astimezone(timezone.utc)).total_seconds() / 3600
-                measured_time_agrees = (math.isfinite(actual_hours) and 0 < actual_hours <= max_outlier_hours
-                                        and abs(hours - max(1.0, actual_hours)) <= 0.11)
+                if captured.tzinfo is None:
+                    captured = captured.replace(tzinfo=timezone.utc)
+                published = published.astimezone(timezone.utc)
+                captured = captured.astimezone(timezone.utc)
+                hours_at_capture = (captured - published).total_seconds() / 3600
+                hours_now = (now - published).total_seconds() / 3600
+                # `hours` and `views` were measured at capture time. A fallback topic may be
+                # attempted minutes later after another script call, so compare the measured
+                # age with the signal timestamp, while still requiring the video to be live now.
+                measured_time_agrees = (
+                    math.isfinite(hours_at_capture) and math.isfinite(hours_now)
+                    and 0 < hours_at_capture <= max_outlier_hours
+                    and 0 < hours_now <= max_outlier_hours
+                    and abs(hours - max(1.0, hours_at_capture)) <= 0.11)
             except (TypeError, ValueError, OverflowError):
                 measured_time_agrees = False
             evidence_id = str(evidence.get("video_id") or "").strip()
