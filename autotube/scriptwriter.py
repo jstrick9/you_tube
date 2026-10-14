@@ -62,6 +62,7 @@ FORMAT_GUIDE = {
 _SPORTS_TREND_MARKER = re.compile(
     r"\b(?:borussia|bundesliga|champions\s+league|uefa|fifa|premier\s+league|la\s+liga|serie\s+a|"
     r"football\s+club|soccer\s+club|football\s+team|soccer\s+team|sports?\s+club|"
+    r"cricket\s+(?:history|match|team|club|league|score|player|innings|championship|world\s+cup)|"
     r"ligue\s+1|world\s+cup|super\s+bowl|nfl|nba|wnba|mlb|nhl|ncaaf|ncaab|ufc|wwe|"
     r"formula\s*1|f1|copa\s+(?:america|libertadores)|grand\s+slam|wimbledon|ipl|atp|wta|"
     r"real\s+madrid|bayern\s+munich|manchester\s+(?:united|city)|liverpool\s+(?:fc|football)|"

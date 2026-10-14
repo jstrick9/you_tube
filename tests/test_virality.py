@@ -177,6 +177,12 @@ def test_selector_rejects_sports_trend_context_even_if_the_model_could_relabel_i
             "context": ["LIVE MATCH: Inter Miami vs. NYCFC: Match Preview & Start Time for 2026"],
             "signals": [signal("google_trends", "https://trends.test/inter-miami", {"traffic": 25_000})],
         },
+        {
+            "topic": "Funny Moments in Cricket History!", "topic_key": "funny moments in cricket history",
+            "source": "google_trends", "sources": ["google_trends"], "score": 0.95,
+            "context": ["A viral cricket Short from this week's sports roundup"],
+            "signals": [signal("google_trends", "https://trends.test/cricket", {"traffic": 25_000})],
+        },
     ]
     for candidate in candidates:
         llm = LLMPicks([])
