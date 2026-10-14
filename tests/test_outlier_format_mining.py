@@ -115,6 +115,130 @@ def test_youtube_outlier_collection_uses_duration_metadata_not_descriptions(monk
     assert description not in json.dumps(stored["trend_cache.json"])
 
 
+def test_cached_youtube_outliers_refresh_metrics_and_drop_stale_videos(monkeypatch):
+    fixed_now = datetime(2026, 10, 14, 22, 55, tzinfo=timezone.utc)
+    fresh_id, stale_id = "abcdefghijk", "zyxwvutsrqp"
+    fresh_published = (fixed_now - timedelta(hours=20)).isoformat().replace("+00:00", "Z")
+    stale_published = (fixed_now - timedelta(hours=80)).isoformat().replace("+00:00", "Z")
+
+    def cached_row(video_id, old_views, old_published):
+        url = f"https://www.youtube.com/watch?v={video_id}"
+        return {"topic": "Old cached title", "source": "youtube_outliers", "lane": "science_nature",
+                "source_url": url, "video_id": video_id,
+                "evidence": {"video_id": video_id, "video_url": url, "search_query": "science facts",
+                             "views": old_views, "hours": 10, "vph": old_views // 10,
+                             "breakout": 10, "published_at": old_published}}
+
+    cache = {"yt_outliers_date": fixed_now.date().isoformat(), "yt_outliers": [
+        cached_row(fresh_id, 50_000, fresh_published), cached_row(stale_id, 70_000, stale_published),
+    ]}
+    videos = [
+        {"id": fresh_id,
+         "snippet": {"title": "Why deep-sea fish glow at night", "publishedAt": fresh_published,
+                     "channelId": "channel-1", "channelTitle": "Other Creator"},
+         "statistics": {"viewCount": "120000"}, "contentDetails": {"duration": "PT25S"}},
+        {"id": stale_id,
+         "snippet": {"title": "An old viral science discovery", "publishedAt": stale_published,
+                     "channelId": "channel-2", "channelTitle": "Another Creator"},
+         "statistics": {"viewCount": "800000"}, "contentDetails": {"duration": "PT40S"}},
+    ]
+    captured = {}
+
+    class Request:
+        def __init__(self, data):
+            self.data = data
+
+        def execute(self):
+            return self.data
+
+    class Search:
+        def list(self, **kwargs):
+            raise AssertionError("same-day cache refresh must not spend search.list quota")
+
+    class Videos:
+        def list(self, **kwargs):
+            captured["video_ids"] = kwargs["id"]
+            return Request({"items": videos})
+
+    class Channels:
+        def list(self, **kwargs):
+            captured["channel_ids"] = kwargs["id"]
+            return Request({"items": [
+                {"id": "channel-1", "statistics": {"subscriberCount": "2000"}},
+                {"id": "channel-2", "statistics": {"subscriberCount": "1000"}},
+            ]})
+
+    class Service:
+        def search(self):
+            return Search()
+
+        def videos(self):
+            return Videos()
+
+        def channels(self):
+            return Channels()
+
+    monkeypatch.setattr(trends, "_yt_oauth_ready", lambda: True)
+    monkeypatch.setattr(trends, "lane_queries", lambda _cfg: [("science_nature", "science facts")])
+    monkeypatch.setattr(trends, "now_utc", lambda: fixed_now)
+    monkeypatch.setattr(trends, "read_json", lambda *_args, **_kwargs: cache)
+    monkeypatch.setattr(common, "write_json", lambda *_args, **_kwargs: (_ for _ in ()).throw(
+        AssertionError("refreshing metrics must not rewrite the daily search cache")))
+    monkeypatch.setattr(youtube, "service", lambda: Service())
+    cfg = {"channel": {"name": "Archive 13", "region": "US", "language": "en"},
+           "trends": {"outlier_min_views": 30000, "outlier_window_hours": 72,
+                      "lanes": {"science_nature": {"queries": ["science facts"]}}}}
+
+    outliers = trends.youtube_outliers(cfg)
+
+    assert captured["video_ids"] == f"{fresh_id},{stale_id}"
+    assert set(captured["channel_ids"].split(",")) == {"channel-1", "channel-2"}
+    assert [row["video_id"] for row in outliers] == [fresh_id]
+    fresh = outliers[0]
+    assert fresh["evidence"]["views"] == 120000
+    assert fresh["evidence"]["hours"] == 20
+    assert fresh["evidence"]["vph"] == 6000
+    assert fresh["evidence"]["breakout"] == 60
+    assert "60x its channel's subscribers" in fresh["context"][0]
+    signal = trends._signal_record(fresh, fixed_now.isoformat())
+    assert trends.has_current_trend_evidence({"signals": [signal]}, 3.0, cfg["trends"])
+
+
+def test_cached_youtube_outlier_refresh_fails_closed_on_video_api_error(monkeypatch):
+    fixed_now = datetime(2026, 10, 14, 22, 55, tzinfo=timezone.utc)
+    video_id = "abcdefghijk"
+    url = f"https://www.youtube.com/watch?v={video_id}"
+    cache = {"yt_outliers_date": fixed_now.date().isoformat(), "yt_outliers": [{
+        "topic": "Cached but unverified", "source": "youtube_outliers", "lane": "science_nature",
+        "source_url": url, "video_id": video_id,
+        "evidence": {"video_id": video_id, "video_url": url, "search_query": "science facts",
+                     "views": 100000, "hours": 10, "vph": 10000, "breakout": 10},
+    }]}
+
+    class Request:
+        def execute(self):
+            raise RuntimeError("temporary YouTube API outage")
+
+    class Videos:
+        def list(self, **kwargs):
+            return Request()
+
+    class Service:
+        def videos(self):
+            return Videos()
+
+    monkeypatch.setattr(trends, "_yt_oauth_ready", lambda: True)
+    monkeypatch.setattr(trends, "lane_queries", lambda _cfg: [("science_nature", "science facts")])
+    monkeypatch.setattr(trends, "now_utc", lambda: fixed_now)
+    monkeypatch.setattr(trends, "read_json", lambda *_args, **_kwargs: cache)
+    monkeypatch.setattr(youtube, "service", lambda: Service())
+    cfg = {"channel": {"name": "Archive 13"},
+           "trends": {"outlier_min_views": 30000, "outlier_window_hours": 72,
+                      "lanes": {"science_nature": {"queries": ["science facts"]}}}}
+
+    assert trends.youtube_outliers(cfg) == []
+
+
 def test_writer_receives_only_fresh_lane_aggregates_not_the_outlier_title(monkeypatch):
     cfg = load_config()
     now = now_utc()

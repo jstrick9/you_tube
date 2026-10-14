@@ -124,8 +124,12 @@ def reddit_rss(sub: str, limit: int = 25) -> list[dict]:
     try:
         r = http().get(f"https://www.reddit.com/r/{sub}/top/.rss?t=day&limit={limit}",
                        headers={"User-Agent": "Mozilla/5.0 (AutoTube trend reader)"}, timeout=20)
+        r.raise_for_status()
         feed = feedparser.parse(r.content)
         n = len(feed.entries)
+        if n == 0:
+            log.info("reddit r/%s RSS returned no entries (content-type=%s, parse_warning=%s)", sub,
+                     str(r.headers.get("Content-Type", ""))[:80], bool(getattr(feed, "bozo", False)))
         for i, e in enumerate(feed.entries):
             title = re.sub(r"^(TIL( that)?|TIL:)\s*", "", e.title, flags=re.I).strip()
             out.append({"topic": title, "source": f"reddit_{sub}", "score": _norm_rank(i, n) * 0.9,
@@ -376,126 +380,268 @@ def format_pulse(rows: list[dict]) -> dict:
     }
 
 
-def youtube_outliers(cfg: dict) -> list[dict]:
-    """Fact/explainer Shorts that are going viral RIGHT NOW (measured demand for the subject).
+def _rank_youtube_outlier_rows(rows: list[dict]) -> list[dict]:
+    """Turn measured YouTube rows into bounded selector evidence without creator executions."""
+    rows.sort(key=lambda r: -(math.log10(r["vph"] + 1) + 0.6 * math.log10(r["ratio"] + 1)))
+    n = len(rows)
+    out = []
+    for i, row in enumerate(rows[:40]):
+        subscriber_multiple = row["views"] / row["subs"] if row["subs"] > 0 else 0.0
+        out.append({
+            "topic": row["topic"], "source": "youtube_outliers", "is_fact": True,
+            "lane": row["lane"], "hook": row["hook"],
+            "score": round(min(1.0, 0.55 + 0.45 * _norm_rank(i, n)), 4),
+            "context": [f"viral Short now: {row['views']:,} views in {row['hours']:.0f}h"
+                        + (f", {subscriber_multiple:.0f}x its channel's subscribers" if row["subs"] else "")],
+            "source_url": row["source_url"], "video_id": row["video_id"],
+            "published_at": row["published_at"], "channel_title": row["channel_title"],
+            "evidence": {"views": row["views"], "hours": round(row["hours"], 1), "vph": round(row["vph"]),
+                         "breakout": round(subscriber_multiple, 1), "video_id": row["video_id"],
+                         "video_url": row["source_url"], "published_at": row["published_at"],
+                         "channel_title": row["channel_title"], "search_query": row["query"],
+                         "duration_seconds": row["duration_seconds"], "subscriber_count": row["subs"],
+                         "channel_id": row.get("channel_id", "")},
+        })
+    return out
 
-    search.list (100 units/query) for recent short videos ordered by views, then videos.list + channels.list
-    (1 unit per 50) to compute views/hour and views relative to the channel's size. A Short with far more views
-    than its channel has subscribers is an "outlier": the subject is spreading. The topic selector may see an
-    outlier title only to identify that subject; the script-generation prompt receives the independent research
-    title and original angle, while format guidance is only aggregate, lane-level title-pattern/duration metadata.
-    No creator title, description, script, caption, footage, audio or identity is used as a format example. Beat
-    count and caption density remain unmeasured. Results are cached once per day.
+
+def _refresh_cached_youtube_outliers(yt, cached: list[dict], cfg: dict,
+                                     pairs: list[tuple[str, str]], min_views: int,
+                                     max_outlier_hours: float) -> list[dict]:
+    """Re-fetch cached video metrics before treating yesterday's search as today's trend evidence.
+
+    Search.list is the quota-expensive discovery call (100 units/query), so its result IDs are cached for
+    the UTC day. videos.list and channels.list are only one unit per 50 IDs each; they refresh view count,
+    publication age, channel size and duration on every run. A stale/removed/private video is dropped. If
+    the video metrics cannot be refreshed, the caller fails closed rather than reusing stale view/hour data.
+    """
+    valid_pairs = set(pairs)
+    by_id: dict[str, dict] = {}
+    for row in cached:
+        if not isinstance(row, dict) or row.get("source") != "youtube_outliers":
+            continue
+        evidence = row.get("evidence") if isinstance(row.get("evidence"), dict) else {}
+        video_id = str(row.get("video_id") or evidence.get("video_id") or "").strip()
+        url = str(row.get("source_url") or evidence.get("video_url") or "").strip()
+        lane = row.get("lane") or evidence.get("lane")
+        query = evidence.get("search_query")
+        if (not video_id or not _youtube_video_url_matches(url, video_id)
+                or not isinstance(lane, str) or not isinstance(query, str)
+                or (lane, query) not in valid_pairs):
+            continue
+        by_id.setdefault(video_id, {"lane": lane, "query": query})
+    if not by_id:
+        return []
+
+    videos: dict[str, dict] = {}
+    ids = list(by_id)
+    for i in range(0, len(ids), 50):
+        page = yt.videos().list(part="snippet,statistics,contentDetails",
+                                id=",".join(ids[i:i + 50])).execute()
+        for video in page.get("items", []):
+            if isinstance(video, dict) and video.get("id") in by_id:
+                videos[video["id"]] = video
+
+    channel_ids = sorted({str((video.get("snippet") or {}).get("channelId") or "").strip()
+                          for video in videos.values()
+                          if str((video.get("snippet") or {}).get("channelId") or "").strip()})
+    subscribers: dict[str, int] = {}
+    try:
+        for i in range(0, len(channel_ids), 50):
+            page = yt.channels().list(part="statistics", id=",".join(channel_ids[i:i + 50])).execute()
+            for channel in page.get("items", []):
+                if not isinstance(channel, dict) or not channel.get("id"):
+                    continue
+                count = _provider_count((channel.get("statistics") or {}).get("subscriberCount"))
+                if count is not None:
+                    subscribers[channel["id"]] = count
+    except Exception as e:  # noqa: BLE001
+        # Current views and age are the qualification evidence; subscriber counts only refine the rank.
+        log.warning("youtube cached outlier subscriber refresh failed: %s", str(e)[:160])
+
+    own = str(cfg.get("channel", {}).get("name", "")).strip().casefold()
+    now = now_utc()  # take the age measurement after both API calls, immediately before building evidence
+    rows = []
+    for video_id, meta in by_id.items():
+        video = videos.get(video_id)
+        if not video:
+            continue
+        snippet = video.get("snippet") if isinstance(video.get("snippet"), dict) else {}
+        stats = video.get("statistics") if isinstance(video.get("statistics"), dict) else {}
+        views = _provider_count(stats.get("viewCount"))
+        title = snippet.get("title")
+        channel_title = str(snippet.get("channelTitle") or "").strip()
+        if (views is None or views < min_views
+                or (own and channel_title.casefold() == own)
+                or not isinstance(title, str)):
+            continue
+        published_at = snippet.get("publishedAt")
+        try:
+            published = _parse_ts(published_at)
+            if published.tzinfo is None:
+                continue
+            age_hours = (now - published.astimezone(timezone.utc)).total_seconds() / 3600
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if not math.isfinite(age_hours) or not 0 < age_hours <= max_outlier_hours:
+            continue
+        topic = _clean_title(title)
+        if len(topic) < 8:
+            continue
+        channel_id = str(snippet.get("channelId") or "").strip()
+        # Do not describe a cached subscriber ratio as current if channels.list failed or hid it.
+        # View velocity and publication age remain the live qualification metrics.
+        subscriber_count = subscribers.get(channel_id, 0)
+        hours = max(1.0, age_hours)
+        vph = views / hours
+        ratio = views / max(subscriber_count, 1000)
+        rows.append({"topic": topic, "vph": vph, "ratio": ratio, "views": views, "hours": hours,
+                     "subs": subscriber_count, "duration_seconds": youtube_duration_seconds(
+                         (video.get("contentDetails") or {}).get("duration")),
+                     "video_id": video_id, "source_url": f"https://www.youtube.com/watch?v={video_id}",
+                     "published_at": published_at, "channel_title": channel_title,
+                     "channel_id": channel_id, "query": meta["query"], "lane": meta["lane"],
+                     "hook": hook_pattern(topic)})
+    return rows
+
+
+def youtube_outliers(cfg: dict) -> list[dict]:
+    """Find current viral Shorts in approved lanes while keeping expensive discovery within quota.
+
+    Search.list (100 units/query) discovers recent outliers once per UTC day. On later runs that day,
+    cached video IDs are revalidated with fresh YouTube view, publication, and channel statistics before
+    their evidence can reach the selector. No creator title, description, script, caption, footage, audio
+    or identity is used as a format example; only aggregate lane-level format metrics are retained.
     """
     t = cfg.get("trends", {})
     pairs = lane_queries(cfg)
     if not pairs or not _yt_oauth_ready():
         return []
-    from .common import write_json
-    today = now_utc().date().isoformat()
-    cache = read_json("trend_cache.json", {})
-    if cache.get("yt_outliers_date") == today and isinstance(cache.get("yt_outliers"), list):
-        log.info("youtube outliers: %d (cached today)", len(cache["yt_outliers"]))
-        return cache["yt_outliers"]
-    region = cfg["channel"].get("region", "US")
-    lang = cfg["channel"].get("language", "en")
-    min_views = int(t.get("outlier_min_views", 30000))
-    max_outlier_hours = float(t.get("outlier_window_hours", 96))
+    try:
+        min_views = int(t.get("outlier_min_views", 30000))
+        max_outlier_hours = float(t.get("outlier_window_hours", 96))
+    except (TypeError, ValueError, OverflowError):
+        log.warning("invalid YouTube outlier thresholds; skipping source")
+        return []
     if min_views <= 0 or not math.isfinite(max_outlier_hours) or max_outlier_hours <= 0:
         log.warning("invalid YouTube outlier thresholds; skipping source")
         return []
+
+    from .common import write_json
+    today = now_utc().date().isoformat()
+    cache = read_json("trend_cache.json", {})
+    if not isinstance(cache, dict):
+        cache = {}
+    if cache.get("yt_outliers_date") == today and isinstance(cache.get("yt_outliers"), list):
+        try:
+            from . import youtube
+            rows = _refresh_cached_youtube_outliers(
+                youtube.service(), cache["yt_outliers"], cfg, pairs, min_views, max_outlier_hours)
+            out = _rank_youtube_outlier_rows(rows)
+            log.info("youtube outliers: %d from cached search, live-revalidated (%d cached IDs)",
+                     len(out), len(cache["yt_outliers"]))
+            return out
+        except Exception as e:  # noqa: BLE001
+            log.warning("youtube cached outlier refresh failed; ignoring stale metrics: %s", str(e)[:200])
+            return []
+
+    region = cfg["channel"].get("region", "US")
+    lang = cfg["channel"].get("language", "en")
     since = now_utc() - timedelta(hours=max_outlier_hours)
-    out: list[dict] = []
     try:
         from . import youtube
         yt = youtube.service()
         found: dict[str, tuple[str, str]] = {}        # videoId -> (query, lane)
-        for lane, q in pairs:
+        for lane, query in pairs:
             try:
-                r = yt.search().list(part="id", q=q, type="video", videoDuration="short", order="viewCount",
-                                     publishedAfter=since.strftime("%Y-%m-%dT%H:%M:%SZ"), regionCode=region,
-                                     relevanceLanguage=lang, safeSearch="strict", maxResults=25).execute()
-                for it in r.get("items", []):
-                    found.setdefault(it["id"]["videoId"], (q, lane))
+                response = yt.search().list(
+                    part="id", q=query, type="video", videoDuration="short", order="viewCount",
+                    publishedAfter=since.strftime("%Y-%m-%dT%H:%M:%SZ"), regionCode=region,
+                    relevanceLanguage=lang, safeSearch="strict", maxResults=25).execute()
+                for item in response.get("items", []):
+                    video_id = ((item.get("id") or {}).get("videoId")
+                                if isinstance(item, dict) else None)
+                    if video_id:
+                        found.setdefault(video_id, (query, lane))
             except Exception as e:  # noqa: BLE001
-                log.warning("youtube outlier search %r failed: %s", q, str(e)[:120])
+                log.warning("youtube outlier search %r failed: %s", query, str(e)[:120])
         ids = list(found)
-        vids = []
+        videos = []
         for i in range(0, len(ids), 50):
-            page = yt.videos().list(part="snippet,statistics,contentDetails", id=",".join(ids[i:i + 50])).execute()
-            vids += page.get("items", [])
-        ch_ids = list({v["snippet"]["channelId"] for v in vids})
-        subs: dict[str, int] = {}
-        for i in range(0, len(ch_ids), 50):
-            for c in yt.channels().list(part="statistics", id=",".join(ch_ids[i:i + 50])).execute().get("items", []):
-                count = _provider_count(c.get("statistics", {}).get("subscriberCount"))
-                subs[c["id"]] = count if count is not None else 0
-        own = cfg["channel"].get("name", "").lower()
+            page = yt.videos().list(part="snippet,statistics,contentDetails",
+                                    id=",".join(ids[i:i + 50])).execute()
+            videos.extend(page.get("items", []))
+        channel_ids = sorted({str((video.get("snippet") or {}).get("channelId") or "").strip()
+                              for video in videos
+                              if str((video.get("snippet") or {}).get("channelId") or "").strip()})
+        subscribers: dict[str, int] = {}
+        for i in range(0, len(channel_ids), 50):
+            page = yt.channels().list(part="statistics", id=",".join(channel_ids[i:i + 50])).execute()
+            for channel in page.get("items", []):
+                count = _provider_count((channel.get("statistics") or {}).get("subscriberCount"))
+                if count is not None:
+                    subscribers[channel["id"]] = count
+        own = str(cfg.get("channel", {}).get("name", "")).strip().casefold()
         now = now_utc()
         rows = []
-        for v in vids:
-            sn, st = v["snippet"], v.get("statistics", {})
-            views = _provider_count(st.get("viewCount"))
-            if views is None or views < min_views or sn.get("channelTitle", "").lower() == own:
+        for video in videos:
+            snippet = video.get("snippet") if isinstance(video.get("snippet"), dict) else {}
+            stats = video.get("statistics") if isinstance(video.get("statistics"), dict) else {}
+            views = _provider_count(stats.get("viewCount"))
+            channel_title = str(snippet.get("channelTitle") or "").strip()
+            if (views is None or views < min_views
+                    or (own and channel_title.casefold() == own)):
                 continue
+            published_at = snippet.get("publishedAt")
             try:
-                published = _parse_ts(sn["publishedAt"])
+                published = _parse_ts(published_at)
                 if published.tzinfo is None:
                     continue
                 age_hours = (now - published.astimezone(timezone.utc)).total_seconds() / 3600
-            except (KeyError, TypeError, ValueError, OverflowError):
+            except (TypeError, ValueError, OverflowError):
                 continue
             if not math.isfinite(age_hours) or not 0 < age_hours <= max_outlier_hours:
                 continue
-            hours = max(1.0, age_hours)
-            s_count = subs.get(sn["channelId"], 0)
-            vph = views / hours
-            ratio = views / max(s_count, 1000)
-            topic = _clean_title(sn["title"])
+            topic_raw = snippet.get("title")
+            if not isinstance(topic_raw, str):
+                continue
+            topic = _clean_title(topic_raw)
             if len(topic) < 8:
                 continue
-            rows.append({"topic": topic, "vph": vph, "ratio": ratio, "views": views, "hours": hours, "subs": s_count,
-                         "duration_seconds": youtube_duration_seconds(
-                             (v.get("contentDetails") or {}).get("duration")),
-                         "video_id": v["id"], "source_url": f"https://www.youtube.com/watch?v={v['id']}",
-                         "published_at": sn.get("publishedAt", ""), "channel_title": sn.get("channelTitle", ""),
-                         "query": found.get(v["id"], ("", ""))[0], "lane": found.get(v["id"], ("", ""))[1],
-                         "hook": hook_pattern(topic)})
-        # rank: speed (views/hour) and breakout (views vs. channel size) both matter
-        rows.sort(key=lambda r: -(math.log10(r["vph"] + 1) + 0.6 * math.log10(r["ratio"] + 1)))
-        n = len(rows)
-        for i, r in enumerate(rows[:40]):
-            out.append({
-                "topic": r["topic"], "source": "youtube_outliers", "is_fact": True,
-                "lane": r["lane"], "hook": r["hook"],
-                "score": round(min(1.0, 0.55 + 0.45 * _norm_rank(i, n)), 4),
-                # Trend selection receives the subject and measured demand, never the creator's description.
-                "context": [f"viral Short now: {r['views']:,} views in {r['hours']:.0f}h"
-                            + (f", {r['ratio']:.0f}x its channel's subscribers" if r["subs"] else "")],
-                "source_url": r["source_url"], "video_id": r["video_id"],
-                "published_at": r["published_at"], "channel_title": r["channel_title"],
-                "evidence": {"views": r["views"], "hours": round(r["hours"], 1), "vph": round(r["vph"]),
-                             "breakout": round(r["ratio"], 1), "video_id": r["video_id"],
-                             "video_url": r["source_url"], "published_at": r["published_at"],
-                             "channel_title": r["channel_title"], "search_query": r["query"],
-                             "duration_seconds": r["duration_seconds"]},
-            })
+            video_id = str(video.get("id") or "").strip()
+            if not video_id:
+                continue
+            channel_id = str(snippet.get("channelId") or "").strip()
+            subscriber_count = subscribers.get(channel_id, 0)
+            hours = max(1.0, age_hours)
+            vph = views / hours
+            ratio = views / max(subscriber_count, 1000)
+            query, lane = found.get(video_id, ("", ""))
+            rows.append({"topic": topic, "vph": vph, "ratio": ratio, "views": views, "hours": hours,
+                         "subs": subscriber_count, "duration_seconds": youtube_duration_seconds(
+                             (video.get("contentDetails") or {}).get("duration")),
+                         "video_id": video_id, "source_url": f"https://www.youtube.com/watch?v={video_id}",
+                         "published_at": published_at, "channel_title": channel_title, "channel_id": channel_id,
+                         "query": query, "lane": lane, "hook": hook_pattern(topic)})
+
+        out = _rank_youtube_outlier_rows(rows)
         by_lane: dict[str, int] = {}
-        for o in out:
-            by_lane[o.get("lane") or "-"] = by_lane.get(o.get("lane") or "-", 0) + 1
+        for row in out:
+            by_lane[row.get("lane") or "-"] = by_lane.get(row.get("lane") or "-", 0) + 1
         log.info("youtube outliers: %d viral Shorts from %d searches across %d lanes (%s)",
                  len(out), len(pairs), len(by_lane),
-                 ", ".join(f"{k}:{v}" for k, v in sorted(by_lane.items())))
+                 ", ".join(f"{key}:{value}" for key, value in sorted(by_lane.items())))
         cache.update({"yt_outliers_date": today, "yt_outliers": out})
         write_json("trend_cache.json", cache)
         if t.get("format_pulse", True) and rows:
             pulse = format_pulse(rows)
             write_json("format_pulse.json", pulse)
             log.info("format pulse (%d viral Shorts): %s", pulse["sample"],
-                     ", ".join(f"{k} {v:.0%}" for k, v in pulse["hook_style"].items()))
+                     ", ".join(f"{key} {value:.0%}" for key, value in pulse["hook_style"].items()))
+        return out
     except Exception as e:  # noqa: BLE001
         log.warning("youtube outliers failed: %s", str(e)[:200])
-    return out
+        return []
 
 
 def wikipedia_spikes(items: list[dict], lang: str = "en", top: int = 40) -> None:
@@ -848,7 +994,13 @@ def collect(cfg: dict) -> list[dict]:
         raw += reddit_rss(subreddit, limit)
     raw += hackernews()
     raw += youtube_chart(region)
-    log.info("collected %d raw trend signals from %d sources", len(raw), len({r['source'] for r in raw}))
+    source_counts: dict[str, int] = {}
+    for row in raw:
+        source = str(row.get("source") or "unknown")
+        source_counts[source] = source_counts.get(source, 0) + 1
+    source_detail = ", ".join(f"{source}:{count}" for source, count in sorted(source_counts.items()))
+    log.info("collected %d raw trend signals from %d sources (%s)",
+             len(raw), len(source_counts), source_detail or "no source rows")
 
     # Merge exact-title duplicates, but only award a cross-source bonus for an independent
     # platform family. Two Reddit feeds or two YouTube feeds are multiple observations, not

@@ -564,7 +564,8 @@ def test_trend_collection_uses_configured_reddit_sources_once(monkeypatch):
     assert calls == [("science", 15), ("archaeology", 10)]
 
 
-def test_trend_merge_only_rewards_independent_sources_and_keeps_measured_evidence(monkeypatch):
+def test_trend_merge_only_rewards_independent_sources_and_keeps_measured_evidence(monkeypatch, caplog):
+    caplog.set_level("INFO", logger="autotube.trends")
     cfg = common.load_config()
     cfg["trends"]["wikipedia_spike_check"] = 0
     cfg["trends"]["on_this_day"] = False
@@ -586,6 +587,7 @@ def test_trend_merge_only_rewards_independent_sources_and_keeps_measured_evidenc
 
     merged = trends.collect(cfg)
     assert merged == [], "multiple subreddit feeds are one family and cannot qualify alone"
+    assert "reddit_science:1, reddit_space:1" in caplog.text
 
     monkeypatch.setattr(trends, "google_trends", lambda region: [
         {"topic": topic, "source": "google_trends", "score": 0.80, "traffic": 100000,
