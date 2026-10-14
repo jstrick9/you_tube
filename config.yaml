@@ -173,7 +173,7 @@ trends:
   # not a claim about recommendation or monetization outcomes.
   lanes:
     history_mystery:
-      queries: ["unsolved mystery", "history facts", "disappeared without a trace", "declassified", "did you know history"]
+      queries: ["unsolved mystery", "history facts", "disappeared without a trace", "declassified", "did you know history", "archaeology discovery", "ancient mysteries"]
       categories: [history, mysteries, culture]
       # Distinct lane profiles guide editorial treatment. They are creative constraints, not a representation
       # of YouTube's monetization review criteria; the underlying facts and story remain topic-specific.
@@ -188,7 +188,7 @@ trends:
           slower, with one deliberate pause before the payoff. Let the final line land
           without a wrap-up.
     science_nature:
-      queries: ["science facts", "space facts", "animal facts", "ocean facts", "deep sea discovery"]
+      queries: ["science facts", "space facts", "animal facts", "ocean facts", "deep sea discovery", "astronomy discovery", "wildlife discovery"]
       categories: [science, space, nature, animals, geography]
       profile:
         tone: >-
@@ -201,6 +201,7 @@ trends:
           a reflection.
   # Each search.list costs 100 quota units, so 14 queries is ~1,400 of the 10,000/day ceiling.
   max_queries_per_run: 14
+  reddit_subreddits: [todayilearned, science, space, archaeology, history, AskHistorians, astronomy, nature]
   youtube_outlier_queries: []            # legacy flat list; the lanes above supersede it
   format_pulse: true                     # aggregate outlier title-pattern/duration metadata by lane; not a retention metric
   # 72h, not 96. "Trending" has a shelf life: a video that broke out four days ago is

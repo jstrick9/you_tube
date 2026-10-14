@@ -1023,6 +1023,8 @@ class ScriptWriter:
 
         def evidence(c):
             bits = [f"sources={','.join(sorted(set(c['sources'])))}", f"trend={c['score']:.2f}"]
+            if isinstance(c.get("lane"), str) and c["lane"] in approved_lanes:
+                bits.append(f"source lane={c['lane']}")
             measured = trend_evidence_summary(c)
             if measured:
                 bits.append("measured trend evidence: " + _clip(measured, 150))
@@ -1035,6 +1037,8 @@ class ScriptWriter:
             return " | ".join(bits)
 
         listing = "\n".join(f"{i}. {c['topic'][:150]} | {evidence(c)}" for i, c in enumerate(pool))
+        log.info("live-qualified selector shortlist: %s", [
+            f"{i}: {c['topic'][:60]} | {evidence(c)}" for i, c in enumerate(pool)])
         weights = {c: round(self.strategy.category_weight(c), 2) for c in cats}
         today = now_utc()
         want = min(len(pool), 3 * n + 4)

@@ -832,9 +832,20 @@ def collect(cfg: dict) -> list[dict]:
     raw += wiki
     if tcfg.get("on_this_day", True):
         raw += on_this_day(lang)
-    raw += reddit_rss("todayilearned")
-    raw += reddit_rss("science", 15)
-    raw += reddit_rss("space", 10)
+    reddit_subs = tcfg.get("reddit_subreddits", ["todayilearned", "science", "space"])
+    if not isinstance(reddit_subs, list):
+        reddit_subs = ["todayilearned", "science", "space"]
+    seen_subs: set[str] = set()
+    for subreddit in reddit_subs:
+        if not isinstance(subreddit, str):
+            continue
+        subreddit = subreddit.strip()
+        key = subreddit.casefold()
+        if not re.fullmatch(r"[a-z0-9_]{2,21}", key) or key in seen_subs:
+            continue
+        seen_subs.add(key)
+        limit = 25 if key == "todayilearned" else 15 if key in {"science", "space"} else 10
+        raw += reddit_rss(subreddit, limit)
     raw += hackernews()
     raw += youtube_chart(region)
     log.info("collected %d raw trend signals from %d sources", len(raw), len({r['source'] for r in raw}))

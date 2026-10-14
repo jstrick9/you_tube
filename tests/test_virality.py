@@ -84,12 +84,15 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
                      "why_trending": "An unverified claim from the selector."},
                     {"index": 2, "viral_score": 8, "category": "culture", "risk": "high"}])
     w = ScriptWriter(CFG, llm, Strat())
-    picks = w.select_topics(cands(), 2, set())
+    candidates = cands()
+    candidates[2]["lane"] = "science_nature"
+    picks = w.select_topics(candidates, 2, set())
     assert [p["topic"] for p in picks] == ["Octopus can taste with its arms", "Hunger stone"]   # source weight breaks tie
     assert all(p["viral_score"] >= CFG["content"]["min_viral_score"] for p in picks)
     assert "1496.5x its 30-day baseline" in llm.prompt and "2,000,000 views" in llm.prompt  # judged WITH evidence
     assert "100,000 views/hour" in llm.prompt
     assert "trend context (discovery only): viral Short now: 2,000,000 views in 20h" in llm.prompt
+    assert "source lane=science_nature" in llm.prompt
     assert '"script_subject"' in llm.prompt and "do not copy the outlier headline" in llm.prompt
     assert "Every pick MUST include an explicit risk verdict" in llm.prompt
     assert len(llm.prompt) < 5_000, "selector context must stay compact for free-tier models"
@@ -540,6 +543,25 @@ def test_primary_source():
     assert trends.primary_source(["google_trends", "youtube_outliers"]) == "youtube_outliers"
     assert trends.primary_source(["reddit_science"]) == "reddit"
     assert trends.primary_source([]) == "evergreen"
+
+
+def test_trend_collection_uses_configured_reddit_sources_once(monkeypatch):
+    cfg = common.load_config()
+    cfg["trends"]["wikipedia_spike_check"] = 0
+    cfg["trends"]["on_this_day"] = False
+    cfg["trends"]["reddit_subreddits"] = ["science", "archaeology", "SCIENCE", "bad/name", 7]
+    calls = []
+    monkeypatch.setattr(trends, "youtube_outliers", lambda cfg: [])
+    monkeypatch.setattr(trends, "google_trends", lambda region: [])
+    monkeypatch.setattr(trends, "wikipedia_top", lambda lang: [])
+    monkeypatch.setattr(trends, "reddit_rss", lambda sub, limit=25: calls.append((sub, limit)) or [])
+    monkeypatch.setattr(trends, "hackernews", lambda: [])
+    monkeypatch.setattr(trends, "youtube_chart", lambda region: [])
+    monkeypatch.setattr(trends, "on_this_day", lambda lang: [])
+    monkeypatch.setattr("autotube.safety.screen", lambda *a, **k: ("allow", ""))
+
+    assert trends.collect(cfg) == []
+    assert calls == [("science", 15), ("archaeology", 10)]
 
 
 def test_trend_merge_only_rewards_independent_sources_and_keeps_measured_evidence(monkeypatch):
