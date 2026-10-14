@@ -634,12 +634,24 @@ def subject_is_depictable(subject: str, cfg: dict, source: dict | None = None) -
             return True
     from .media import commons_search
 
+    # Search the full label first, then progressively remove trailing modifiers. Commons
+    # metadata often indexes "iPhone Duo" but not the longer writer label "iPhone Duo
+    # cameras". This is a discovery preflight only: the script's subject, the matched
+    # assets, and final-render QA still have to pass their independent relevance gates.
+    queries = [subject]
+    terms = [term for term in tokens(subject) if len(term) > 2]
+    for end in range(len(terms) - 1, 0, -1):
+        query = " ".join(terms[:end])
+        if query.casefold() not in {item.casefold() for item in queries}:
+            queries.append(query)
     try:
-        hits = commons_search(subject, cfg.get("media", {}).get("licenses_allowed") or [],
-                              200, limit=20)
+        for query in queries:
+            if commons_search(query, cfg.get("media", {}).get("licenses_allowed") or [],
+                              200, limit=20):
+                return True
     except Exception:  # noqa: BLE001
         return True
-    return bool(hits)
+    return False
 
 
 BANNED_OPENERS = (
@@ -1041,7 +1053,8 @@ If no specific article carries the claim, say so with "wiki_query": "" and we wi
 publish the generic version of it.
 
 For a trending living person, ground on the historical record, object or phenomenon instead - but still the
-specific one.
+specific one. Every pick MUST include an explicit risk verdict (`none`, `low`, or `high`); if you cannot confidently
+rule out a safety or scope concern, use `high`. Never omit the verdict.
 
 Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<one of categories>",
 "script_subject": "<1-6 word, concrete name for the trending thing, independently worded; do not copy the outlier headline or use only a background article's title>",
@@ -1053,6 +1066,27 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
             assert isinstance(o, dict), "selection response must be a JSON object"
             assert isinstance(o.get("picks"), list) and o["picks"], "no picks"
             assert all(isinstance(pick, dict) for pick in o["picks"]), "every pick must be a JSON object"
+            required = ("index", "viral_score", "category", "script_subject", "angle",
+                        "wiki_query", "formats", "risk")
+            for i, pick in enumerate(o["picks"]):
+                # A high-risk pick is dropped immediately; only its risk verdict is
+                # needed. Every potentially usable pick must carry the full schema.
+                risk = pick.get("risk")
+                assert isinstance(risk, str) and risk in {"none", "low", "high"}, \
+                    f"pick {i} needs an explicit risk verdict: none, low, or high"
+                if risk == "high":
+                    continue
+                missing = [key for key in required if key != "risk" and key not in pick]
+                assert not missing, f"pick {i} is missing required field(s): {', '.join(missing)}"
+                index = pick.get("index")
+                subject = pick.get("script_subject")
+                if type(index) is int and 0 <= index < len(pool):
+                    assert isinstance(subject, str) and subject.strip() and 1 <= len(subject.split()) <= 6, \
+                        f"pick {i} script_subject must be a concise, concrete label"
+                    subject_terms = set(originality.tokens(subject))
+                    trend_terms = set(originality.tokens(pool[index]["topic"]))
+                    assert subject_terms and trend_terms and subject_terms & trend_terms, \
+                        f"pick {i} script_subject must name the trend candidate, not a background article"
 
         try:
             res = self.llm.json(SELECT_SYSTEM, user, temperature=0.4, validate=validate)

@@ -90,6 +90,7 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     assert "1496.5x its 30-day baseline" in llm.prompt and "2,000,000 views" in llm.prompt  # judged WITH evidence
     assert "100,000 views/hour" in llm.prompt
     assert '"script_subject"' in llm.prompt and "do not copy the outlier headline" in llm.prompt
+    assert "Every pick MUST include an explicit risk verdict" in llm.prompt
     assert picks[0]["script_subject"] == "octopus"
     assert "An unverified claim" not in picks[0]["why_trending"]
     assert "2,000,000 views in 20h" in picks[0]["why_trending"]
@@ -109,6 +110,10 @@ def test_selector_requires_a_concrete_subject_connected_to_the_live_trend():
     missing = dict(base)
     missing.pop("script_subject")
     assert ScriptWriter(CFG, LLMPicks([missing]), Strat()).select_topics([candidate], 1, set()) == []
+
+    missing_risk = dict(base)
+    missing_risk.pop("risk")
+    assert ScriptWriter(CFG, LLMPicks([missing_risk]), Strat()).select_topics([candidate], 1, set()) == []
 
     unrelated = dict(base, script_subject="Stereopsis")
     assert ScriptWriter(CFG, LLMPicks([unrelated]), Strat()).select_topics([candidate], 1, set()) == []

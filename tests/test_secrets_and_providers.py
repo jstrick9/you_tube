@@ -1421,19 +1421,29 @@ def test_depictability_uses_the_articles_own_images(monkeypatch):
                                     {"title": "Sea turtle", "images": ["a", "b"]})
 
     # Images from a merely related research article cannot stand in for the trending
-    # subject. Search for the actual subject instead, even when that other article has images.
-    seen = {}
+    # subject. Search the full label, then shorter noun-prefix variants for Commons metadata.
+    seen = {"queries": []}
 
     def fake(q, lic, min_w, limit=4):
-        seen["query"], seen["min_w"], seen["limit"] = q, min_w, limit
+        seen["queries"].append(q)
+        seen["min_w"], seen["limit"] = min_w, limit
         return []
 
     monkeypatch.setattr(M, "commons_search", fake)
-    assert not SW.subject_is_depictable("iPhone Duo", {"media": {}},
-                                        {"title": "Stereopsis", "images": ["stereo-image"]})
-    assert seen["query"] == "iPhone Duo"
+    related_source = {"title": "Stereopsis", "images": ["stereo-image"]}
+    assert not SW.subject_is_depictable("iPhone Duo cameras", {"media": {}}, related_source)
+    assert seen["queries"] == ["iPhone Duo cameras", "iphone duo", "iphone"]
+
+    # The shorter noun query can recover a real licensed photo that the verbose label missed.
+    seen["queries"].clear()
+    monkeypatch.setattr(M, "commons_search", lambda q, *_a, **_k:
+                        seen["queries"].append(q) or ([{"title": "IPhone Duo.webp"}] if q == "iphone duo" else []))
+    assert SW.subject_is_depictable("iPhone Duo cameras", {"media": {}}, related_source)
+    assert seen["queries"] == ["iPhone Duo cameras", "iphone duo"]
 
     # Bare article: fall back to a generous search.
+    seen["queries"].clear()
+    monkeypatch.setattr(M, "commons_search", fake)
     assert not SW.subject_is_depictable("Zzqq Nonexistent", {"media": {}}, {"images": []})
     assert seen["limit"] >= 20, "the sample must be large enough to survive filtering"
     assert seen["min_w"] <= 200
