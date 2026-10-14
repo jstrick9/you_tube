@@ -875,5 +875,106 @@
     "rate_limited_models": [
       "mistral:mistral-small-latest"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261014-200733-3763",
+    "workflow_run_id": "38629194648",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-14T20:07:33.520478+00:00",
+    "finished_at": "2026-10-14T20:16:17.545246+00:00",
+    "duration_seconds": 524.025,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 2,
+      "topic_production": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [],
+    "failures": [
+      {
+        "at": "2026-10-14T20:11:51.225303+00:00",
+        "stage": "topic_selection",
+        "category": "no_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-14T20:16:17.540089+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-14T20:07:33.520961+00:00",
+        "cooldown_until": "2026-10-14T23:35:31.837026+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "cooldown_skip",
+        "at": "2026-10-14T20:07:33.520972+00:00",
+        "cooldown_until": "2026-10-14T20:10:38.923346+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "cooldown_skip",
+        "at": "2026-10-14T20:07:33.520983+00:00",
+        "cooldown_until": "2026-10-14T20:20:45.574254+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-14T20:07:42.489058+00:00",
+        "cooldown_until": "2026-10-14T20:27:42.488316+00:00",
+        "retry_after_seconds": 0.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-14T20:12:06.553669+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "circuit_open",
+        "at": "2026-10-14T20:12:06.554351+00:00",
+        "cooldown_until": "2026-10-14T20:22:06.553718+00:00"
+      }
+    ],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:qwen/qwen3.8-27b",
+      "mistral:provider_cooldown"
+    ]
   }
 ]
