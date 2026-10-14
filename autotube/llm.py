@@ -61,6 +61,19 @@ def advertised_retry(msg: str) -> float:
     return secs / 1000.0 if m.group(2) else secs
 
 
+def _request_too_large(message: str) -> bool:
+    """Recognize model input/context limits even when a provider labels them HTTP 429.
+
+    These are model/request-size failures, not quota exhaustion: cooling down the whole
+    provider strands healthy models and needlessly persists a rate-limit block.
+    """
+    text = str(message or "").lower()
+    return any(marker in text for marker in (
+        "request too large", "prompt too long", "input too long", "context length exceeded",
+        "maximum context length", "too many tokens in the input", "input token limit",
+    ))
+
+
 def _retry_after_header(value: str | None) -> float | None:
     """Parse standard Retry-After delay-seconds or HTTP-date without guessing at resets."""
     text = str(value or "").strip()
@@ -249,8 +262,10 @@ def _groq(model, system, user, temperature, images=None):
     key = os.environ.get("GROQ_API_KEY")
     if not key:
         raise LLMError("no GROQ_API_KEY")
+    # Bound the completion budget so small-context Groq models do not reserve a
+    # provider-default maximum larger than the prompt can leave room for.
     return _openai_compatible("https://api.groq.com/openai/v1/chat/completions", key, model, system, user, temperature,
-                              images=images)
+                              extra_body={"max_tokens": 2048}, images=images)
 
 
 def _openrouter(model, system, user, temperature, images=None):
@@ -494,6 +509,15 @@ class LLM:
                             retry_after = advertised_retry(msg) or None
                         if msg.startswith("no ") and "_API_KEY" in msg:
                             self._dead.add(tag)
+                            break
+                        if _request_too_large(msg):
+                            # A 429 can mean this specific model cannot fit the prompt,
+                            # not that the provider quota is exhausted. Retire only this
+                            # model and continue through configured fallbacks.
+                            self._dead.add(tag)
+                            if receipt:
+                                receipt.note_provider_event(pname, status, "model_request_too_large")
+                            log.warning("skipping %s after a model input/context limit; trying the next model", tag)
                             break
                         if status == 402:
                             self._dead.add(tag)

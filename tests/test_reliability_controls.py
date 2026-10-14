@@ -131,6 +131,37 @@ def test_long_retry_after_opens_provider_circuit_instead_of_retrying_early(
     assert client.circuits.is_open("fake")
 
 
+def test_model_request_too_large_tries_next_model_without_provider_cooldown(
+        monkeypatch, memory_provider_circuits):
+    from autotube import llm
+
+    calls = []
+
+    def models(model, system, user, temp):
+        calls.append(model)
+        if model == "small-context":
+            raise llm.LLMError("HTTP 429: Request too large for model; submit a smaller request",
+                               status_code=429, retry_after_seconds=0.001)
+        return '{"ok": true}'
+
+    monkeypatch.setitem(llm.PROVIDERS, "fake", (models, "fake_models"))
+    client = llm.LLM.__new__(llm.LLM)
+    client.cfg = {"fake_models": ["small-context", "fallback"]}
+    client.order = ["fake"]
+    client.temperature = 0.7
+    client._dead = set()
+    client._blocked_providers = set()
+    client.circuits = memory_provider_circuits()
+    client.last_used = None
+    before_limited = llm.rate_limited()
+
+    assert client.json("system", "user") == {"ok": True}
+    assert calls == ["small-context", "fallback"]
+    assert client.last_used == "fake:fallback"
+    assert not client.circuits.is_open("fake")
+    assert llm.rate_limited() == before_limited
+
+
 def test_failure_classification_preserves_diagnostics_without_raw_errors():
     from autotube.run_report import classify_failure
 

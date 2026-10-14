@@ -122,7 +122,7 @@ def test_independence_is_recorded_rather_than_assumed():
     assert "independently_reviewed" in src
 
 
-def test_groq_retries_without_json_mode_when_the_model_refuses_it():
+def test_groq_retries_without_json_mode_when_the_model_refuses_it(monkeypatch):
     """Reasoning models 400 on response_format=json_object; we must ask again without it.
 
     This single line is why the review stage had no model but the writer's own: every
@@ -146,16 +146,13 @@ def test_groq_retries_without_json_mode_when_the_model_refuses_it():
                 return R(400, '{"error":{"code":"json_validate_failed"}}')
             return R(200, "", {"choices": [{"message": {"content": '{"ok": true}'}}]})
 
-    orig = L.http
-    L.http = lambda: FakeHTTP()
-    try:
-        out = L._openai_compatible("https://api.groq.com/openai/v1/chat/completions", "k",
-                             "openai/gpt-oss-120b", "sys", "usr", 0.0, json_mode=True)
-    finally:
-        L.http = orig
+    monkeypatch.setenv("GROQ_API_KEY", "k")
+    monkeypatch.setattr(L, "http", lambda: FakeHTTP())
+    out = L._groq("openai/gpt-oss-120b", "sys", "usr", 0.0)
 
     assert len(calls) == 2, "should retry once without the json_object constraint"
     assert "response_format" in calls[0] and "response_format" not in calls[1]
+    assert calls[0]["max_tokens"] == calls[1]["max_tokens"] == 2048
     assert out
 
 

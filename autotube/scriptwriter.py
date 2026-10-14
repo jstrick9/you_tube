@@ -985,8 +985,10 @@ class ScriptWriter:
         if len(eligible) < len(candidates):
             log.info("excluding %d candidate(s) without qualifying live evidence or approved scope",
                      len(candidates) - len(eligible))
+        # Keep the decision batch bounded for free-tier model context windows. Candidates
+        # are already sorted by measured trend strength; 24 leaves ample choice and backups.
         pool = [c for c in eligible if c["topic_key"] not in recent and c["topic_key"] not in exclude
-                and c["score"] >= ccfg["min_trend_score"] * 0.5][:80]
+                and c["score"] >= ccfg["min_trend_score"] * 0.5][:24]
         if not pool:
             return []
 
@@ -1005,62 +1007,46 @@ class ScriptWriter:
         want = min(len(pool), 3 * n + 4)
         in_season = getattr(self.strategy, "formats_in_season", None)
         formats = in_season() if in_season else list(ccfg.get("formats", []))
-        fmt_list = "\n".join(f"  {f}: {_clip(FORMAT_GUIDE[f], 110)}" for f in formats if f in FORMAT_GUIDE)
+        fmt_list = "\n".join(
+            f"  {f}: {_clip(FORMAT_GUIDE[f].split('. ', 1)[0], 72)}"
+            for f in formats if f in FORMAT_GUIDE)
         season = ""
         if "creepy_true" in (getattr(self.strategy, "seasonal_now", lambda: [])()):
-            season = ("\nSPOOKY SEASON: it is October — eerie-but-true subjects (strange phenomena, abandoned places, "
-                      "unsettling creatures, odd history, unexplained sounds) are extra viral now; favour them, never gore.")
-        user = f"""TODAY: {today:%A %B %d, %Y}. (Consider seasonal interest in the coming week, e.g. holidays, events.){season}
-CHANNEL NICHE: {self.cfg['channel']['niche']}
-HARD EDITORIAL SCOPE: use ONLY the two approved lanes: history_mystery (historical evidence, unresolved past events,
-archaeology, strange documented history) and science_nature (science, space, animals, natural phenomena, geography).
-Sports/leagues/teams/rules, gaming, current news/politics, celebrity gossip and unrelated entertainment are out of scope.
-Do not relabel an off-scope trend as "culture", "history" or "science" just to make it fit; return fewer picks or none.
-CATEGORIES (learned audience preference 0-1 from our own analytics, favor higher): {json.dumps(weights)}
-RECENTLY COVERED (avoid): {', '.join(list(recent)[:40]) or 'none'}
+            season = " October is spooky season; favour eerie-but-true subjects, never gore."
+        user = f"""TODAY: {today:%A %B %d, %Y}.{season}
+CHANNEL: {self.cfg['channel']['niche']}
+HARD EDITORIAL SCOPE: ONLY history_mystery (documented history, archaeology, unresolved past events) and
+science_nature (science, space, animals, natural phenomena, geography). Exclude sports, gaming, current news or
+politics, celebrity gossip, living-person biographies and unrelated entertainment. Never relabel an off-scope trend.
+CATEGORIES (learned audience preference 0-1; favour higher): {json.dumps(weights)}
+RECENTLY COVERED — avoid: {', '.join(list(recent)[:40]) or 'none'}
 
-LIVE TREND CANDIDATES (every one has a recent capture time and auditable source URL):
-  youtube_outliers = a measured Short with >= {outlier_min_views:,} views in <= {outlier_window_hours:g}h and measured views/hour; it may qualify alone
-  google_trends = live feed with >= {min_google_traffic:,} approximate searches; it may qualify alone
-  Lower-volume Google Trends, Reddit top-day posts, Hacker News (>= {min_hn_points} points), YouTube chart, and Wikipedia spikes are corroboration only: at least {min_families} independent source families must agree
-  Reddit feeds all count as ONE family; YouTube chart and outliers are ONE family; Wikipedia counts only at >= {min_wiki_spike:g}x its own 30-day readership baseline
-  A source label, plain Wikipedia listing, evergreen seed, or calendar anniversary alone does NOT prove a trend.
+LIVE TREND CANDIDATES (each passed the independent current-evidence gate; evidence below is for discovery, not facts):
 {listing}
 
-Pick the {want} candidates most likely to make a VIRAL, genuinely ENTERTAINING (not just "interesting") YouTube Short
-for our channel. Score each one's viral_score 0-10:
-  + a scroll-stopping, "wait, WHAT?" true fact or story a total stranger would stop for (surprise, disbelief, awe)
-  + broad appeal — needs no prior knowledge; not niche insider news
-  + proven demand right now (see evidence) — a viral Short on the same subject is the strongest proof
-  + emotional pull — makes people laugh, gasp, cringe, feel creeped out or say "no way" out loud (absurd, funny,
-    eerie, jaw-dropping), or awe/nostalgia — without being tragic or divisive; would people SEND it to a friend?
-  + it can be shown with real photos of the actual thing (animals, places, objects, artworks, historic photos)
-  - cap at 4: dry news, sports scores, award results, celebrity/relationship gossip, politics, anything a Wikipedia
-    article can't support with surprising facts; cap at 2: tragedies, crime victims, living private people
-FORMATS we can make (pick the 2-4 this topic can HONESTLY support from its Wikipedia article — e.g. myth_buster only
-if the article describes a misconception, dumbest_decision only for a documented absurd decision):
+Choose up to {want} distinct candidates for original, genuinely ENTERTAINING, family-friendly 15-20 second Shorts.
+Include only topics with viral_score >= {min_viral:g}/10. Prioritize a scroll-stopping true surprise, broad appeal, measured demand NOW,
+emotional pull or awe without tragedy/divisiveness, and a subject that can be shown with relevant real visuals.
+Do not choose an evergreen or Wikipedia-only idea. Return fewer picks or none if no candidate genuinely fits.
+
+FORMATS we can make (choose 2-4 that the specific article honestly supports; myth_buster requires an explicit misconception):
 {fmt_list}
-For a viral Short topic, the outlier title is discovery evidence only: give our OWN independently worded angle and
-never reuse its title wording, script, sequence, captions, visuals, audio, or creator style. Give the English Wikipedia
-article that grounds the angle.
 
-The article must be the MOST SPECIFIC one that actually contains the surprising claim - the named thing, event,
-person, creature or place the claim is about. Do NOT widen to the category: "the longest conveyor belt in the
-world" is grounded by the specific installation, not by "Conveyor belt"; "nail-filled Roman boots" by "Caliga",
-not by "Imperial Roman army". The writer may only state facts that appear in the article you name, so a category
-article silently deletes the one detail that made the topic worth watching and leaves a dull list of generalities.
-If no specific article carries the claim, say so with "wiki_query": "" and we will drop the topic rather than
-publish the generic version of it.
+For every pick:
+- `script_subject` is a concise concrete name (1-6 words) for the CURRENT TREND CANDIDATE — it must name and be
+  depicted in the video, share a meaningful word with the candidate, and must NOT be replaced by a background article title.
+- Give one independently worded, specific `angle`; the article is the source of facts, not the trend headline.
+- `wiki_query` must be the MOST SPECIFIC one that actually contains the surprising claim: the English Wikipedia
+  article for the named thing, not a broader category (e.g. Bou Craa, not “Conveyor belt”). If none supports it, use "".
+- Viral/outlier titles are discovery evidence only: do not copy the outlier headline, wording, script, sequence, captions,
+  visuals, audio, or creator style. `why_trending` briefly cites the measured evidence shown above.
+- Use a valid channel `category` and only fitting format names. Every pick MUST include an explicit risk verdict
+  (`none`, `low`, or `high`); use `high` if any safety or scope concern cannot be ruled out.
 
-For a trending living person, ground on the historical record, object or phenomenon instead - but still the
-specific one. Every pick MUST include an explicit risk verdict (`none`, `low`, or `high`); if you cannot confidently
-rule out a safety or scope concern, use `high`. Never omit the verdict.
-
-Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<one of categories>",
-"script_subject": "<1-6 word, concrete name for the trending thing, independently worded; do not copy the outlier headline or use only a background article's title>",
-"angle": "<one sentence: the single most surprising/funny true hook>", "wiki_query": "<wikipedia article title>",
-"formats": ["<2-4 fitting formats from FORMATS>"],
-"why_trending": "<short, cite the evidence>", "risk": "none|low|high"}}]}} — best first."""
+Return JSON only, as an object with a `picks` array, best first. Each pick has exactly these fields:
+{{"picks":[{{"index":<candidate index>,"viral_score":<0-10>,"category":"<one of {', '.join(cats)}>",
+"script_subject":"<1-6 words>","angle":"<one specific sentence>","wiki_query":"<specific article or empty>",
+"formats":["<2-4 fitting names>"],"why_trending":"<brief evidence>","risk":"none|low|high"}}]}}"""
 
         def validate(o):
             assert isinstance(o, dict), "selection response must be a JSON object"

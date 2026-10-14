@@ -91,10 +91,26 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     assert "100,000 views/hour" in llm.prompt
     assert '"script_subject"' in llm.prompt and "do not copy the outlier headline" in llm.prompt
     assert "Every pick MUST include an explicit risk verdict" in llm.prompt
+    assert len(llm.prompt) < 5_000, "selector context must stay compact for free-tier models"
     assert picks[0]["script_subject"] == "octopus"
     assert "An unverified claim" not in picks[0]["why_trending"]
     assert "2,000,000 views in 20h" in picks[0]["why_trending"]
     assert "Willie Mays" not in llm.prompt                                               # no Wikipedia-only fallback
+
+
+def test_selector_prompt_caps_candidates_to_a_bounded_live_shortlist():
+    import copy
+
+    template = cands()[2]
+    rows = []
+    for i in range(40):
+        row = copy.deepcopy(template)
+        row["topic"] = f"Octopus can taste prey with its arms {i}"
+        row["topic_key"] = f"octopus taste arms {i}"
+        rows.append(row)
+    llm = LLMPicks([])
+    assert ScriptWriter(CFG, llm, Strat()).select_topics(rows, 1, set()) == []
+    assert sum(f"Octopus can taste prey with its arms {i}" in llm.prompt for i in range(40)) == 24
 
 
 def test_selector_requires_a_concrete_subject_connected_to_the_live_trend():
