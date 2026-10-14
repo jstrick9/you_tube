@@ -1087,9 +1087,15 @@ def test_produce_never_drafts_for_an_undepictable_subject(monkeypatch):
     import autotube.scriptwriter as SW
 
     cfg = _y.safe_load((ROOT / "config.yaml").read_text())
-    monkeypatch.setattr(SW, "ground", lambda *a, **k: {"title": "Montauk Monster",
-                                                       "url": "u", "text": "t", "summary": "s"})
-    monkeypatch.setattr(SW, "subject_is_depictable", lambda *a, **k: False)
+    monkeypatch.setattr(SW, "ground", lambda *a, **k: {"title": "Stereopsis", "url": "u",
+                                                       "text": "t", "summary": "s", "images": ["related"]})
+    checked = {}
+
+    def not_depictable(subject, *_args, **_kwargs):
+        checked["subject"] = subject
+        return False
+
+    monkeypatch.setattr(SW, "subject_is_depictable", not_depictable)
 
     drafted = []
 
@@ -1100,8 +1106,10 @@ def test_produce_never_drafts_for_an_undepictable_subject(monkeypatch):
     w = SW.ScriptWriter(cfg, FakeLLM(), type("S", (), {"fit": lambda *a, **k: {}})())
     monkeypatch.setattr(w, "write", lambda *a, **k: drafted.append(1) or {})
 
-    assert w.produce({"topic": "x", "category": "history"},
+    assert w.produce({"topic": "Why the iPhone Duo detects depth", "script_subject": "iPhone Duo cameras",
+                      "category": "science", "angle": "two camera views create stereo depth maps"},
                      {"format": "sounds_fake", "hook_style": "bold_claim", "voice": "v"}) is None
+    assert checked["subject"] == "iPhone Duo cameras", "the article title is not the actual trend subject"
     assert drafted == [], "a draft was written for a subject that cannot be pictured"
 
 
@@ -1405,19 +1413,27 @@ def test_depictability_uses_the_articles_own_images(monkeypatch):
     import autotube.media as M
     import autotube.scriptwriter as SW
 
-    # Article has images: decided without any search at all.
+    # Article images satisfy the preflight only when the article title names the
+    # trend subject; a matching article already supplies verified, free images.
     monkeypatch.setattr(M, "commons_search", lambda *a, **k: (_ for _ in ()).throw(
-        AssertionError("must not search when the article already has images")))
-    assert SW.subject_is_depictable("Sea turtle", {"media": {}}, {"images": ["a", "b"]})
+        AssertionError("must not search when the matching article already has images")))
+    assert SW.subject_is_depictable("Sea turtle", {"media": {}},
+                                    {"title": "Sea turtle", "images": ["a", "b"]})
 
-    # Bare article: fall back to a generous search.
+    # Images from a merely related research article cannot stand in for the trending
+    # subject. Search for the actual subject instead, even when that other article has images.
     seen = {}
 
     def fake(q, lic, min_w, limit=4):
-        seen["min_w"], seen["limit"] = min_w, limit
+        seen["query"], seen["min_w"], seen["limit"] = q, min_w, limit
         return []
 
     monkeypatch.setattr(M, "commons_search", fake)
+    assert not SW.subject_is_depictable("iPhone Duo", {"media": {}},
+                                        {"title": "Stereopsis", "images": ["stereo-image"]})
+    assert seen["query"] == "iPhone Duo"
+
+    # Bare article: fall back to a generous search.
     assert not SW.subject_is_depictable("Zzqq Nonexistent", {"media": {}}, {"images": []})
     assert seen["limit"] >= 20, "the sample must be large enough to survive filtering"
     assert seen["min_w"] <= 200

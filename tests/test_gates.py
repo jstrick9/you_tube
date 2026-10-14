@@ -151,8 +151,21 @@ def test_a_clean_script_passes_every_gate():
 
 # ── independent reviewer routing ──────────────────────────────────────────────
 def _llm(providers, review_providers, models):
+    from autotube import common
     from autotube.llm import LLM
-    return LLM({"llm": {"providers": providers, "review_providers": review_providers, **models}})
+    from autotube.provider_health import ProviderCircuitBreakers
+
+    llm = LLM({"llm": {"providers": providers, "review_providers": review_providers, **models}})
+    # These routing unit tests assert failover mechanics, not today's live provider
+    # outages. Start with an isolated in-memory ledger so state/provider_cooldowns.json
+    # from a real production run cannot make the tests order- or time-dependent.
+    circuits = ProviderCircuitBreakers.__new__(ProviderCircuitBreakers)
+    circuits._clock = common.now_utc
+    circuits._entries = {}
+    circuits._failures_5xx = {}
+    circuits.events = []
+    llm.circuits = circuits
+    return llm
 
 
 def test_review_runs_on_a_different_provider_than_the_writer(monkeypatch):

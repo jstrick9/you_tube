@@ -75,9 +75,11 @@ def cands():
 
 def test_select_keeps_only_viral_topics_and_ranks_them():
     llm = LLMPicks([{"index": 0, "viral_score": 9, "category": "history", "risk": "none",
-                     "wiki_query": "Hunger stone", "angle": "the stone appeared only when drought returned",
+                     "script_subject": "Hunger stone", "wiki_query": "Hunger stone",
+                     "angle": "the stone appeared only when drought returned",
                      "formats": ["creepy_true"]},
-                    {"index": 1, "viral_score": 9, "category": "nature", "risk": "low", "wiki_query": "Octopus",
+                    {"index": 1, "viral_score": 9, "category": "nature", "risk": "low",
+                     "script_subject": "octopus", "wiki_query": "Octopus",
                      "angle": "its arms taste prey before it reaches the mouth", "formats": ["sounds_fake"],
                      "why_trending": "An unverified claim from the selector."},
                     {"index": 2, "viral_score": 8, "category": "culture", "risk": "high"}])
@@ -87,9 +89,32 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     assert all(p["viral_score"] >= CFG["content"]["min_viral_score"] for p in picks)
     assert "1496.5x its 30-day baseline" in llm.prompt and "2,000,000 views" in llm.prompt  # judged WITH evidence
     assert "100,000 views/hour" in llm.prompt
+    assert '"script_subject"' in llm.prompt and "do not copy the outlier headline" in llm.prompt
+    assert picks[0]["script_subject"] == "octopus"
     assert "An unverified claim" not in picks[0]["why_trending"]
     assert "2,000,000 views in 20h" in picks[0]["why_trending"]
     assert "Willie Mays" not in llm.prompt                                               # no Wikipedia-only fallback
+
+
+def test_selector_requires_a_concrete_subject_connected_to_the_live_trend():
+    candidate = cands()[2]
+    base = {"index": 0, "viral_score": 9, "category": "nature", "risk": "low",
+            "script_subject": "octopus", "wiki_query": "Octopus",
+            "angle": "sensory cells on its arms identify chemical traces",
+            "formats": ["sounds_fake"]}
+
+    picks = ScriptWriter(CFG, LLMPicks([base]), Strat()).select_topics([candidate], 1, set())
+    assert len(picks) == 1 and picks[0]["script_subject"] == "octopus"
+
+    missing = dict(base)
+    missing.pop("script_subject")
+    assert ScriptWriter(CFG, LLMPicks([missing]), Strat()).select_topics([candidate], 1, set()) == []
+
+    unrelated = dict(base, script_subject="Stereopsis")
+    assert ScriptWriter(CFG, LLMPicks([unrelated]), Strat()).select_topics([candidate], 1, set()) == []
+
+    too_long = dict(base, script_subject="octopus senses food with chemical receptor cells")
+    assert ScriptWriter(CFG, LLMPicks([too_long]), Strat()).select_topics([candidate], 1, set()) == []
 
 
 def test_selector_rejects_known_off_lane_youtube_chart_topics_before_provider_call():
@@ -111,7 +136,8 @@ def test_selector_rejects_category_that_conflicts_with_explicit_trend_lane():
     candidate = cands()[2]
     candidate["lane"] = "science_nature"
     llm = LLMPicks([{"index": 0, "viral_score": 9, "category": "history", "risk": "none",
-                     "wiki_query": "Octopus", "angle": "its arms taste prey before it reaches the mouth",
+                     "script_subject": "octopus", "wiki_query": "Octopus",
+                     "angle": "its arms taste prey before it reaches the mouth",
                      "formats": ["sounds_fake"]}])
     assert ScriptWriter(CFG, llm, Strat()).select_topics([candidate], 1, set()) == []
     assert "HARD EDITORIAL SCOPE" in llm.prompt
@@ -143,7 +169,8 @@ def test_selector_rejects_malformed_live_trend_thresholds_before_provider_call()
 
 def test_selector_deduplicates_repeated_provider_picks():
     pick = {"index": 0, "viral_score": 9, "category": "history", "risk": "none",
-            "wiki_query": "Hunger stone", "angle": "the stone appeared only when drought returned",
+            "script_subject": "Hunger stone", "wiki_query": "Hunger stone",
+            "angle": "the stone appeared only when drought returned",
             "formats": ["creepy_true"]}
     picks = ScriptWriter(CFG, LLMPicks([pick, dict(pick)]), Strat()).select_topics(cands(), 2, set())
     assert len(picks) == 1
@@ -152,11 +179,14 @@ def test_selector_deduplicates_repeated_provider_picks():
 
 def test_selector_fails_closed_without_a_specific_angle_and_out_of_range_viral_score():
     llm = LLMPicks([
-        {"index": 0, "viral_score": 9, "category": "history", "risk": "none", "wiki_query": "Hunger stone",
+        {"index": 0, "viral_score": 9, "category": "history", "risk": "none",
+         "script_subject": "Hunger stone", "wiki_query": "Hunger stone",
          "angle": "Hunger stone", "formats": ["creepy_true"]},
-        {"index": 1, "viral_score": 9, "category": "nature", "risk": "low", "wiki_query": "Octopus",
+        {"index": 1, "viral_score": 9, "category": "nature", "risk": "low",
+         "script_subject": "octopus", "wiki_query": "Octopus",
          "angle": "octopus can taste with arms", "formats": ["sounds_fake"]},
-        {"index": 2, "viral_score": 11, "category": "culture", "risk": "none", "wiki_query": "Dry policy news",
+        {"index": 2, "viral_score": 11, "category": "culture", "risk": "none",
+         "script_subject": "dry policy news", "wiki_query": "Dry policy news",
          "angle": "a surprising policy fact changed everything", "formats": ["backstory"]},
     ])
     picks = ScriptWriter(CFG, llm, Strat()).select_topics(cands(), 2, set())
@@ -165,9 +195,11 @@ def test_selector_fails_closed_without_a_specific_angle_and_out_of_range_viral_s
 
 def test_selector_rejects_invalid_category_or_no_fitting_format():
     llm = LLMPicks([
-        {"index": 0, "viral_score": 9, "category": "off_topic", "risk": "none", "wiki_query": "Hunger stone",
+        {"index": 0, "viral_score": 9, "category": "off_topic", "risk": "none",
+         "script_subject": "Hunger stone", "wiki_query": "Hunger stone",
          "angle": "the stone appeared only when drought returned", "formats": ["creepy_true"]},
-        {"index": 1, "viral_score": 9, "category": "nature", "risk": "none", "wiki_query": "Octopus",
+        {"index": 1, "viral_score": 9, "category": "nature", "risk": "none",
+         "script_subject": "octopus", "wiki_query": "Octopus",
          "angle": "its arms taste prey before it reaches the mouth", "formats": ["not_a_format"]},
     ])
     assert ScriptWriter(CFG, llm, Strat()).select_topics(cands(), 2, set()) == []
@@ -176,13 +208,17 @@ def test_selector_rejects_invalid_category_or_no_fitting_format():
 def test_selector_fails_closed_on_malformed_scores_indices_risks_and_angles():
     bad_picks = [
         {"index": 0, "viral_score": True, "category": "history", "risk": "none",
-         "wiki_query": "Hunger stone", "angle": "the stone appeared when drought returned", "formats": ["creepy_true"]},
+         "script_subject": "Hunger stone", "wiki_query": "Hunger stone",
+         "angle": "the stone appeared when drought returned", "formats": ["creepy_true"]},
         {"index": True, "viral_score": 9, "category": "history", "risk": "none",
-         "wiki_query": "Hunger stone", "angle": "the stone appeared when drought returned", "formats": ["creepy_true"]},
+         "script_subject": "Hunger stone", "wiki_query": "Hunger stone",
+         "angle": "the stone appeared when drought returned", "formats": ["creepy_true"]},
         {"index": 0, "viral_score": 9, "category": "history",
-         "wiki_query": "Hunger stone", "angle": "the stone appeared when drought returned", "formats": ["creepy_true"]},
+         "script_subject": "Hunger stone", "wiki_query": "Hunger stone",
+         "angle": "the stone appeared when drought returned", "formats": ["creepy_true"]},
         {"index": 0, "viral_score": 9, "category": "history", "risk": "none",
-         "wiki_query": "Hunger stone", "angle": ["the stone appeared", "when drought returned"], "formats": ["creepy_true"]},
+         "script_subject": "Hunger stone", "wiki_query": "Hunger stone",
+         "angle": ["the stone appeared", "when drought returned"], "formats": ["creepy_true"]},
     ]
     assert ScriptWriter(CFG, LLMPicks(bad_picks), Strat()).select_topics(cands(), 2, set()) == []
 

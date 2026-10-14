@@ -53,6 +53,7 @@ def test_writer_prompt_renders_assigned_treatment_without_changing_facts(monkeyp
     writer.src_chars = 4000
     topic = {
         "topic": "A rising space mystery",
+        "script_subject": "space observation",
         "angle": "the observation has a source-backed contradiction",
         "category": "science_nature",
         "why_trending": "A current science Short is accelerating.",
@@ -68,6 +69,8 @@ def test_writer_prompt_renders_assigned_treatment_without_changing_facts(monkeyp
     with pytest.raises(RuntimeError, match="prompt captured"):
         writer.write(topic, plan, source)
 
+    assert "CURRENT TREND SUBJECT (this is what the video is about; name it and show it): space observation" in writer.llm.prompt
+    assert "RESEARCH SOURCE SUBJECT (the source of facts, not a replacement for the trend subject): Space Beacon" in writer.llm.prompt
     assert "RANDOMIZED EARLY-TURN TREATMENT (consequence_first)" in writer.llm.prompt
     assert "first clause" in writer.llm.prompt and "source-backed consequence" in writer.llm.prompt
     assert "Keep the script original; do not reuse another upload's topic" in writer.llm.prompt
@@ -75,6 +78,73 @@ def test_writer_prompt_renders_assigned_treatment_without_changing_facts(monkeyp
     assert "spoken question is" in writer.llm.prompt and "optional" in writer.llm.prompt
     assert "segment 2 (THE TURN)" in writer.llm.prompt
     assert "open a question that only the end" not in writer.llm.prompt
+
+
+def test_writer_visual_gate_targets_trend_subject_not_research_article():
+    cfg = common.load_config()
+    script = {
+        "title": "iPhone Duo's two cameras map depth",
+        "segments": [
+            {"text": "The iPhone Duo reads depth with two camera views.", "aside": "",
+             "emphasis": [], "reveal": False,
+             "visual": {"shows": "close-up of the iPhone Duo camera module",
+                        "queries": ["iPhone Duo rear camera", "iPhone Duo camera module"]},
+             "evidence": "The iPhone Duo uses two camera views for depth mapping."},
+            {"text": "Two camera lenses capture the same scene from different positions.",
+             "aside": "Two eyes, pocket-sized.", "emphasis": [], "reveal": False,
+             "visual": {"shows": "two lenses on the iPhone Duo",
+                        "queries": ["iPhone Duo dual cameras", "iPhone Duo camera close-up"]},
+             "evidence": "Two camera views capture the same scene from different positions."},
+            {"text": "Stereo vision compares those shifted images to estimate distance.",
+             "aside": "", "emphasis": [], "reveal": False,
+             "visual": {"shows": "a pair of camera lenses aimed at one scene",
+                        "queries": ["paired camera lenses", "stereo camera lenses"]},
+             "evidence": "Stereo vision compares shifted images to estimate distance."},
+            {"text": "A tiny offset helps software place objects nearer or farther.",
+             "aside": "", "emphasis": [], "reveal": True,
+             "visual": {"shows": "a phone camera focused on a foreground object",
+                        "queries": ["phone camera foreground object", "smartphone depth focus"]},
+             "evidence": "The shift helps software estimate distance and depth."},
+            {"text": "That difference becomes the phone's depth map.", "aside": "",
+             "emphasis": [], "reveal": False,
+             "visual": {"shows": "the iPhone Duo camera module",
+                        "queries": ["iPhone Duo camera module", "iPhone Duo rear lenses"]},
+             "evidence": "Two camera views support a depth map."},
+        ],
+    }
+    metadata = {
+        "description": "A source-grounded look at how two camera views can help estimate depth.",
+        "tags": ["iPhone Duo", "smartphone cameras", "stereo vision", "depth mapping",
+                 "computer vision", "optics", "camera sensors", "smartphones"],
+        "hashtags": ["#science", "#technology", "#shorts"],
+        "thumbnail_text": "Two views",
+    }
+
+    class ScriptLLM:
+        lite = False
+        last_used = "test:model"
+
+        def json(self, _system, user, validate=None, **_kwargs):
+            if user.startswith("VIDEO TITLE:"):
+                return metadata
+            assert "CURRENT TREND SUBJECT (this is what the video is about; name it and show it): iPhone Duo cameras" in user
+            assert "RESEARCH SOURCE SUBJECT (the source of facts, not a replacement for the trend subject): Stereopsis" in user
+            assert "Why the iPhone Duo detects depth" not in user, "raw trend wording must not reach the writer"
+            if validate:
+                validate(script)
+            return copy.deepcopy(script)
+
+    writer = scriptwriter.ScriptWriter(cfg, ScriptLLM(), object())
+    result = writer.write(
+        {"topic": "Why the iPhone Duo detects depth", "script_subject": "iPhone Duo cameras",
+         "category": "science", "angle": "two camera views can build stereo depth maps",
+         "why_trending": "A qualifying current science trend."},
+        {"format": "sounds_fake", "hook_style": "bold_claim", "voice": "en-US-AndrewNeural"},
+        {"title": "Stereopsis", "text": "Stereo vision compares two camera views from different positions. " * 40},
+    )
+
+    assert result["title"] == script["title"]
+    assert "iPhone Duo" in result["segments"][0]["visual"]["shows"]
 
 
 def test_early_turn_timing_is_recorded_as_runtime_location_not_feed_data():

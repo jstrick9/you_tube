@@ -616,17 +616,24 @@ def subject_is_depictable(subject: str, cfg: dict, source: dict | None = None) -
     topics were discarded in one run and the run shipped nothing. A check that is wrong
     in the safe direction still stops the channel.
 
-    The grounded article already carries its own image list, fetched during grounding,
-    and it is both free and accurate: Sea turtle has 19, Göbekli Tepe 15, Mudskipper 6.
-    Use that when it exists, and fall back to a deliberately generous search only when
-    the article is bare.
+    The grounded article can provide a free, accurate image list when its title names
+    the actual trend subject. A different article may explain the mechanism without
+    depicting the thing that trended, so its images must not satisfy this gate. In that
+    case, search for the trend subject itself before spending tokens on a draft.
     """
-    if source is not None and (source.get("images") or []):
-        return True
-    from .media import commons_search
+    from .originality import tokens
 
     if not subject:
         return True
+    if source is not None and (source.get("images") or []):
+        stop = {"the", "a", "an", "of", "and", "in", "on", "at", "for", "with", "to",
+                "incident", "mystery", "case", "story", "history", "effect", "phenomenon", "signal"}
+        key = _subject_terms(subject, stop)
+        title_terms = set(tokens(str(source.get("title") or "")))
+        if not key or key.issubset(_matched_subject_terms(key, title_terms)):
+            return True
+    from .media import commons_search
+
     try:
         hits = commons_search(subject, cfg.get("media", {}).get("licenses_allowed") or [],
                               200, limit=20)
@@ -1037,6 +1044,7 @@ For a trending living person, ground on the historical record, object or phenome
 specific one.
 
 Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<one of categories>",
+"script_subject": "<1-6 word, concrete name for the trending thing, independently worded; do not copy the outlier headline or use only a background article's title>",
 "angle": "<one sentence: the single most surprising/funny true hook>", "wiki_query": "<wikipedia article title>",
 "formats": ["<2-4 fitting formats from FORMATS>"],
 "why_trending": "<short, cite the evidence>", "risk": "none|low|high"}}]}} — best first."""
@@ -1092,6 +1100,17 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                 if len(_angle_terms(angle, c["topic"])) < 2:
                     dropped.append(f"{c['topic'][:40]} (no distinctive trend angle)")
                     continue
+                raw_subject = p.get("script_subject")
+                if not isinstance(raw_subject, str) or not raw_subject.strip():
+                    dropped.append(f"{c['topic'][:40]} (no independent script subject)")
+                    continue
+                script_subject = raw_subject.strip()
+                subject_terms = set(originality.tokens(script_subject))
+                trend_terms = set(originality.tokens(c["topic"]))
+                if (len(script_subject.split()) > 6 or len(script_subject) > 80
+                        or not subject_terms or not (subject_terms & trend_terms)):
+                    dropped.append(f"{c['topic'][:40]} (script subject is not a concise name for the trend)")
+                    continue
                 cat = p.get("category")
                 if not isinstance(cat, str) or cat not in cats:
                     dropped.append(f"{c['topic'][:40]} (invalid category)")
@@ -1110,6 +1129,7 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                     dropped.append(f"{c['topic'][:40]} (no fitting format)")
                     continue
                 c.update({"category": cat, "angle": angle, "wiki_query": wiki_query,
+                          "script_subject": script_subject,
                           "formats": fits,
                           # Preserve reproducible observations, not an LLM's potentially invented trend claim.
                           "why_trending": trend_evidence_summary(c), "viral_score": vs})
@@ -1215,6 +1235,7 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                 + ". Never mention their health, death, family, relationships, appearance, money, "
                   "legal matters, accusations, feuds or politics. State nothing you cannot point to "
                   "in the SOURCE TEXT. No 'allegedly', 'reportedly' or 'sources say'.")
+        trend_subject = str(topic.get("script_subject") or source.get("title") or "").strip()
         persona_line = (f"NARRATOR PERSONA: {persona['character']}\nCHANNEL PROMISE: \"{persona.get('catchphrase', '')}\" "
                         "— every wild claim is proven by the source (a PROVEN stamp + source card closes each video).\n"
                         if persona.get("character") else "")
@@ -1232,7 +1253,8 @@ Return JSON: {{"picks": [{{"index": <int>, "viral_score": <0-10>, "category": "<
                      if turn_rule else "")
         feedback_line = (f"PREVIOUS DRAFT FEEDBACK (fix without changing the facts or trend angle): {str(topic.get('_draft_feedback') or '')[:600]}\n"
                          if topic.get("_draft_feedback") else "")
-        user = f"""SOURCE SUBJECT (research article): {source.get('title') or topic.get('topic', '')}
+        user = f"""CURRENT TREND SUBJECT (this is what the video is about; name it and show it): {trend_subject}
+RESEARCH SOURCE SUBJECT (the source of facts, not a replacement for the trend subject): {source.get('title') or trend_subject}
 WHY IT'S TRENDING: {topic.get('why_trending') or ', '.join(topic.get('sources', []))}
 {originality_line}ANGLE (this is the story to tell — not the article's summary, not the subject's general
 history. If the angle names a specific surprise, that surprise IS the video):
@@ -1308,7 +1330,11 @@ Return JSON:
  "segments": [{{"text": "...", "aside": "", "emphasis": ["..."], "reveal": false,
                "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "..."}}]}}"""
 
-        subject_for_visuals = source["title"]
+        # The independently worded trend subject is the Short's actual subject. The
+        # grounded article may explain the mechanism (for example, a camera trend
+        # grounded by an optics article); requiring that article's title in the shots
+        # can reject relevant trend visuals or steer the draft into a generic explainer.
+        subject_for_visuals = trend_subject or str(source.get("title") or "")
 
         def validate(o):
             assert isinstance(o, dict), "script must be a JSON object"
@@ -1771,10 +1797,11 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
                 receipt.note_failure("script_research", "source_grounding_failed")
             return None
         topic["wiki_title"] = source["title"]
-        if not subject_is_depictable(source["title"], self.cfg, source):
+        visual_subject = str(topic.get("script_subject") or source.get("title") or "").strip()
+        if not subject_is_depictable(visual_subject, self.cfg, source):
             if receipt:
                 receipt.note_failure("script_research", "no_depictable_source_asset")
-            log.info("  ✗ no free image of %r exists — skipping before writing", source["title"])
+            log.info("  ✗ no free image of trend subject %r exists — skipping before writing", visual_subject)
             return None
         configured = RecoveryBudgets.from_config(self.cfg).script_drafts
         max_attempts = configured if max_attempts is None else bounded_attempts(
