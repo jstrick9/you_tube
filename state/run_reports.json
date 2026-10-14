@@ -1504,5 +1504,153 @@
       "groq:openai/gpt-oss-120b",
       "mistral:mistral-small-latest"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261014-234017-3894",
+    "workflow_run_id": "38655349496",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-14T23:40:17.384718+00:00",
+    "finished_at": "2026-10-14T23:58:47.984828+00:00",
+    "duration_seconds": 1110.6,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 2,
+      "topic_production": 1,
+      "topic_validation": 3,
+      "script_research": 6,
+      "script_draft": 3,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "They Fired A Torpedo At Their Own President",
+        "topic_key": "they fired a torpedo at their own president",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "El delineador de Cleopatra contenía VENENO!",
+        "topic_key": "el delineador de cleopatra contena veneno",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Who Reaches the Bottom of the Ocean First? Titanic isn't even close...",
+        "topic_key": "who reaches the bottom of the ocean first titanic isnt even close",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-14T23:45:36.135668+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-14T23:45:36.135816+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-14T23:50:01.972301+00:00",
+        "stage": "script_draft",
+        "category": "provider_transient_network",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-14T23:50:01.972443+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-14T23:54:27.438318+00:00",
+        "stage": "script_draft",
+        "category": "provider_transient_network",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-14T23:54:27.438460+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-14T23:58:47.976478+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-14T23:40:44.451111+00:00",
+        "cooldown_until": "2026-10-15T00:00:44.450524+00:00",
+        "retry_after_seconds": 38.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-14T23:40:55.069578+00:00",
+        "cooldown_until": "2026-10-15T00:00:55.069005+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-14T23:41:01.671342+00:00",
+        "cooldown_until": "2026-10-15T00:01:01.670637+00:00"
+      },
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "circuit_open",
+        "at": "2026-10-14T23:45:36.135354+00:00",
+        "cooldown_until": "2026-10-15T23:45:36.134744+00:00"
+      }
+    ],
+    "top_up": true,
+    "rate_limited_models": [
+      "gemini:gemini-flash-latest",
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]

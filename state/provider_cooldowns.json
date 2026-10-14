@@ -1,30 +1,30 @@
 {
   "schema_version": 1,
   "providers": {
-    "pollinations": {
-      "reason": "billing_or_entitlement",
-      "status_code": 402,
-      "recorded_at": "2026-10-13T23:35:31.837026+00:00",
-      "blocked_until": "2026-10-14T23:35:31.837026+00:00"
-    },
     "groq": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-14T23:02:56.453940+00:00",
-      "blocked_until": "2026-10-14T23:22:56.453940+00:00",
-      "retry_after_seconds": 29.0
-    },
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-14T23:05:08.328279+00:00",
-      "blocked_until": "2026-10-14T23:25:08.328279+00:00"
+      "recorded_at": "2026-10-14T23:40:44.450524+00:00",
+      "blocked_until": "2026-10-15T00:00:44.450524+00:00",
+      "retry_after_seconds": 38.0
     },
     "gemini": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-14T23:18:34.270019+00:00",
-      "blocked_until": "2026-10-14T23:38:34.270019+00:00"
+      "recorded_at": "2026-10-14T23:40:55.069005+00:00",
+      "blocked_until": "2026-10-15T00:00:55.069005+00:00"
+    },
+    "mistral": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-14T23:41:01.670637+00:00",
+      "blocked_until": "2026-10-15T00:01:01.670637+00:00"
+    },
+    "pollinations": {
+      "reason": "billing_or_entitlement",
+      "status_code": 402,
+      "recorded_at": "2026-10-14T23:45:36.134744+00:00",
+      "blocked_until": "2026-10-15T23:45:36.134744+00:00"
     }
   },
   "failures_5xx": {}
