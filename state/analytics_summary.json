@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-13T23:27:04.305947+00:00",
+  "updated": "2026-10-14T02:11:02.016631+00:00",
   "videos_total": 43,
-  "videos_7d": 8,
-  "views_7d": 2928,
+  "videos_7d": 7,
+  "views_7d": 2416,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -41,7 +41,7 @@
         },
         {
           "arm": "geography",
-          "mean": 0.409,
+          "mean": 0.41,
           "n": 2
         },
         {
@@ -77,7 +77,7 @@
         },
         {
           "arm": "sounds_fake",
-          "mean": 0.512,
+          "mean": 0.511,
           "n": 3
         },
         {
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 34,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 34,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
