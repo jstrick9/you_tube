@@ -89,6 +89,7 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     assert all(p["viral_score"] >= CFG["content"]["min_viral_score"] for p in picks)
     assert "1496.5x its 30-day baseline" in llm.prompt and "2,000,000 views" in llm.prompt  # judged WITH evidence
     assert "100,000 views/hour" in llm.prompt
+    assert "trend context (discovery only): viral Short now: 2,000,000 views in 20h" in llm.prompt
     assert '"script_subject"' in llm.prompt and "do not copy the outlier headline" in llm.prompt
     assert "Every pick MUST include an explicit risk verdict" in llm.prompt
     assert len(llm.prompt) < 5_000, "selector context must stay compact for free-tier models"
@@ -151,6 +152,18 @@ def test_selector_rejects_known_off_lane_youtube_chart_topics_before_provider_ca
     llm = LLMPicks([])
     assert ScriptWriter(CFG, llm, Strat()).select_topics([sports], 1, set()) == []
     assert llm.prompt == "", "explicit sports chart metadata should be filtered before selection"
+
+
+def test_selector_rejects_sports_trend_context_even_if_the_model_could_relabel_it():
+    candidate = {
+        "topic": "Dortmund", "topic_key": "dortmund", "source": "google_trends",
+        "sources": ["google_trends"], "score": 0.95,
+        "context": ["Borussia Dortmund advance in the UEFA Champions League"],
+        "signals": [signal("google_trends", "https://trends.test/dortmund", {"traffic": 25_000})],
+    }
+    llm = LLMPicks([])
+    assert ScriptWriter(CFG, llm, Strat()).select_topics([candidate], 1, set()) == []
+    assert llm.prompt == "", "out-of-scope sports context must be filtered before model selection"
 
 
 def test_selector_rejects_category_that_conflicts_with_explicit_trend_lane():

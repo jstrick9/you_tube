@@ -55,6 +55,18 @@ FORMAT_GUIDE = {
                     "and end on the chilling detail. Spooky, never gory: no violence, injuries, bodies or death details, "
                     "and never claim the supernatural is real."),
 }
+
+# Explicit competition/league and team identifiers prevent a model from relabelling
+# football or other sports trends as history or culture. Generic words like "match" or
+# "field" are intentionally absent to avoid suppressing unrelated science topics.
+_SPORTS_TREND_MARKER = re.compile(
+    r"\b(?:borussia|bundesliga|champions\s+league|uefa|fifa|premier\s+league|la\s+liga|serie\s+a|"
+    r"football\s+club|soccer\s+club|football\s+team|soccer\s+team|sports?\s+club|"
+    r"ligue\s+1|world\s+cup|super\s+bowl|nfl|nba|wnba|mlb|nhl|ncaaf|ncaab|ufc|wwe|"
+    r"formula\s*1|f1|copa\s+(?:america|libertadores)|grand\s+slam|wimbledon|ipl|atp|wta|"
+    r"real\s+madrid|bayern\s+munich|manchester\s+(?:united|city)|liverpool\s+(?:fc|football)|"
+    r"arsenal\s+fc|chelsea\s+fc|juventus|fc\s+barcelona|barcelona\s+fc)\b", re.I)
+
 # formats whose structure centres on one big reveal (gets the riser, flash and a beat of silence)
 REVEAL_FORMATS = {"guess_reveal", "plot_twist", "myth_buster", "sounds_fake", "ranked_escalation", "creepy_true",
                   "dumbest_decision", "would_you_survive"}
@@ -965,6 +977,23 @@ class ScriptWriter:
             source_lane = candidate.get("lane")
             if source_lane and source_lane not in approved_lanes:
                 return False
+            # Use the trend's own context, not a model-chosen Wikipedia category, to
+            # identify obvious sports fixtures or clubs such as Borussia Dortmund.
+            trend_context = [str(candidate.get("topic") or "")]
+            raw_context = candidate.get("context")
+            if isinstance(raw_context, list):
+                trend_context.extend(str(item) for item in raw_context if item)
+            raw_signals = candidate.get("signals")
+            if isinstance(raw_signals, list):
+                for item in raw_signals:
+                    if not isinstance(item, dict):
+                        continue
+                    if item.get("topic"):
+                        trend_context.append(str(item["topic"]))
+                    if isinstance(item.get("context"), list):
+                        trend_context.extend(str(value) for value in item["context"] if value)
+            if _SPORTS_TREND_MARKER.search(" ".join(trend_context)):
+                return False
             # A YouTube-chart category is direct metadata, not a model interpretation.
             # Sports, gaming and news/politics trends cannot be relabelled into our lanes.
             for signal in candidate.get("signals") or []:
@@ -996,9 +1025,13 @@ class ScriptWriter:
             bits = [f"sources={','.join(sorted(set(c['sources'])))}", f"trend={c['score']:.2f}"]
             measured = trend_evidence_summary(c)
             if measured:
-                bits.append("measured trend evidence: " + _clip(measured, 190))
-            elif c.get("context"):
-                bits.append("evidence: " + _clip(" / ".join(str(x) for x in c["context"][:2] if x), 170))
+                bits.append("measured trend evidence: " + _clip(measured, 150))
+            raw_context = c.get("context")
+            context = [str(x).strip() for x in raw_context if str(x).strip()] if isinstance(raw_context, list) else []
+            if context:
+                # News/viral context distinguishes an ambiguous trend label (e.g. a
+                # club from a city). It is discovery evidence only, never a script source.
+                bits.append("trend context (discovery only): " + _clip(" / ".join(context[:2]), 140))
             return " | ".join(bits)
 
         listing = "\n".join(f"{i}. {c['topic'][:150]} | {evidence(c)}" for i, c in enumerate(pool))
@@ -1024,10 +1057,11 @@ RECENTLY COVERED — avoid: {', '.join(list(recent)[:40]) or 'none'}
 LIVE TREND CANDIDATES (each passed the independent current-evidence gate; evidence below is for discovery, not facts):
 {listing}
 
-Choose up to {want} distinct candidates for original, genuinely ENTERTAINING, family-friendly 15-20 second Shorts.
-Include only topics with viral_score >= {min_viral:g}/10. Prioritize a scroll-stopping true surprise, broad appeal, measured demand NOW,
-emotional pull or awe without tragedy/divisiveness, and a subject that can be shown with relevant real visuals.
-Do not choose an evergreen or Wikipedia-only idea. Return fewer picks or none if no candidate genuinely fits.
+Return as many qualifying candidates as possible, up to {want}, as fallbacks for the requested video count.
+Do not stop after one if other candidates independently score >= {min_viral:g}/10 and fit scope and safety; rank the best first.
+Choose only original, genuinely ENTERTAINING, family-friendly 15-20 second Shorts with a scroll-stopping true surprise,
+broad appeal, measured demand NOW, emotional pull or awe without tragedy/divisiveness, and relevant real visuals.
+Do not choose an evergreen or Wikipedia-only idea. Return fewer picks or none when candidates do not genuinely fit.
 
 FORMATS we can make (choose 2-4 that the specific article honestly supports; myth_buster requires an explicit misconception):
 {fmt_list}
@@ -1166,7 +1200,9 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
             except (KeyError, ValueError, TypeError):
                 continue
         picks.sort(key=lambda c: -c["priority"])
-        log.info("viral picks: %s", [f"{c['topic'][:35]} ({c['viral_score']:.0f})" for c in picks])
+        log.info("viral picks: %s", [
+            f"{c['topic'][:32]} → {c['script_subject'][:40]} [{c['category']}, {c['viral_score']:.0f}]"
+            for c in picks])
         if dropped:
             log.info("dropped as not viral enough (< %.0f): %s", min_viral, dropped[:10])
         return picks
