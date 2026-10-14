@@ -1089,5 +1089,102 @@
       "groq:openai/gpt-oss-120b",
       "mistral:mistral-small-latest"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261014-221646-3655",
+    "workflow_run_id": "38646314959",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-14T22:16:46.492325+00:00",
+    "finished_at": "2026-10-14T22:26:55.725567+00:00",
+    "duration_seconds": 609.233,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 2,
+      "topic_production": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [],
+    "failures": [
+      {
+        "at": "2026-10-14T22:22:45.018341+00:00",
+        "stage": "topic_selection",
+        "category": "no_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-14T22:26:55.721663+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-14T22:16:46.690912+00:00",
+        "cooldown_until": "2026-10-14T23:35:31.837026+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-14T22:17:10.655312+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-14T22:17:17.558608+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-14T22:18:32.684743+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "circuit_open",
+        "at": "2026-10-14T22:18:32.685301+00:00",
+        "cooldown_until": "2026-10-14T22:28:32.684784+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-14T22:18:39.198418+00:00",
+        "cooldown_until": "2026-10-14T22:38:39.197843+00:00"
+      }
+    ],
+    "top_up": true,
+    "rate_limited_models": [
+      "mistral:mistral-small-latest"
+    ]
   }
 ]
