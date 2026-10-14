@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-14T15:59:29.348487+00:00",
+  "updated": "2026-10-14T19:35:40.284713+00:00",
   "videos_total": 43,
-  "videos_7d": 7,
-  "views_7d": 2417,
+  "videos_7d": 5,
+  "views_7d": 1054,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -656,7 +656,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10070,
+    "views_90d": 10075,
     "per_1k_views": 2.68,
     "videos": 34,
     "denominator_basis": "engaged_views",
@@ -667,11 +667,11 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10070,
+    "engaged_views_90d": 10075,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003357,
+    "expanded_threshold_progress": 0.003358,
     "current_full_threshold_progress": 0.001007,
     "feb_2027_full_threshold_progress": 0.000504,
     "public_videos": 34,
