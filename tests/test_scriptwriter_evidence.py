@@ -1,6 +1,10 @@
 import re
 
-from autotube.scriptwriter import _attach_missing_evidence, _source_evidence_quote
+from autotube.scriptwriter import (
+    _attach_missing_evidence,
+    _source_evidence_quote,
+    visual_subject_for_topic,
+)
 
 
 SOURCE = (
@@ -12,6 +16,22 @@ SOURCE = (
 
 def _words(text):
     return re.findall(r"[\w]+(?:['’][\w]+)?", text)
+
+
+def test_visual_subject_resolves_nonvisual_modifiers_to_concrete_subjects():
+    assert visual_subject_for_topic(
+        {"script_subject": "Ancient Mysteries Unearthed"},
+        {"title": "Derinkuyu underground city"},
+    ) == "Derinkuyu underground city"
+    assert visual_subject_for_topic(
+        {"script_subject": "Cleopatra eyeliner poison"}, {"title": "Kohl"},
+    ) == "Cleopatra eyeliner"
+    assert visual_subject_for_topic(
+        {"script_subject": "Mountain Goats Jumps"}, {"title": "Goats"},
+    ) == "Mountain Goats"
+    assert visual_subject_for_topic(
+        {"script_subject": "Giant Stone Spheres"}, {"title": "Stone spheres"},
+    ) == "Stone Spheres"
 
 
 def test_missing_evidence_is_backfilled_only_with_a_source_matched_quote():
@@ -64,6 +84,7 @@ def test_real_writer_validator_backfills_an_omitted_evidence_field():
 
         def json(self, _system, _user, validate=None, **_kwargs):
             captured["validate"] = validate
+            captured["user"] = _user
             raise RuntimeError("capture the production validator")
 
     class FakeStrategy:
@@ -93,6 +114,7 @@ def test_real_writer_validator_backfills_an_omitted_evidence_field():
     with pytest.raises(AssertionError, match="no shot shows"):
         captured["validate"](script)
 
+    assert "CONCRETE SUBJECT TO NAME AND SHOW: Stone Sphere" in captured["user"]
     assert script["segments"][0]["evidence"] == ""
     assert script["segments"][1]["evidence"] in SOURCE
     assert script["segments"][2]["evidence"] == ""

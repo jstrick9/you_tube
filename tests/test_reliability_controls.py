@@ -239,6 +239,42 @@ def test_validation_retry_repeats_schema_and_lowers_temperature(monkeypatch, mem
     assert calls[0][1] == 0.8 and retry_temperature == 0.3
 
 
+def test_visual_validation_retry_repeats_the_concrete_subject_requirement(monkeypatch, memory_provider_circuits):
+    import autotube.llm as L
+
+    calls = []
+
+    def draft(_model, _system, user, temperature):
+        calls.append((user, temperature))
+        if len(calls) == 1:
+            return '{"shows":"a dark cave","queries":["cave wall","shadows"]}'
+        return '{"shows":"a stone sphere close-up","queries":["stone sphere photo","stone sphere detail"]}'
+
+    def validate(obj):
+        blob = " ".join([obj.get("shows", "")] + obj.get("queries", []))
+        assert "stone" in blob.lower() and "sphere" in blob.lower(), \
+            "no shot shows 'stone sphere' itself — every visual is ambient scenery"
+
+    monkeypatch.setitem(L.PROVIDERS, "visual", (draft, "visual_models"))
+    monkeypatch.setattr(L.time, "sleep", lambda *_: None)
+    router = L.LLM.__new__(L.LLM)
+    router.cfg = {"visual_models": ["model"]}
+    router.order = ["visual"]
+    router.temperature = 0.8
+    router._dead = set()
+    router._blocked_providers = set()
+    router.circuits = memory_provider_circuits()
+    router.last_used = ""
+
+    assert router.json("system", "draw the stone sphere", validate=validate)["shows"] == \
+        "a stone sphere close-up"
+    retry_prompt, retry_temperature = calls[1]
+    assert "VALIDATION FAILURE: no shot shows 'stone sphere' itself" in retry_prompt
+    assert "visual.shows must explicitly name the concrete subject itself" in retry_prompt
+    assert "must include its distinctive noun(s)" in retry_prompt
+    assert calls[0][1] == 0.8 and retry_temperature == 0.3
+
+
 def test_text_router_stops_when_all_configured_provider_circuits_are_open(
         memory_provider_circuits):
     from autotube.llm import LLM

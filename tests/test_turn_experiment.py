@@ -69,8 +69,8 @@ def test_writer_prompt_renders_assigned_treatment_without_changing_facts(monkeyp
     with pytest.raises(RuntimeError, match="prompt captured"):
         writer.write(topic, plan, source)
 
-    assert "CURRENT TREND SUBJECT (this is what the video is about; name it and show it): space observation" in writer.llm.prompt
-    assert "RESEARCH SOURCE SUBJECT (the source of facts, not a replacement for the trend subject): Space Beacon" in writer.llm.prompt
+    assert "CURRENT TREND SUBJECT (deliver its specific live-trend angle; do not copy the raw headline): space observation" in writer.llm.prompt
+    assert "RESEARCH SOURCE SUBJECT (facts must come from this article; the trend angle still determines the story): Space Beacon" in writer.llm.prompt
     assert "RANDOMIZED EARLY-TURN TREATMENT (consequence_first)" in writer.llm.prompt
     assert "first clause" in writer.llm.prompt and "source-backed consequence" in writer.llm.prompt
     assert "Keep the script original; do not reuse another upload's topic" in writer.llm.prompt
@@ -127,8 +127,8 @@ def test_writer_visual_gate_targets_trend_subject_not_research_article():
         def json(self, _system, user, validate=None, **_kwargs):
             if user.startswith("VIDEO TITLE:"):
                 return metadata
-            assert "CURRENT TREND SUBJECT (this is what the video is about; name it and show it): iPhone Duo cameras" in user
-            assert "RESEARCH SOURCE SUBJECT (the source of facts, not a replacement for the trend subject): Stereopsis" in user
+            assert "CURRENT TREND SUBJECT (deliver its specific live-trend angle; do not copy the raw headline): iPhone Duo cameras" in user
+            assert "RESEARCH SOURCE SUBJECT (facts must come from this article; the trend angle still determines the story): Stereopsis" in user
             assert "Why the iPhone Duo detects depth" not in user, "raw trend wording must not reach the writer"
             if validate:
                 validate(script)

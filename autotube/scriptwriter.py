@@ -677,6 +677,45 @@ def _matched_subject_terms(key: set[str], observed: set[str]) -> set[str]:
     return {term for term in key if _subject_forms(term) & observed}
 
 
+_VISUAL_SUBJECT_MODIFIERS = frozenset("""
+a an after and are at ancient by crazy discovery discoveries discovered discover evolution evolving fast
+for from giant hidden huge impossible in into insane jump jumps jumping loves love massive mystery mysteries
+mysterious of old on or poison poisoned secret shocking survive survives survival the to toxic unearthed
+venom weird with years year
+""".split())
+
+
+def visual_subject_for_topic(topic: dict | None, source: dict | None = None) -> str:
+    """Resolve a trend label to the concrete name that must appear in a shot and narration.
+
+    Trend titles often append a mechanism or click-driving adjective to the actual subject
+    ("Mountain Goats Jumps", "Cleopatra Eyeliner Poison"). Those modifiers need not be
+    pictured. If the trend label is only abstract framing, use the specific article selected
+    to ground its angle; the trend-alignment gate still independently checks the live story.
+    """
+    topic = topic if isinstance(topic, dict) else {}
+    source = source if isinstance(source, dict) else {}
+    raw = str(topic.get("script_subject") or "").strip()
+    source_title = str(source.get("title") or "").strip()
+
+    def core(label: str) -> list[str]:
+        result = []
+        for word in re.findall(r"[\w’'-]+", label, re.UNICODE):
+            term = word.casefold().replace("’", "'")
+            term = term[:-2] if term.endswith("'s") else term
+            if len(term) > 2 and term not in _VISUAL_SUBJECT_MODIFIERS:
+                result.append(word[:-2] if word.casefold().endswith("'s") else word)
+        return result
+
+    trend_core = core(raw)
+    if trend_core:
+        return " ".join(trend_core)
+    source_core = core(source_title)
+    if source_core:
+        return " ".join(source_core)
+    return raw or source_title
+
+
 def names_subject(script: dict, subject: str) -> bool:
     """Does any shot actually depict the thing the video is about?
 
@@ -1412,6 +1451,7 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                   "legal matters, accusations, feuds or politics. State nothing you cannot point to "
                   "in the SOURCE TEXT. No 'allegedly', 'reportedly' or 'sources say'.")
         trend_subject = str(topic.get("script_subject") or source.get("title") or "").strip()
+        subject_for_visuals = visual_subject_for_topic(topic, source) or trend_subject
         persona_line = (f"NARRATOR PERSONA: {persona['character']}\nCHANNEL PROMISE: \"{persona.get('catchphrase', '')}\" "
                         "— every wild claim is proven by the source (a PROVEN stamp + source card closes each video).\n"
                         if persona.get("character") else "")
@@ -1429,8 +1469,10 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                      if turn_rule else "")
         feedback_line = (f"PREVIOUS DRAFT FEEDBACK (fix without changing the facts or trend angle): {str(topic.get('_draft_feedback') or '')[:600]}\n"
                          if topic.get("_draft_feedback") else "")
-        user = f"""CURRENT TREND SUBJECT (this is what the video is about; name it and show it): {trend_subject}
-RESEARCH SOURCE SUBJECT (the source of facts, not a replacement for the trend subject): {source.get('title') or trend_subject}
+        user = f"""CURRENT TREND SUBJECT (deliver its specific live-trend angle; do not copy the raw headline): {trend_subject}
+CONCRETE SUBJECT TO NAME AND SHOW: {subject_for_visuals} — show this specific person, place, object, or species itself.
+The trend angle remains the story; this concrete subject is its on-screen referent, not an excuse to make a generic article summary.
+RESEARCH SOURCE SUBJECT (facts must come from this article; the trend angle still determines the story): {source.get('title') or trend_subject}
 WHY IT'S TRENDING: {topic.get('why_trending') or ', '.join(topic.get('sources', []))}
 {originality_line}ANGLE (this is the story to tell — not the article's summary, not the subject's general
 history. If the angle names a specific surprise, that surprise IS the video):
@@ -1506,11 +1548,9 @@ Return JSON:
  "segments": [{{"text": "...", "aside": "", "emphasis": ["..."], "reveal": false,
                "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "..."}}]}}"""
 
-        # The independently worded trend subject is the Short's actual subject. The
-        # grounded article may explain the mechanism (for example, a camera trend
-        # grounded by an optics article); requiring that article's title in the shots
-        # can reject relevant trend visuals or steer the draft into a generic explainer.
-        subject_for_visuals = trend_subject or str(source.get("title") or "")
+        # The live trend remains the required story; this concrete core is used for
+        # depiction and opening-name checks so modifiers such as "poison" or
+        # "unearthed" do not become impossible image targets.
 
         def validate(o):
             assert isinstance(o, dict), "script must be a JSON object"
@@ -1978,7 +2018,7 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
                 receipt.note_failure("script_research", "source_grounding_failed")
             return None
         topic["wiki_title"] = source["title"]
-        visual_subject = str(topic.get("script_subject") or source.get("title") or "").strip()
+        visual_subject = visual_subject_for_topic(topic, source)
         if not subject_is_depictable(visual_subject, self.cfg, source):
             if receipt:
                 receipt.note_failure("script_research", "no_depictable_source_asset")

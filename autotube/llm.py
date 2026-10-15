@@ -490,12 +490,18 @@ class LLM:
                 for attempt in range(attempts_per_model):
                     last_try = attempt == attempts_per_model - 1
                     try:
+                        feedback_lower = feedback.lower()
                         prompt = user + (f"\n\nVALIDATION FAILURE: {feedback}. Return the complete corrected JSON object, "
                                          "preserve every required key and the requested schema, and fix the stated issue. "
                                          "Return JSON only; no markdown or commentary."
                                          + (" The script must have exactly 4 or 5 segment objects; every segment needs a "
                                             "string evidence field (empty only for the hook/CTA) and the requested visual object."
-                                            if "segment" in feedback.lower() else "")
+                                            if "segment" in feedback_lower else "")
+                                         + (" The subject-visual gate is mandatory: in at least one segment, "
+                                            "visual.shows must explicitly name the concrete subject itself and a visual query "
+                                            "must include its distinctive noun(s); do not substitute scenery, atmosphere, "
+                                            "or a generic landmark."
+                                            if "visual" in feedback_lower or "shot shows" in feedback_lower else "")
                                          if feedback else "")
                         retry_temp = min(temp, 0.3) if feedback else temp
                         raw = fn(model, system, prompt, retry_temp, images) if images else fn(
