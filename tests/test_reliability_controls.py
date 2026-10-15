@@ -199,6 +199,46 @@ def test_provider_read_timeout_is_skipped_for_rest_of_run(monkeypatch, memory_pr
     assert not router.circuits.is_open("slow"), "one-run network failures must not persist cooldowns"
 
 
+def test_validation_retry_repeats_schema_and_lowers_temperature(monkeypatch, memory_provider_circuits):
+    """A correction attempt should make structural requirements easier to follow."""
+    import autotube.llm as L
+
+    calls = []
+
+    def draft(_model, _system, user, temperature):
+        calls.append((user, temperature))
+        if len(calls) == 1:
+            return '{"title":"Draft","segments":[]}'
+        return '{"title":"Draft","segments":[' + ','.join(
+            '{"text":"Fact","evidence":"source quote"}' for _ in range(4)) + ']}'
+
+    def validate(obj):
+        segments = obj.get("segments")
+        assert isinstance(segments, list) and 4 <= len(segments) <= 5, "need exactly 4 or 5 segments"
+        assert all(isinstance(item.get("evidence"), str) for item in segments), \
+            "every segment must include textual evidence"
+
+    monkeypatch.setitem(L.PROVIDERS, "schema", (draft, "schema_models"))
+    monkeypatch.setattr(L.time, "sleep", lambda *_: None)
+    router = L.LLM.__new__(L.LLM)
+    router.cfg = {"schema_models": ["model"]}
+    router.order = ["schema"]
+    router.temperature = 0.8
+    router._dead = set()
+    router._blocked_providers = set()
+    router.circuits = memory_provider_circuits()
+    router.last_used = ""
+
+    assert router.json("system", "original request", validate=validate) == {
+        "title": "Draft", "segments": [{"text": "Fact", "evidence": "source quote"}] * 4,
+    }
+    retry_prompt, retry_temperature = calls[1]
+    assert "VALIDATION FAILURE: need exactly 4 or 5 segments" in retry_prompt
+    assert "preserve every required key" in retry_prompt
+    assert "string evidence field" in retry_prompt
+    assert calls[0][1] == 0.8 and retry_temperature == 0.3
+
+
 def test_text_router_stops_when_all_configured_provider_circuits_are_open(
         memory_provider_circuits):
     from autotube.llm import LLM

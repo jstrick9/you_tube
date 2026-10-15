@@ -490,9 +490,16 @@ class LLM:
                 for attempt in range(attempts_per_model):
                     last_try = attempt == attempts_per_model - 1
                     try:
-                        prompt = user + (f"\n\nIMPORTANT — your previous answer was rejected: {feedback}. Fix this."
+                        prompt = user + (f"\n\nVALIDATION FAILURE: {feedback}. Return the complete corrected JSON object, "
+                                         "preserve every required key and the requested schema, and fix the stated issue. "
+                                         "Return JSON only; no markdown or commentary."
+                                         + (" The script must have exactly 4 or 5 segment objects; every segment needs a "
+                                            "string evidence field (empty only for the hook/CTA) and the requested visual object."
+                                            if "segment" in feedback.lower() else "")
                                          if feedback else "")
-                        raw = fn(model, system, prompt, temp, images) if images else fn(model, system, prompt, temp)
+                        retry_temp = min(temp, 0.3) if feedback else temp
+                        raw = fn(model, system, prompt, retry_temp, images) if images else fn(
+                            model, system, prompt, retry_temp)
                         obj = _extract_json(raw)
                         if validate:
                             validate(obj)
