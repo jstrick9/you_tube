@@ -98,11 +98,13 @@ jobs:
             pip install -q pyyaml==6.0.3 && python scripts/needed_today.py   # pinned; full install stays below
           else
             echo "needed=manual" >> "$GITHUB_OUTPUT"
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+            echo "skip_reason=" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install
         id: install
-        if: steps.need.outputs.needed != '0'
+        if: steps.need.outputs.proceed == 'true'
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core > /dev/null
           pip install -q -r requirements.txt
@@ -110,33 +112,33 @@ jobs:
           pip install -q -r requirements-vision.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Cache CLIP model weights
-        if: steps.need.outputs.needed != '0'
+        if: steps.need.outputs.proceed == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
           key: clip-vit-b-32-laion2b
 
       - name: Cache depth model (living-photo motion)
-        if: steps.need.outputs.needed != '0'
+        if: steps.need.outputs.proceed == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.cache/autotube
           key: depth-anything-v2-small-q
 
       - name: Cache offline TTS voice (fallback only)
-        if: steps.need.outputs.needed != '0'
+        if: steps.need.outputs.proceed == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.cache/piper
           key: piper-ryan-high
 
       - name: Learn from previous videos
-        if: ${{ steps.need.outputs.needed != '0' && env.YT_REFRESH_TOKEN != '' && env.YT_CLIENT_ID != '' && env.YT_CLIENT_SECRET != '' }}
+        if: ${{ steps.need.outputs.proceed == 'true' && env.YT_REFRESH_TOKEN != '' && env.YT_CLIENT_ID != '' && env.YT_CLIENT_SECRET != '' }}
         run: python -m autotube analytics || true
 
       - name: Produce & schedule today's videos
         id: production
-        if: steps.need.outputs.needed != '0'
+        if: steps.need.outputs.proceed == 'true'
         timeout-minutes: 350
         run: |
           ARGS=""
@@ -153,6 +155,8 @@ jobs:
         if: always()
         env:
           AUTOTUBE_NEEDED: ${{ steps.need.outputs.needed }}
+          AUTOTUBE_PROCEED: ${{ steps.need.outputs.proceed }}
+          AUTOTUBE_SKIP_REASON: ${{ steps.need.outputs.skip_reason }}
           AUTOTUBE_REQUESTED_COUNT: ${{ github.event.inputs.count }}
           AUTOTUBE_TOP_UP: ${{ github.event_name == 'schedule' || github.event.inputs.top_up == 'true' }}
           AUTOTUBE_NEED_OUTCOME: ${{ steps.need.outcome }}

@@ -27,9 +27,19 @@ def test_watchdog_schedule_covers_each_daily_and_top_up_slot():
     assert "17 10 * * *" in daily_crons
     assert "47 11-23/4 * * *" in daily_crons
     assert watchdog_crons == ["35 10 * * *", "5 0,12,16,20 * * *"]
-    first_step = daily["jobs"]["produce"]["steps"][0]
+    steps = daily["jobs"]["produce"]["steps"]
+    first_step = steps[0]
     assert first_step["uses"] == "actions/checkout@v4"
     assert first_step["with"]["ref"] == "main", "queued top-ups must read the latest committed target"
+    preflight = next(step for step in steps if step.get("id") == "need")
+    assert 'echo "proceed=true"' in preflight["run"]
+    for name in ("Install", "Cache CLIP model weights", "Cache depth model (living-photo motion)",
+                 "Cache offline TTS voice (fallback only)", "Learn from previous videos",
+                 "Produce & schedule today's videos"):
+        step = next(item for item in steps if item.get("name") == name)
+        assert "steps.need.outputs.proceed == 'true'" in str(step.get("if", ""))
+    fallback = next(step for step in steps if step.get("name") == "Ensure every Actions run has a production receipt")
+    assert "AUTOTUBE_SKIP_REASON" in fallback.get("env", {})
 
 
 def test_scheduled_slots_resolve_the_daily_and_top_up_crons_in_utc():

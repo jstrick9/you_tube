@@ -770,6 +770,19 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     plans = strat.plan(n)
     log.info("topic queue: %s", [p["topic"][:40] for p in picks[: n + 4]])
 
+    # A configured key/model is not proof that image input works today. Probe one tiny
+    # image before spending more text calls on scripts or synthesizing narration; this
+    # is only a readiness check, never a substitute for per-shot and final-render QA.
+    if picks and cfg.get("media", {}).get("require_llm_verdict", True):
+        _report_stage("vision_preflight")
+        try:
+            route = llm.preflight_vision()
+            log.info("  ✓ live vision preflight passed via %s; all visual QA gates remain mandatory", route)
+        except Exception as e:  # noqa: BLE001 — strict mode stops before script/TTS investment
+            _report_failure("vision_preflight", "vision_preflight_unavailable", e)
+            log.error("  ✗ live vision preflight unavailable before scripting/TTS: %s", str(e)[:420])
+            return []
+
     # 2. produce
     _report_stage("topic_production")
     series_mod.reset()          # episode numbers are per-run unique, see series._ISSUED

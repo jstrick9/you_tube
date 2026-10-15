@@ -1,8 +1,9 @@
 """Lightweight pre-check for scheduled top-up runs (stdlib + PyYAML only, runs before the heavy install).
 
-Prints how many of today's videos (channel timezone) are still missing and writes `needed=N` to
-$GITHUB_OUTPUT, so backup/catch-up runs that have nothing to do finish in seconds instead of
-spending Actions minutes installing PyTorch. Mirrors autotube.pipeline.remaining_today().
+Prints how many of today's videos (channel timezone) are still missing and writes the actual
+`needed=N` count plus a separate `proceed=true|false` decision to $GITHUB_OUTPUT. A delayed-schedule
+skip must not erase unmet work or masquerade as an already-satisfied target. This lets true no-ops
+finish in seconds instead of spending Actions minutes installing PyTorch.
 """
 import json
 import os
@@ -32,10 +33,13 @@ hist = json.loads(hist_path.read_text()) if hist_path.exists() else []
 done = sum(1 for h in hist if h.get("status") in ok and h.get("created_at")
            and datetime.fromisoformat(h["created_at"]).astimezone(tz).date() == today)
 needed = max(0, daily_target(cfg) - done)
+proceed = needed > 0
 skip_reason = ""
+skip_message = ""
 # A scheduled event may sit in GitHub's queue for an hour or more. If a safe recovery
 # run already started after this cron's intended slot, do not replay the delayed slot.
-# If the API is unavailable, fail open so normal production is not silently skipped.
+# Keep `needed` as the actual remaining count; a schedule guard is not proof the target
+# was satisfied. If the API is unavailable, fail open so normal production is not silently skipped.
 if (needed > 0 and os.environ.get("GITHUB_EVENT_NAME") == "schedule"
         and os.environ.get("GITHUB_WORKFLOW") == "AutoTube daily"
         and os.environ.get("GITHUB_TOKEN")):
@@ -45,17 +49,22 @@ if (needed > 0 and os.environ.get("GITHUB_EVENT_NAME") == "schedule"
         runs = list_daily_runs(os.environ.get("GITHUB_REPOSITORY", ""),
                                os.environ["GITHUB_TOKEN"],
                                os.environ.get("GITHUB_API_URL", "https://api.github.com"))
-        skip, skip_reason = should_skip_delayed_schedule(
+        skip, skip_message = should_skip_delayed_schedule(
             event.get("schedule", ""), runs, datetime.now(timezone.utc),
             current_run_id=os.environ.get("GITHUB_RUN_ID"))
         if skip:
-            needed = 0
+            proceed = False
+            skip_reason = ("active_run_exists" if "already active" in skip_message
+                           else "delayed_schedule_superseded")
     except Exception as exc:  # noqa: BLE001 — API trouble must not suppress a scheduled production attempt
         print(f"recent-run guard unavailable ({type(exc).__name__}); proceeding with the scheduled top-up")
         skip_reason = ""
-suffix = f"; skipping delayed replay: {skip_reason}" if skip_reason else ""
+        skip_message = ""
+suffix = f"; preflight deferred: {skip_message}" if skip_message and not proceed else ""
 print(f"{today}: {done} done, {needed} still needed{suffix}")
 if os.environ.get("GITHUB_OUTPUT"):
     with open(os.environ["GITHUB_OUTPUT"], "a") as f:
         f.write(f"needed={needed}\n")
+        f.write(f"proceed={'true' if proceed else 'false'}\n")
+        f.write(f"skip_reason={skip_reason}\n")
 sys.exit(0)

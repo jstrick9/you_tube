@@ -282,7 +282,7 @@ def test_top_up_cadence_stays_within_free_tier_budget():
 
 
 # ── scheduled top-up pre-flight ─────────────────────────────────────────────
-def test_preflight_gate_handles_a_videos_per_day_range():
+def test_preflight_gate_handles_a_videos_per_day_range(tmp_path):
     """Every scheduled top-up run died in 18 seconds before this.
 
     videos_per_day became a [lo, hi] range, but the pre-flight copy of the rule still
@@ -291,10 +291,48 @@ def test_preflight_gate_handles_a_videos_per_day_range():
     """
     import subprocess
 
+    output = tmp_path / "github-output"
+    env = {**os.environ, "GITHUB_EVENT_NAME": "workflow_dispatch", "GITHUB_OUTPUT": str(output)}
     r = subprocess.run([sys.executable, str(ROOT / "scripts" / "needed_today.py")],
-                       capture_output=True, text=True, cwd=ROOT)
+                       capture_output=True, text=True, cwd=ROOT, env=env)
     assert r.returncode == 0, f"pre-flight gate crashed: {r.stderr[-400:]}"
     assert "still needed" in r.stdout
+    fields = dict(line.split("=", 1) for line in output.read_text().splitlines())
+    assert fields["needed"].isdigit()
+    assert fields["proceed"] == ("true" if int(fields["needed"]) > 0 else "false")
+    assert fields["skip_reason"] == ""
+
+
+def test_delayed_schedule_preflight_keeps_remaining_count_and_skips_work(tmp_path, monkeypatch):
+    import runpy
+    import pytest
+    from autotube import target as target_module, watchdog as watchdog_module
+
+    event = tmp_path / "event.json"
+    event.write_text(json.dumps({"schedule": "47 11-23/4 * * *"}))
+    output = tmp_path / "github-output"
+    monkeypatch.setattr(target_module, "daily_target", lambda _cfg: 10_000)
+    monkeypatch.setattr(watchdog_module, "list_daily_runs", lambda *_args, **_kwargs: [])
+    monkeypatch.setattr(watchdog_module, "should_skip_delayed_schedule",
+                        lambda *_args, **_kwargs: (True, "a later recovery run superseded this delayed slot"))
+    for key, value in {
+        "GITHUB_EVENT_NAME": "schedule",
+        "GITHUB_WORKFLOW": "AutoTube daily",
+        "GITHUB_REPOSITORY": "owner/repo",
+        "GITHUB_TOKEN": "test-token",
+        "GITHUB_EVENT_PATH": str(event),
+        "GITHUB_RUN_ID": "late-run",
+        "GITHUB_OUTPUT": str(output),
+    }.items():
+        monkeypatch.setenv(key, value)
+
+    with pytest.raises(SystemExit) as stopped:
+        runpy.run_path(str(ROOT / "scripts" / "needed_today.py"), run_name="__main__")
+    assert stopped.value.code == 0
+    fields = dict(line.split("=", 1) for line in output.read_text().splitlines())
+    assert int(fields["needed"]) > 0, "a delayed-slot guard is not proof the target was met"
+    assert fields["proceed"] == "false"
+    assert fields["skip_reason"] == "delayed_schedule_superseded"
 
 
 def test_the_daily_target_rule_exists_only_once():

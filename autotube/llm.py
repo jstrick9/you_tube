@@ -417,8 +417,20 @@ class LLM:
         return False
 
     def vision_available(self) -> bool:
-        return any(_provider_key(p) and self._vision_models(p) and not self._provider_open(p)
-                   for p in self.cfg.get("vision_providers", ["gemini", "groq", "openrouter"]))
+        """Whether at least one configured vision model is still eligible this run.
+
+        A key plus a model name is not enough: json() retires individual vision routes
+        after permanent model errors, so availability must exclude those too. This is
+        still a routing check, not a live health guarantee; preflight_vision() makes a
+        small real image call before script/TTS investment.
+        """
+        dead = getattr(self, "_dead", set())
+        for provider in self.cfg.get("vision_providers", ["gemini", "groq", "openrouter"]):
+            if provider not in PROVIDERS or not _provider_key(provider) or self._provider_open(provider):
+                continue
+            if any(f"{provider}:{model}:vision" not in dead for model in self._vision_models(provider)):
+                return True
+        return False
 
     def _vision_models(self, pname: str) -> list[str]:
         default = self.cfg.get("gemini_models", []) if pname == "gemini" else []
@@ -429,6 +441,30 @@ class LLM:
         order = [p for p in self.cfg.get("vision_providers", ["gemini", "groq", "openrouter"]) if p in PROVIDERS]
         return self.json(system, user, temperature=0.1, validate=validate, images=images, order=order,
                          models_of=self._vision_models, attempts_per_model=1)
+
+    def preflight_vision(self) -> str:
+        """Prove a configured vision route can inspect an image before scripts or TTS are built.
+
+        This probe is only a readiness check. Candidate relevance, rendered-frame, adversarial,
+        and sequence-level QA remain mandatory for every finished Short.
+        """
+        if not self.vision_available():
+            raise LLMError("no eligible vision model configured (or all vision routes are retired/open)")
+        from PIL import Image
+        import io
+
+        buf = io.BytesIO()
+        Image.new("RGB", (64, 64), (220, 32, 32)).save(buf, format="JPEG", quality=80)
+
+        def validate(value):
+            if (not isinstance(value, dict) or not isinstance(value.get("color"), str)
+                    or "red" not in value["color"].lower()):
+                raise AssertionError("vision preflight must identify the solid red test image")
+
+        self.vision_json(
+            "You are checking image-input readiness. Inspect the pixels and return strict JSON only.",
+            'What color is the solid square? Return {"color":"red"}.', [buf.getvalue()], validate)
+        return str(getattr(self, "last_used", "") or "vision provider")
 
     def _review_models(self, pname: str) -> list[str]:
         """Models used for fact-checking/review. Falls back to the normal list for that provider."""
@@ -502,6 +538,11 @@ class LLM:
                                             "must include its distinctive noun(s); do not substitute scenery, atmosphere, "
                                             "or a generic landmark."
                                             if "visual" in feedback_lower or "shot shows" in feedback_lower else "")
+                                         + (" Treat the reported word-count bands as hard: count whitespace-separated words "
+                                            "in each spoken text, excluding asides from beat-specific counts. Rewrite only the "
+                                            "flagged beat(s), preserve already-valid beats and supported facts, and do not pad "
+                                            "with an aside or add an unsupported claim."
+                                            if "word-count repair required" in feedback_lower or "word count" in feedback_lower else "")
                                          + (" The selected current-trend angle is the required story, not a broad topic label: "
                                             "make its specific claim and distinctive details the through-line. Use only facts "
                                             "supported by SOURCE TEXT; never invent facts to match an unsupported angle."

@@ -239,6 +239,40 @@ def test_validation_retry_repeats_schema_and_lowers_temperature(monkeypatch, mem
     assert calls[0][1] == 0.8 and retry_temperature == 0.3
 
 
+def test_word_count_validation_retry_gives_a_targeted_repair_instruction(monkeypatch, memory_provider_circuits):
+    import autotube.llm as L
+
+    calls = []
+    responses = ['{"text":"The turn arrives too late."}',
+                 '{"text":"A specific source-backed consequence changes the whole story for everyone."}']
+
+    def draft(_model, _system, user, _temperature):
+        calls.append(user)
+        return responses[len(calls) - 1]
+
+    def validate(value):
+        count = len(value["text"].split())
+        assert 9 <= count <= 11, (
+            f"word-count repair required: segment 2 turn is {count} words; it must be 9-11 factual words")
+
+    monkeypatch.setitem(L.PROVIDERS, "wordcheck", (draft, "wordcheck_models"))
+    monkeypatch.setattr(L.time, "sleep", lambda *_: None)
+    router = L.LLM.__new__(L.LLM)
+    router.cfg = {"wordcheck_models": ["model"]}
+    router.order = ["wordcheck"]
+    router.temperature = 0.8
+    router._dead = set()
+    router._blocked_providers = set()
+    router.circuits = memory_provider_circuits()
+    router.last_used = ""
+
+    result = router.json("system", "write a turn", validate=validate)
+    assert result["text"] == "A specific source-backed consequence changes the whole story for everyone."
+    assert "VALIDATION FAILURE: word-count repair required" in calls[1]
+    assert "count whitespace-separated words in each spoken text" in calls[1]
+    assert "preserve already-valid beats" in calls[1]
+
+
 def test_visual_validation_retry_repeats_the_concrete_subject_requirement(monkeypatch, memory_provider_circuits):
     import autotube.llm as L
 
@@ -447,6 +481,8 @@ def test_actions_fallback_creates_one_receipt_for_preflight_noop(tmp_path, monke
     monkeypatch.setattr(module, "STATE", tmp_path / "state")
     monkeypatch.setenv("GITHUB_RUN_ID", "98765")
     monkeypatch.setenv("AUTOTUBE_NEEDED", "0")
+    monkeypatch.setenv("AUTOTUBE_PROCEED", "false")
+    monkeypatch.setenv("AUTOTUBE_SKIP_REASON", "")
     monkeypatch.setenv("AUTOTUBE_NEED_OUTCOME", "success")
     monkeypatch.setenv("AUTOTUBE_INSTALL_OUTCOME", "skipped")
     monkeypatch.setenv("AUTOTUBE_PRODUCTION_OUTCOME", "skipped")
@@ -457,11 +493,37 @@ def test_actions_fallback_creates_one_receipt_for_preflight_noop(tmp_path, monke
     row = json.loads(report.read_text())
     assert row["outcome"] == "already_satisfied"
     assert row["target_count"] == 0 and row["target_count_known"] is True
+    assert "preflight_skip_reason" not in row
     rows = json.loads((tmp_path / "state" / "run_reports.json").read_text())
     assert len(rows) == 1
 
 
+def test_delayed_schedule_skip_preserves_remaining_count_and_is_not_already_satisfied(tmp_path, monkeypatch):
+    path = ROOT / "scripts" / "fallback_run_report.py"
+    spec = importlib.util.spec_from_file_location("fallback_run_report_superseded", path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    spec.loader.exec_module(module)
+    monkeypatch.setattr(module, "OUTPUT", tmp_path / "output")
+    monkeypatch.setattr(module, "STATE", tmp_path / "state")
+    monkeypatch.setenv("GITHUB_RUN_ID", "late-cron")
+    monkeypatch.setenv("AUTOTUBE_NEEDED", "2")
+    monkeypatch.setenv("AUTOTUBE_PROCEED", "false")
+    monkeypatch.setenv("AUTOTUBE_SKIP_REASON", "delayed_schedule_superseded")
+    monkeypatch.setenv("AUTOTUBE_NEED_OUTCOME", "success")
+    monkeypatch.setenv("AUTOTUBE_INSTALL_OUTCOME", "skipped")
+    monkeypatch.setenv("AUTOTUBE_PRODUCTION_OUTCOME", "skipped")
+
+    assert module.main() == 0
+    row = json.loads((tmp_path / "output" / "run-report-late-cron.json").read_text())
+    assert row["outcome"] == "superseded"
+    assert row["target_count"] == 2 and row["target_count_known"] is True
+    assert row["preflight_skip_reason"] == "delayed_schedule_superseded"
+    assert row["produced_count"] == 0 and row["topic_attempts"] == []
+
+
 def test_workflow_artifact_keeps_receipts_even_if_video_production_is_skipped():
+
     workflow = (ROOT / ".github" / "workflows" / "daily.yml").read_text()
     assert "Ensure every Actions run has a production receipt" in workflow
     assert "if: always()" in workflow

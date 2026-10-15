@@ -330,8 +330,9 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0, "legible
             _validate_vision_output(o, n)
 
         sheet = contact_sheet([c["_img"] for c in cands])
-        out, err = None, None
+        out, err, attempts = None, None, 0
         for attempt in range(len(self.retry_pauses) + 1):
+            attempts = attempt + 1
             try:
                 self.calls += 1
                 out = self.llm.vision_json(VISION_SYSTEM, user, [sheet], validate)
@@ -341,11 +342,22 @@ Return JSON: {{"images": [{{"n": 1, "shows": "<= 12 words", "score": 0, "legible
                 err = e
                 out = None
                 if attempt < len(self.retry_pauses):
+                    # Retrying after every configured route is already circuit-open or
+                    # permanently retired cannot help; it only burns the run's time budget.
+                    # Keep the hard gate, but fail closed immediately once no route remains.
+                    try:
+                        eligible = bool(self.llm and self.llm.vision_available())
+                    except Exception:  # noqa: BLE001 — an unknown health state is not proof of outage
+                        eligible = True
+                    if self.strict and not eligible:
+                        log.warning("no vision provider remains eligible; stopping strict retries after %d attempt(s)",
+                                    attempts)
+                        break
                     time.sleep(self.retry_pauses[attempt])
         if out is None:
             summary = _vision_error_summary(err)
             if self.strict:
-                raise VisionUnavailable(f"vision model unavailable after {len(self.retry_pauses) + 1} tries: {summary}")
+                raise VisionUnavailable(f"vision model unavailable after {attempts} tries: {summary}")
             self.fail_streak += 1
             if self.fail_streak >= 2:
                 self.llm_failed = True

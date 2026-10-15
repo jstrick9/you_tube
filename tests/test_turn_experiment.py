@@ -102,7 +102,12 @@ def test_review_feedback_gets_targeted_story_and_ordering_corrections():
         "category": "science_nature",
         "_draft_feedback": (
             "Rewrite Segment 2 to follow the 'consequence_first' treatment; this is a list of facts, not a story; "
-            "not entertaining enough."),
+            "not entertaining enough; final payoff is 11 words, it must be 6-9 factual words."),
+        "_rewrite_attempt": 3,
+        "_prior_draft": {"segments": [
+            {"text": "The stone spheres hide their makers.", "aside": "The rock has secrets."},
+            {"text": "Some were carved before their discovery."},
+        ]},
     }
     plan = {
         "format": "sounds_fake", "hook_style": "bold_claim", "voice": "en-US-AndrewNeural",
@@ -118,10 +123,103 @@ def test_review_feedback_gets_targeted_story_and_ordering_corrections():
     assert "CAUSAL-CHAIN REPAIR" in writer.llm.prompt
     assert "Never invent a causal link" in writer.llm.prompt
     assert "ENTERTAINMENT REPAIR" in writer.llm.prompt
+    assert "WORD-COUNT REPAIR" in writer.llm.prompt
+    assert "LATER-REWRITE ESCALATION" in writer.llm.prompt
+    assert "PREVIOUS AUTO-TUBE ATTEMPT (our own draft, NOT factual evidence)" in writer.llm.prompt
+    assert "The stone spheres hide their makers." in writer.llm.prompt
     assert "do not copy a reviewer example unless SOURCE TEXT supports it" in writer.llm.prompt
 
 
+def test_unresolved_review_feedback_survives_programmatic_rewrite_failures(monkeypatch):
+    cfg = common.load_config()
+    writer = scriptwriter.ScriptWriter.__new__(scriptwriter.ScriptWriter)
+    writer.cfg = cfg
+    writer.llm = object()
+    writer.lang = "en"
+    calls = []
+
+    def fake_write(topic, _plan, _source):
+        calls.append(copy.deepcopy(topic))
+        return {"title": f"draft {len(calls)}", "segments": [{"text": f"attempt {len(calls)}"}]}
+
+    reviews = [
+        (False, {"programmatic_ok": True, "score": 5,
+                 "issues": ["not entertaining enough (5/10, need 6)",
+                            "overall review score too low (5/10, need 7)"]}),
+        (False, {"programmatic_ok": False,
+                 "issues": ["final payoff is 11 words; it must be 6-9 factual words"]}),
+        (False, {"programmatic_ok": False,
+                 "issues": ["the hook is 10 words, must be 6-9"]}),
+    ]
+
+    def fake_check(_script, _source, _topic):
+        return reviews.pop(0)
+
+    writer.write = fake_write
+    writer.check = fake_check
+    monkeypatch.setattr(scriptwriter, "ground", lambda *_args, **_kwargs: {
+        "title": "Stone spheres of Costa Rica", "text": "Stone spheres were carved from rock. " * 20,
+    })
+    monkeypatch.setattr(scriptwriter, "source_supports_angle", lambda *_args, **_kwargs: True)
+    monkeypatch.setattr(scriptwriter, "subject_is_depictable", lambda *_args, **_kwargs: True)
+
+    result = writer.produce({
+        "topic": "The Giant Stone Sphere", "script_subject": "Stone Sphere",
+        "angle": "the spheres were carved before their discovery", "category": "science",
+    }, {}, max_attempts=3)
+
+    assert result is None and len(calls) == 3
+    assert calls[1]["_rewrite_attempt"] == 2
+    assert calls[1]["_prior_draft"]["title"] == "draft 1"
+    assert "not entertaining enough" in calls[1]["_draft_feedback"]
+    assert calls[2]["_rewrite_attempt"] == 3
+    assert calls[2]["_prior_draft"]["title"] == "draft 2"
+    assert "not entertaining enough" in calls[2]["_draft_feedback"]
+    assert "final payoff" in calls[2]["_draft_feedback"]
+
+
+def test_writer_word_count_errors_are_sent_to_the_model_validation_retry():
+    cfg = common.load_config()
+
+    class CaptureThenStop:
+        lite = False
+        validator = None
+
+        def json(self, _system, _user, validate=None, **_kwargs):
+            self.validator = validate
+            raise RuntimeError("prompt captured")
+
+    writer = scriptwriter.ScriptWriter.__new__(scriptwriter.ScriptWriter)
+    writer.cfg = cfg
+    writer.llm = CaptureThenStop()
+    writer.src_chars = 4000
+    topic = {"topic": "Stone Sphere", "script_subject": "Stone Sphere", "category": "science"}
+    plan = {"format": "sounds_fake", "hook_style": "bold_claim", "voice": "en-US-AndrewNeural",
+            "comment_device": "none"}
+    source = {"title": "Stone spheres", "text": "Stone spheres were carved from stone. " * 30}
+
+    with pytest.raises(RuntimeError, match="prompt captured"):
+        writer.write(topic, plan, source)
+
+    bad_counts = {
+        "title": "Stone spheres hide a strange history",
+        "segments": [
+            {"text": "Stone spheres hide a strange mystery.", "aside": "", "evidence": "source quote",
+             "visual": {"shows": "a stone sphere", "queries": ["stone sphere photo", "stone sphere detail"]}},
+            {"text": "Some were carved from hard stone.", "aside": "", "evidence": "source quote",
+             "visual": {"shows": "a stone sphere", "queries": ["stone sphere photo", "stone sphere detail"]}},
+            {"text": "A stone sphere can weigh several tons and remain mysterious.", "aside": "", "evidence": "source quote",
+             "visual": {"shows": "a stone sphere", "queries": ["stone sphere photo", "stone sphere detail"]}},
+            {"text": "Their makers remain unknown today.", "aside": "", "evidence": "source quote",
+             "visual": {"shows": "a stone sphere", "queries": ["stone sphere photo", "stone sphere detail"]}},
+        ],
+    }
+    with pytest.raises(AssertionError, match="word-count repair required:.*segment 2 turn.*final payoff"):
+        writer.llm.validator(bad_counts)
+
+
 def test_writer_visual_gate_targets_trend_subject_not_research_article():
+
     cfg = common.load_config()
     script = {
         "title": "iPhone Duo's two cameras map depth",

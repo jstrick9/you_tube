@@ -129,6 +129,80 @@ def test_no_judge_means_no_verdict():
     assert j.score(_cands(2), "x", "y", "z") == []      # non-strict, no CLIP → still nothing "verified"
 
 
+def test_strict_vision_stops_retrying_when_all_routes_become_unavailable(monkeypatch):
+    import pytest
+
+    class CircuitOpeningVision:
+        last_used = "fake:vision"
+
+        def __init__(self):
+            self.available = True
+            self.calls = 0
+
+        def vision_available(self):
+            return self.available
+
+        def vision_json(self, *args, **kwargs):
+            self.calls += 1
+            self.available = False
+            raise RuntimeError("all provider circuits open")
+
+    llm = CircuitOpeningVision()
+    sleeps = []
+    monkeypatch.setattr(vision.time, "sleep", lambda seconds: sleeps.append(seconds))
+    judge = vision.Judge({"media": {"clip": False}}, llm)
+    judge.retry_pauses = [15, 45, 90]
+    with pytest.raises(vision.VisionUnavailable, match="after 1 tries"):
+        judge.score(_cands(1), "a stone sphere", "The stone sphere is visible.", "Stone Sphere")
+    assert llm.calls == 1 and sleeps == []
+
+
+def test_live_vision_preflight_routes_a_tiny_image_and_checks_the_visual_answer():
+    import io
+    import pytest
+    from autotube.llm import LLM
+
+    client = LLM.__new__(LLM)
+    client.last_used = "gemini:fake:vision"
+    client.vision_available = lambda: True
+    seen = {}
+
+    def fake_vision_json(system, user, images, validate=None):
+        assert "image-input readiness" in system
+        assert "solid square" in user
+        assert len(images) == 1
+        with Image.open(io.BytesIO(images[0])) as im:
+            seen["size"] = im.size
+            seen["pixel"] = im.convert("RGB").getpixel((32, 32))
+        if validate:
+            validate({"color": "red"})
+
+    client.vision_json = fake_vision_json
+    assert client.preflight_vision() == "gemini:fake:vision"
+    assert seen["size"] == (64, 64)
+    assert seen["pixel"][0] > seen["pixel"][1] * 3
+
+    def wrong_color(_system, _user, _images, validate=None):
+        return validate({"color": "blue"})
+
+    client.vision_json = wrong_color
+    with pytest.raises(AssertionError, match="solid red test image"):
+        client.preflight_vision()
+
+
+def test_vision_availability_excludes_permanently_retired_vision_models(monkeypatch):
+    from autotube import llm as llm_module
+
+    client = llm_module.LLM.__new__(llm_module.LLM)
+    client.cfg = {"vision_providers": ["gemini"], "gemini_vision_models": ["one", "two"]}
+    client._dead = {"gemini:one:vision"}
+    client._provider_open = lambda _provider: False
+    monkeypatch.setattr(llm_module, "_provider_key", lambda _provider: "test-key")
+    assert client.vision_available()
+    client._dead.add("gemini:two:vision")
+    assert not client.vision_available()
+
+
 def test_contact_sheet_is_jpeg():
     b = vision.contact_sheet([c["_img"] for c in _cands(5)])
     assert b[:2] == b"\xff\xd8"

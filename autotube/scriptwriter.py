@@ -274,6 +274,21 @@ def _clip(s: str, n: int) -> str:
     return s if len(s) <= n else s[:n].rsplit(" ", 1)[0]
 
 
+def _rewrite_draft_excerpt(script: dict, limit: int = 900) -> str:
+    """Pass only the prior narration into a rewrite prompt; it is never factual evidence."""
+    if not isinstance(script, dict) or not isinstance(script.get("segments"), list):
+        return ""
+    rows = []
+    for index, segment in enumerate(script["segments"], 1):
+        if not isinstance(segment, dict):
+            continue
+        text = re.sub(r"\s+", " ", str(segment.get("text") or "")).strip()
+        aside = re.sub(r"\s+", " ", str(segment.get("aside") or "")).strip()
+        if text:
+            rows.append(f"{index}. {text}" + (f" [aside: {aside}]" if aside else ""))
+    return _clip("\n".join(rows), limit)
+
+
 def trend_evidence_summary(candidate: dict) -> str:
     """Describe measured, source-linked trend signals without trusting selector prose."""
     summaries = []
@@ -1499,8 +1514,12 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                      "Keep the script original; do not reuse another upload's topic, wording, or substance. Invent no facts and relax no factual, originality, safety, or approval standard. "
                      "Apply the treatment only when the source supports it.\n"
                      if turn_rule else "")
-        draft_feedback = str(topic.get("_draft_feedback") or "")[:600]
+        draft_feedback = str(topic.get("_draft_feedback") or "")[:1000]
         feedback_lower = draft_feedback.lower()
+        try:
+            rewrite_attempt = max(1, int(topic.get("_rewrite_attempt", 1)))
+        except (TypeError, ValueError, OverflowError):
+            rewrite_attempt = 1
         feedback_guidance = []
         if "consequence_first" in feedback_lower or "concrete result or reversal" in feedback_lower:
             feedback_guidance.append(
@@ -1512,14 +1531,47 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                 "CAUSAL-CHAIN REPAIR: Keep one source-supported event or argument. Make each beat cause, explain, "
                 "or reveal the meaning of the preceding beat; replace or remove disconnected facts. Never invent a "
                 "causal link just to create a story.")
+        if ("word-count repair required" in feedback_lower or "word count" in feedback_lower
+                or ("words" in feedback_lower and any(term in feedback_lower
+                                                       for term in ("hook", "turn", "escalation", "payoff")))):
+            feedback_guidance.append(
+                "WORD-COUNT REPAIR: obey the exact range in each reported failure; count whitespace-separated words "
+                "in factual text only, not asides. Rewrite only the flagged beat(s), preserve the other already-valid "
+                "beats, and never pad with an aside or an unsupported fact.")
         if "not entertaining enough" in feedback_lower:
             feedback_guidance.append(
-                "ENTERTAINMENT REPAIR: sharpen the fact-specific contrast, narrator reaction, and payoff; add no "
-                "unsupported stakes or factual claims.")
-        feedback_line = (f"PREVIOUS DRAFT FEEDBACK (fix without changing the facts or trend angle): {draft_feedback}\n"
+                "ENTERTAINMENT REPAIR: use one genuinely surprising detail the SOURCE TEXT supports; make the story "
+                "turn on a clear expectation-versus-reality contrast, build to a concrete payoff, and add a specific, "
+                "fact-free narrator reaction. Make a meaningful change to the treatment, not just stronger adjectives; "
+                "invent no stakes or claims.")
+        if "overall review score too low" in feedback_lower:
+            feedback_guidance.append(
+                "OVERALL-QUALITY REPAIR: fix each named reviewer concern in the actual beats; do not chase the number "
+                "or trade away factual accuracy, the trend angle, originality, safety, or beat limits.")
+        if "hook too weak" in feedback_lower:
+            feedback_guidance.append(
+                "HOOK REPAIR: make the first line specific and immediately surprising without relying on the title; "
+                "keep its exact configured word band and preserve the payoff for the end.")
+        if "specific current-trend angle" in feedback_lower:
+            feedback_guidance.append(
+                "TREND-ANGLE REPAIR: make the selected live-trend detail the story's through-line, but use only "
+                "details the SOURCE TEXT actually supports; if it cannot be supported, do not embellish it.")
+        if rewrite_attempt >= 3 and draft_feedback:
+            feedback_guidance.append(
+                "LATER-REWRITE ESCALATION: earlier draft(s) have not cleared every gate. Do not merely synonym-swap "
+                "or rephrase the prior version; materially improve the failing beat(s) while preserving all supported "
+                "facts and every factual, trend, originality, safety, and quality gate.")
+        feedback_line = (f"PREVIOUS DRAFT FEEDBACK (fix without changing supported facts or the selected trend angle): "
+                         f"{draft_feedback}\n"
                          + ("REWRITE PRIORITIES: " + " ".join(feedback_guidance) + "\n"
                             if feedback_guidance else "")
                          if draft_feedback else "")
+        prior_excerpt = _rewrite_draft_excerpt(topic.get("_prior_draft"))
+        prior_line = ("PREVIOUS AUTO-TUBE ATTEMPT (our own draft, NOT factual evidence):\n" + prior_excerpt + "\n"
+                      "Use this only to see what must change. Keep facts only when SOURCE TEXT supports them. "
+                      "For a count-only repair, preserve passing beats; for a story/entertainment repair, change the "
+                      "treatment enough to address the concern.\n"
+                      if prior_excerpt else "")
         user = f"""CURRENT TREND SUBJECT (deliver its specific live-trend angle; do not copy the raw headline): {trend_subject}
 CONCRETE SUBJECT TO NAME AND SHOW: {subject_for_visuals} — show this specific person, place, object, or species itself.
 The trend angle remains the story; this concrete subject is its on-screen referent, not an excuse to make a generic article summary.
@@ -1528,7 +1580,7 @@ WHY IT'S TRENDING: {topic.get('why_trending') or ', '.join(topic.get('sources', 
 {originality_line}ANGLE (this is the story to tell — not the article's summary, not the subject's general
 history. If the angle names a specific surprise, that surprise IS the video):
 {topic.get('angle') or 'most surprising educational angle'}
-{feedback_line}FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
+{feedback_line}{prior_line}FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
 {hook_line}
 {structure_line}{comment_line}{turn_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
 CHANNEL: {self.cfg['channel']['name']}
@@ -1676,6 +1728,14 @@ Return JSON:
                 f"aside {canned[0]!r} is canned filler that would fit any video. React to "
                 "something specific in that line - the thing, the number, the absurdity it "
                 "just described")
+            hook_lo = int(ccfg.get("hook_words_min", 6))
+            hook_hi = int(ccfg.get("hook_words_max", 9))
+            hook_words = len(segs[0]["text"].split())
+            count_issues = []
+            if not hook_lo <= hook_words <= hook_hi:
+                count_issues.append(f"hook is {hook_words} words; it must be {hook_lo}-{hook_hi}")
+            count_issues.extend(gates.check_segment_lengths(segs, self.cfg))
+            assert not count_issues, "word-count repair required: " + "; ".join(count_issues)
             words = sum(len(spoken_text(s).split()) for s in segs)
             # The upper tolerance used to be 1.3x, which accepted 120 words against a 93-word
             # target. At the measured ~3 words/second that is a 40-second narration before pauses
@@ -2086,13 +2146,18 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
         max_attempts = configured if max_attempts is None else bounded_attempts(
             max_attempts, configured, MAX_SCRIPT_DRAFTS, 1)
         feedback = ""
+        sticky_review_feedback = ""
+        previous_draft = None
         for attempt in range(max_attempts):
             if receipt:
                 receipt.set_stage("script_draft")
             try:
                 t = dict(topic)
+                t["_rewrite_attempt"] = attempt + 1
                 if feedback:
                     t["_draft_feedback"] = feedback
+                if previous_draft is not None:
+                    t["_prior_draft"] = previous_draft
                 script = self.write(t, plan, source)
             except LLMError as e:
                 if receipt:
@@ -2114,8 +2179,29 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
                 if receipt:
                     receipt.note_failure("script_review", "independent_review_unavailable", attempt=attempt + 1)
                 return None
-            feedback = "; ".join((review.get("issues") or []) + (review.get("factual_errors") or [])
-                                 + (review.get("policy_concerns") or []) + (review.get("fixes") or []))[:600]
+
+            items = []
+            for key in ("issues", "factual_errors", "policy_concerns", "fixes"):
+                value = review.get(key) or []
+                if isinstance(value, str):
+                    value = [value]
+                if isinstance(value, (list, tuple)):
+                    for item in value:
+                        text = str(item or "").strip()
+                        if text and text not in items:
+                            items.append(text)
+            current_feedback = "; ".join(items)[:900]
+            # A programmatic-only failure (for example, a beat word-count miss) has no
+            # reviewer to reconsider the earlier quality diagnosis. Keep that diagnosis
+            # attached until a later independent review either clears it or replaces it.
+            if review.get("programmatic_ok") is True:
+                sticky_review_feedback = current_feedback
+            feedback_parts = []
+            for item in (sticky_review_feedback, current_feedback):
+                if item and item not in feedback_parts:
+                    feedback_parts.append(item)
+            feedback = "; ".join(feedback_parts)[:1000]
+            previous_draft = script
             if attempt + 1 < max_attempts and receipt:
                 receipt.note_retry("script_review", attempt + 1, max_attempts, "rewrite_with_review_feedback")
             elif receipt:

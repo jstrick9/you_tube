@@ -30,13 +30,22 @@ def main() -> int:
         return 0
 
     needed = os.environ.get("AUTOTUBE_NEEDED", "")
+    proceed = os.environ.get("AUTOTUBE_PROCEED", "")
+    skip_reason = os.environ.get("AUTOTUBE_SKIP_REASON", "").strip()
     need_outcome = os.environ.get("AUTOTUBE_NEED_OUTCOME", "")
     install_outcome = os.environ.get("AUTOTUBE_INSTALL_OUTCOME", "")
     production_outcome = os.environ.get("AUTOTUBE_PRODUCTION_OUTCOME", "")
-    if needed == "0":
-        stage, outcome, category = "preflight", "already_satisfied", None
-    elif need_outcome == "failure":
+    if need_outcome == "failure":
         stage, outcome, category = "preflight", "failed", "preflight_failed"
+    elif proceed == "false" and skip_reason:
+        stage = "preflight"
+        outcome = "deferred" if skip_reason == "active_run_exists" else "superseded"
+        category = None
+    elif needed == "0":
+        stage, outcome, category = "preflight", "already_satisfied", None
+    elif proceed == "false" and needed.isdigit():
+        stage, outcome, category = "preflight", "deferred", None
+        skip_reason = "preflight_not_proceeded"
     elif install_outcome == "failure":
         stage, outcome, category = "install", "failed", "workflow_install_failed"
     elif production_outcome == "failure":
@@ -74,6 +83,8 @@ def main() -> int:
         "retry_events": [],
         "provider_events": [],
     }
+    if skip_reason:
+        row["preflight_skip_reason"] = skip_reason
     try:
         atomic_json(receipt_path, row)
         state_path = STATE / "run_reports.json"
