@@ -80,6 +80,47 @@ def test_writer_prompt_renders_assigned_treatment_without_changing_facts(monkeyp
     assert "open a question that only the end" not in writer.llm.prompt
 
 
+def test_review_feedback_gets_targeted_story_and_ordering_corrections():
+    cfg = common.load_config()
+
+    class CaptureThenStop:
+        lite = False
+        prompt = ""
+
+        def json(self, system, user, **kwargs):
+            self.prompt = user
+            raise RuntimeError("prompt captured")
+
+    writer = scriptwriter.ScriptWriter.__new__(scriptwriter.ScriptWriter)
+    writer.cfg = cfg
+    writer.llm = CaptureThenStop()
+    writer.src_chars = 4000
+    topic = {
+        "topic": "The Giant Stone Sphere",
+        "script_subject": "Stone Sphere",
+        "angle": "the spheres were carved before their discovery",
+        "category": "science_nature",
+        "_draft_feedback": (
+            "Rewrite Segment 2 to follow the 'consequence_first' treatment; this is a list of facts, not a story; "
+            "not entertaining enough."),
+    }
+    plan = {
+        "format": "sounds_fake", "hook_style": "bold_claim", "voice": "en-US-AndrewNeural",
+        "comment_device": "none", "turn_experiment_id": TURN_EXPERIMENT_ID,
+        "turn_variant": "consequence_first",
+    }
+    source = {"title": "Stone spheres of Costa Rica", "text": "The source describes stone spheres. " * 30}
+
+    with pytest.raises(RuntimeError, match="prompt captured"):
+        writer.write(topic, plan, source)
+
+    assert "ORDERING REPAIR (consequence_first)" in writer.llm.prompt
+    assert "CAUSAL-CHAIN REPAIR" in writer.llm.prompt
+    assert "Never invent a causal link" in writer.llm.prompt
+    assert "ENTERTAINMENT REPAIR" in writer.llm.prompt
+    assert "do not copy a reviewer example unless SOURCE TEXT supports it" in writer.llm.prompt
+
+
 def test_writer_visual_gate_targets_trend_subject_not_research_article():
     cfg = common.load_config()
     script = {

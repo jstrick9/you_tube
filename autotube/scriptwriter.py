@@ -1499,8 +1499,27 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                      "Keep the script original; do not reuse another upload's topic, wording, or substance. Invent no facts and relax no factual, originality, safety, or approval standard. "
                      "Apply the treatment only when the source supports it.\n"
                      if turn_rule else "")
-        feedback_line = (f"PREVIOUS DRAFT FEEDBACK (fix without changing the facts or trend angle): {str(topic.get('_draft_feedback') or '')[:600]}\n"
-                         if topic.get("_draft_feedback") else "")
+        draft_feedback = str(topic.get("_draft_feedback") or "")[:600]
+        feedback_lower = draft_feedback.lower()
+        feedback_guidance = []
+        if "consequence_first" in feedback_lower or "concrete result or reversal" in feedback_lower:
+            feedback_guidance.append(
+                "ORDERING REPAIR (consequence_first): Segment 2 opens with a concrete, source-supported result or "
+                "reversal, then its cause/actor. Keep the beat word limit; do not copy a reviewer example unless "
+                "SOURCE TEXT supports it.")
+        if "list of facts, not a story" in feedback_lower:
+            feedback_guidance.append(
+                "CAUSAL-CHAIN REPAIR: Keep one source-supported event or argument. Make each beat cause, explain, "
+                "or reveal the meaning of the preceding beat; replace or remove disconnected facts. Never invent a "
+                "causal link just to create a story.")
+        if "not entertaining enough" in feedback_lower:
+            feedback_guidance.append(
+                "ENTERTAINMENT REPAIR: sharpen the fact-specific contrast, narrator reaction, and payoff; add no "
+                "unsupported stakes or factual claims.")
+        feedback_line = (f"PREVIOUS DRAFT FEEDBACK (fix without changing the facts or trend angle): {draft_feedback}\n"
+                         + ("REWRITE PRIORITIES: " + " ".join(feedback_guidance) + "\n"
+                            if feedback_guidance else "")
+                         if draft_feedback else "")
         user = f"""CURRENT TREND SUBJECT (deliver its specific live-trend angle; do not copy the raw headline): {trend_subject}
 CONCRETE SUBJECT TO NAME AND SHOW: {subject_for_visuals} — show this specific person, place, object, or species itself.
 The trend angle remains the story; this concrete subject is its on-screen referent, not an excuse to make a generic article summary.
