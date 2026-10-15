@@ -1085,7 +1085,8 @@ def test_produce_never_drafts_for_an_undepictable_subject(monkeypatch):
 
     cfg = _y.safe_load((ROOT / "config.yaml").read_text())
     monkeypatch.setattr(SW, "ground", lambda *a, **k: {"title": "Stereopsis", "url": "u",
-                                                       "text": "t", "summary": "s", "images": ["related"]})
+                                                       "text": "Two camera views create stereo depth maps.",
+                                                       "summary": "s", "images": ["related"]})
     checked = {}
 
     def not_depictable(subject, *_args, **_kwargs):
@@ -1180,7 +1181,7 @@ def test_selection_demands_the_specific_article_not_the_category():
     src = (ROOT / "autotube" / "scriptwriter.py").read_text()
     assert "prefer the underlying record, place, object or phenomenon" not in src, \
         "the generalising instruction is back"
-    assert "MOST SPECIFIC one that actually contains the surprising claim" in src
+    assert "MOST SPECIFIC English Wikipedia article supporting it" in src
     assert "Conveyor belt" in src, "keep the worked example that motivated this"
 
 

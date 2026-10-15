@@ -275,6 +275,43 @@ def test_visual_validation_retry_repeats_the_concrete_subject_requirement(monkey
     assert calls[0][1] == 0.8 and retry_temperature == 0.3
 
 
+def test_trend_angle_validation_retry_keeps_story_specific_and_source_bound(monkeypatch, memory_provider_circuits):
+    import json
+    import autotube.llm as L
+
+    calls = []
+
+    def draft(_model, _system, user, temperature):
+        calls.append((user, temperature))
+        text = "The Nintendo DS sold millions of units." if len(calls) == 1 else \
+            "The Nintendo DS could not render 3D, so developers faked it with flat images."
+        return json.dumps({"text": text})
+
+    def validate(obj):
+        assert "faked" in obj["text"], \
+            "this is not the story that trended. The angle was: the DS faked 3D"
+
+    monkeypatch.setitem(L.PROVIDERS, "angle", (draft, "angle_models"))
+    monkeypatch.setattr(L.time, "sleep", lambda *_: None)
+    router = L.LLM.__new__(L.LLM)
+    router.cfg = {"angle_models": ["model"]}
+    router.order = ["angle"]
+    router.temperature = 0.8
+    router._dead = set()
+    router._blocked_providers = set()
+    router.circuits = memory_provider_circuits()
+    router.last_used = ""
+
+    result = router.json("system", "SOURCE TEXT: the effect used flat images", validate=validate)
+    assert "faked" in result["text"]
+    retry_prompt, retry_temperature = calls[1]
+    assert "The selected current-trend angle is the required story" in retry_prompt
+    assert "make its specific claim and distinctive details the through-line" in retry_prompt
+    assert "Use only facts supported by SOURCE TEXT" in retry_prompt
+    assert "never invent facts to match an unsupported angle" in retry_prompt
+    assert calls[0][1] == 0.8 and retry_temperature == 0.3
+
+
 def test_text_router_stops_when_all_configured_provider_circuits_are_open(
         memory_provider_circuits):
     from autotube.llm import LLM

@@ -424,3 +424,45 @@ def test_production_fails_closed_before_grounding_when_angle_is_missing(monkeypa
         AssertionError("grounding must not run without a specific angle")))
 
     assert writer.produce({"topic": "A currently trending topic", "angle": ""}, {}) is None
+
+
+def test_source_angle_gate_requires_distinctive_research_support():
+    angle = "Break down the impossible biomechanics and sheer nerve required for mountain goats to scale near-vertical cliffs"
+    subject = "Mountain Goats"
+    generic_source = (
+        "Mountain goats are mammals that live in mountains. Their coats are thick, and both sexes grow horns. "
+        "They are adapted to rugged terrain and rocky cliffs."
+    )
+    on_angle_source = (
+        "Mountain goats grip steep cliffs with split hooves and rough pads. Their hooves help them climb vertical rock faces."
+    )
+
+    assert not scriptwriter.source_supports_angle(angle, subject, generic_source)
+    assert scriptwriter.source_supports_angle(
+        "Mountain goats grip steep cliffs with split hooves", subject, on_angle_source)
+
+
+def test_production_skips_before_drafting_when_research_does_not_support_trend_angle(monkeypatch):
+    cfg = copy.deepcopy(common.load_config())
+    writer = scriptwriter.ScriptWriter.__new__(scriptwriter.ScriptWriter)
+    writer.cfg = cfg
+    writer.lang = cfg["channel"].get("language", "en")
+    writer.llm = object()
+    source = {
+        "title": "Mountain goat",
+        "text": "Mountain goats are mammals that live in mountains. Their coats are thick, and both sexes grow horns. "
+                "They are adapted to rugged terrain and rocky cliffs.",
+    }
+    drafts = []
+    monkeypatch.setattr(scriptwriter, "ground", lambda *a, **k: source)
+    monkeypatch.setattr(scriptwriter, "subject_is_depictable", lambda *a, **k: True)
+    monkeypatch.setattr(writer, "write", lambda *a, **k: drafts.append(True))
+
+    topic = {
+        "topic": "How Do Mountain Goats Survive These Insane Jumps?",
+        "script_subject": "Mountain Goats",
+        "angle": "Break down the impossible biomechanics and sheer nerve required for mountain goats to scale near-vertical cliffs",
+        "wiki_query": "Mountain goat",
+    }
+    assert writer.produce(topic, {}) is None
+    assert drafts == [], "do not call the writer when the grounded source misses the selected story"

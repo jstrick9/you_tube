@@ -502,6 +502,10 @@ class LLM:
                                             "must include its distinctive noun(s); do not substitute scenery, atmosphere, "
                                             "or a generic landmark."
                                             if "visual" in feedback_lower or "shot shows" in feedback_lower else "")
+                                         + (" The selected current-trend angle is the required story, not a broad topic label: "
+                                            "make its specific claim and distinctive details the through-line. Use only facts "
+                                            "supported by SOURCE TEXT; never invent facts to match an unsupported angle."
+                                            if "this is not the story that trended" in feedback_lower or "angle was:" in feedback_lower else "")
                                          if feedback else "")
                         retry_temp = min(temp, 0.3) if feedback else temp
                         raw = fn(model, system, prompt, retry_temp, images) if images else fn(

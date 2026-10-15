@@ -680,7 +680,7 @@ def _matched_subject_terms(key: set[str], observed: set[str]) -> set[str]:
 _VISUAL_SUBJECT_MODIFIERS = frozenset("""
 a an after and are at ancient by crazy discovery discoveries discovered discover evolution evolving fast
 for from giant hidden huge impossible in into insane jump jumps jumping lost loves love massive mystery mysteries
-mysterious of old on or poison poisoned secret shocking survive survives survival the to toxic unearthed
+mysterious of old on or poison poisoned secret shocking survive survives survival terrifying the to toxic unearthed
 venom weird with years year
 """.split())
 _VISUAL_GENERIC_SINGLETONS = frozenset("""
@@ -948,7 +948,12 @@ def _angle_terms(angle: str, subject: str = "") -> set[str]:
             "from", "about", "into", "than", "then", "when", "how", "why", "what",
             "most", "more", "very", "just", "even", "only", "also", "some", "one",
             "first", "actually", "really", "still", "because", "which", "who", "been",
-            "have", "has", "had", "are", "can", "could", "would", "will", "did", "does"}
+            "have", "has", "had", "are", "can", "could", "would", "will", "did", "does",
+            # Rhetorical framing is not evidence that the specific factual angle appears in
+            # the source (e.g. "explore the unsettling reality" or "sheer impossible nerve").
+            "after", "ancient", "break", "baffled", "crazy", "down", "examine", "explore", "impossible",
+            "insane", "leaving", "near", "perfectly", "required", "reality", "scary", "shocking", "sheer",
+            "terrifying", "unsettling", "wild"}
     key = {t for t in tokens(angle or "") if len(t) > 3 and t not in stop}
     # The subject appears in every script about it; only the words describing the
     # surprising turn can prove the selected trend angle was delivered.
@@ -974,6 +979,26 @@ def delivers_angle(script: dict, angle: str, subject: str = "") -> bool:
     said = {t for seg in script.get("segments", []) for t in tokens(spoken_text(seg))}
     needed = 1 if len(key) == 1 else max(2, (len(key) + 2) // 3)
     return len(key & said) >= needed
+
+
+def source_supports_angle(angle: str, subject: str, source_text: str) -> bool:
+    """Fail closed before drafting if the grounded research cannot substantiate the trend angle.
+
+    The candidate selector sees trend metadata, not article text, so an angle can be a
+    plausible-sounding guess that the selected source never supports. Requiring at least
+    half of the angle's distinctive terms in the actual research text is a conservative
+    preflight: it prevents spending a draft on a generic/adjacent article while leaving
+    the existing script and independent-review gates in place for meaning and facts.
+    """
+    from .originality import tokens
+
+    key = _angle_terms(angle, subject)
+    if len(key) < 2 or not isinstance(source_text, str) or not source_text.strip():
+        return False
+    observed = set(tokens(source_text))
+    supported = _matched_subject_terms(key, observed)
+    required = max(2, math.ceil(len(key) * 0.5))
+    return len(supported) >= required
 
 UNREADABLE_SHOTS = ("infographic", "chart", "graph", "diagram", "schematic", "timeline",
                     "bar chart", "pie chart", "screenshot", "table of", "map showing",
@@ -1234,9 +1259,10 @@ FORMATS we can make (choose 2-4 that the specific article honestly supports; myt
 For every pick:
 - `script_subject` is a concise concrete name (1-6 words) for the CURRENT TREND CANDIDATE — it must name and be
   depicted in the video, share a meaningful word with the candidate, and must NOT be replaced by a background article title.
-- Give one independently worded, specific `angle`; the article is the source of facts, not the trend headline.
-- `wiki_query` must be the MOST SPECIFIC one that actually contains the surprising claim: the English Wikipedia
-  article for the named thing, not a broader category (e.g. Bou Craa, not “Conveyor belt”). If none supports it, use "".
+- `angle` must be a specific, independently worded factual claim. Trend evidence is discovery, not proof; the selector
+  lacks article text, so invent no details. Grounded research must support the angle before drafting.
+- `wiki_query` must be the MOST SPECIFIC English Wikipedia article supporting it, not a broad category (e.g. Bou Craa,
+  not “Conveyor belt”). If none supports it, do not select the candidate.
 - Viral/outlier titles are discovery evidence only: do not copy the outlier headline, wording, script, sequence, captions,
   visuals, audio, or creator style. `why_trending` briefly cites the measured evidence shown above.
 - Use a valid channel `category` and only fitting format names. Every pick MUST include an explicit risk verdict
@@ -2025,6 +2051,13 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
             return None
         topic["wiki_title"] = source["title"]
         visual_subject = visual_subject_for_topic(topic, source)
+        if not source_supports_angle(str(topic.get("angle") or ""), visual_subject,
+                                     str(source.get("text") or "")):
+            if receipt:
+                receipt.note_failure("script_research", "trend_angle_unsupported_by_source")
+            log.info("  ✗ grounded research does not substantiate the current-trend angle for %r — skipping before draft",
+                     source["title"])
+            return None
         if not subject_is_depictable(visual_subject, self.cfg, source):
             if receipt:
                 receipt.note_failure("script_research", "no_depictable_source_asset")
