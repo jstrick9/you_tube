@@ -10,27 +10,33 @@
     "groq": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-15T02:32:21.759514+00:00",
-      "blocked_until": "2026-10-15T02:52:21.759514+00:00",
-      "retry_after_seconds": 2.0
+      "recorded_at": "2026-10-15T03:01:45.068465+00:00",
+      "blocked_until": "2026-10-15T03:21:45.068465+00:00",
+      "retry_after_seconds": 1.0
     },
     "gemini": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-15T02:33:03.192744+00:00",
-      "blocked_until": "2026-10-15T02:53:03.192744+00:00"
+      "recorded_at": "2026-10-15T03:02:53.548475+00:00",
+      "blocked_until": "2026-10-15T03:22:53.548475+00:00"
     },
     "mistral": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-15T02:33:09.786919+00:00",
-      "blocked_until": "2026-10-15T02:53:09.786919+00:00"
+      "recorded_at": "2026-10-15T03:02:59.924959+00:00",
+      "blocked_until": "2026-10-15T03:22:59.924959+00:00"
+    },
+    "cloudflare": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-15T03:03:06.148740+00:00",
+      "blocked_until": "2026-10-15T03:23:06.148740+00:00"
     }
   },
   "failures_5xx": {
     "gemini": {
       "count": 1,
-      "last_at": "2026-10-15T02:32:55.102961+00:00"
+      "last_at": "2026-10-15T03:02:45.432424+00:00"
     }
   }
 }
