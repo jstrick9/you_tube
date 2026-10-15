@@ -679,9 +679,13 @@ def _matched_subject_terms(key: set[str], observed: set[str]) -> set[str]:
 
 _VISUAL_SUBJECT_MODIFIERS = frozenset("""
 a an after and are at ancient by crazy discovery discoveries discovered discover evolution evolving fast
-for from giant hidden huge impossible in into insane jump jumps jumping loves love massive mystery mysteries
+for from giant hidden huge impossible in into insane jump jumps jumping lost loves love massive mystery mysteries
 mysterious of old on or poison poisoned secret shocking survive survives survival the to toxic unearthed
 venom weird with years year
+""".split())
+_VISUAL_GENERIC_SINGLETONS = frozenset("""
+animal artifact cave city creature history island mountain mystery object river species sphere stone story temple
+village town
 """.split())
 
 
@@ -703,12 +707,14 @@ def visual_subject_for_topic(topic: dict | None, source: dict | None = None) -> 
         for word in re.findall(r"[\w’'-]+", label, re.UNICODE):
             term = word.casefold().replace("’", "'")
             term = term[:-2] if term.endswith("'s") else term
-            if len(term) > 2 and term not in _VISUAL_SUBJECT_MODIFIERS:
+            if (len(term) > 2 and not term.isdigit()
+                    and term not in _VISUAL_SUBJECT_MODIFIERS):
                 result.append(word[:-2] if word.casefold().endswith("'s") else word)
         return result
 
     trend_core = core(raw)
-    if trend_core:
+    if trend_core and not (len(trend_core) == 1
+                           and trend_core[0].casefold() in _VISUAL_GENERIC_SINGLETONS):
         return " ".join(trend_core)
     source_core = core(source_title)
     if source_core:

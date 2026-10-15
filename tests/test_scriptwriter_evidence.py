@@ -19,9 +19,12 @@ def _words(text):
 
 
 def test_visual_subject_resolves_nonvisual_modifiers_to_concrete_subjects():
+    grounded_city = {"title": "Derinkuyu underground city"}
     assert visual_subject_for_topic(
-        {"script_subject": "Ancient Mysteries Unearthed"},
-        {"title": "Derinkuyu underground city"},
+        {"script_subject": "Ancient Mysteries Unearthed"}, grounded_city,
+    ) == "Derinkuyu underground city"
+    assert visual_subject_for_topic(
+        {"script_subject": "Lost 1,000‑Year‑Old City"}, grounded_city,
     ) == "Derinkuyu underground city"
     assert visual_subject_for_topic(
         {"script_subject": "Cleopatra eyeliner poison"}, {"title": "Kohl"},
