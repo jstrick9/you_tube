@@ -684,7 +684,7 @@ mysterious of old on or poison poisoned secret shocking survive survives surviva
 venom weird with years year
 """.split())
 _VISUAL_GENERIC_SINGLETONS = frozenset("""
-animal artifact cave city creature history island mountain mystery object river species sphere stone story temple
+animal artifact cave city creature cycle cycles history island mountain mystery object river species sphere stone story temple
 village town
 """.split())
 

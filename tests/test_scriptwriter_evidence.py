@@ -36,6 +36,9 @@ def test_visual_subject_resolves_nonvisual_modifiers_to_concrete_subjects():
         {"script_subject": "Terrifying Carnivorous Plants"}, {"title": "Carnivorous plant"},
     ) == "Carnivorous Plants"
     assert visual_subject_for_topic(
+        {"script_subject": "The Evolution of Cycles"}, {"title": "Bicycle"},
+    ) == "Bicycle"
+    assert visual_subject_for_topic(
         {"script_subject": "Giant Stone Spheres"}, {"title": "Stone spheres"},
     ) == "Stone Spheres"
 
