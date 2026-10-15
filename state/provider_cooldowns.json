@@ -10,21 +10,21 @@
     "groq": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-15T15:11:43.444701+00:00",
-      "blocked_until": "2026-10-15T15:31:43.444701+00:00",
-      "retry_after_seconds": 32.0
+      "recorded_at": "2026-10-15T19:25:59.195664+00:00",
+      "blocked_until": "2026-10-15T19:45:59.195664+00:00",
+      "retry_after_seconds": 29.0
     },
     "mistral": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-15T15:14:12.224217+00:00",
-      "blocked_until": "2026-10-15T15:34:12.224217+00:00"
+      "recorded_at": "2026-10-15T19:26:29.377958+00:00",
+      "blocked_until": "2026-10-15T19:46:29.377958+00:00"
     },
     "cloudflare": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-15T15:14:19.250125+00:00",
-      "blocked_until": "2026-10-15T15:34:19.250125+00:00"
+      "recorded_at": "2026-10-15T19:39:33.785851+00:00",
+      "blocked_until": "2026-10-15T19:59:33.785851+00:00"
     }
   },
   "failures_5xx": {}

@@ -3292,5 +3292,191 @@
     "failures": [],
     "retry_events": [],
     "provider_events": []
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261015-192545-3637",
+    "workflow_run_id": "38793615275",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-15T19:25:45.869588+00:00",
+    "finished_at": "2026-10-15T19:42:03.792578+00:00",
+    "duration_seconds": 977.923,
+    "mode": "upload",
+    "target_count": 2,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 2,
+      "topic_production": 1,
+      "topic_validation": 4,
+      "script_research": 8,
+      "script_draft": 5,
+      "script_review": 5,
+      "tts": 1,
+      "visuals": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Ancient Mysteries Unearthed After 1,000 Years!",
+        "topic_key": "ancient mysteries unearthed after 1000 years",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "The Giant Stone Sphere",
+        "topic_key": "the giant stone sphere",
+        "outcome": "rejected",
+        "stage": "script_review",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "They Fired A Torpedo At Their Own President",
+        "topic_key": "they fired a torpedo at their own president",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "2 Most Terrifying Carnivorous Plants in the World!",
+        "topic_key": "2 most terrifying carnivorous plants in the world",
+        "outcome": "rejected",
+        "stage": "visuals",
+        "failure_category": "vision_unavailable"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-15T19:26:08.768560+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-15T19:26:08.768697+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-15T19:27:30.816412+00:00",
+        "stage": "script_review",
+        "category": "script_quality_rejected",
+        "attempt": 4
+      },
+      {
+        "at": "2026-10-15T19:27:30.816464+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-15T19:30:23.085019+00:00",
+        "stage": "script_research",
+        "category": "source_grounding_failed"
+      },
+      {
+        "at": "2026-10-15T19:30:23.085053+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-15T19:42:03.786959+00:00",
+        "stage": "visuals",
+        "category": "vision_unavailable",
+        "exception_type": "VisionUnavailable",
+        "attempt": 4
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "script_review",
+        "attempt": 1,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 2,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 3,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-15T19:25:45.871068+00:00",
+        "cooldown_until": "2026-10-15T23:45:36.134744+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-15T19:25:59.196273+00:00",
+        "cooldown_until": "2026-10-15T19:45:59.195664+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-15T19:26:29.378612+00:00",
+        "cooldown_until": "2026-10-15T19:46:29.377958+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-15T19:29:05.632449+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-15T19:36:43.018427+00:00"
+      },
+      {
+        "provider": "cloudflare",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-15T19:39:33.786478+00:00",
+        "cooldown_until": "2026-10-15T19:59:33.785851+00:00"
+      }
+    ],
+    "top_up": true,
+    "rate_limited_models": [
+      "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct",
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]

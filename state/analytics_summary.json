@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-15T15:11:27.968534+00:00",
+  "updated": "2026-10-15T19:25:33.850398+00:00",
   "videos_total": 43,
   "videos_7d": 5,
   "views_7d": 1054,
@@ -46,7 +46,7 @@
         },
         {
           "arm": "culture",
-          "mean": 0.395,
+          "mean": 0.396,
           "n": 3
         }
       ]
@@ -67,7 +67,7 @@
         },
         {
           "arm": "dumbest_decision",
-          "mean": 0.541,
+          "mean": 0.54,
           "n": 1
         },
         {
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 34,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 34,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -517,10 +517,10 @@
         "format": "backstory",
         "hook_style": "you_statement",
         "duration_seconds": 33.3,
-        "avg_view_pct": 36.64,
+        "avg_view_pct": 37.56,
         "views": 329,
-        "engaged_views_90d": 58,
-        "sample_size": 58,
+        "engaged_views_90d": 59,
+        "sample_size": 59,
         "sample_basis": "engaged_views_90d",
         "sample_qualified": true
       },
@@ -656,7 +656,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10075,
+    "views_90d": 10077,
     "per_1k_views": 2.68,
     "videos": 34,
     "denominator_basis": "engaged_views",
@@ -667,12 +667,12 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10075,
+    "engaged_views_90d": 10077,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003358,
-    "current_full_threshold_progress": 0.001007,
+    "expanded_threshold_progress": 0.003359,
+    "current_full_threshold_progress": 0.001008,
     "feb_2027_full_threshold_progress": 0.000504,
     "public_videos": 34,
     "videos_with_metric": 34,
