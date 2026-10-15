@@ -3266,5 +3266,31 @@
       "groq:openai/gpt-oss-120b",
       "mistral:mistral-small-latest"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "38762923793",
+    "workflow_run_id": "38762923793",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-15T15:44:23.198797+00:00",
+    "finished_at": "2026-10-15T15:44:23.198797+00:00",
+    "duration_seconds": 0,
+    "mode": "workflow_fallback",
+    "top_up": true,
+    "target_count": 0,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "already_satisfied",
+    "stage": "preflight",
+    "stage_entries": {
+      "preflight": 1
+    },
+    "retry_budgets": {},
+    "topic_attempts": [],
+    "failures": [],
+    "retry_events": [],
+    "provider_events": []
   }
 ]
