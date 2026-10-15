@@ -1,30 +1,30 @@
 {
   "schema_version": 1,
   "providers": {
-    "groq": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-14T23:40:44.450524+00:00",
-      "blocked_until": "2026-10-15T00:00:44.450524+00:00",
-      "retry_after_seconds": 38.0
-    },
-    "gemini": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-14T23:40:55.069005+00:00",
-      "blocked_until": "2026-10-15T00:00:55.069005+00:00"
-    },
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-14T23:41:01.670637+00:00",
-      "blocked_until": "2026-10-15T00:01:01.670637+00:00"
-    },
     "pollinations": {
       "reason": "billing_or_entitlement",
       "status_code": 402,
       "recorded_at": "2026-10-14T23:45:36.134744+00:00",
       "blocked_until": "2026-10-15T23:45:36.134744+00:00"
+    },
+    "groq": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-15T01:44:11.773519+00:00",
+      "blocked_until": "2026-10-15T02:04:11.773519+00:00",
+      "retry_after_seconds": 29.0
+    },
+    "gemini": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-15T01:45:19.668887+00:00",
+      "blocked_until": "2026-10-15T02:05:19.668887+00:00"
+    },
+    "mistral": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-15T01:45:26.143016+00:00",
+      "blocked_until": "2026-10-15T02:05:26.143016+00:00"
     }
   },
   "failures_5xx": {}
