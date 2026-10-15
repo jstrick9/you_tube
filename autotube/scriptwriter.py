@@ -100,6 +100,106 @@ def grounding_floor(n_segments: int, ccfg: dict) -> int:
     return min(max(1, n_segments), max(floor, min(cap, math.ceil(ratio * max(1, n_segments)))))
 
 
+_EVIDENCE_STOPWORDS = frozenset("""
+a an and are as at be been being but by can could did do does doing for from had has have he her hers
+him his how i if in into is it its may might more most must my no nor not of on once only or other our
+ours out over own same she should so some such than that the their theirs them then there these they
+this those through to too under until up very was we were what when where which while who why will with
+would you your yours
+""".split())
+_EVIDENCE_WORD_RE = re.compile(r"[\w]+(?:['’][\w]+)?", re.UNICODE)
+_EVIDENCE_NUMBER_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
+
+
+def _evidence_terms(text: str) -> set[str]:
+    """Normalize meaningful words for conservative script-to-source quote matching."""
+    terms = set()
+    for match in _EVIDENCE_WORD_RE.finditer(text or ""):
+        raw = match.group(0).casefold().replace("’", "'")
+        if raw.endswith("'s"):
+            raw = raw[:-2]
+        # A one-letter plural normalization helps ordinary paraphrases without stemming
+        # unrelated words or turning broad topical overlap into apparent factual support.
+        if len(raw) > 4 and raw.endswith("s") and not raw.endswith(("ss", "us", "is")):
+            raw = raw[:-1]
+        if raw not in _EVIDENCE_STOPWORDS and (len(raw) > 2 or raw.isdigit()
+                                                or match.group(0).isupper()):
+            terms.add(raw)
+    return terms
+
+
+def _source_evidence_quote(segment_text: str, source_text: str, min_words: int = 8,
+                           max_words: int = 15, used: set[str] | None = None) -> str | None:
+    """Find a short, verbatim source passage with strong lexical support for a script line.
+
+    This only fills a missing metadata field: it never rewrites the narration or invents a
+    quotation. Weak topical overlap, unsupported numerals, and reused quotes are rejected.
+    """
+    segment_terms = _evidence_terms(segment_text)
+    if len(segment_terms) < 2 or not source_text:
+        return None
+    numbers = {m.group(0).replace(",", "").rstrip(".") for m in _EVIDENCE_NUMBER_RE.finditer(segment_text)}
+    used_quotes = {q.strip().casefold() for q in (used or set()) if isinstance(q, str)}
+    used_term_sets = [_evidence_terms(q) for q in used_quotes]
+    best: tuple[float, str] | None = None
+    for sentence in re.split(r"(?<=[.!?])\s+|[\r\n]+", source_text):
+        sentence = sentence.strip()
+        matches = list(_EVIDENCE_WORD_RE.finditer(sentence))
+        if len(matches) < min_words:
+            continue
+        for length in range(min(max_words, len(matches)), min_words - 1, -1):
+            for start in range(0, len(matches) - length + 1):
+                quote = sentence[matches[start].start():matches[start + length - 1].end()].strip()
+                if len(quote) <= 25 or quote.casefold() in used_quotes:
+                    continue
+                quote_numbers = {m.group(0).replace(",", "").rstrip(".")
+                                 for m in _EVIDENCE_NUMBER_RE.finditer(quote)}
+                if not numbers.issubset(quote_numbers):
+                    continue
+                quote_terms = _evidence_terms(quote)
+                if any(quote_terms and terms and len(quote_terms & terms) / min(len(quote_terms), len(terms)) >= 0.7
+                       for terms in used_term_sets):
+                    continue
+                overlap = segment_terms & quote_terms
+                if len(overlap) < 2:
+                    continue
+                coverage = len(overlap) / len(segment_terms)
+                precision = len(overlap) / max(1, len(quote_terms))
+                if coverage < 0.4 or precision < 0.28:
+                    continue
+                score = coverage * 0.7 + precision * 0.3
+                if best is None or score > best[0]:
+                    best = (score, quote)
+    return best[1] if best else None
+
+
+def _attach_missing_evidence(segments: list, source_text: str, min_words: int = 8,
+                             max_words: int = 15) -> int:
+    """Backfill omitted evidence fields from distinct, source-matched verbatim quotes.
+
+    The hook may remain empty. A factual segment is filled only when its own words and any
+    numerals match the quoted source passage; the existing grounding floor remains unchanged.
+    """
+    used = {s.get("evidence", "").strip() for s in segments
+            if isinstance(s, dict) and isinstance(s.get("evidence"), str) and s.get("evidence", "").strip()}
+    attached = 0
+    for index, segment in enumerate(segments):
+        if not isinstance(segment, dict):
+            continue
+        if "evidence" not in segment:
+            segment["evidence"] = ""
+        evidence = segment.get("evidence")
+        if not isinstance(evidence, str) or evidence.strip() or index == 0:
+            continue
+        quote = _source_evidence_quote(str(segment.get("text") or ""), source_text,
+                                       min_words=min_words, max_words=max_words, used=used)
+        if quote:
+            segment["evidence"] = quote
+            used.add(quote)
+            attached += 1
+    return attached
+
+
 COMMENT_GUIDE = {
     "none": "",
     "poll": "Finish by making the viewer pick between two concrete options from the story itself "
@@ -1419,6 +1519,11 @@ Return JSON:
             assert all(isinstance(s, dict) for s in segs), "every segment must be a JSON object"
             assert all(isinstance(s.get("text"), str) and s["text"].strip() for s in segs), "empty segment"
             assert all("aside" not in s or isinstance(s["aside"], str) for s in segs), "aside must be text"
+            evidence_min, evidence_max = (5, 9) if self.llm.lite else (8, 15)
+            attached_evidence = _attach_missing_evidence(
+                segs, str(source.get("text") or ""), evidence_min, evidence_max)
+            if attached_evidence:
+                log.info("  attached %d source-matched evidence quote(s) to omitted draft fields", attached_evidence)
             assert all(isinstance(s.get("evidence"), str) for s in segs), "every segment must include textual evidence"
             assert isinstance(o.get("title"), str) and o["title"].strip(), "missing title"
             bad = [i + 1 for i, s in enumerate(segs) if not (
