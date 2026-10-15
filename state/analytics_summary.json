@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-15T06:24:38.085375+00:00",
+  "updated": "2026-10-15T15:11:27.968534+00:00",
   "videos_total": 43,
   "videos_7d": 5,
   "views_7d": 1054,
@@ -41,7 +41,7 @@
         },
         {
           "arm": "geography",
-          "mean": 0.41,
+          "mean": 0.411,
           "n": 2
         },
         {
@@ -261,7 +261,7 @@
     {
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
-      "views": 1562,
+      "views": 1564,
       "avg_view_pct": 114.19
     },
     {
@@ -309,7 +309,7 @@
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
-      "views": 1179,
+      "views": 1182,
       "avg_view_pct": 50.35000000000001
     },
     {
@@ -566,7 +566,7 @@
         "hook_style": "question",
         "duration_seconds": 38.4,
         "avg_view_pct": 45.65,
-        "views": 973,
+        "views": 974,
         "engaged_views_90d": 540,
         "sample_size": 540,
         "sample_basis": "engaged_views_90d",
@@ -598,7 +598,7 @@
         "hook_style": "you_statement",
         "duration_seconds": 37.3,
         "avg_view_pct": 50.35,
-        "views": 1179,
+        "views": 1182,
         "engaged_views_90d": 534,
         "sample_size": 534,
         "sample_basis": "engaged_views_90d",
