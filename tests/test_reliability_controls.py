@@ -172,6 +172,33 @@ def test_failure_classification_preserves_diagnostics_without_raw_errors():
     assert classify_failure("script_draft", "ReadTimeout") == "provider_transient_network"
 
 
+def test_provider_read_timeout_is_skipped_for_rest_of_run(monkeypatch, memory_provider_circuits):
+    """A dead endpoint must not consume two long request timeouts for every topic."""
+    import requests
+    import autotube.llm as L
+
+    calls = []
+
+    def slow(_model, _system, _user, _temperature):
+        calls.append("slow")
+        raise requests.exceptions.ReadTimeout("provider did not respond")
+
+    def healthy(_model, _system, _user, _temperature):
+        calls.append("healthy")
+        return '{"ok": true}'
+
+    monkeypatch.setitem(L.PROVIDERS, "slow", (slow, "slow_models"))
+    monkeypatch.setitem(L.PROVIDERS, "healthy", (healthy, "healthy_models"))
+    router = L.LLM({"llm": {"providers": ["slow", "healthy"],
+                              "slow_models": ["model-a", "model-b"],
+                              "healthy_models": ["model-c"]}})
+
+    assert router.json("system", "user") == {"ok": True}
+    assert calls == ["slow", "healthy"]
+    assert "slow" in router._blocked_providers
+    assert not router.circuits.is_open("slow"), "one-run network failures must not persist cooldowns"
+
+
 def test_text_router_stops_when_all_configured_provider_circuits_are_open(
         memory_provider_circuits):
     from autotube.llm import LLM

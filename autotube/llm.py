@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from typing import Any
 
+import requests
+
 from . import run_report
 from .common import http
 from .provider_health import (DEFAULT_402_COOLDOWN_SECONDS, DEFAULT_429_COOLDOWN_SECONDS,
@@ -578,6 +580,19 @@ class LLM:
                         errors.append(f"{tag}: {type(e).__name__}: {str(e)[:160]}")
                         if isinstance(e, AssertionError):
                             feedback = str(e)
+                        elif isinstance(e, (requests.exceptions.Timeout,
+                                            requests.exceptions.ConnectionError)):
+                            # A 120-second request timeout is already the bounded retry budget for
+                            # that provider in this run. Retire the provider for the remaining calls
+                            # rather than paying the same timeout once per topic/model. Do not persist
+                            # a cooldown: a one-off network failure should be retried on the next run.
+                            self._dead.add(tag)
+                            self._blocked_providers.add(pname)
+                            if receipt:
+                                receipt.note_provider_event(pname, None, "transient_network_failure")
+                            log.warning("skipping provider %s for this run after %s", pname,
+                                        type(e).__name__)
+                            break
                         if not last_try:
                             time.sleep(1)
         # An empty `errors` list is not "nothing went wrong" - it means every candidate
