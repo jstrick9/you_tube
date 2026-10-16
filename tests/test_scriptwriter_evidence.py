@@ -112,8 +112,6 @@ def test_real_writer_validator_backfills_an_omitted_evidence_field():
         def json(self, _system, _user, validate=None, **_kwargs):
             captured["validate"] = validate
             captured["user"] = _user
-            captured["attempts_per_model"] = _kwargs.get("attempts_per_model")
-            captured["validation_attempts_per_model"] = _kwargs.get("validation_attempts_per_model")
             raise RuntimeError("capture the production validator")
 
     class FakeStrategy:
@@ -131,8 +129,6 @@ def test_real_writer_validator_backfills_an_omitted_evidence_field():
     except RuntimeError:
         pass
 
-    assert captured["attempts_per_model"] == 2
-    assert captured["validation_attempts_per_model"] == 3
     script = {"title": "The Stone Sphere mystery", "segments": [
         {"text": "The Stone Sphere shocked everyone.", "visual": {"shows": "a dark cave", "queries": ["dark cave", "cave wall"]}},
         {"text": "The stone sphere is two meters wide and weighs several tons.",

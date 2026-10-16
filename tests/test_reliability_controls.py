@@ -339,6 +339,7 @@ def test_validation_retry_repeats_schema_and_lowers_temperature(monkeypatch, mem
     assert router.json("system", "original request", validate=validate) == {
         "title": "Draft", "segments": [{"text": "Fact", "evidence": "source quote"}] * 4,
     }
+    assert len(calls) == 2, "schema correction stays within the bounded two-call model budget"
     retry_prompt, retry_temperature = calls[1]
     assert "VALIDATION FAILURE: need exactly 4 or 5 segments" in retry_prompt
     assert "preserve every required key" in retry_prompt
@@ -346,64 +347,6 @@ def test_validation_retry_repeats_schema_and_lowers_temperature(monkeypatch, mem
     assert "Prefer exactly five segment objects in this order: hook, turn, escalation, escalation, payoff" in retry_prompt
     assert "complete, non-null visual object" in retry_prompt
     assert calls[0][1] == 0.8 and retry_temperature == 0.3
-
-
-def test_script_validation_gets_one_extra_correction_without_extra_transport_retries(
-        monkeypatch, memory_provider_circuits):
-    import autotube.llm as L
-
-    calls = []
-
-    def draft(_model, _system, user, _temperature):
-        calls.append(user)
-        return '{"ok": true}' if len(calls) == 3 else '{"ok": false}'
-
-    def validate(obj):
-        assert obj.get("ok") is True, "script schema requires ok=true"
-
-    monkeypatch.setitem(L.PROVIDERS, "schema_budget", (draft, "schema_budget_models"))
-    monkeypatch.setattr(L.time, "sleep", lambda *_: None)
-    router = L.LLM.__new__(L.LLM)
-    router.cfg = {"schema_budget_models": ["model"]}
-    router.order = ["schema_budget"]
-    router.temperature = 0.7
-    router._dead = set()
-    router._blocked_providers = set()
-    router.circuits = memory_provider_circuits()
-    router.last_used = ""
-
-    assert router.json(
-        "system", "original request", validate=validate,
-        attempts_per_model=2, validation_attempts_per_model=3,
-    ) == {"ok": True}
-    assert len(calls) == 3
-    assert all("VALIDATION FAILURE: script schema requires ok=true" in call for call in calls[1:])
-
-
-def test_validation_budget_does_not_extend_transient_transport_retries(monkeypatch, memory_provider_circuits):
-    import autotube.llm as L
-
-    calls = []
-
-    def unavailable(model, _system, _user, _temperature):
-        calls.append(model)
-        raise L.LLMError("HTTP 503: temporarily unavailable", status_code=503)
-
-    monkeypatch.setitem(L.PROVIDERS, "schema_transport", (unavailable, "schema_transport_models"))
-    monkeypatch.setattr(L.time, "sleep", lambda *_: None)
-    router = L.LLM.__new__(L.LLM)
-    router.cfg = {"schema_transport_models": ["model"]}
-    router.order = ["schema_transport"]
-    router.temperature = 0.7
-    router._dead = set()
-    router._blocked_providers = set()
-    router.circuits = memory_provider_circuits()
-    router.last_used = ""
-
-    with pytest.raises(L.LLMError, match="All LLM providers failed"):
-        router.json("system", "original request", attempts_per_model=2,
-                    validation_attempts_per_model=3)
-    assert calls == ["model", "model"]
 
 
 def test_word_count_validation_retry_gives_a_targeted_repair_instruction(monkeypatch, memory_provider_circuits):

@@ -1905,13 +1905,10 @@ Return JSON:
                 + ("add more concrete facts from the source to the body segments" if words < words_lo
                    else "shorten the body segments"))
 
-        # Keep the ordinary transport retry budget; add one extra same-model pass only
-        # for a concrete validation failure. The validator and every editorial/safety gate
-        # remain unchanged, so a retry can improve the draft but can never waive a check.
-        script = self.llm.json(
-            WRITER_SYSTEM, user, validate=validate,
-            attempts_per_model=2, validation_attempts_per_model=3,
-        )
+        # Keep the two-call per-model cap: run 144 produced no valid draft after a third
+        # schema attempt and later recorded a Cloudflare 429. Prefer clearer instructions
+        # and provider failover over spending more calls on repeated malformed output.
+        script = self.llm.json(WRITER_SYSTEM, user, validate=validate)
         validate(script)  # trust-boundary check even for custom routers that ignore the callback
         script["_writer_model"] = getattr(self.llm, "last_used", "")
         tidy(script, fmt, max_asides)
