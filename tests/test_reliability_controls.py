@@ -464,6 +464,14 @@ def test_text_router_stops_when_all_configured_provider_circuits_are_open(
     assert router.has_available_provider() is False
 
 
+def test_live_vision_model_is_kept_as_a_cloudflare_text_fallback():
+    from autotube.common import load_config
+
+    models = load_config()["llm"]["cloudflare_models"]
+    assert models[:2] == ["@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                          "@cf/meta/llama-4-scout-17b-16e-instruct"]
+
+
 def test_run_receipt_records_zero_output_and_never_persists_raw_exception(tmp_path, monkeypatch):
     from autotube import common, run_report
 
@@ -476,6 +484,12 @@ def test_run_receipt_records_zero_output_and_never_persists_raw_exception(tmp_pa
         receipt.set_stage("script_review")
         receipt.note_failure("script_review", "script_quality_rejected", exception_type="LLMError", attempt=4)
         receipt.note_topic("rejected", category="script_quality_rejected")
+        receipt.note_grounding_repair("Kola Borehole", "Kola Superdeep Borehole",
+                                      "180 degrees, nearly twice model prediction",
+                                      "180 °C, higher than expected",
+                                      "higher-than-expected temperatures of 180 °C")
+        receipt.note_grounding_repair("example", "source", "original", "corrected",
+                                      "API_KEY=SHOULD_NOT_LEAK github_pat_1234567890123456")
         receipt.finish(0, 2, 0, 0)
         artifact = receipt.persist()
     finally:
@@ -486,6 +500,8 @@ def test_run_receipt_records_zero_output_and_never_persists_raw_exception(tmp_pa
     assert row["produced_count"] == 0
     assert row["outcome"] == "no_output"
     assert row["stage"] == "script_review"
+    assert row["grounding_repairs"][0]["source_quote"] == "higher-than-expected temperatures of 180 °C"
+    assert "SHOULD_NOT_LEAK" not in artifact.read_text(encoding="utf-8")
     assert json.loads((tmp_path / "state" / "run_reports.json").read_text())[0] == row
 
     failed = run_report.RunReceipt("test-456", 1, upload=True)

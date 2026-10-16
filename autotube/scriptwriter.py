@@ -1804,7 +1804,10 @@ Return JSON:
         def validate(o):
             assert isinstance(o, dict), "script must be a JSON object"
             segs = o.get("segments")
-            assert isinstance(segs, list) and 4 <= len(segs) <= 5, "need exactly 4 or 5 segments"
+            assert isinstance(segs, list), "segments must be a JSON list of 4 or 5 objects"
+            assert 4 <= len(segs) <= 5, (
+                f"need exactly 4 or 5 segments; received {len(segs)}. Merge or split the body "
+                "without dropping any source-backed claim, and keep the hook first and payoff last")
             assert all(isinstance(s, dict) for s in segs), "every segment must be a JSON object"
             assert all(isinstance(s.get("text"), str) and s["text"].strip() for s in segs), "empty segment"
             assert all("aside" not in s or isinstance(s["aside"], str) for s in segs), "aside must be text"
@@ -2256,6 +2259,101 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
             review["trend_alignment_reason"] = alignment_reason
         return ok, review
 
+    def _repair_trend_angle(self, topic: dict, subject: str, source: dict) -> dict | None:
+        """Narrow an overlong trend angle only when its core claim is already sourced.
+
+        Selector-generated angles can add unsupported embellishment to a real live trend
+        (e.g. turning a sourced 180 °C temperature into an unsourced model comparison).
+        This repair never invents a replacement story: at least one salient claim from
+        the trend label itself must already be supported by the grounded source, and the
+        corrected sentence must preserve every such claim, cite an exact source excerpt,
+        retain the specific subject, pass the normal angle gate, and use only sourced numbers.
+        """
+        original = str(topic.get("angle") or "").strip()
+        source_text = str(source.get("text") or "")
+        if not original or not source_text.strip():
+            return None
+        subject_terms = set(originality.tokens(subject))
+        source_title_terms = set(originality.tokens(str(source.get("title") or "")))
+        if not any(_angle_word_forms(term) & source_title_terms for term in subject_terms):
+            log.info("cannot repair trend angle for %r: grounded article title does not name its concrete subject",
+                     topic.get("topic"))
+            return None
+        trend_label = " ".join(str(topic.get(key) or "") for key in ("topic", "angle"))
+        claims = set(originality.tokens(trend_label)) & _CORE_ANGLE_CLAIMS
+        if not claims:
+            return None
+        supported_claims = _angle_supported_terms(claims, source_text)
+        if not claims.issubset(supported_claims):
+            missing = sorted(claims - supported_claims)
+            log.info("cannot repair trend angle for %r: source does not support core claim(s) %s",
+                     topic.get("topic"), missing)
+            return None
+
+        def numeric_facts(text: str) -> set[str]:
+            return {match.replace(",", "") for match in re.findall(r"\d[\d,]*(?:\.\d+)?", text or "")}
+
+        source_numbers = numeric_facts(source_text)
+        protected_numbers = {number for number in numeric_facts(trend_label)
+                             if number in source_numbers and float(number) > 12}
+
+        system = (
+            "You are a strict evidence editor. Trend labels are discovery evidence, not factual sources. "
+            "Correct an overclaimed angle only when the original live-trend surprise is directly supported "
+            "by the supplied source; otherwise refuse. Never replace it with a different evergreen fact.")
+        user = f"""CURRENT TREND CANDIDATE (discovery only): {topic.get('topic', '')}
+CONCRETE SUBJECT THAT MUST REMAIN THE STORY: {subject}
+ORIGINAL ANGLE (may contain unsupported embellishment): {original}
+CORE TREND CLAIM(S) that must all survive the correction: {', '.join(sorted(claims))}
+SOURCE-VERIFIED TREND NUMBER(S) to retain when present: {', '.join(sorted(protected_numbers)) or 'none'}
+SOURCE ARTICLE: {source.get('title', '')}
+SOURCE TEXT (the only factual authority):
+\"\"\"{source_text[:min(getattr(self, 'src_chars', 5000), 7000)]}\"\"\"
+
+Return one concise, independently worded angle only if the source directly supports the SAME
+surprise and every core claim above. Do not substitute another fact about the subject. Do not
+repeat a claim from the trend title unless this source verifies it. If it does not, set supported
+false and leave angle/quote empty. The source_quote must be an exact contiguous excerpt from the
+source text that directly supports the corrected angle and every core claim. Use no outside facts.
+Return JSON only: {{"supported": true, "angle": "...", "source_quote": "..."}}"""
+
+        def validate(value):
+            if not isinstance(value, dict) or value.get("supported") is not True:
+                raise AssertionError("source does not verify the same core live-trend surprise; reject, do not substitute")
+            angle = value.get("angle")
+            quote = value.get("source_quote")
+            if not isinstance(angle, str) or not angle.strip() or len(angle.split()) > 35:
+                raise AssertionError("corrected angle must be one concise sentence of at most 35 words")
+            if not isinstance(quote, str) or not 5 <= len(quote.split()) <= 30:
+                raise AssertionError("source_quote must be an exact 5-30 word excerpt")
+            normalize = lambda text: re.sub(r"\s+", " ", str(text or "")).casefold().strip()
+            if normalize(quote) not in normalize(source_text):
+                raise AssertionError("source_quote is not an exact contiguous excerpt from SOURCE TEXT")
+            if not claims.issubset(_angle_supported_terms(claims, quote)):
+                raise AssertionError("source_quote does not directly support every core trend claim")
+            if not claims.issubset(_angle_supported_terms(claims, angle)):
+                raise AssertionError("corrected angle dropped or obscured a core trend claim")
+            if not source_supports_angle(angle, subject, source_text):
+                raise AssertionError("corrected angle still fails the existing grounded trend-angle gate")
+            bad_numbers = unsupported_numbers(angle, source_text)
+            if bad_numbers:
+                raise AssertionError(f"corrected angle contains unsourced number(s): {bad_numbers}")
+            angle_numbers = numeric_facts(angle)
+            if protected_numbers and not protected_numbers.intersection(angle_numbers):
+                raise AssertionError("corrected angle dropped all source-verified numeric trend detail")
+            subject_terms = set(originality.tokens(subject))
+            if not subject_terms.intersection(originality.tokens(angle)):
+                raise AssertionError("corrected angle no longer names the specific trend subject")
+
+        try:
+            result = self.llm.json(system, user, temperature=0.1, validate=validate)
+            validate(result)  # custom routers may ignore the callback
+            return {"angle": result["angle"].strip(), "source_quote": result["source_quote"].strip()}
+        except Exception as exc:  # noqa: BLE001 — unsupported or unavailable correction fails closed
+            log.info("grounded angle correction unavailable for %r (%s)", topic.get("topic"),
+                     type(exc).__name__)
+            return None
+
     def produce(self, topic: dict, plan: dict, max_attempts: int | None = None) -> tuple[dict, dict, dict] | None:
         """Ground → write → check with a hard-capped script-only rewrite budget."""
         receipt = run_report.current_receipt()
@@ -2276,13 +2374,27 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
             return None
         topic["wiki_title"] = source["title"]
         visual_subject = visual_subject_for_topic(topic, source)
-        if not source_supports_angle(str(topic.get("angle") or ""), visual_subject,
-                                     str(source.get("text") or "")):
+        original_angle = str(topic.get("angle") or "").strip()
+        source_text = str(source.get("text") or "")
+        if not source_supports_angle(original_angle, visual_subject, source_text):
+            repaired = self._repair_trend_angle(topic, visual_subject, source)
+            if not repaired:
+                if receipt:
+                    receipt.note_failure("script_research", "trend_angle_unsupported_by_source")
+                log.info("  ✗ grounded research does not substantiate trend angle %r for subject %r in %r — skipping before draft",
+                         original_angle[:180], visual_subject, source["title"])
+                return None
+            topic["angle"] = repaired["angle"]
             if receipt:
-                receipt.note_failure("script_research", "trend_angle_unsupported_by_source")
-            log.info("  ✗ grounded research does not substantiate trend angle %r for subject %r in %r — skipping before draft",
-                     str(topic.get("angle") or "")[:180], visual_subject, source["title"])
-            return None
+                receipt.note_grounding_repair(topic.get("topic", ""), source.get("title", ""),
+                                              original_angle, repaired["angle"], repaired["source_quote"])
+            log.info("  ✓ narrowed unsupported embellishment to a source-backed angle for %r: %r",
+                     topic.get("topic"), repaired["angle"][:180])
+            if not source_supports_angle(topic["angle"], visual_subject, source_text):
+                # Keep a second trust-boundary check in case a custom LLM adapter skipped validation.
+                if receipt:
+                    receipt.note_failure("script_research", "trend_angle_unsupported_by_source")
+                return None
         if not subject_is_depictable(visual_subject, self.cfg, source):
             if receipt:
                 receipt.note_failure("script_research", "no_depictable_source_asset")

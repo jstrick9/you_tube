@@ -335,7 +335,9 @@ llm:
   mistral_review_models: [mistral-small-latest]
   # Run #103 (2026-10-13) returned HTTP 403 for the DeepSeek candidate; keep the
   # Llama model that reached generation and remove the inaccessible model from failover.
-  cloudflare_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast"]
+  # Keep Scout as a text fallback too: its Cloudflare model id passed the live multimodal
+  # preflight, while the 70B text model returned two invalid segment-count drafts in run 139.
+  cloudflare_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "@cf/meta/llama-4-scout-17b-16e-instruct"]
   cloudflare_review_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast"]
   # Vision is a hard gate: if no configured model returns a valid verdict, the video is
   # discarded. Multiple provider families are configured so one vision quota does not

@@ -98,6 +98,7 @@ class RunReceipt:
             "failures": [],
             "retry_events": [],
             "provider_events": [],
+            "grounding_repairs": [],
         }
         self._written = False
 
@@ -162,6 +163,24 @@ class RunReceipt:
         self.data["retry_events"].append({"stage": _bounded_text(stage, 48), "attempt": attempt,
                                           "limit": limit, "action": _bounded_text(action, 80)})
         self.data["retry_events"] = self.data["retry_events"][-DETAILS_TO_KEEP:]
+
+    def note_grounding_repair(self, topic: str, source_title: str, original_angle: str,
+                              repaired_angle: str, source_quote: str) -> None:
+        """Record a bounded source-backed correction, not the prompt or full model response."""
+        safe_quote = re.sub(
+            r"(?i)\b(api[_-]?key|token|client[_-]?secret)\b\s*[:=]\s*[^\s,;]+",
+            r"\1=[REDACTED]", str(source_quote or ""))
+        safe_quote = re.sub(
+            r"\b(?:gh[pousr]_|github_pat_|AIza)[A-Za-z0-9_-]{12,}\b", "[REDACTED]", safe_quote)
+        self.data["grounding_repairs"].append({
+            "topic": _bounded_text(topic, 100),
+            "source_title": _bounded_text(source_title, 120),
+            "original_angle": _bounded_text(original_angle, 240),
+            "repaired_angle": _bounded_text(repaired_angle, 240),
+            "source_quote": _bounded_text(safe_quote, 280),
+            "at": _iso(),
+        })
+        self.data["grounding_repairs"] = self.data["grounding_repairs"][-DETAILS_TO_KEEP:]
 
     def note_provider_event(self, provider: str, status_code: int | None, action: str,
                             cooldown_until: str | None = None, retry_after_seconds: float | None = None) -> None:

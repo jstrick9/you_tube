@@ -464,6 +464,73 @@ def test_source_angle_gate_does_not_infer_hot_from_an_unqualified_temperature():
     assert not scriptwriter.source_supports_angle(angle, "Kola Superdeep Borehole", source)
 
 
+def test_angle_repair_narrows_only_to_an_exact_source_quote_and_preserves_core_claim():
+    cfg = copy.deepcopy(common.load_config())
+    source_text = (
+        "The Kola Superdeep Borehole has been the deepest human-made hole on Earth. "
+        "The drilling of the fourth hole was stopped due to higher-than-expected temperatures "
+        "of 180 °C (356 °F) in 1992 at 11,882 metres (38,983 ft) of depth."
+    )
+    corrected = {
+        "supported": True,
+        "angle": "At 11,882 metres, the Kola borehole reached 180 °C as temperatures ran higher than expected.",
+        "source_quote": "higher-than-expected temperatures of 180 °C",
+    }
+
+    class RepairLLM:
+        def __init__(self):
+            self.calls = 0
+
+        def json(self, _system, user, temperature=None, validate=None, **_kwargs):
+            self.calls += 1
+            assert "CORE TREND CLAIM(S)" in user
+            assert temperature == 0.1
+            if validate:
+                validate(corrected)
+            return corrected
+
+    writer = scriptwriter.ScriptWriter.__new__(scriptwriter.ScriptWriter)
+    writer.cfg = cfg
+    writer.src_chars = 7000
+    writer.llm = RepairLLM()
+    topic = {
+        "topic": "They drilled 12 km into Earth and it got extremely hot — Kola Superdeep Borehole",
+        "script_subject": "Kola Superdeep Borehole temperatures",
+        "angle": "The drilling reached 12 kilometers and the 180 Celsius temperature was nearly double what models predicted.",
+    }
+    repaired = writer._repair_trend_angle(topic, topic["script_subject"],
+                                          {"title": "Kola Superdeep Borehole", "text": source_text})
+
+    assert repaired == {"angle": corrected["angle"], "source_quote": corrected["source_quote"]}
+    assert writer.llm.calls == 1
+    assert scriptwriter.source_supports_angle(repaired["angle"], topic["script_subject"], source_text)
+
+
+def test_angle_repair_will_not_replace_an_unsupported_viral_claim_with_a_different_fact():
+    cfg = copy.deepcopy(common.load_config())
+
+    class NeverCallLLM:
+        calls = 0
+
+        def json(self, *_args, **_kwargs):
+            self.calls += 1
+            raise AssertionError("must not ask a model to invent a substitute story")
+
+    writer = scriptwriter.ScriptWriter.__new__(scriptwriter.ScriptWriter)
+    writer.cfg = cfg
+    writer.llm = NeverCallLLM()
+    topic = {
+        "topic": "A mysterious green light appeared on Jupiter",
+        "script_subject": "Green Light Jupiter",
+        "angle": "Juno captured emerald lightning inside Jupiter's swirling storms.",
+    }
+    source = {"title": "Juno (spacecraft)",
+              "text": "Juno is a NASA space probe orbiting Jupiter. Its mission measures the planet's composition."}
+
+    assert writer._repair_trend_angle(topic, topic["script_subject"], source) is None
+    assert writer.llm.calls == 0, "unsupported green-light premise must remain a hard rejection"
+
+
 def test_script_trend_alignment_accepts_elevated_temperature_paraphrase():
     script = {"segments": [{"text": "At 180 Celsius, the temperature was higher than expected, so drilling stopped."}]}
     angle = "The Kola Superdeep Borehole got extremely hot and stopped drilling"
