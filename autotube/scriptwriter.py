@@ -980,6 +980,16 @@ def uses_escalation_template(script: dict) -> int:
     return n
 
 
+_SHORT_ANGLE_TERMS = frozenset({"hot", "red", "wet", "dry", "ice", "gas", "dna"})
+# These words carry the factual promise of a trend angle. A generic overlap such as
+# "Earth" and "drilling" must not stand in for an unsupported claim that something
+# was hot, green, poisoned, the deepest, or a record.
+_CORE_ANGLE_CLAIMS = frozenset({
+    "hot", "warm", "cold", "red", "green", "blue", "yellow", "black", "white",
+    "poison", "poisoned", "toxic", "deepest",
+})
+
+
 def _angle_terms(angle: str, subject: str = "") -> set[str]:
     """Distinctive angle words after removing the subject name and connective filler."""
     from .originality import tokens
@@ -995,11 +1005,88 @@ def _angle_terms(angle: str, subject: str = "") -> set[str]:
             "after", "ancient", "break", "baffled", "crazy", "down", "examine", "explore", "impossible",
             "insane", "leaving", "near", "perfectly", "required", "reality", "scary", "shocking", "sheer",
             "terrifying", "unsettling", "wild"}
-    key = {t for t in tokens(angle or "") if len(t) > 3 and t not in stop}
+    key = {t for t in tokens(angle or "") if (len(t) > 3 or t in _SHORT_ANGLE_TERMS) and t not in stop}
     # The subject appears in every script about it; only the words describing the
     # surprising turn can prove the selected trend angle was delivered.
-    key -= {t for t in tokens(subject or "") if len(t) > 3}
+    key -= {t for t in tokens(subject or "") if len(t) > 3 or t in _SHORT_ANGLE_TERMS}
     return key
+
+
+def _angle_word_forms(word: str) -> set[str]:
+    """Conservative inflection bridge for angle words (drilled ↔ drilling, hotter ↔ hot).
+
+    The trend/source gates must tolerate ordinary English morphology without turning
+    related subjects into matches. This deliberately handles only common inflections;
+    it is not stemming, fuzzy matching, or semantic similarity.
+    """
+    forms = {word}
+    if not isinstance(word, str) or len(word) < 4:
+        return forms
+    if word.endswith("ied") and len(word) > 5:
+        forms.add(word[:-3] + "y")
+    if word.endswith("ed") and len(word) > 4:
+        stem = word[:-2]
+        forms.add(stem)
+        if len(stem) > 2 and stem[-1] == stem[-2]:
+            forms.add(stem[:-1])
+    if word.endswith("ing") and len(word) > 5:
+        stem = word[:-3]
+        forms.add(stem)
+        if len(stem) > 2 and stem[-1] == stem[-2]:
+            stem = stem[:-1]
+            forms.add(stem)
+        if not stem.endswith("e"):
+            forms.add(stem + "e")
+    if word.endswith("er") and len(word) > 5:
+        stem = word[:-2]
+        if len(stem) > 2 and stem[-1] == stem[-2]:
+            stem = stem[:-1]
+        forms.add(stem)
+    if word.endswith("est") and len(word) > 6:
+        stem = word[:-3]
+        if len(stem) > 2 and stem[-1] == stem[-2]:
+            stem = stem[:-1]
+        forms.add(stem)
+    if word.endswith("s") and not word.endswith("ss") and len(word) > 4:
+        forms.add(word[:-1])
+    return forms
+
+
+def _angle_supported_terms(terms: set[str], evidence_text: str) -> set[str]:
+    """Count only direct lexical matches, ordinary inflections, or a narrow heat paraphrase.
+
+    In the Kola example, the source says ``higher-than-expected temperatures`` while a
+    trend angle may say ``it got extremely hot``. Those phrases express the same
+    observable claim. Accept that paraphrase only when the source couples temperature
+    with an explicit elevated/unexpected descriptor; a bare mention of temperature is
+    not evidence that something was hot.
+    """
+    from .originality import tokens
+
+    observed = set(tokens(evidence_text))
+    observed_forms: set[str] = set()
+    for word in observed:
+        observed_forms.update(_angle_word_forms(word))
+    hot_words = {"hot", "hotter", "hottest", "heat", "heated", "heating"}
+    warm_words = {"warm", "warmer", "warmest"}
+    temp_pattern = re.compile(
+        r"\b(?:(?:high(?:er|est)?|elevated|extreme(?:ly)?|unusually|unexpected|above[- ]expected)"
+        r"\b[^.]{0,120}\btemperatures?\b|\btemperatures?\b[^.]{0,120}"
+        r"\b(?:high(?:er|est)?|elevated|extreme(?:ly)?|unusually|unexpected|above[- ]expected)\b)",
+        re.I,
+    )
+    elevated_temperature = bool(temp_pattern.search(evidence_text or ""))
+    supported = set()
+    for term in terms:
+        if _angle_word_forms(term) & observed_forms:
+            supported.add(term)
+        elif term in hot_words and (observed & hot_words or elevated_temperature):
+            supported.add(term)
+        elif term in warm_words and (observed & (warm_words | hot_words) or elevated_temperature):
+            supported.add(term)
+        elif term in {"deep", "deeper", "deepest"} and "depth" in observed:
+            supported.add(term)
+    return supported
 
 
 def delivers_angle(script: dict, angle: str, subject: str = "") -> bool:
@@ -1012,14 +1099,14 @@ def delivers_angle(script: dict, angle: str, subject: str = "") -> bool:
     A missing/empty angle fails closed: a current trend without a specific story is not
     enough reason to make an episode.
     """
-    from .originality import tokens
-
     key = _angle_terms(angle, subject)
     if not key:
         return False
-    said = {t for seg in script.get("segments", []) for t in tokens(spoken_text(seg))}
+    said = " ".join(spoken_text(seg) for seg in script.get("segments", []))
+    supported = _angle_supported_terms(key, said)
     needed = 1 if len(key) == 1 else max(2, (len(key) + 2) // 3)
-    return len(key & said) >= needed
+    core_claims = key & _CORE_ANGLE_CLAIMS
+    return len(supported) >= needed and core_claims.issubset(supported)
 
 
 def source_supports_angle(angle: str, subject: str, source_text: str) -> bool:
@@ -1030,16 +1117,18 @@ def source_supports_angle(angle: str, subject: str, source_text: str) -> bool:
     half of the angle's distinctive terms in the actual research text is a conservative
     preflight: it prevents spending a draft on a generic/adjacent article while leaving
     the existing script and independent-review gates in place for meaning and facts.
+    Ordinary inflections and a tightly bounded ``hot``/elevated-temperature paraphrase
+    are recognized. The two-term minimum and one-half threshold are unchanged; salient
+    factual descriptors in the angle (for example ``hot`` or ``green``) must also be
+    supported, so generic overlap cannot stand in for the promised claim.
     """
-    from .originality import tokens
-
     key = _angle_terms(angle, subject)
     if len(key) < 2 or not isinstance(source_text, str) or not source_text.strip():
         return False
-    observed = set(tokens(source_text))
-    supported = _matched_subject_terms(key, observed)
+    supported = _angle_supported_terms(key, source_text)
     required = max(2, math.ceil(len(key) * 0.5))
-    return len(supported) >= required
+    core_claims = key & _CORE_ANGLE_CLAIMS
+    return len(supported) >= required and core_claims.issubset(supported)
 
 UNREADABLE_SHOTS = ("infographic", "chart", "graph", "diagram", "schematic", "timeline",
                     "bar chart", "pie chart", "screenshot", "table of", "map showing",
@@ -2191,8 +2280,8 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
                                      str(source.get("text") or "")):
             if receipt:
                 receipt.note_failure("script_research", "trend_angle_unsupported_by_source")
-            log.info("  ✗ grounded research does not substantiate the current-trend angle for %r — skipping before draft",
-                     source["title"])
+            log.info("  ✗ grounded research does not substantiate trend angle %r for subject %r in %r — skipping before draft",
+                     str(topic.get("angle") or "")[:180], visual_subject, source["title"])
             return None
         if not subject_is_depictable(visual_subject, self.cfg, source):
             if receipt:

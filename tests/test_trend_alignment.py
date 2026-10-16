@@ -442,6 +442,42 @@ def test_source_angle_gate_requires_distinctive_research_support():
         "Mountain goats grip steep cliffs with split hooves", subject, on_angle_source)
 
 
+def test_source_angle_gate_recognizes_inflections_and_elevated_temperature_paraphrase():
+    angle = "They drilled 12 km into Earth and it got extremely hot"
+    source = ("The Kola Superdeep Borehole drilling effort reached great depth through Earth's crust. "
+              "Drilling was stopped due to higher-than-expected temperatures of 180 °C.")
+
+    assert scriptwriter.source_supports_angle(angle, "Kola Superdeep Borehole", source)
+
+
+def test_source_angle_gate_requires_the_core_hot_claim_not_generic_overlap():
+    angle = "They drilled into Earth and it got extremely hot"
+    source = "The Kola Superdeep Borehole was drilled deep into Earth's crust."
+
+    assert not scriptwriter.source_supports_angle(angle, "Kola Superdeep Borehole", source)
+
+
+def test_source_angle_gate_does_not_infer_hot_from_an_unqualified_temperature():
+    angle = "The Kola Superdeep Borehole got extremely hot"
+    source = "The Kola Superdeep Borehole study measured temperature during drilling."
+
+    assert not scriptwriter.source_supports_angle(angle, "Kola Superdeep Borehole", source)
+
+
+def test_script_trend_alignment_accepts_elevated_temperature_paraphrase():
+    script = {"segments": [{"text": "At 180 Celsius, the temperature was higher than expected, so drilling stopped."}]}
+    angle = "The Kola Superdeep Borehole got extremely hot and stopped drilling"
+
+    assert scriptwriter.delivers_angle(script, angle, "Kola Superdeep Borehole")
+
+
+def test_script_trend_alignment_requires_the_core_hot_claim():
+    script = {"segments": [{"text": "They drilled down through Earth's crust before work stopped."}]}
+    angle = "They drilled into Earth and it got extremely hot"
+
+    assert not scriptwriter.delivers_angle(script, angle, "Kola Superdeep Borehole")
+
+
 def test_production_skips_before_drafting_when_research_does_not_support_trend_angle(monkeypatch):
     cfg = copy.deepcopy(common.load_config())
     writer = scriptwriter.ScriptWriter.__new__(scriptwriter.ScriptWriter)
