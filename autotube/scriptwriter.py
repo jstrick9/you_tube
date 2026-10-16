@@ -787,6 +787,18 @@ def visual_subject_for_topic(topic: dict | None, source: dict | None = None) -> 
     return raw or source_title
 
 
+def _model_designations(text: str) -> set[str]:
+    """Extract compact letter-digit identifiers such as M38A1C, W54, or Mk-54.
+
+    Trend selectors sometimes invent a vehicle variant that differs from the grounded
+    article (for example, adding a C suffix to an M38A1). Require such identifiers to
+    be stated by the trend candidate or the selected article query before accepting it.
+    """
+    normalized = str(text or "").upper()
+    found = re.findall(r"(?<![A-Z0-9])[A-Z]{1,8}[- ]?\d+[A-Z0-9]*(?![A-Z0-9])", normalized)
+    return {re.sub(r"[- ]", "", value) for value in found}
+
+
 def names_subject(script: dict, subject: str) -> bool:
     """Does any shot actually depict the thing the video is about?
 
@@ -1410,19 +1422,18 @@ Do not choose an evergreen or Wikipedia-only idea. Return fewer picks or none wh
 FORMATS we can make (choose 2-4 that the specific article honestly supports; myth_buster requires an explicit misconception):
 {fmt_list}
 
-For every pick:
-- `script_subject` is a concise concrete name (1-6 words) for the CURRENT TREND CANDIDATE — it must name and be
-  depicted in the video, share a meaningful word with the candidate, and must NOT be replaced by a background article title.
-  It must name a photographable object, creature, person, place, or artifact—not only abstract framing like
-  “deep-sea exploration,” “discovery,” or “history.” Reject vague trends instead of inventing a subject.
-- `angle` must be a specific, independently worded factual claim. Trend evidence is discovery, not proof; the selector
-  lacks article text, so invent no details. Grounded research must support the angle before drafting.
-- `wiki_query` must be the MOST SPECIFIC English Wikipedia article supporting it, not a broad category (e.g. Bou Craa,
-  not “Conveyor belt”). If none supports it, do not select the candidate.
-- Viral/outlier titles are discovery evidence only: do not copy the outlier headline, wording, script, sequence, captions,
-  visuals, audio, or creator style. `why_trending` briefly cites the measured evidence shown above.
-- Use a valid channel `category` and only fitting format names. Every pick MUST include an explicit risk verdict
-  (`none`, `low`, or `high`); use `high` if any safety or scope concern cannot be ruled out.
+For each pick:
+- `script_subject`: 1-6 words naming a photographable object, creature, person, place, or artifact from the trend;
+  share a meaningful trend word and explicitly show it. Never substitute the background article or use abstract framing
+  (“deep-sea exploration,” “discovery,” “history”); reject vague trends.
+- `angle`: one specific factual sentence, independently worded; trend evidence is not proof. Grounded research must verify it.
+- `wiki_query`: the MOST SPECIFIC English Wikipedia article supporting it, not a broad category (e.g. Bou Craa,
+  not “Conveyor belt”); reject the candidate if none supports it.
+- Never invent a serial/model/variant code in `script_subject`: each compact letter-digit code must appear exactly in the
+  candidate or `wiki_query`. Query the exact variant or name the parent object; never turn M38A1 into M38A1C/D.
+- Viral/outlier titles are discovery only: never copy their headline, script, sequence, captions, visuals, audio, or style.
+  `why_trending` briefly cites the measured evidence above.
+- Use a valid channel `category`, 2-4 fitting formats, and explicit `risk`=`none|low|high`; use `high` for unresolved risks.
 
 Return JSON only, as an object with a `picks` array, best first. Each pick has exactly these fields:
 {{"picks":[{{"index":<candidate index>,"viral_score":<0-10>,"category":"<one of {', '.join(cats)}>",
@@ -1511,6 +1522,14 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                 if (len(script_subject.split()) > 6 or len(script_subject) > 80
                         or not subject_terms or not (subject_terms & trend_terms)):
                     dropped.append(f"{c['topic'][:40]} (script subject is not a concise name for the trend)")
+                    continue
+                invented_designations = (_model_designations(script_subject)
+                                         - _model_designations(c["topic"])
+                                         - _model_designations(wiki_query))
+                if invented_designations:
+                    dropped.append(
+                        f"{c['topic'][:40]} (script subject adds unverified model/variant code(s): "
+                        f"{', '.join(sorted(invented_designations))})")
                     continue
                 cat = p.get("category")
                 if not isinstance(cat, str) or cat not in cats:

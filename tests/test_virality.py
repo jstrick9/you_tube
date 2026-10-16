@@ -93,10 +93,11 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     assert "100,000 views/hour" in llm.prompt
     assert "trend context (discovery only): viral Short now: 2,000,000 views in 20h" in llm.prompt
     assert "source lane=science_nature" in llm.prompt
-    assert '"script_subject"' in llm.prompt and "do not copy the outlier headline" in llm.prompt
+    assert '"script_subject"' in llm.prompt and "never copy their headline" in llm.prompt
     assert "Do not stop at four" in llm.prompt and "inflate scores" in llm.prompt and "pad below the floor" in llm.prompt
     assert "deep-sea exploration" in llm.prompt and "photographable" in llm.prompt
-    assert "Every pick MUST include an explicit risk verdict" in llm.prompt
+    assert "explicit `risk`=`none|low|high`" in llm.prompt
+    assert "never turn M38A1 into M38A1C/D" in llm.prompt
     assert len(llm.prompt) < 5_000, "selector context must stay compact for free-tier models"
     assert picks[0]["script_subject"] == "octopus"
     assert "An unverified claim" not in picks[0]["why_trending"]
@@ -142,6 +143,29 @@ def test_selector_requires_a_concrete_subject_connected_to_the_live_trend():
 
     too_long = dict(base, script_subject="octopus senses food with chemical receptor cells")
     assert ScriptWriter(CFG, LLMPicks([too_long]), Strat()).select_topics([candidate], 1, set()) == []
+
+
+def test_selector_rejects_unverified_model_variant_designation():
+    candidate = cands()[2]
+    candidate.update({
+        "topic": "This Jeep Could Launch A Nuke",
+        "topic_key": "this jeep could launch a nuke",
+        "score": 0.95,
+        "context": ["viral Short now: 190,100 views in 35.3h"],
+        "lane": "history_mystery",
+        "sources": ["youtube_outliers"],
+        "signals": [signal("youtube_outliers", "https://www.youtube.com/shorts/jeep1234567",
+                            {"views": 190_100, "hours": 35.3, "vph": 5_380, "video_id": "jeep1234567"})],
+    })
+    base = {"index": 0, "viral_score": 9, "category": "history", "risk": "low",
+            "wiki_query": "Willys M38A1", "angle": "the military jeep carried a nuclear launcher",
+            "formats": ["creepy_true"]}
+    invented = dict(base, script_subject="M38A1C Nuclear Jeep")
+    assert ScriptWriter(CFG, LLMPicks([invented]), Strat()).select_topics([candidate], 1, set()) == []
+
+    verified = dict(base, script_subject="M38A1 Jeep")
+    picks = ScriptWriter(CFG, LLMPicks([verified]), Strat()).select_topics([candidate], 1, set())
+    assert len(picks) == 1 and picks[0]["script_subject"] == "M38A1 Jeep"
 
 
 def test_selector_rejects_known_off_lane_youtube_chart_topics_before_provider_call():
