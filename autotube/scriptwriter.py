@@ -719,10 +719,10 @@ def _matched_subject_terms(key: set[str], observed: set[str]) -> set[str]:
 
 
 _VISUAL_SUBJECT_MODIFIERS = frozenset("""
-a an after and are at ancient by crazy discovery discoveries discovered discover evolution evolving fast
+a an after and are at ancient by crazy deep discovery discoveries discovered discover evolution evolving fast
 for from giant hidden huge impossible in into insane jump jumps jumping last lost goodbye farewell loves love massive mystery mysteries
-mysterious of old on or poison poisoned secret shocking survive survives survival terrifying the to toxic unearthed
-venom weird with years year
+mysterious of old on or poison poisoned pressure sea ocean light lights green missile missiles launcher launchers
+secret shocking survive survives survival terrifying the to toxic unearthed venom weird with years year
 """.split())
 _VISUAL_GENERIC_SINGLETONS = frozenset("""
 animal artifact cave city creature cycle cycles history island mountain mystery object river species sphere stone story temple
@@ -734,9 +734,10 @@ def visual_subject_for_topic(topic: dict | None, source: dict | None = None) -> 
     """Resolve a trend label to the concrete name that must appear in a shot and narration.
 
     Trend titles often append a mechanism or click-driving adjective to the actual subject
-    ("Mountain Goats Jumps", "Cleopatra Eyeliner Poison"). Those modifiers need not be
-    pictured. If the trend label is only abstract framing, use the specific article selected
-    to ground its angle; the trend-alignment gate still independently checks the live story.
+    ("Mountain Goats Jumps", "Cleopatra Eyeliner Poison", "Green Light on Jupiter"). Those
+    modifiers need not be pictured: show the goat, Cleopatra, or Jupiter, not an abstract claim.
+    If the trend label is only abstract framing, use the specific article selected to ground its
+    angle; the trend-alignment gate still independently checks the live story.
     """
     topic = topic if isinstance(topic, dict) else {}
     source = source if isinstance(source, dict) else {}
@@ -1736,7 +1737,10 @@ SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of fact
 
 {HOOK_RULES.format(hook_min=ccfg.get('hook_words_min', 6), hook_max=ccfg.get('hook_words_max', 9))}
 {retention_guidance(self.cfg)}
-Write the script as exactly 4 or 5 segments. Each beat has a DIFFERENT job — do not write interchangeable body lines:
+Write the script as exactly 4 or 5 segments. Prefer exactly FIVE by default, in this
+order: HOOK, TURN, ESCALATION, ESCALATION, PAYOFF. FOUR is allowed only when one
+escalation is enough; never return fewer than four. Each beat has a DIFFERENT job — do not
+write interchangeable body lines:
   - segment 1 = HOOK (see rules), spoken in under 3 seconds;
   - segment 2 = THE TURN, {body_min}-{body_max} factual words. This single line decides whether the video is watched, and it is the
     one most often written wrong. It must make the hook BIGGER — a second surprise, or the consequence of the
@@ -1791,6 +1795,11 @@ For each segment give:
                 a place, business, film or brand name. Never ask for text, charts, maps or abstract ideas; for an
                 abstract line, show the video's main subject in a way that fits it. Hook/CTA: show the main subject.
   "evidence": a VERBATIM {ev_len} word quote copied from the SOURCE TEXT that supports the segment ("" only for hook/CTA).
+
+FINAL SHAPE CHECK before emitting JSON: use five beats unless four is editorially cleaner;
+never use three. Repeat the full segment object shape for every beat. No segment may omit
+its visual object: each needs a non-empty "shows" string and 2-3 non-empty query strings.
+Keep each evidence value a string; use an empty string only for the hook/CTA.
 
 Return JSON:
 {{"title": "<= 60 chars: names the subject + a curiosity gap the video truly answers; no emojis, no clickbait lies",

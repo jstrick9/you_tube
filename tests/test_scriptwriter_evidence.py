@@ -45,6 +45,20 @@ def test_visual_subject_resolves_nonvisual_modifiers_to_concrete_subjects():
     assert visual_subject_for_topic(
         {"script_subject": "Voyager 1's Last Goodbye"}, {"title": "Voyager 1"},
     ) == "Voyager"
+    assert visual_subject_for_topic(
+        {"script_subject": "Green Light on Jupiter"}, {"title": "Juno (spacecraft)"},
+    ) == "Jupiter"
+    assert visual_subject_for_topic(
+        {"script_subject": "Jeep Missile Launcher"}, {"title": "Nuclear command and control"},
+    ) == "Jeep"
+    # Abstract environmental framing can resolve to the specific grounded object/place;
+    # the source-angle gate still decides whether that source supports the live claim.
+    assert visual_subject_for_topic(
+        {"script_subject": "Deep Sea Discovery"}, {"title": "Hydrothermal vent"},
+    ) == "Hydrothermal vent"
+    assert visual_subject_for_topic(
+        {"script_subject": "Deep Ocean Pressure"}, {"title": "Mariana Trench"},
+    ) == "Mariana Trench"
 
 
 def test_missing_evidence_is_backfilled_only_with_a_source_matched_quote():
@@ -132,6 +146,8 @@ def test_real_writer_validator_backfills_an_omitted_evidence_field():
         captured["validate"](script)
 
     assert "CONCRETE SUBJECT TO NAME AND SHOW: Stone Sphere" in captured["user"]
+    assert "Write the script as exactly 4 or 5 segments. Prefer exactly FIVE by default" in captured["user"]
+    assert "FINAL SHAPE CHECK" in captured["user"]
     assert script["segments"][0]["evidence"] == ""
     assert script["segments"][1]["evidence"] in SOURCE
     assert script["segments"][2]["evidence"] == ""

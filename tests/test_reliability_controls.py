@@ -343,6 +343,8 @@ def test_validation_retry_repeats_schema_and_lowers_temperature(monkeypatch, mem
     assert "VALIDATION FAILURE: need exactly 4 or 5 segments" in retry_prompt
     assert "preserve every required key" in retry_prompt
     assert "string evidence field" in retry_prompt
+    assert "Prefer exactly five segment objects in this order: hook, turn, escalation, escalation, payoff" in retry_prompt
+    assert "complete, non-null visual object" in retry_prompt
     assert calls[0][1] == 0.8 and retry_temperature == 0.3
 
 
@@ -469,6 +471,7 @@ def test_visual_validation_retry_repeats_the_concrete_subject_requirement(monkey
         "a stone sphere close-up"
     retry_prompt, retry_temperature = calls[1]
     assert "VALIDATION FAILURE: no shot shows 'stone sphere' itself" in retry_prompt
+    assert "Every segment must include visual={shows: non-empty string, queries: [2-3 non-empty strings]}" in retry_prompt
     assert "visual.shows must explicitly name the concrete subject itself" in retry_prompt
     assert "must include its distinctive noun(s)" in retry_prompt
     assert calls[0][1] == 0.8 and retry_temperature == 0.3
