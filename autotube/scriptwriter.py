@@ -720,7 +720,7 @@ def _matched_subject_terms(key: set[str], observed: set[str]) -> set[str]:
 
 _VISUAL_SUBJECT_MODIFIERS = frozenset("""
 a an after and are at ancient by crazy discovery discoveries discovered discover evolution evolving fast
-for from giant hidden huge impossible in into insane jump jumps jumping lost loves love massive mystery mysteries
+for from giant hidden huge impossible in into insane jump jumps jumping last lost goodbye farewell loves love massive mystery mysteries
 mysterious of old on or poison poisoned secret shocking survive survives survival terrifying the to toxic unearthed
 venom weird with years year
 """.split())
@@ -1896,7 +1896,13 @@ Return JSON:
                 + ("add more concrete facts from the source to the body segments" if words < words_lo
                    else "shorten the body segments"))
 
-        script = self.llm.json(WRITER_SYSTEM, user, validate=validate)
+        # Keep the ordinary transport retry budget; add one extra same-model pass only
+        # for a concrete validation failure. The validator and every editorial/safety gate
+        # remain unchanged, so a retry can improve the draft but can never waive a check.
+        script = self.llm.json(
+            WRITER_SYSTEM, user, validate=validate,
+            attempts_per_model=2, validation_attempts_per_model=3,
+        )
         validate(script)  # trust-boundary check even for custom routers that ignore the callback
         script["_writer_model"] = getattr(self.llm, "last_used", "")
         tidy(script, fmt, max_asides)

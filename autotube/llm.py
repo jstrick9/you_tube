@@ -523,12 +523,25 @@ class LLM:
 
     def json(self, system: str, user: str, temperature: float | None = None,
              validate=None, attempts_per_model: int = 2, images: list[bytes] | None = None,
-             order: list[str] | None = None, models_of=None, avoid: str | None = None) -> Any:
-        """Return parsed JSON. `validate(obj)` may raise to force a retry/failover.
+             order: list[str] | None = None, models_of=None, avoid: str | None = None,
+             validation_attempts_per_model: int | None = None) -> Any:
+        """Return parsed JSON; validation errors can request a corrective generation.
 
-        `avoid` is a provider:model tag to skip (used to keep the reviewer independent of the writer).
+        `validation_attempts_per_model` controls schema-only corrections independently from
+        `attempts_per_model`, which remains the cap for transport/parse retries. `avoid` is a
+        provider:model tag to skip (used to keep the reviewer independent of the writer).
         """
         temp = self.temperature if temperature is None else temperature
+        # Keep transport retries bounded independently from schema-correction attempts.
+        # Script drafts may merit one extra same-model correction, but a 429 or timeout
+        # must not trigger an additional request just because that budget is larger.
+        if type(attempts_per_model) is not int or attempts_per_model < 1:
+            attempts_per_model = 1
+        if validation_attempts_per_model is None:
+            validation_attempts_per_model = attempts_per_model
+        elif type(validation_attempts_per_model) is not int or validation_attempts_per_model < 1:
+            validation_attempts_per_model = attempts_per_model
+        attempt_limit = max(attempts_per_model, validation_attempts_per_model)
         errors = []
         vision_route = images is not None
         if not hasattr(self, "_dead"):
@@ -553,8 +566,9 @@ class LLM:
                 if tag in self._dead or (avoid and tag == avoid):
                     continue
                 feedback = ""
-                for attempt in range(attempts_per_model):
-                    last_try = attempt == attempts_per_model - 1
+                for attempt in range(attempt_limit):
+                    last_try = attempt >= attempts_per_model - 1
+                    last_validation_try = attempt >= validation_attempts_per_model - 1
                     try:
                         feedback_lower = feedback.lower()
                         prompt = user + (f"\n\nVALIDATION FAILURE: {feedback}. Return the complete corrected JSON object, "
@@ -668,15 +682,22 @@ class LLM:
                             break
                         if not last_try:
                             time.sleep(1.5)
+                            continue
+                        break
                     except Exception as e:  # validation or network
                         errors.append(f"{tag}: {type(e).__name__}: {str(e)[:160]}")
                         if isinstance(e, (AssertionError, ValueError)):
                             # Validators may use either exception type. Carry the exact schema
                             # failure into the correction attempt instead of repeating the same
-                            # malformed vision response with no feedback.
+                            # malformed response with no feedback. This budget is independent
+                            # of transport retries so schema recovery never extends 429/timeouts.
                             feedback = str(e)
-                        elif isinstance(e, (requests.exceptions.Timeout,
-                                            requests.exceptions.ConnectionError)):
+                            if last_validation_try:
+                                break
+                            time.sleep(1)
+                            continue
+                        if isinstance(e, (requests.exceptions.Timeout,
+                                          requests.exceptions.ConnectionError)):
                             # A 120-second request timeout is already the bounded retry budget for
                             # that route in this run. Retire the text or vision route independently;
                             # a text timeout does not prove the same provider's image model is down.
@@ -693,6 +714,8 @@ class LLM:
                             break
                         if not last_try:
                             time.sleep(1)
+                            continue
+                        break
         # An empty `errors` list is not "nothing went wrong" - it means every candidate
         # was skipped before being called, because it was already retired or was the
         # model being avoided. Reporting that distinctly is the difference between a
