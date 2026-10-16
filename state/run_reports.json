@@ -1,144 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261014-193541-3823",
-    "workflow_run_id": "38624770991",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-14T19:35:41.517324+00:00",
-    "finished_at": "2026-10-14T19:40:49.734704+00:00",
-    "duration_seconds": 308.217,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 2,
-      "topic_production": 1,
-      "topic_validation": 1,
-      "script_research": 2,
-      "script_draft": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "iphone duo",
-        "topic_key": "iphone duo",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-14T19:40:39.369185+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-14T19:40:39.369408+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-14T19:40:49.729611+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-14T19:35:41.518732+00:00",
-        "cooldown_until": "2026-10-14T23:35:31.837026+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-14T19:35:53.440448+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-14T19:36:01.792989+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-14T19:36:53.529657+00:00",
-        "cooldown_until": "2026-10-14T19:56:53.528997+00:00",
-        "retry_after_seconds": 1.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-14T19:36:58.720519+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-14T19:37:09.147066+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-14T19:38:07.845551+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "circuit_open",
-        "at": "2026-10-14T19:38:07.846145+00:00",
-        "cooldown_until": "2026-10-14T19:48:07.845598+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-14T19:38:14.329080+00:00",
-        "cooldown_until": "2026-10-14T19:58:14.328254+00:00"
-      }
-    ],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261014-195959-3898",
     "workflow_run_id": "38628135969",
     "workflow_run_attempt": "1",
@@ -3958,6 +3820,207 @@
         "at": "2026-10-16T19:08:08.437354+00:00"
       }
     ],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261016-212751-3612",
+    "workflow_run_id": "38969401811",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-16T21:27:51.105168+00:00",
+    "finished_at": "2026-10-16T21:40:55.483168+00:00",
+    "duration_seconds": 784.378,
+    "mode": "dry_run",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 2,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 6,
+      "script_research": 12,
+      "script_draft": 2,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "a Mysterious Green Light Appeared on Jupiter!",
+        "topic_key": "a mysterious green light appeared on jupiter",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "A Shocking Discovery in the Deep Sea",
+        "topic_key": "a shocking discovery in the deep sea",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "This Jeep Could Launch A Nuke",
+        "topic_key": "this jeep could launch a nuke",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "These are the Sticky Glowing Balls",
+        "topic_key": "these are the sticky glowing balls",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Voyager 1's Last Goodbye, The Loneliest Spacecraft",
+        "topic_key": "voyager 1s last goodbye the loneliest spacecraft",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "கடலகக அடயல இவவளவ Pressure இரககம? Deep Ocean Facts Tamil",
+        "topic_key": "pressure deep ocean facts tamil",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-16T21:32:14.590380+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-16T21:32:14.590443+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-16T21:34:07.246014+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-16T21:34:07.246175+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-16T21:34:11.347108+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-16T21:34:11.347173+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-16T21:34:12.373618+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-16T21:34:12.373664+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-16T21:37:49.877179+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-16T21:37:49.877293+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-16T21:40:55.482039+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-16T21:40:55.482086+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-16T21:40:55.482156+00:00",
+        "stage": "topic_selection",
+        "category": "topic_attempt_budget_exhausted",
+        "attempt": 6
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-16T21:27:51.114282+00:00",
+        "cooldown_until": "2026-10-17T01:52:33.373195+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-16T21:28:04.985045+00:00",
+        "cooldown_until": "2026-10-16T21:48:04.984431+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-16T21:29:38.792332+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-16T21:29:45.216595+00:00",
+        "cooldown_until": "2026-10-16T21:49:45.216001+00:00"
+      }
+    ],
+    "grounding_repairs": [],
     "top_up": true,
     "rate_limited_models": [
       "groq:openai/gpt-oss-120b",

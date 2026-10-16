@@ -11,15 +11,15 @@
     "groq": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-16T19:03:29.897877+00:00",
-      "blocked_until": "2026-10-16T19:23:29.897877+00:00",
+      "recorded_at": "2026-10-16T21:28:04.984431+00:00",
+      "blocked_until": "2026-10-16T21:48:04.984431+00:00",
       "retry_after_seconds": 29.0
     },
     "mistral": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-16T19:05:46.116004+00:00",
-      "blocked_until": "2026-10-16T19:25:46.116004+00:00"
+      "recorded_at": "2026-10-16T21:29:45.216001+00:00",
+      "blocked_until": "2026-10-16T21:49:45.216001+00:00"
     }
   },
   "failures_5xx": {}
