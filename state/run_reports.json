@@ -3621,5 +3621,155 @@
       "groq:openai/gpt-oss-120b",
       "mistral:mistral-small-latest"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261016-014115-3740",
+    "workflow_run_id": "38836307132",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-16T01:41:15.515379+00:00",
+    "finished_at": "2026-10-16T01:52:33.380292+00:00",
+    "duration_seconds": 677.865,
+    "mode": "upload",
+    "target_count": 2,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 1,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 1,
+      "script_research": 2,
+      "script_draft": 4,
+      "script_review": 3,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "They Drilled 12 KM Into Earth And It Got EXTREMELY Hot Kola Superdeep Part 1",
+        "topic_key": "they drilled 12 km into earth and it got extremely hot kola superdeep part 1",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-16T01:52:33.374064+00:00",
+        "stage": "script_draft",
+        "category": "billing_or_entitlement",
+        "exception_type": "LLMError",
+        "attempt": 4
+      },
+      {
+        "at": "2026-10-16T01:52:33.374233+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-16T01:52:33.374344+00:00",
+        "stage": "script",
+        "category": "all_text_providers_circuit_open_or_unusable"
+      },
+      {
+        "at": "2026-10-16T01:52:33.374368+00:00",
+        "stage": "script",
+        "category": "all_text_providers_circuit_open_or_unusable"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "script_review",
+        "attempt": 1,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 2,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 3,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-16T01:41:56.731217+00:00",
+        "cooldown_until": "2026-10-16T02:01:56.730681+00:00",
+        "retry_after_seconds": 1.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-16T01:42:52.658929+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-16T01:43:03.988821+00:00",
+        "cooldown_until": "2026-10-16T02:03:03.988308+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-16T01:45:04.169739+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-16T01:48:03.332849+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-16T01:50:15.061510+00:00"
+      },
+      {
+        "provider": "cloudflare",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-16T01:52:15.163478+00:00"
+      },
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "circuit_open",
+        "at": "2026-10-16T01:52:33.373724+00:00",
+        "cooldown_until": "2026-10-17T01:52:33.373195+00:00",
+        "retry_after_seconds": 13.0
+      }
+    ],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]
