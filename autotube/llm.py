@@ -370,7 +370,7 @@ class LLM:
         self.order = self.cfg.get("providers", list(PROVIDERS))
         self.temperature = float(self.cfg.get("temperature", 0.8))
         self._dead: set[str] = set()   # provider/model/route combos that hard-failed this run
-        self._blocked_providers: set[str] = set()  # provider-wide auth/billing/rate-limit/repeated-5xx circuits
+        self._blocked_providers: set[str] = set()  # provider-wide auth/billing/rate-limit/long-retry circuits
         self._blocked_text_providers: set[str] = set()
         self._blocked_vision_providers: set[str] = set()
         self.circuits = ProviderCircuitBreakers()
@@ -383,7 +383,9 @@ class LLM:
             if row.get("reason") == "rate_limited":
                 note_rate_limited(f"{provider}:provider_cooldown")
             if receipt:
-                receipt.note_provider_event(provider, row.get("status_code"), "cooldown_skip",
+                action = ("transient_5xx_history" if row.get("reason") == "repeated_http_5xx"
+                          else "cooldown_skip")
+                receipt.note_provider_event(provider, row.get("status_code"), action,
                                             row.get("blocked_until"))
 
     def _breaker(self) -> ProviderCircuitBreakers:
@@ -394,14 +396,23 @@ class LLM:
     def _provider_open(self, provider: str, *, vision: bool = False) -> bool:
         """Is this provider unavailable for this route?
 
-        A text-generation timeout must not consume/retire a separate image-input route;
-        likewise a vision-only failure must not silence healthy script/review models.
-        Explicit provider-wide auth, billing, rate-limit and repeated-5xx circuits still apply to both.
+        A text-generation timeout or repeated 5xx must not consume/retire a separate
+        image-input route; likewise a vision-only failure must not silence healthy
+        script/review models. Auth, billing, rate-limit, and long-retry circuits remain
+        provider-wide. Repeated-5xx circuits are persisted as a backoff signal, but the
+        route that actually failed is retired independently for this run.
         """
         route_set = "_blocked_vision_providers" if vision else "_blocked_text_providers"
-        return (provider in getattr(self, "_blocked_providers", set())
-                or provider in getattr(self, route_set, set())
-                or self._breaker().is_open(provider))
+        if (provider in getattr(self, "_blocked_providers", set())
+                or provider in getattr(self, route_set, set())):
+            return True
+        circuits = self._breaker()
+        if not circuits.is_open(provider):
+            return False
+        # Older runs persisted 5xx state without a route label. Probe this route once
+        # rather than letting failures from the other modality disable image QA (or text).
+        row = circuits.snapshot().get(provider, {})
+        return row.get("reason") != "repeated_http_5xx"
 
     def _open_provider(self, provider: str, status: int | None, reason: str, seconds: float,
                        retry_after: float | None = None) -> None:
@@ -432,8 +443,9 @@ class LLM:
 
         A key plus a model name is not enough: json() retires individual vision routes
         after permanent model errors, so availability must exclude those too. Text-route
-        timeouts are isolated; explicit provider-wide auth, billing, rate-limit and repeated-5xx
-        circuits still apply. This is a routing check, not a live health guarantee; preflight_vision()
+        timeouts and repeated-5xx failures are isolated by route; provider-wide auth,
+        billing, rate-limit and long-retry circuits still apply. This is a routing check,
+        not a live health guarantee; preflight_vision()
         makes a small real image call before script/TTS investment.
         """
         dead = getattr(self, "_dead", set())
@@ -639,12 +651,16 @@ class LLM:
                                 break
                             opened = circuits.note_5xx(pname, status)
                             if opened:
-                                self._blocked_providers.add(pname)
+                                route_set = "_blocked_vision_providers" if vision_route else "_blocked_text_providers"
+                                if not hasattr(self, route_set):
+                                    setattr(self, route_set, set())
+                                getattr(self, route_set).add(pname)
                                 if receipt:
                                     row = circuits._entries.get(pname, {})
-                                    receipt.note_provider_event(pname, status, "circuit_open",
+                                    receipt.note_provider_event(pname, status, "route_circuit_open",
                                                                 row.get("blocked_until"))
-                                log.warning("skipping provider %s after repeated HTTP 5xx failures", pname)
+                                log.warning("skipping provider %s %s route after repeated HTTP 5xx failures",
+                                            pname, "vision" if vision_route else "text")
                                 break
                             if not last_try:
                                 time.sleep(_retry_after(msg, 8 + 8 * attempt, retry_after))

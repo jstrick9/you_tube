@@ -239,6 +239,41 @@ def test_text_network_timeout_does_not_disable_configured_vision_route(monkeypat
     assert calls == [("text-model", None), ("vision-model", [b"jpeg"])]
 
 
+def test_repeated_text_5xx_circuit_does_not_disable_vision_route(monkeypatch, memory_provider_circuits):
+    import autotube.llm as L
+
+    def split_routes(_model, _system, _user, _temperature, images=None):
+        if images is None:
+            raise L.LLMError("HTTP 503: text endpoint unavailable", status_code=503)
+        return '{"color":"red"}'
+
+    monkeypatch.setitem(L.PROVIDERS, "fake", (split_routes, "fake_models"))
+    monkeypatch.setattr(L, "_provider_key", lambda _provider: "test-key")
+    monkeypatch.setattr(L.time, "sleep", lambda *_: None)
+    router = L.LLM.__new__(L.LLM)
+    router.cfg = {"fake_models": ["text-model"], "vision_providers": ["fake"],
+                  "fake_vision_models": ["vision-model"]}
+    router.order = ["fake"]
+    router.temperature = 0.7
+    router._dead = set()
+    router._blocked_providers = set()
+    router._blocked_text_providers = set()
+    router._blocked_vision_providers = set()
+    router.circuits = memory_provider_circuits()
+    router.last_used = ""
+
+    for _ in range(3):
+        with pytest.raises(L.LLMError, match="All LLM providers failed"):
+            router.json("system", "text request", attempts_per_model=1)
+    assert router.circuits.is_open("fake")
+    assert "fake" in router._blocked_text_providers
+    assert router.vision_available(), "a repeated text 5xx circuit must not suppress image QA"
+    assert router.vision_json("vision system", "inspect image", [b"jpeg"]) == {"color": "red"}
+
+    router.circuits.open("fake", 429, "rate_limited", 60)
+    assert not router.vision_available(), "provider-wide quota circuits still apply to vision"
+
+
 def test_vision_schema_error_gets_one_same_model_correction(monkeypatch, memory_provider_circuits):
     import autotube.llm as L
 
