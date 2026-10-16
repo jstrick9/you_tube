@@ -724,6 +724,7 @@ for from giant hidden huge impossible in into insane jump jumps jumping last los
 mysterious of old on or poison poisoned pressure sea ocean light lights green missile missiles launcher launchers
 secret shocking survive survives survival terrifying the to toxic unearthed venom weird with years year
 explore explored exploring exploration explorations observation observations research researching study studies
+call calls called calling sleep sleepy drowsy drowsiness detection warning warnings alert alerts
 """.split())
 _VISUAL_GENERIC_SINGLETONS = frozenset("""
 animal artifact cave city creature cycle cycles history island mountain mystery object river species sphere stone story temple

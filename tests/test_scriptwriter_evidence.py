@@ -72,6 +72,14 @@ def test_abstract_deep_sea_exploration_is_not_mistaken_for_a_visual_subject():
     assert has_specific_visual_subject("Stone Sphere")
 
 
+def test_action_heavy_car_trend_normalizes_to_a_physical_subject():
+    assert visual_subject_for_topic(
+        {"script_subject": "Car AI calling driver sleepy"},
+        {"title": "Driver drowsiness detection"},
+    ) == "Car driver"
+    assert has_specific_visual_subject("Car driver")
+
+
 def test_produce_skips_abstract_visual_subject_before_any_script_draft(monkeypatch):
     import yaml
     from pathlib import Path
