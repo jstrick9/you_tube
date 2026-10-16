@@ -196,7 +196,7 @@ def test_vision_availability_excludes_permanently_retired_vision_models(monkeypa
     client = llm_module.LLM.__new__(llm_module.LLM)
     client.cfg = {"vision_providers": ["gemini"], "gemini_vision_models": ["one", "two"]}
     client._dead = {"gemini:one:vision"}
-    client._provider_open = lambda _provider: False
+    client._provider_open = lambda _provider, **_kwargs: False
     monkeypatch.setattr(llm_module, "_provider_key", lambda _provider: "test-key")
     assert client.vision_available()
     client._dead.add("gemini:two:vision")

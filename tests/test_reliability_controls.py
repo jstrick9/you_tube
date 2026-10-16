@@ -195,8 +195,80 @@ def test_provider_read_timeout_is_skipped_for_rest_of_run(monkeypatch, memory_pr
 
     assert router.json("system", "user") == {"ok": True}
     assert calls == ["slow", "healthy"]
-    assert "slow" in router._blocked_providers
+    assert "slow" in router._blocked_text_providers
+    assert "slow" not in router._blocked_providers
     assert not router.circuits.is_open("slow"), "one-run network failures must not persist cooldowns"
+
+
+def test_text_network_timeout_does_not_disable_configured_vision_route(monkeypatch, memory_provider_circuits):
+    import requests
+    import autotube.llm as L
+
+    calls = []
+
+    def dual_route(model, _system, _user, _temperature, images=None):
+        calls.append((model, images))
+        if images is None:
+            raise requests.exceptions.ReadTimeout("text endpoint did not respond")
+        return '{"color":"red"}'
+
+    monkeypatch.setitem(L.PROVIDERS, "fake", (dual_route, "fake_models"))
+    monkeypatch.setattr(L, "_provider_key", lambda _provider: "test-key")
+    router = L.LLM.__new__(L.LLM)
+    router.cfg = {"fake_models": ["text-model"], "vision_providers": ["fake"],
+                  "fake_vision_models": ["vision-model"]}
+    router.order = ["fake"]
+    router.temperature = 0.7
+    router._dead = set()
+    router._blocked_providers = set()
+    router._blocked_text_providers = set()
+    router._blocked_vision_providers = set()
+    router.circuits = memory_provider_circuits()
+    router.last_used = ""
+
+    with pytest.raises(L.LLMError, match="All LLM providers failed"):
+        router.json("system", "text request")
+    assert "fake" in router._blocked_text_providers
+    assert "fake" not in router._blocked_providers
+    assert router.vision_available(), "a text timeout alone must not retire the image route"
+
+    def require_red(value):
+        assert value.get("color") == "red"
+
+    assert router.vision_json("vision system", "inspect image", [b"jpeg"], validate=require_red) == {"color": "red"}
+    assert calls == [("text-model", None), ("vision-model", [b"jpeg"])]
+
+
+def test_vision_schema_error_gets_one_same_model_correction(monkeypatch, memory_provider_circuits):
+    import autotube.llm as L
+
+    calls = []
+    valid = {"images": [{"n": 1, "shows": "a specific object", "score": 8, "legible": True}]}
+
+    def provider(_model, _system, user, temperature, images=None):
+        calls.append((user, temperature, images))
+        return '{"images":[]}' if len(calls) == 1 else json.dumps(valid)
+
+    def validate(value):
+        if not isinstance(value.get("images"), list) or len(value["images"]) != 1:
+            raise ValueError("vision response needs exactly 1 image verdicts")
+
+    monkeypatch.setitem(L.PROVIDERS, "fake", (provider, "fake_models"))
+    monkeypatch.setattr(L.time, "sleep", lambda *_: None)
+    router = L.LLM.__new__(L.LLM)
+    router.cfg = {"vision_providers": ["fake"], "fake_vision_models": ["vision-model"]}
+    router.order = ["fake"]
+    router.temperature = 0.7
+    router._dead = set()
+    router._blocked_providers = set()
+    router._blocked_text_providers = set()
+    router._blocked_vision_providers = set()
+    router.circuits = memory_provider_circuits()
+    router.last_used = ""
+
+    assert router.vision_json("vision system", "return one verdict", [b"jpeg"], validate=validate) == valid
+    assert len(calls) == 2
+    assert "VALIDATION FAILURE: vision response needs exactly 1 image verdicts" in calls[1][0]
 
 
 def test_validation_retry_repeats_schema_and_lowers_temperature(monkeypatch, memory_provider_circuits):

@@ -369,8 +369,10 @@ class LLM:
         self.cfg = cfg.get("llm", {})
         self.order = self.cfg.get("providers", list(PROVIDERS))
         self.temperature = float(self.cfg.get("temperature", 0.8))
-        self._dead: set[str] = set()   # provider/model combos that hard-failed this run
-        self._blocked_providers: set[str] = set()
+        self._dead: set[str] = set()   # provider/model/route combos that hard-failed this run
+        self._blocked_providers: set[str] = set()  # provider-wide auth/billing/rate-limit/repeated-5xx circuits
+        self._blocked_text_providers: set[str] = set()
+        self._blocked_vision_providers: set[str] = set()
         self.circuits = ProviderCircuitBreakers()
         self.last_used = ""
         keyed = KEYED_PROVIDERS
@@ -389,8 +391,17 @@ class LLM:
             self.circuits = ProviderCircuitBreakers()
         return self.circuits
 
-    def _provider_open(self, provider: str) -> bool:
-        return provider in getattr(self, "_blocked_providers", set()) or self._breaker().is_open(provider)
+    def _provider_open(self, provider: str, *, vision: bool = False) -> bool:
+        """Is this provider unavailable for this route?
+
+        A text-generation timeout must not consume/retire a separate image-input route;
+        likewise a vision-only failure must not silence healthy script/review models.
+        Explicit provider-wide auth, billing, rate-limit and repeated-5xx circuits still apply to both.
+        """
+        route_set = "_blocked_vision_providers" if vision else "_blocked_text_providers"
+        return (provider in getattr(self, "_blocked_providers", set())
+                or provider in getattr(self, route_set, set())
+                or self._breaker().is_open(provider))
 
     def _open_provider(self, provider: str, status: int | None, reason: str, seconds: float,
                        retry_after: float | None = None) -> None:
@@ -420,13 +431,14 @@ class LLM:
         """Whether at least one configured vision model is still eligible this run.
 
         A key plus a model name is not enough: json() retires individual vision routes
-        after permanent model errors, so availability must exclude those too. This is
-        still a routing check, not a live health guarantee; preflight_vision() makes a
-        small real image call before script/TTS investment.
+        after permanent model errors, so availability must exclude those too. Text-route
+        timeouts are isolated; explicit provider-wide auth, billing, rate-limit and repeated-5xx
+        circuits still apply. This is a routing check, not a live health guarantee; preflight_vision()
+        makes a small real image call before script/TTS investment.
         """
         dead = getattr(self, "_dead", set())
         for provider in self.cfg.get("vision_providers", ["gemini", "groq", "openrouter"]):
-            if provider not in PROVIDERS or not _provider_key(provider) or self._provider_open(provider):
+            if provider not in PROVIDERS or not _provider_key(provider) or self._provider_open(provider, vision=True):
                 continue
             if any(f"{provider}:{model}:vision" not in dead for model in self._vision_models(provider)):
                 return True
@@ -439,8 +451,11 @@ class LLM:
     def vision_json(self, system: str, user: str, images: list[bytes], validate=None) -> Any:
         """Like json(), but sends JPEG images to vision-capable models only (never the keyless tier)."""
         order = [p for p in self.cfg.get("vision_providers", ["gemini", "groq", "openrouter"]) if p in PROVIDERS]
+        # One same-model correction is worth a validation error (e.g. 8 verdicts for a
+        # 9-image sheet); transport timeouts still retire that route immediately. The
+        # exact-count/relevance/readability validators remain mandatory on both tries.
         return self.json(system, user, temperature=0.1, validate=validate, images=images, order=order,
-                         models_of=self._vision_models, attempts_per_model=1)
+                         models_of=self._vision_models, attempts_per_model=2)
 
     def preflight_vision(self) -> str:
         """Prove a configured vision route can inspect an image before scripts or TTS are built.
@@ -503,6 +518,7 @@ class LLM:
         """
         temp = self.temperature if temperature is None else temperature
         errors = []
+        vision_route = images is not None
         if not hasattr(self, "_dead"):
             self._dead = set()
         if not hasattr(self, "_blocked_providers"):
@@ -510,16 +526,18 @@ class LLM:
         circuits = self._breaker()
         receipt = run_report.current_receipt()
         for pname in (order or self.order):
-            if self._provider_open(pname):
+            if self._provider_open(pname, vision=vision_route):
                 until = circuits.blocked_until(pname)
-                errors.append(f"{pname}: provider circuit open until {until or 'end of this run'}")
+                route_name = "vision" if vision_route else "text"
+                errors.append(f"{pname}: provider {route_name} route circuit open until "
+                              f"{until or 'end of this run'}")
                 continue
             fn, models_key = PROVIDERS[pname]
             models = models_of(pname) if models_of else self.cfg.get(models_key, [])
             for model in models:
-                if self._provider_open(pname):
+                if self._provider_open(pname, vision=vision_route):
                     break
-                tag = f"{pname}:{model}" + (":vision" if images else "")
+                tag = f"{pname}:{model}" + (":vision" if vision_route else "")
                 if tag in self._dead or (avoid and tag == avoid):
                     continue
                 feedback = ""
@@ -549,7 +567,7 @@ class LLM:
                                             if "this is not the story that trended" in feedback_lower or "angle was:" in feedback_lower else "")
                                          if feedback else "")
                         retry_temp = min(temp, 0.3) if feedback else temp
-                        raw = fn(model, system, prompt, retry_temp, images) if images else fn(
+                        raw = fn(model, system, prompt, retry_temp, images) if vision_route else fn(
                             model, system, prompt, retry_temp)
                         obj = _extract_json(raw)
                         if validate:
@@ -636,20 +654,26 @@ class LLM:
                             time.sleep(1.5)
                     except Exception as e:  # validation or network
                         errors.append(f"{tag}: {type(e).__name__}: {str(e)[:160]}")
-                        if isinstance(e, AssertionError):
+                        if isinstance(e, (AssertionError, ValueError)):
+                            # Validators may use either exception type. Carry the exact schema
+                            # failure into the correction attempt instead of repeating the same
+                            # malformed vision response with no feedback.
                             feedback = str(e)
                         elif isinstance(e, (requests.exceptions.Timeout,
                                             requests.exceptions.ConnectionError)):
                             # A 120-second request timeout is already the bounded retry budget for
-                            # that provider in this run. Retire the provider for the remaining calls
-                            # rather than paying the same timeout once per topic/model. Do not persist
-                            # a cooldown: a one-off network failure should be retried on the next run.
+                            # that route in this run. Retire the text or vision route independently;
+                            # a text timeout does not prove the same provider's image model is down.
+                            # Do not persist a cooldown: retry on the next workflow invocation.
                             self._dead.add(tag)
-                            self._blocked_providers.add(pname)
+                            route_set = "_blocked_vision_providers" if vision_route else "_blocked_text_providers"
+                            if not hasattr(self, route_set):
+                                setattr(self, route_set, set())
+                            getattr(self, route_set).add(pname)
                             if receipt:
                                 receipt.note_provider_event(pname, None, "transient_network_failure")
-                            log.warning("skipping provider %s for this run after %s", pname,
-                                        type(e).__name__)
+                            log.warning("skipping provider %s %s route for this run after %s", pname,
+                                        "vision" if vision_route else "text", type(e).__name__)
                             break
                         if not last_try:
                             time.sleep(1)
