@@ -80,6 +80,21 @@ def test_writer_prompt_renders_assigned_treatment_without_changing_facts(monkeyp
     assert "open a question that only the end" not in writer.llm.prompt
 
 
+def test_passing_score_guardrails_require_an_independent_programmatic_pass():
+    cfg = common.load_config()
+    review = {
+        "programmatic_ok": True, "independent": True, "score": 8, "hook_strength": 8,
+        "entertainment": 7, "coherence": 5, "trend_alignment": 9,
+    }
+    scores = scriptwriter._passing_review_scores(review, cfg)
+    assert set(scores) == {"score", "hook_strength", "entertainment", "trend_alignment"}
+    review["independent"] = False
+    assert scriptwriter._passing_review_scores(review, cfg) == {}
+    review["independent"] = True
+    review["programmatic_ok"] = False
+    assert scriptwriter._passing_review_scores(review, cfg) == {}
+
+
 def test_review_feedback_gets_targeted_story_and_ordering_corrections():
     cfg = common.load_config()
 
@@ -102,12 +117,17 @@ def test_review_feedback_gets_targeted_story_and_ordering_corrections():
         "category": "science_nature",
         "_draft_feedback": (
             "Rewrite Segment 2 to follow the 'consequence_first' treatment; this is a list of facts, not a story; "
-            "not entertaining enough; final payoff is 11 words, it must be 6-9 factual words."),
+            "not entertaining enough; final payoff is 11 words, it must be 6-9 factual words; "
+            "independent reviewer still requests a rewrite: Enhance narrative tension in the middle segments."),
         "_rewrite_attempt": 3,
         "_prior_draft": {"segments": [
             {"text": "The stone spheres hide their makers.", "aside": "The rock has secrets."},
             {"text": "Some were carved before their discovery."},
         ]},
+        "_prior_review_scores": {
+            "hook_strength": {"score": 8, "minimum": 7},
+            "coherence": {"score": 7, "minimum": 6},
+        },
     }
     plan = {
         "format": "sounds_fake", "hook_style": "bold_claim", "voice": "en-US-AndrewNeural",
@@ -123,7 +143,11 @@ def test_review_feedback_gets_targeted_story_and_ordering_corrections():
     assert "CAUSAL-CHAIN REPAIR" in writer.llm.prompt
     assert "Never invent a causal link" in writer.llm.prompt
     assert "ENTERTAINMENT REPAIR" in writer.llm.prompt
+    assert "MIDDLE-BEAT TENSION REPAIR" in writer.llm.prompt
+    assert "REVIEWER-FIX REPAIR" in writer.llm.prompt
     assert "WORD-COUNT REPAIR" in writer.llm.prompt
+    assert "PREVIOUS INDEPENDENT-REVIEW PASSES (not factual evidence)" in writer.llm.prompt
+    assert "hook 8/10 (passed minimum 7)" in writer.llm.prompt
     assert "LATER-REWRITE ESCALATION" in writer.llm.prompt
     assert "PREVIOUS AUTO-TUBE ATTEMPT (our own draft, NOT factual evidence)" in writer.llm.prompt
     assert "The stone spheres hide their makers." in writer.llm.prompt
@@ -143,7 +167,8 @@ def test_unresolved_review_feedback_survives_programmatic_rewrite_failures(monke
         return {"title": f"draft {len(calls)}", "segments": [{"text": f"attempt {len(calls)}"}]}
 
     reviews = [
-        (False, {"programmatic_ok": True, "score": 5,
+        (False, {"programmatic_ok": True, "independent": True, "score": 5, "hook_strength": 6,
+                 "entertainment": 5, "coherence": 7, "trend_alignment": 9,
                  "issues": ["not entertaining enough (5/10, need 6)",
                             "overall review score too low (5/10, need 7)"]}),
         (False, {"programmatic_ok": False,
@@ -172,10 +197,70 @@ def test_unresolved_review_feedback_survives_programmatic_rewrite_failures(monke
     assert calls[1]["_rewrite_attempt"] == 2
     assert calls[1]["_prior_draft"]["title"] == "draft 1"
     assert "not entertaining enough" in calls[1]["_draft_feedback"]
+    assert calls[1]["_prior_review_scores"] == {
+        "coherence": {"score": 7.0, "minimum": 6.0},
+        "trend_alignment": {"score": 9.0, "minimum": 8.0},
+    }
     assert calls[2]["_rewrite_attempt"] == 3
     assert calls[2]["_prior_draft"]["title"] == "draft 2"
+    assert calls[2]["_prior_review_scores"] == calls[1]["_prior_review_scores"]
     assert "not entertaining enough" in calls[2]["_draft_feedback"]
     assert "final payoff" in calls[2]["_draft_feedback"]
+
+
+def test_review_retry_preserves_passed_scores_while_targeting_middle_tension(monkeypatch):
+    cfg = common.load_config()
+    writer = scriptwriter.ScriptWriter.__new__(scriptwriter.ScriptWriter)
+    writer.cfg = cfg
+    writer.llm = object()
+    writer.lang = "en"
+    calls = []
+
+    def fake_write(topic, _plan, _source):
+        calls.append(copy.deepcopy(topic))
+        return {"title": f"draft {len(calls)}", "segments": [{"text": f"attempt {len(calls)}"}]}
+
+    reviews = [
+        (False, {"programmatic_ok": True, "independent": True, "score": 4, "hook_strength": 6, "entertainment": 4,
+                 "coherence": 7, "trend_alignment": 9,
+                 "issues": ["hook too weak (6/10, need 7)", "not entertaining enough (4/10, need 6)"]}),
+        (False, {"programmatic_ok": True, "independent": True, "score": 8, "hook_strength": 8, "entertainment": 7,
+                 "coherence": 7, "trend_alignment": 9,
+                 "issues": ["independent reviewer still requests a rewrite: "
+                            "Enhance narrative tension in the middle segments to boost entertainment value above 6."]}),
+        (True, {"programmatic_ok": True, "independent": True, "score": 8, "hook_strength": 8, "entertainment": 8,
+                "coherence": 7, "trend_alignment": 9, "issues": []}),
+    ]
+
+    def fake_check(_script, _source, _topic):
+        return reviews.pop(0)
+
+    writer.write = fake_write
+    writer.check = fake_check
+    monkeypatch.setattr(scriptwriter, "ground", lambda *_args, **_kwargs: {
+        "title": "Kola Superdeep Borehole", "text": "The borehole reached deep rock. " * 20,
+    })
+    monkeypatch.setattr(scriptwriter, "source_supports_angle", lambda *_args, **_kwargs: True)
+    monkeypatch.setattr(scriptwriter, "subject_is_depictable", lambda *_args, **_kwargs: True)
+
+    result = writer.produce({
+        "topic": "They Drilled 12 KM Into Earth And It Got Extremely Hot",
+        "script_subject": "Kola Superdeep Borehole", "angle": "temperature rose with depth",
+        "category": "science",
+    }, {}, max_attempts=3)
+
+    assert result is not None and len(calls) == 3
+    assert calls[1]["_prior_review_scores"]["coherence"] == {"score": 7.0, "minimum": 6.0}
+    assert "hook_strength" not in calls[1]["_prior_review_scores"]
+    assert calls[2]["_prior_review_scores"] == {
+        "score": {"score": 8.0, "minimum": 7.0},
+        "hook_strength": {"score": 8.0, "minimum": 7.0},
+        "entertainment": {"score": 7.0, "minimum": 6.0},
+        "coherence": {"score": 7.0, "minimum": 6.0},
+        "trend_alignment": {"score": 9.0, "minimum": 8.0},
+    }
+    assert "narrative tension" in calls[2]["_draft_feedback"]
+    assert "not entertaining enough" not in calls[2]["_draft_feedback"]
 
 
 def test_writer_word_count_errors_are_sent_to_the_model_validation_retry():

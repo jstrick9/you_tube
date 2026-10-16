@@ -551,7 +551,33 @@ def _valid_review_score(number) -> bool:
     return _finite_in_range(number, 0, 10)
 
 
+def _passing_review_scores(review: dict, cfg: dict) -> dict[str, dict[str, float]]:
+    """Keep numeric reviewer passes as rewrite guardrails, never as factual evidence."""
+    if (not isinstance(review, dict) or review.get("programmatic_ok") is not True
+            or review.get("independent") is not True):
+        return {}
+    content = cfg.get("content") if isinstance(cfg.get("content"), dict) else {}
+    compliance = cfg.get("compliance") if isinstance(cfg.get("compliance"), dict) else {}
+    thresholds = {
+        "score": compliance.get("quality_gate_min_score", 7),
+        "hook_strength": content.get("min_hook_score", 7),
+        "entertainment": content.get("min_entertainment", 6),
+        "coherence": content.get("min_coherence", 6),
+        "trend_alignment": content.get("min_trend_alignment", 8),
+    }
+    passed = {}
+    for dimension, minimum in thresholds.items():
+        value = review.get(dimension)
+        if not _valid_review_score(value) or not _valid_review_score(minimum):
+            continue
+        score, floor = float(value), float(minimum)
+        if score >= floor:
+            passed[dimension] = {"score": score, "minimum": floor}
+    return passed
+
+
 def metadata_schema_issues(value) -> list[str]:
+
     """Validate upload-facing metadata before it can be attached to an otherwise approved script."""
     if not isinstance(value, dict):
         return ["metadata response must be a JSON object"]
@@ -1544,6 +1570,18 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                 "turn on a clear expectation-versus-reality contrast, build to a concrete payoff, and add a specific, "
                 "fact-free narrator reaction. Make a meaningful change to the treatment, not just stronger adjectives; "
                 "invent no stakes or claims.")
+        if any(term in feedback_lower for term in (
+                "narrative tension", "tension in the middle", "middle segments", "middle beats", "middle section")):
+            feedback_guidance.append(
+                "MIDDLE-BEAT TENSION REPAIR: change only the named middle beat(s) to make a SOURCE-TEXT-supported "
+                "uncertainty, obstacle, reversal, or consequence drive the next beat. Do not invent danger, motives, "
+                "deadlines, stakes, or causation. Preserve any passing hook, payoff, and score dimensions; keep every "
+                "beat inside its configured factual-word band.")
+        if "independent reviewer still requests a rewrite" in feedback_lower:
+            feedback_guidance.append(
+                "REVIEWER-FIX REPAIR: implement the specific requested change, not a wholesale rewrite. Keep already "
+                "passing beats and reviewer dimensions stable; alter only the beat(s) named in the fix unless a hard "
+                "gate requires more. Re-run all facts, safety, originality, trend, and length checks unchanged.")
         if "overall review score too low" in feedback_lower:
             feedback_guidance.append(
                 "OVERALL-QUALITY REPAIR: fix each named reviewer concern in the actual beats; do not chase the number "
@@ -1572,6 +1610,25 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                       "For a count-only repair, preserve passing beats; for a story/entertainment repair, change the "
                       "treatment enough to address the concern.\n"
                       if prior_excerpt else "")
+        prior_scores = topic.get("_prior_review_scores")
+        score_labels = {
+            "score": "overall quality", "hook_strength": "hook", "entertainment": "entertainment",
+            "coherence": "story coherence", "trend_alignment": "current-trend alignment",
+        }
+        score_rows = []
+        if isinstance(prior_scores, dict):
+            for key, label in score_labels.items():
+                row = prior_scores.get(key)
+                if not isinstance(row, dict):
+                    continue
+                score, floor = row.get("score"), row.get("minimum")
+                if _valid_review_score(score) and _valid_review_score(floor) and float(score) >= float(floor):
+                    score_rows.append(f"{label} {float(score):.0f}/10 (passed minimum {float(floor):.0f})")
+        prior_scores_line = (
+            "PREVIOUS INDEPENDENT-REVIEW PASSES (not factual evidence): " + "; ".join(score_rows) + "\n"
+            "Preserve these passing dimensions while fixing the named issue. Do not weaken a working hook or payoff "
+            "to add tension elsewhere; make the narrowest change that clears the remaining review.\n"
+            if score_rows else "")
         user = f"""CURRENT TREND SUBJECT (deliver its specific live-trend angle; do not copy the raw headline): {trend_subject}
 CONCRETE SUBJECT TO NAME AND SHOW: {subject_for_visuals} — show this specific person, place, object, or species itself.
 The trend angle remains the story; this concrete subject is its on-screen referent, not an excuse to make a generic article summary.
@@ -1580,7 +1637,7 @@ WHY IT'S TRENDING: {topic.get('why_trending') or ', '.join(topic.get('sources', 
 {originality_line}ANGLE (this is the story to tell — not the article's summary, not the subject's general
 history. If the angle names a specific surprise, that surprise IS the video):
 {topic.get('angle') or 'most surprising educational angle'}
-{feedback_line}{prior_line}FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
+{feedback_line}{prior_line}{prior_scores_line}FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
 {hook_line}
 {structure_line}{comment_line}{turn_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
 CHANNEL: {self.cfg['channel']['name']}
@@ -2147,6 +2204,7 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
             max_attempts, configured, MAX_SCRIPT_DRAFTS, 1)
         feedback = ""
         sticky_review_feedback = ""
+        sticky_review_scores = {}
         previous_draft = None
         for attempt in range(max_attempts):
             if receipt:
@@ -2158,6 +2216,10 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
                     t["_draft_feedback"] = feedback
                 if previous_draft is not None:
                     t["_prior_draft"] = previous_draft
+                if sticky_review_scores:
+                    t["_prior_review_scores"] = {
+                        key: dict(value) for key, value in sticky_review_scores.items()
+                    }
                 script = self.write(t, plan, source)
             except LLMError as e:
                 if receipt:
@@ -2196,6 +2258,10 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
             # attached until a later independent review either clears it or replaces it.
             if review.get("programmatic_ok") is True:
                 sticky_review_feedback = current_feedback
+                # Preserve independently scored passes through later count/schema repairs.
+                # A new independent review replaces this snapshot; programmatic-only
+                # failures cannot erase it because no reviewer rescored those dimensions.
+                sticky_review_scores = _passing_review_scores(review, self.cfg)
             feedback_parts = []
             for item in (sticky_review_feedback, current_feedback):
                 if item and item not in feedback_parts:
