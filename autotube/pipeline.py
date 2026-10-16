@@ -818,7 +818,6 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             break
         plan = plans[i]
         slot_attempts = 0
-        failures_since_refill = 0
         while True:
             if not llm.has_available_provider():
                 _report_failure("script", "all_text_providers_circuit_open_or_unusable")
@@ -874,13 +873,10 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             if receipt:
                 failure = receipt.last_failure or {}
                 receipt.note_topic("rejected", category=failure.get("category", "topic_not_produced"))
-            failures_since_refill += 1
-            if (failures_since_refill >= 2 and pi < len(picks)
-                    and rounds < budgets.selection_rounds and llm.has_available_provider()):
-                log.info("%d topics rejected; replenishing the fallback queue while existing picks remain",
-                         failures_since_refill)
+            if (pi < len(picks) and rounds < budgets.selection_rounds
+                    and llm.has_available_provider()):
+                log.info("topic rejected; replenishing the fallback queue while existing picks remain")
                 select_more_topics()
-                failures_since_refill = 0
     log.info("produced %d/%d videos", len(results), n)
 
     # 3. upload (scheduled)

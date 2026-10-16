@@ -1,7 +1,7 @@
 from autotube.common import load_config
 
 
-def test_pipeline_refills_fallback_queue_after_two_rejections_without_duplicates(monkeypatch, tmp_path):
+def test_pipeline_refills_fallback_queue_after_early_rejection_without_duplicates(monkeypatch, tmp_path):
     from autotube import pipeline
 
     cfg = load_config()
@@ -68,8 +68,8 @@ def test_pipeline_refills_fallback_queue_after_two_rejections_without_duplicates
 
     second_selection = next(i for i, event in enumerate(events)
                             if event[0] == "select" and event[1] == 2)
-    third_attempt = events.index(("attempt", "third"))
-    assert second_selection < third_attempt, "refill should happen after two misses, before queued fallbacks"
+    second_attempt = events.index(("attempt", "second"))
+    assert second_selection < second_attempt, "refill should happen after the first miss, before the next topic"
     assert events[second_selection][2] == {"first", "second", "third"}, \
         "attempted and still-queued candidates must be excluded from the fresh selection"
     assert [event[1] for event in events if event[0] == "attempt"] == [
