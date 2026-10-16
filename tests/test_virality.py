@@ -199,8 +199,12 @@ def test_selector_rejects_category_that_conflicts_with_explicit_trend_lane():
                      "script_subject": "octopus", "wiki_query": "Octopus",
                      "angle": "its arms taste prey before it reaches the mouth",
                      "formats": ["sounds_fake"]}])
-    assert ScriptWriter(CFG, llm, Strat()).select_topics([candidate], 1, set()) == []
+    writer = ScriptWriter(CFG, llm, Strat())
+    assert writer.select_topics([candidate], 1, set()) == []
     assert "HARD EDITORIAL SCOPE" in llm.prompt
+    first_prompt = llm.prompt
+    assert writer.select_topics([candidate], 1, set()) == []
+    assert llm.prompt == first_prompt, "a malformed pick must not burn another selection round"
 
 
 def test_selector_rejects_configuration_that_weakens_viral_floor():

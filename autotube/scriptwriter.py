@@ -1246,6 +1246,7 @@ class ScriptWriter:
         self.lang = cfg["channel"].get("language", "en")
         self.src_chars = 2600 if llm.lite else 7000
         self._history: list[dict] | None = None      # lazily read, see check()
+        self._selection_rejected: set[str] = set()   # do not spend another round on malformed picks
 
     # ── 1. topic selection ───────────────────────────────────────────────────
     def select_topics(self, candidates: list[dict], n: int, recent: set[str],
@@ -1261,7 +1262,7 @@ class ScriptWriter:
             return []
         cats = self.cfg["channel"]["categories"]
         ccfg = self.cfg["content"]
-        exclude = exclude if isinstance(exclude, set) else set()
+        exclude = (exclude if isinstance(exclude, set) else set()) | self._selection_rejected
         recent = recent if isinstance(recent, set) else set()
         min_viral_raw = ccfg.get("min_viral_score", 7)
         if not _finite_in_range(min_viral_raw, 7, 10):
@@ -1545,6 +1546,13 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                 picks.append(c)
             except (KeyError, ValueError, TypeError):
                 continue
+        accepted_keys = {pick["topic_key"] for pick in picks}
+        for response_pick in res["picks"]:
+            idx = response_pick.get("index")
+            if type(idx) is int and 0 <= idx < len(pool):
+                key = pool[idx].get("topic_key")
+                if isinstance(key, str) and key not in accepted_keys:
+                    self._selection_rejected.add(key)
         picks.sort(key=lambda c: -c["priority"])
         log.info("viral picks: %s", [
             f"{c['topic'][:32]} → {c['script_subject'][:40]} [{c['category']}, {c['viral_score']:.0f}]"
