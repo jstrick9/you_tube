@@ -789,11 +789,36 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     results, used_titles, used_formats = [], set(), set()
     pi = 0
     vision_down = False
+
+    def select_more_topics() -> bool:
+        """Replenish the fallback queue within the existing bounded selection budget."""
+        nonlocal rounds, picks
+        if (rounds >= budgets.selection_rounds or not cands or time.monotonic() > deadline
+                or not llm.has_available_provider()):
+            return False
+        current_receipt = run_report.current_receipt()
+        if current_receipt:
+            current_receipt.set_stage("topic_selection")
+            current_receipt.note_retry("topic_selection", rounds, budgets.selection_rounds,
+                                       "select_fresh_live_candidates")
+        rounds += 1
+        # Exclude both attempted topics and any picks already waiting in the queue. Early
+        # replenishment must not enqueue duplicates of the still-untried first-round picks.
+        exclude = tried | {str(row.get("topic_key") or "") for row in picks[pi:]}
+        more = writer.select_topics(cands, n - len(results), recent, exclude=exclude)
+        if not more:
+            _report_failure("topic_selection", "no_more_eligible_trending_topics")
+            return False
+        log.info("selection round %d: %d more viral picks", rounds, len(more))
+        picks += more
+        return True
+
     for i in range(n):
         if vision_down:
             break
         plan = plans[i]
         slot_attempts = 0
+        failures_since_refill = 0
         while True:
             if not llm.has_available_provider():
                 _report_failure("script", "all_text_providers_circuit_open_or_unusable")
@@ -803,21 +828,10 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
                 log.warning("topic retry budget exhausted for slot %d (%d topics)", i + 1, slot_attempts)
                 break
             if pi >= len(picks):
-                if rounds >= budgets.selection_rounds or not cands or time.monotonic() > deadline:
-                    _report_failure("topic_selection", "selection_round_budget_exhausted")
+                if not select_more_topics():
+                    if rounds >= budgets.selection_rounds or not cands or time.monotonic() > deadline:
+                        _report_failure("topic_selection", "selection_round_budget_exhausted")
                     break
-                receipt = run_report.current_receipt()
-                if receipt:
-                    receipt.set_stage("topic_selection")
-                    receipt.note_retry("topic_selection", rounds, budgets.selection_rounds,
-                                       "select_fresh_live_candidates")
-                rounds += 1
-                more = writer.select_topics(cands, n - len(results), recent, exclude=tried)
-                if not more:
-                    _report_failure("topic_selection", "no_more_eligible_trending_topics")
-                    break
-                log.info("selection round %d: %d more viral picks", rounds, len(more))
-                picks += more
             reserve = 60 * float(cfg["schedule"].get("topic_reserve_minutes", 45))
             if time.monotonic() > deadline - reserve:
                 _report_failure("topic_production", "soft_deadline_reserve_reached")
@@ -860,6 +874,13 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             if receipt:
                 failure = receipt.last_failure or {}
                 receipt.note_topic("rejected", category=failure.get("category", "topic_not_produced"))
+            failures_since_refill += 1
+            if (failures_since_refill >= 2 and pi < len(picks)
+                    and rounds < budgets.selection_rounds and llm.has_available_provider()):
+                log.info("%d topics rejected; replenishing the fallback queue while existing picks remain",
+                         failures_since_refill)
+                select_more_topics()
+                failures_since_refill = 0
     log.info("produced %d/%d videos", len(results), n)
 
     # 3. upload (scheduled)

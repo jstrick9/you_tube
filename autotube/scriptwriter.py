@@ -723,11 +723,45 @@ a an after and are at ancient by crazy deep discovery discoveries discovered dis
 for from giant hidden huge impossible in into insane jump jumps jumping last lost goodbye farewell loves love massive mystery mysteries
 mysterious of old on or poison poisoned pressure sea ocean light lights green missile missiles launcher launchers
 secret shocking survive survives survival terrifying the to toxic unearthed venom weird with years year
+explore explored exploring exploration explorations observation observations research researching study studies
 """.split())
 _VISUAL_GENERIC_SINGLETONS = frozenset("""
 animal artifact cave city creature cycle cycles history island mountain mystery object river species sphere stone story temple
 village town
 """.split())
+_VISUAL_ABSTRACT_SUBJECTS = frozenset("""
+concept discovery discoveries event events exploration explorations fact facts history idea investigation mystery mysteries
+observation observations phenomenon phenomena process research science story study studies subject topic world space
+""".split())
+
+
+def _visual_subject_core(label: str) -> list[str]:
+    """Remove click-driving modifiers and split compounds such as ``deep-sea``."""
+    result = []
+    for compound in re.findall(r"[\w’'-]+", label or "", re.UNICODE):
+        for word in compound.split("-"):
+            term = word.casefold().replace("’", "'")
+            term = term[:-2] if term.endswith("'s") else term
+            if (len(term) > 2 and not term.isdigit()
+                    and term not in _VISUAL_SUBJECT_MODIFIERS):
+                result.append(word[:-2] if word.casefold().endswith("'s") else word)
+    return result
+
+
+def has_specific_visual_subject(subject: str) -> bool:
+    """Reject abstract labels that invite interchangeable scenery instead of a real subject.
+
+    A physical pair such as ``stone sphere`` is still depictable even though each word can
+    be generic on its own. By contrast, ``deep-sea exploration`` contributes no concrete
+    referent after its framing words are removed; a generic sea floor or research vessel
+    would not prove what the trend promised.
+    """
+    core = [word.casefold() for word in _visual_subject_core(subject)]
+    if not core or any(word in _VISUAL_ABSTRACT_SUBJECTS for word in core):
+        return False
+    if any(word not in _VISUAL_GENERIC_SINGLETONS for word in core):
+        return True
+    return tuple(core) in {("stone", "sphere"), ("sphere", "stone")}
 
 
 def visual_subject_for_topic(topic: dict | None, source: dict | None = None) -> str:
@@ -743,23 +777,11 @@ def visual_subject_for_topic(topic: dict | None, source: dict | None = None) -> 
     source = source if isinstance(source, dict) else {}
     raw = str(topic.get("script_subject") or "").strip()
     source_title = str(source.get("title") or "").strip()
-
-    def core(label: str) -> list[str]:
-        result = []
-        for word in re.findall(r"[\w’'-]+", label, re.UNICODE):
-            term = word.casefold().replace("’", "'")
-            term = term[:-2] if term.endswith("'s") else term
-            if (len(term) > 2 and not term.isdigit()
-                    and term not in _VISUAL_SUBJECT_MODIFIERS):
-                result.append(word[:-2] if word.casefold().endswith("'s") else word)
-        return result
-
-    trend_core = core(raw)
-    if trend_core and not (len(trend_core) == 1
-                           and trend_core[0].casefold() in _VISUAL_GENERIC_SINGLETONS):
+    trend_core = _visual_subject_core(raw)
+    if trend_core and has_specific_visual_subject(" ".join(trend_core)):
         return " ".join(trend_core)
-    source_core = core(source_title)
-    if source_core:
+    source_core = _visual_subject_core(source_title)
+    if source_core and has_specific_visual_subject(" ".join(source_core)):
         return " ".join(source_core)
     return raw or source_title
 
@@ -1378,8 +1400,7 @@ RECENTLY COVERED — avoid: {', '.join(list(recent)[:40]) or 'none'}
 LIVE TREND CANDIDATES (each passed the independent current-evidence gate; evidence below is for discovery, not facts):
 {listing}
 
-Return as many qualifying candidates as possible, up to {want}, as fallbacks for the requested video count.
-Do not stop after one if other candidates independently score >= {min_viral:g}/10 and fit scope and safety; rank the best first.
+Return each distinct candidate you rate >= {min_viral:g}/10, up to {want}, best first as backups for this one video. Do not stop at four, inflate scores, or pad below the floor.
 Choose only original, genuinely ENTERTAINING, family-friendly 15-20 second Shorts with a scroll-stopping true surprise,
 broad appeal, measured demand NOW, emotional pull or awe without tragedy/divisiveness, and relevant real visuals.
 Do not choose an evergreen or Wikipedia-only idea. Return fewer picks or none when candidates do not genuinely fit.
@@ -1390,6 +1411,8 @@ FORMATS we can make (choose 2-4 that the specific article honestly supports; myt
 For every pick:
 - `script_subject` is a concise concrete name (1-6 words) for the CURRENT TREND CANDIDATE — it must name and be
   depicted in the video, share a meaningful word with the candidate, and must NOT be replaced by a background article title.
+  It must name a photographable object, creature, person, place, or artifact—not only abstract framing like
+  “deep-sea exploration,” “discovery,” or “history.” Reject vague trends instead of inventing a subject.
 - `angle` must be a specific, independently worded factual claim. Trend evidence is discovery, not proof; the selector
   lacks article text, so invent no details. Grounded research must support the angle before drafting.
 - `wiki_query` must be the MOST SPECIFIC English Wikipedia article supporting it, not a broad category (e.g. Bou Craa,
@@ -2386,6 +2409,12 @@ Return JSON only: {{"supported": true, "angle": "...", "source_quote": "..."}}""
             return None
         topic["wiki_title"] = source["title"]
         visual_subject = visual_subject_for_topic(topic, source)
+        if not has_specific_visual_subject(visual_subject):
+            if receipt:
+                receipt.note_failure("script_research", "no_depictable_source_asset")
+            log.info("  ✗ grounded topic %r has no concrete visual subject (resolved %r) — skipping before draft",
+                     topic.get("topic"), visual_subject)
+            return None
         original_angle = str(topic.get("angle") or "").strip()
         source_text = str(source.get("text") or "")
         if not source_supports_angle(original_angle, visual_subject, source_text):

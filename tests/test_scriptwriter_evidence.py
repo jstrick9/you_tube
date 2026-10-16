@@ -3,6 +3,7 @@ import re
 from autotube.scriptwriter import (
     _attach_missing_evidence,
     _source_evidence_quote,
+    has_specific_visual_subject,
     visual_subject_for_topic,
 )
 
@@ -59,6 +60,47 @@ def test_visual_subject_resolves_nonvisual_modifiers_to_concrete_subjects():
     assert visual_subject_for_topic(
         {"script_subject": "Deep Ocean Pressure"}, {"title": "Mariana Trench"},
     ) == "Mariana Trench"
+
+
+def test_abstract_deep_sea_exploration_is_not_mistaken_for_a_visual_subject():
+    abstract = visual_subject_for_topic(
+        {"script_subject": "Deep-sea exploration"}, {"title": "Deep-sea exploration"},
+    )
+    assert abstract == "Deep-sea exploration"
+    assert not has_specific_visual_subject(abstract)
+    assert has_specific_visual_subject("Hydrothermal vent")
+    assert has_specific_visual_subject("Stone Sphere")
+
+
+def test_produce_skips_abstract_visual_subject_before_any_script_draft(monkeypatch):
+    import yaml
+    from pathlib import Path
+    from autotube import scriptwriter
+
+    cfg = yaml.safe_load((Path(__file__).resolve().parents[1] / "config.yaml").read_text())
+    source = {"title": "Deep-sea exploration", "text": "Deep-sea exploration describes a broad activity. " * 80}
+
+    class NoDraftLLM:
+        lite = False
+        calls = 0
+
+        def json(self, *_args, **_kwargs):
+            self.calls += 1
+            raise AssertionError("an abstract subject should be rejected before drafting")
+
+    llm = NoDraftLLM()
+    monkeypatch.setattr(scriptwriter, "ground", lambda *_args, **_kwargs: source)
+    monkeypatch.setattr(scriptwriter, "subject_is_depictable", lambda *_args, **_kwargs: True)
+    writer = scriptwriter.ScriptWriter(cfg, llm, object())
+    topic = {
+        "topic": "A Shocking Discovery in the Deep Sea",
+        "script_subject": "Deep-sea exploration",
+        "wiki_query": "Deep-sea exploration",
+        "angle": "deep-sea exploration describes a broad activity",
+    }
+
+    assert writer.produce(topic, {"format": "sounds_fake", "hook_style": "bold_claim", "voice": "test"}) is None
+    assert llm.calls == 0
 
 
 def test_missing_evidence_is_backfilled_only_with_a_source_matched_quote():

@@ -94,6 +94,8 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     assert "trend context (discovery only): viral Short now: 2,000,000 views in 20h" in llm.prompt
     assert "source lane=science_nature" in llm.prompt
     assert '"script_subject"' in llm.prompt and "do not copy the outlier headline" in llm.prompt
+    assert "Do not stop at four" in llm.prompt and "inflate scores" in llm.prompt and "pad below the floor" in llm.prompt
+    assert "deep-sea exploration" in llm.prompt and "photographable" in llm.prompt
     assert "Every pick MUST include an explicit risk verdict" in llm.prompt
     assert len(llm.prompt) < 5_000, "selector context must stay compact for free-tier models"
     assert picks[0]["script_subject"] == "octopus"
