@@ -11,16 +11,21 @@
     "groq": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-16T03:01:10.267029+00:00",
-      "blocked_until": "2026-10-16T03:21:10.267029+00:00",
-      "retry_after_seconds": 1.0
+      "recorded_at": "2026-10-16T03:26:50.710956+00:00",
+      "blocked_until": "2026-10-16T03:46:50.710956+00:00",
+      "retry_after_seconds": 31.0
     },
     "mistral": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-16T03:03:48.109853+00:00",
-      "blocked_until": "2026-10-16T03:23:48.109853+00:00"
+      "recorded_at": "2026-10-16T03:28:03.273263+00:00",
+      "blocked_until": "2026-10-16T03:48:03.273263+00:00"
     }
   },
-  "failures_5xx": {}
+  "failures_5xx": {
+    "gemini": {
+      "count": 2,
+      "last_at": "2026-10-16T03:29:25.469271+00:00"
+    }
+  }
 }
