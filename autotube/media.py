@@ -1072,12 +1072,32 @@ QA_REQUERY_SYSTEM = (
     "You repair a failed visual search for a factual educational Short. Keep the narration unchanged. "
     "Return strict JSON only."
 )
+_REQUERY_SUBJECT_STOPWORDS = frozenset(
+    "a an and are as at by for from how in into is it its of on or the their this to under with why"
+    .split()
+)
+
+
+def _required_requery_subject_terms(subject: str) -> set[str]:
+    """Keep the concrete named subject or place from vanishing into a generic substitute."""
+    return {token for token in re.findall(r"[a-z0-9]+", str(subject or "").casefold())
+            if token not in _REQUERY_SUBJECT_STOPWORDS}
+
+
+def _has_requery_subject_terms(text: str, terms: set[str]) -> bool:
+    tokens = set(re.findall(r"[a-z0-9]+", str(text or "").casefold()))
+    return terms.issubset(tokens)
 
 
 def _requery_after_final_qa(llm, subject: str, line: str, want: str, failed_asset: str,
-                            qa_feedback: str) -> tuple[str, list[str]]:
-    """Ask for a genuinely different, evidence-faithful search after rendered pixels fail QA."""
+                            qa_feedback: str, *, segment_subject: str = "",
+                            required_terms: set[str] | None = None) -> tuple[str, list[str]]:
+    """Ask for a different evidence-faithful search and enforce the subject/place anchor."""
+    required_terms = set(required_terms) if required_terms is not None else _required_requery_subject_terms(subject)
+    term_text = ", ".join(sorted(required_terms)) or "none"
     user = f"""VIDEO SUBJECT: {subject}
+CONCRETE SUBJECT OF THIS SEGMENT: {segment_subject or want}
+REQUIRED SOURCE-SPECIFIC TERMS (case-insensitive; retain verbatim): {term_text}
 EXACT NARRATION: "{line}"
 PREVIOUS SHOT REQUEST: {want}
 FAILED ASSET: {failed_asset}
@@ -1085,10 +1105,12 @@ FINAL RENDERED-FRAME QA: {qa_feedback}
 
 The final pixels were inspected and rejected; do not repeat the failed idea or merely change wording.
 Suggest one physically findable visual that accurately supports this exact narration. Preserve the identity,
-place, object, denomination, species, and historical period. Never substitute a generic look-alike, unrelated
-person/object, fabricated reenactment, or symbolic stock photo. For a past event that cannot be photographed,
-use a documented depiction or a directly relevant real place/object only if it remains honest about what the image
-shows. Do not add unnecessary staging (for example, a hand holding an object) when a clear close-up is better.
+place, object, denomination, species, and historical period. Every required source-specific term must remain in
+"shows" and together in at least one search query; if that cannot be done, return empty output rather than
+broadening to a look-alike. Never substitute a generic look-alike, unrelated person/object, fabricated reenactment,
+or symbolic stock photo. For a past event that cannot be photographed, use a documented depiction or a directly
+relevant real place/object only if it remains honest about what the image shows. Do not add unnecessary staging
+(for example, a hand holding an object) when a clear close-up is better.
 
 Return JSON: {{"shows": "revised, literal shot request", "queries": ["up to 3 short searches, 2-4 words each"]}}.
 If no defensible visual can be suggested, return {{"shows": "", "queries": []}} so this shot can remain rejected."""
@@ -1100,7 +1122,12 @@ If no defensible visual can be suggested, return {{"shows": "", "queries": []}} 
     _validate_requery_output(result, allow_empty=True)  # revalidate custom adapters at the trust boundary
     shows = result["shows"].strip()
     queries = [query.strip() for query in result["queries"]]
-    return (shows, queries) if shows and queries else ("", [])
+    if not shows or not queries:
+        return "", []
+    if required_terms and (not _has_requery_subject_terms(shows, required_terms)
+                           or not any(_has_requery_subject_terms(query, required_terms) for query in queries)):
+        raise ValueError("visual requery dropped required source-specific subject/place terms")
+    return shows, queries
 
 
 def _activate_qa_candidate(visuals: dict, seg: int, bad_path: str, work: Path,
@@ -1135,7 +1162,8 @@ def _activate_qa_candidate(visuals: dict, seg: int, bad_path: str, work: Path,
 
 
 def _find_final_qa_alternative(visuals: dict, seg: int, bad_path: str, work: Path,
-                               source: dict, segment: dict, cfg: dict, llm, feedback: str) -> bool:
+                               source: dict, segment: dict, cfg: dict, llm, feedback: str,
+                               visual_subject: str = "") -> bool:
     """Re-search only after frame QA rejects all pre-verified spares; every new shot is re-judged."""
     from . import vision
 
@@ -1151,9 +1179,15 @@ def _find_final_qa_alternative(visuals: dict, seg: int, bad_path: str, work: Pat
     line = str(segment.get("text", ""))
     if not line:
         return False
+    segment_visual = segment.get("visual") if isinstance(segment.get("visual"), dict) else {}
+    segment_subject = str(segment_visual.get("shows") or shot.get("want", ""))
+    source_title = str(source.get("title") or "").strip()
+    subject = str(visual_subject or source_title).strip()
+    required_terms = _required_requery_subject_terms(subject)
     try:
         want, queries = _requery_after_final_qa(
-            llm, str(source.get("title", "")), line, str(shot.get("want", "")), failed_asset, feedback)
+            llm, subject, line, str(shot.get("want", "")), failed_asset, feedback,
+            segment_subject=segment_subject, required_terms=required_terms)
     except Exception as e:  # noqa: BLE001 — fail closed; the rendered shot remains rejected
         log.info("    QA re-search prompt failed for seg %d: %s", seg, str(e)[:120])
         return False
@@ -1211,14 +1245,15 @@ def _find_final_qa_alternative(visuals: dict, seg: int, bad_path: str, work: Pat
 
 def use_alternative(visuals: dict, seg: int, bad_path: str, work: Path, *,
                     source: dict | None = None, segment: dict | None = None, cfg: dict | None = None,
-                    llm=None, feedback: str = "") -> bool:
+                    llm=None, feedback: str = "", visual_subject: str = "") -> bool:
     """Use a verified spare, then re-search from final-frame QA evidence; never waive that final gate."""
     for candidate in list(visuals["alts"].get(seg, [])):
         visuals["alts"][seg].remove(candidate)
         if _activate_qa_candidate(visuals, seg, bad_path, work, candidate):
             return True
     if source and segment and cfg:
-        return _find_final_qa_alternative(visuals, seg, bad_path, work, source, segment, cfg, llm, feedback)
+        return _find_final_qa_alternative(
+            visuals, seg, bad_path, work, source, segment, cfg, llm, feedback, visual_subject)
     return False
 
 

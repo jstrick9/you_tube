@@ -94,6 +94,39 @@ def test_visual_requery_rejects_malformed_provider_types_even_if_callback_is_ign
         media._requery_after_final_qa(Malformed(), "subject", "exact narration", "old shot", "bad asset", "mismatch")
 
 
+def test_final_qa_requery_preserves_named_place_in_shot_and_queries():
+    import pytest
+    from autotube import media
+
+    class Requery:
+        def __init__(self, result):
+            self.result = result
+            self.prompt = ""
+
+        def json(self, system, user, temperature=None, validate=None):
+            self.prompt = user
+            validate and validate(self.result)
+            return self.result
+
+    required = {"bracken", "cave"}
+    good = Requery({"shows": "Bats roosting beneath the roof of Bracken Cave",
+                    "queries": ["Bracken Cave bats", "Texas bats roost"]})
+    shows, queries = media._requery_after_final_qa(
+        good, "Bracken Cave", "Bats roost beneath the cave roof.", "bats under one roof",
+        "exiting-bats photo", "wrong behavior", segment_subject="bats roosting in Bracken Cave",
+        required_terms=required)
+    assert "Bracken Cave" in shows and queries[0] == "Bracken Cave bats"
+    assert "CONCRETE SUBJECT OF THIS SEGMENT: bats roosting in Bracken Cave" in good.prompt
+    assert "REQUIRED SOURCE-SPECIFIC TERMS" in good.prompt
+
+    dropped = Requery({"shows": "Bats roosting under a cave roof",
+                       "queries": ["Texas cave bats", "Bracken bats"]})
+    with pytest.raises(ValueError, match="source-specific subject/place terms"):
+        media._requery_after_final_qa(
+            dropped, "Bracken Cave", "Bats roost beneath the cave roof.", "bats under one roof",
+            "exiting-bats photo", "wrong behavior", required_terms=required)
+
+
 def test_final_qa_requery_fails_closed_below_strong_match_threshold(monkeypatch, tmp_path):
     from autotube import media, vision
 
@@ -129,7 +162,7 @@ def test_final_qa_requery_fails_closed_below_strong_match_threshold(monkeypatch,
            "compliance": {"allowed_licenses": ["CC BY"]}, "qa": {"repair_min_match_score": 8}}
 
     assert not media.use_alternative(
-        visuals, 0, str(old), tmp_path, source={"title": "Subject"},
+        visuals, 0, str(old), tmp_path, source={"title": "exact object"},
         segment={"text": "Exact narration", "visual": {}}, cfg=cfg, llm=FakeLLM(), feedback="wrong pixels",
     )
     assert visuals["shots"][0]["path"] == old

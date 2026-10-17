@@ -609,7 +609,7 @@ def test_script_fact_check_outage_fails_closed(monkeypatch):
 
     sw = scriptwriter.ScriptWriter.__new__(scriptwriter.ScriptWriter)
     sw.cfg, sw.llm, sw.src_chars = cfg, DownLLM(), 4000
-    src = {"title": "Honey", "text": "Honey is a sweet substance made by bees. " * 20}
+    src = {"title": "Honey", "text": "Honey is a sweet substance made by bees; bees visit two million flowers for one honey jar. " * 20}
     ev = "Honey is a sweet substance made by bees."
     # gate-clean script: the only reason it must fail is that the fact-checker is unreachable
     script = {"title": "Honey facts", "segments": [

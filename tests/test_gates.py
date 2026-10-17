@@ -227,8 +227,10 @@ def test_scriptwriter_flags_a_non_independent_review():
     class SameModel:
         lite = False
         last_used = "gemini:g-1"
+        user = ""
 
         def review_json(self, system, user, avoid=None, **kw):
+            self.user = user
             return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8,
                     "loops": True, "factual_errors": [], "misleading_title": False,
                     "advertiser_friendly": True, "policy_concerns": [],
@@ -241,9 +243,10 @@ def test_scriptwriter_flags_a_non_independent_review():
                     "value_add": "A concise explanation of how the hive dries nectar.", "fixes": []}
 
     w = ScriptWriter.__new__(ScriptWriter)
-    w.llm, w.src_chars = SameModel(), 4000
+    llm = SameModel()
+    w.llm, w.src_chars = llm, 4000
     w.cfg = {**cfg, "content": dict(cfg["content"], require_grounding=False)}
-    src = {"title": "Bees", "text": "Bees make honey from nectar. " * 30}
+    src = {"title": "Bees", "text": "Bees make honey from nectar and visit two million flowers for one honey jar. " * 30}
     script = {"title": "Honey", "_writer_model": "gemini:g-1", "segments": [
         {"text": "Bees visit two million flowers for one honey jar"},
         {"text": "A worker bee makes one twelfth of a teaspoon in life", "aside": "Busy little things."},
@@ -251,3 +254,4 @@ def test_scriptwriter_flags_a_non_independent_review():
         {"text": "so the jar in your cupboard will never spoil"}]}
     ok, review = w.check(script, src)
     assert ok and review["independent"] is False and review["reviewer"] == "gemini:g-1"
+    assert "TITLE-CONTENT GATE" in llm.user and "spoken narration itself" in llm.user

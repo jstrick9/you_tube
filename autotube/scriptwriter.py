@@ -1853,7 +1853,7 @@ its visual object: each needs a non-empty "shows" string and 2-3 non-empty query
 Keep each evidence value a string; use an empty string only for the hook/CTA.
 
 Return JSON:
-{{"title": "<= 60 chars: names the subject + a curiosity gap the video truly answers; no emojis, no clickbait lies",
+{{"title": "<= 60 chars: names the concrete subject; every source-backed promise is explicitly answered in spoken narration (not merely implied or placed in the description). A 'How/Why' title must explain how/why; no emojis or clickbait lies",
  "segments": [{{"text": "...", "aside": "", "emphasis": ["..."], "reveal": false,
                "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "..."}}]}}"""
 
@@ -2161,6 +2161,7 @@ SCRIPT NARRATION (lines marked ASIDE are the narrator's jokes, spoken right afte
 {narration_list}
 
 Evaluate. Verify that the script offers a specific viewer takeaway and an original treatment in its own words, not a bare restatement of the headline or a close copy of source phrasing. If you cannot identify a concrete takeaway, leave value_add empty; if originality is doubtful, say so in policy_concerns or fixes.
+TITLE-CONTENT GATE: compare the title with the spoken narration itself, not the description or source article. Set misleading_title=true if any concrete promise or answer is missing, unsupported, or only implied. A title framed as “How X survives/works” must explain the mechanism; “Why X” must give the reason. Broad subject overlap is not enough.
 Return JSON: {{"factual_errors": ["..."], "misleading_title": true|false, "advertiser_friendly": true|false,
 "policy_concerns": ["..."], "value_add": "<specific takeaway the viewer learns>", "hook_strength": 0-10, "entertainment": 0-10,
 "score": 0-10, "loops": true|false, "coherence": 0-10{trend_schema},

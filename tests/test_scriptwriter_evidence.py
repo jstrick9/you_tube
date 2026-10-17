@@ -194,6 +194,7 @@ def test_real_writer_validator_backfills_an_omitted_evidence_field():
     assert "CONCRETE SUBJECT TO NAME AND SHOW: Stone Sphere" in captured["user"]
     assert "Write the script as exactly 4 or 5 segments. Prefer exactly FIVE by default" in captured["user"]
     assert "FINAL SHAPE CHECK" in captured["user"]
+    assert "A 'How/Why' title must explain how/why" in captured["user"]
     assert script["segments"][0]["evidence"] == ""
     assert script["segments"][1]["evidence"] in SOURCE
     assert script["segments"][2]["evidence"] == ""

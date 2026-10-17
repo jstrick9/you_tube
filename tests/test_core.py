@@ -21,6 +21,17 @@ def test_fact_check_numbers():
     assert unsupported_numbers("3 amazing facts", src) == []          # small structural numbers ok
 
 
+def test_fact_check_parses_spelled_out_large_numbers_and_scales():
+    source = "A cave holds 20 million bats. Voyager is more than 15 billion miles away."
+    assert unsupported_numbers("Twenty million bats roost there.", source) == []
+    assert unsupported_numbers("Voyager is fifteen billion miles away.", source) == []
+    assert "30000000" in unsupported_numbers("Thirty million bats roost there.", source)
+    assert "16000000000" in unsupported_numbers("Voyager is sixteen billion miles away.", source)
+    assert unsupported_numbers("One million bats roost there.", "A million bats roost there.") == []
+    assert "1000000" in unsupported_numbers("One million bats roost there.", "20 million bats roost there.")
+    assert unsupported_numbers("Five hundred pups were recorded.", "500 pups were recorded.") == []
+
+
 def test_json_repair_truncated():
     raw = '```json\n{"title": "X", "segments": [{"text": "a"}, {"text": "b", "keywords": ["c'
     o = _extract_json(raw)

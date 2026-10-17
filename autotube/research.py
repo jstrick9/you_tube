@@ -307,9 +307,18 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
 
 
 # ── programmatic fact check ───────────────────────────────────────────────────
-_WORDNUM = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
-            "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "twenty": 20, "hundred": 100,
-            "thousand": 1000, "million": 10**6, "billion": 10**9}
+_WORDNUM = {
+    "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+    "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12,
+    "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17,
+    "eighteen": 18, "nineteen": 19, "twenty": 20, "thirty": 30, "forty": 40,
+    "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90,
+    "hundred": 100, "thousand": 1000, "million": 10**6, "billion": 10**9,
+}
+_NUMBER_WORDS = set(_WORDNUM) | {"and"}
+_NUMBER_WORD_ALT = "|".join(sorted((re.escape(word) for word in _NUMBER_WORDS), key=len, reverse=True))
+_NUMBER_WORD_RE = re.compile(r"\b(?:" + _NUMBER_WORD_ALT + r")(?:[ -]+(?:" + _NUMBER_WORD_ALT + r"))*\b", re.I)
+_NUMBER_SCALES = {"thousand": 1_000, "million": 1_000_000, "billion": 1_000_000_000}
 
 
 def _numbers(text: str) -> set[str]:
@@ -321,11 +330,74 @@ def _numbers(text: str) -> set[str]:
     return nums
 
 
+def _number_key(value: int | float) -> str:
+    if isinstance(value, float) and not value.is_integer():
+        return format(value, ".12g")
+    return str(int(value))
+
+
+def _scaled_number_values(text: str) -> set[str]:
+    """Expand digit-plus-scale phrases (e.g. ``15 billion``) to their full values."""
+    values = set()
+    pattern = re.compile(r"\b(\d[\d,]*(?:\.\d+)?)\s+(thousand|million|billion)s?\b", re.I)
+    for match in pattern.finditer(text or ""):
+        try:
+            amount = float(match.group(1).replace(",", ""))
+            scale = _NUMBER_SCALES[match.group(2).lower()]
+            values.add(_number_key(amount * scale))
+        except (KeyError, ValueError, OverflowError):
+            continue
+    return values
+
+
+def _word_number_values(text: str) -> set[str]:
+    """Parse spelled-out cardinal phrases, including tens and large scales."""
+    values = set()
+    for match in _NUMBER_WORD_RE.finditer(text or ""):
+        words = re.findall(r"[a-z]+", match.group(0).lower())
+        total = current = 0
+        saw_number = False
+        for word in words:
+            if word == "and":
+                continue
+            value = _WORDNUM[word]
+            if value < 100:
+                current += value
+                saw_number = True
+            elif value == 100:
+                current = max(1, current) * value
+                saw_number = True
+            else:
+                if not saw_number:
+                    prefix = (text or "")[:match.start()]
+                    if re.search(r"\d[\d,]*(?:\.\d+)?\s*$", prefix):
+                        continue  # a digit-plus-scale phrase is normalized by _scaled_number_values
+                    previous = re.search(r"([a-z]+)\s*$", prefix, re.I)
+                    if previous and previous.group(1).casefold() in {
+                            "few", "many", "multiple", "numerous", "several", "various"}:
+                        continue  # do not turn vague quantities into exact counts
+                    current = 1  # idioms such as "a million" are explicit cardinal quantities
+                    saw_number = True
+                total += max(1, current) * value
+                current = 0
+        if saw_number:
+            values.add(str(total + current))
+    return values
+
+
+def _number_mentions(text: str) -> set[str]:
+    """Collect digit, scaled-digit, and spelled-out cardinal values."""
+    text = text or ""
+    return _numbers(text) | _scaled_number_values(text) | _word_number_values(text)
+
+
 def unsupported_numbers(script_text: str, source_text: str) -> list[str]:
     """Numbers in the script that never appear in the source. Small counts (<=12)
-    are ignored because they're usually structural ('3 facts', 'part 2')."""
-    src = _numbers(source_text)
-    # also accept rounded forms: 4.6 → 4.6, 4,600 → 4600, "4.5 billion" etc.
+    are ignored because they're usually structural ('3 facts', 'part 2'). Digit and
+    spelled-out values are normalized, including phrases such as ``twenty million``."""
+    src = _number_mentions(source_text)
+    # Also accept modest rounding/conversion forms already present in the source:
+    # 4.6 → 4.6, 4,600 → 4600, and 4,600,000 → 4.6 million.
     src_alt = set(src)
     for s in src:
         try:
@@ -337,10 +409,11 @@ def unsupported_numbers(script_text: str, source_text: str) -> list[str]:
                     v = f / scale
                     src_alt.add(f"{v:.1f}".rstrip("0").rstrip("."))
                     src_alt.add(str(int(round(v))))
+                    src_alt.add(str(int(round(v) * scale)))
         except ValueError:
             pass
     bad = []
-    for n in _numbers(script_text):
+    for n in _number_mentions(script_text):
         try:
             if float(n) <= 12:
                 continue
@@ -348,4 +421,4 @@ def unsupported_numbers(script_text: str, source_text: str) -> list[str]:
             continue
         if n not in src_alt:
             bad.append(n)
-    return bad
+    return sorted(bad, key=lambda n: (float(n), n))

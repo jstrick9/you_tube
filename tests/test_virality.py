@@ -690,7 +690,7 @@ def test_weak_hook_is_rejected_and_rewritten():
     w.cfg, w.llm, w.src_chars = CFG, Rev(), 4000
     cfg_c = dict(CFG["content"], require_grounding=False)
     w.cfg = {**CFG, "content": cfg_c}
-    src = {"title": "X", "text": "Bees make honey. " * 50}
+    src = {"title": "X", "text": "Bees make honey and visit two million flowers for one honey jar. " * 50}
     # gate-clean script: the ONLY thing wrong with it is the reviewer's hook_strength of 6
     # One aside: content.min_commentary_ratio rejects narration with no narrator voice.
     segs = [{"text": "Bees need two million flowers for one honey jar"},

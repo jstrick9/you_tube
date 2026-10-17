@@ -25,7 +25,7 @@ from .target import daily_target
 from .common import OUTPUT_DIR, WORK_DIR, now_utc, read_json, slugify, write_json
 from .llm import LLM
 from .recovery import RecoveryBudgets
-from .scriptwriter import ScriptWriter, spoken_text, trend_evidence_summary
+from .scriptwriter import ScriptWriter, spoken_text, trend_evidence_summary, visual_subject_for_topic
 from .strategy import Strategy
 from .tts import synthesize
 
@@ -315,6 +315,7 @@ def produce_assets(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict,
     mus = music.generate(tts["duration"] + 1, work / "music.wav", seed) if cfg["video"]["background_music"] else None
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     title = script["title"].strip()
+    visual_subject = visual_subject_for_topic(topic, source)
     # Which series this belongs to is known now; which episode number it gets is not.
     # Numbering is deferred to package(), after final QA, because a number reserved
     # here is spent even when the video is thrown away minutes later. That is how the
@@ -328,7 +329,8 @@ def produce_assets(cfg: dict, writer: ScriptWriter, topic: dict, plan: dict,
             "out": OUTPUT_DIR / f"{run_id}-{idx:02d}-{slug}.mp4",
             "hook_card": script.get("thumbnail_text") or "", "title": title,
             "series": s_key, "episode": 0,
-            "subject": source["title"], "fx": effects_plan(script, plan, source, cfg)}
+            "subject": source["title"], "visual_subject": visual_subject,
+            "fx": effects_plan(script, plan, source, cfg)}
 
 
 def _trend_qa_evidence(topic: dict) -> list[str]:
@@ -501,7 +503,8 @@ def _repair_failed_shots(a: dict, cfg: dict, writer: ScriptWriter, report: dict)
         segment = segments[seg] if 0 <= seg < len(segments) else None
         changed = media.use_alternative(
             a["visuals"], seg, path, a["work"] / "img", source=a.get("source"), segment=segment,
-            cfg=cfg, llm=writer.llm, feedback=_qa_repair_feedback(report, seg, path))
+            cfg=cfg, llm=writer.llm, feedback=_qa_repair_feedback(report, seg, path),
+            visual_subject=a.get("visual_subject", ""))
         repaired = bool(changed) or repaired
     return repaired
 
