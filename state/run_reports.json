@@ -1,200 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261015-014325-3844",
-    "workflow_run_id": "38667043883",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-15T01:43:25.964049+00:00",
-    "finished_at": "2026-10-15T01:49:46.412724+00:00",
-    "duration_seconds": 380.449,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 2,
-      "topic_production": 1,
-      "topic_validation": 5,
-      "script_research": 10,
-      "script_draft": 5,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Ancient Mysteries Unearthed After 1,000 Years!",
-        "topic_key": "ancient mysteries unearthed after 1000 years",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "El delineador de Cleopatra contenía VENENO!",
-        "topic_key": "el delineador de cleopatra contena veneno",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "2 Most Terrifying Carnivorous Plants in the World!",
-        "topic_key": "2 most terrifying carnivorous plants in the world",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "The Giant Stone Sphere",
-        "topic_key": "the giant stone sphere",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Who Reaches the Bottom of the Ocean First? Titanic isn't even close...",
-        "topic_key": "who reaches the bottom of the ocean first titanic isnt even close",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-15T01:47:50.376990+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-15T01:47:50.377218+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-15T01:48:10.976276+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-15T01:48:10.976398+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-15T01:48:40.868560+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-15T01:48:40.868683+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-15T01:49:06.064343+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-15T01:49:06.064470+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-15T01:49:29.133611+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-15T01:49:29.133734+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-15T01:49:46.407769+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-15T01:43:25.965483+00:00",
-        "cooldown_until": "2026-10-15T23:45:36.134744+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-15T01:44:11.774049+00:00",
-        "cooldown_until": "2026-10-15T02:04:11.773519+00:00",
-        "retry_after_seconds": 29.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-15T01:45:19.669485+00:00",
-        "cooldown_until": "2026-10-15T02:05:19.668887+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-15T01:45:26.143751+00:00",
-        "cooldown_until": "2026-10-15T02:05:26.143016+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-15T01:47:50.376534+00:00"
-      }
-    ],
-    "top_up": true,
-    "rate_limited_models": [
-      "gemini:gemini-flash-latest",
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "38667851456",
     "workflow_run_id": "38667851456",
     "workflow_run_attempt": "1",
@@ -4318,5 +4124,190 @@
     "retry_events": [],
     "provider_events": [],
     "preflight_skip_reason": "delayed_schedule_superseded"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261017-014254-3613",
+    "workflow_run_id": "38991931776",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-17T01:42:54.132775+00:00",
+    "finished_at": "2026-10-17T02:01:46.833303+00:00",
+    "duration_seconds": 1132.701,
+    "mode": "dry_run",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 3,
+      "script_research": 6,
+      "script_draft": 3,
+      "script_review": 2,
+      "tts": 1,
+      "visuals": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "This Shark Was Born Before America Even Existed",
+        "topic_key": "this shark was born before america even existed",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "This Jeep Could Launch A Nuke",
+        "topic_key": "this jeep could launch a nuke",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Voyager 1's Last Goodbye, The Loneliest Spacecraft",
+        "topic_key": "voyager 1s last goodbye the loneliest spacecraft",
+        "outcome": "rejected",
+        "stage": "visuals",
+        "failure_category": "vision_unavailable"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-17T01:44:47.993921+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-17T01:44:47.993984+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-17T01:47:15.593085+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-17T01:50:30.809059+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-17T01:50:30.809214+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-17T01:53:09.732915+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-17T02:01:46.830471+00:00",
+        "stage": "visuals",
+        "category": "vision_unavailable",
+        "exception_type": "VisionUnavailable",
+        "attempt": 3
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 1,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-17T01:42:54.164558+00:00",
+        "cooldown_until": "2026-10-17T01:52:33.373195+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-17T01:43:30.513549+00:00",
+        "cooldown_until": "2026-10-17T02:03:30.512943+00:00",
+        "retry_after_seconds": 27.0
+      },
+      {
+        "provider": "cloudflare",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-17T01:43:57.848208+00:00",
+        "cooldown_until": "2026-10-17T02:03:57.847592+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-17T01:44:58.758186+00:00",
+        "cooldown_until": "2026-10-17T02:04:58.757563+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-17T01:45:05.271366+00:00",
+        "cooldown_until": "2026-10-17T02:05:05.270835+00:00"
+      },
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "circuit_open",
+        "at": "2026-10-17T01:53:09.732715+00:00",
+        "cooldown_until": "2026-10-18T01:53:09.732122+00:00",
+        "retry_after_seconds": 10.0
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-17T02:01:46.830205+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct",
+      "gemini:gemini-flash-latest",
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]

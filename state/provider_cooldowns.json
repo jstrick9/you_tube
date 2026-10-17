@@ -1,37 +1,37 @@
 {
   "schema_version": 1,
   "providers": {
-    "pollinations": {
-      "reason": "billing_or_entitlement",
-      "status_code": 402,
-      "recorded_at": "2026-10-16T01:52:33.373195+00:00",
-      "blocked_until": "2026-10-17T01:52:33.373195+00:00",
-      "retry_after_seconds": 13.0
-    },
     "groq": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-17T01:19:37.743242+00:00",
-      "blocked_until": "2026-10-17T01:39:37.743242+00:00",
-      "retry_after_seconds": 31.0
-    },
-    "gemini": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-17T01:20:05.620902+00:00",
-      "blocked_until": "2026-10-17T01:40:05.620902+00:00"
-    },
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-17T01:20:12.125797+00:00",
-      "blocked_until": "2026-10-17T01:40:12.125797+00:00"
+      "recorded_at": "2026-10-17T01:43:30.512943+00:00",
+      "blocked_until": "2026-10-17T02:03:30.512943+00:00",
+      "retry_after_seconds": 27.0
     },
     "cloudflare": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-17T01:20:18.962679+00:00",
-      "blocked_until": "2026-10-17T01:40:18.962679+00:00"
+      "recorded_at": "2026-10-17T01:43:57.847592+00:00",
+      "blocked_until": "2026-10-17T02:03:57.847592+00:00"
+    },
+    "gemini": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-17T01:44:58.757563+00:00",
+      "blocked_until": "2026-10-17T02:04:58.757563+00:00"
+    },
+    "mistral": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-17T01:45:05.270835+00:00",
+      "blocked_until": "2026-10-17T02:05:05.270835+00:00"
+    },
+    "pollinations": {
+      "reason": "billing_or_entitlement",
+      "status_code": 402,
+      "recorded_at": "2026-10-17T01:53:09.732122+00:00",
+      "blocked_until": "2026-10-18T01:53:09.732122+00:00",
+      "retry_after_seconds": 10.0
     }
   },
   "failures_5xx": {}
