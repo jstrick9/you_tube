@@ -11,7 +11,9 @@ log = logging.getLogger("autotube.provider_health")
 
 STATE_NAME = "provider_cooldowns.json"
 MAX_COOLDOWN_SECONDS = 24 * 60 * 60
-DEFAULT_429_COOLDOWN_SECONDS = 20 * 60
+# Observed repeated 429s across runs even after the old 20-minute hold; back off for two hours.
+DEFAULT_429_COOLDOWN_SECONDS = 2 * 60 * 60
+DEFAULT_QUOTA_COOLDOWN_SECONDS = 24 * 60 * 60
 DEFAULT_402_COOLDOWN_SECONDS = 24 * 60 * 60
 DEFAULT_5XX_COOLDOWN_SECONDS = 10 * 60
 TRANSIENT_FAILURE_WINDOW_SECONDS = 30 * 60

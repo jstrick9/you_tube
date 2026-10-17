@@ -129,6 +129,67 @@ def test_long_retry_after_opens_provider_circuit_instead_of_retrying_early(
     assert calls == ["one"]
     assert slept == []
     assert client.circuits.is_open("fake")
+    row = client.circuits.snapshot()["fake"]
+    assert row["reason"] == "rate_limited"
+    assert row["cooldown_seconds"] == llm.DEFAULT_429_COOLDOWN_SECONDS
+
+
+def test_repeated_generic_429_uses_two_hour_circuit(monkeypatch, memory_provider_circuits):
+    from autotube import llm
+
+    calls, slept = [], []
+
+    def limited(model, system, user, temp):
+        calls.append(model)
+        raise llm.LLMError("HTTP 429: rate limit reached", status_code=429,
+                           retry_after_seconds=27)
+
+    monkeypatch.setitem(llm.PROVIDERS, "fake", (limited, "fake_models"))
+    monkeypatch.setattr(llm.time, "sleep", lambda seconds: slept.append(seconds))
+    client = llm.LLM.__new__(llm.LLM)
+    client.cfg = {"fake_models": ["one"]}
+    client.order = ["fake"]
+    client.temperature = 0.7
+    client._dead = set()
+    client._blocked_providers = set()
+    client.circuits = memory_provider_circuits()
+
+    with pytest.raises(llm.LLMError):
+        client.json("system", "user", attempts_per_model=2)
+    assert calls == ["one", "one"]
+    assert slept == [27]
+    row = client.circuits.snapshot()["fake"]
+    assert row["reason"] == "rate_limited"
+    assert row["cooldown_seconds"] == 2 * 60 * 60
+
+
+def test_explicit_quota_exhaustion_uses_day_long_circuit_without_retry(
+        monkeypatch, memory_provider_circuits):
+    from autotube import llm
+
+    calls = []
+
+    def exhausted(model, system, user, temp):
+        calls.append(model)
+        raise llm.LLMError(
+            'HTTP 429: {"message":"You exceeded your current quota, please check your plan and billing details."}',
+            status_code=429, retry_after_seconds=27)
+
+    monkeypatch.setitem(llm.PROVIDERS, "fake", (exhausted, "fake_models"))
+    client = llm.LLM.__new__(llm.LLM)
+    client.cfg = {"fake_models": ["one", "two"]}
+    client.order = ["fake"]
+    client.temperature = 0.7
+    client._dead = set()
+    client._blocked_providers = set()
+    client.circuits = memory_provider_circuits()
+
+    with pytest.raises(llm.LLMError):
+        client.json("system", "user", attempts_per_model=2)
+    assert calls == ["one"]
+    row = client.circuits.snapshot()["fake"]
+    assert row["reason"] == "quota_exhausted"
+    assert row["cooldown_seconds"] == llm.DEFAULT_QUOTA_COOLDOWN_SECONDS == 24 * 60 * 60
 
 
 def test_model_request_too_large_tries_next_model_without_provider_cooldown(

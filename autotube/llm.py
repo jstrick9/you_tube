@@ -22,7 +22,7 @@ import requests
 from . import run_report
 from .common import http
 from .provider_health import (DEFAULT_402_COOLDOWN_SECONDS, DEFAULT_429_COOLDOWN_SECONDS,
-                              ProviderCircuitBreakers)
+                              DEFAULT_QUOTA_COOLDOWN_SECONDS, ProviderCircuitBreakers)
 
 log = logging.getLogger("autotube.llm")
 
@@ -73,6 +73,16 @@ def _request_too_large(message: str) -> bool:
     return any(marker in text for marker in (
         "request too large", "prompt too long", "input too long", "context length exceeded",
         "maximum context length", "too many tokens in the input", "input token limit",
+    ))
+
+
+def _quota_exhausted(message: str) -> bool:
+    """Distinguish an exhausted plan quota from a short rolling-window 429."""
+    text = str(message or "").casefold()
+    return any(marker in text for marker in (
+        "you exceeded your current quota", "exceeded your quota", "quota exceeded",
+        "quota is exhausted", "quota exhausted", "daily quota exceeded",
+        "resource_exhausted", "check your plan and billing details",
     ))
 
 
@@ -618,12 +628,21 @@ class LLM:
                             break
                         if status == 429:
                             note_rate_limited(f"{pname}:{model}")
+                            if _quota_exhausted(msg):
+                                # An explicit exhausted-plan/quota response will not clear
+                                # after a short Retry-After. Keep this provider parked for a day.
+                                self._dead.add(tag)
+                                self._open_provider(pname, status, "quota_exhausted",
+                                                    max(DEFAULT_QUOTA_COOLDOWN_SECONDS, retry_after or 0),
+                                                    retry_after)
+                                break
                             # Never retry earlier than the provider's stated wait. If it
-                            # exceeds our bounded in-run wait, open a persisted cooldown.
+                            # exceeds our bounded in-run wait, persist at least the conservative
+                            # rolling-window hold so the next top-up does not immediately repeat it.
                             if retry_after is not None and retry_after > 45:
                                 self._dead.add(tag)
                                 self._open_provider(pname, status, "rate_limited",
-                                                    retry_after, retry_after)
+                                                    max(DEFAULT_429_COOLDOWN_SECONDS, retry_after), retry_after)
                                 break
                             if not last_try:
                                 time.sleep(_retry_after(msg, 6 + 6 * attempt, retry_after))

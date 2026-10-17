@@ -21,7 +21,9 @@ def memory_provider_circuits(monkeypatch):
 
         def open(self, provider, status_code, reason, cooldown_seconds, retry_after_seconds=None):
             value = f"cooldown:{provider}"
-            self._open[provider] = {"blocked_until": value, "reason": reason, "status_code": status_code}
+            self._open[provider] = {"blocked_until": value, "reason": reason, "status_code": status_code,
+                                    "cooldown_seconds": cooldown_seconds,
+                                    "retry_after_seconds": retry_after_seconds}
             self.events.append({"provider": provider, "status_code": status_code, "action": "circuit_open"})
             return value
 
