@@ -8,30 +8,12 @@
       "blocked_until": "2026-10-17T01:52:33.373195+00:00",
       "retry_after_seconds": 13.0
     },
-    "groq": {
+    "gemini": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-16T23:20:37.147768+00:00",
-      "blocked_until": "2026-10-16T23:40:37.147768+00:00",
-      "retry_after_seconds": 31.0
-    },
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-16T23:24:03.605726+00:00",
-      "blocked_until": "2026-10-16T23:44:03.605726+00:00"
-    },
-    "cloudflare": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-16T23:30:21.127944+00:00",
-      "blocked_until": "2026-10-16T23:50:21.127944+00:00"
+      "recorded_at": "2026-10-17T00:44:48.528746+00:00",
+      "blocked_until": "2026-10-17T01:04:48.528746+00:00"
     }
   },
-  "failures_5xx": {
-    "gemini": {
-      "count": 1,
-      "last_at": "2026-10-16T23:21:24.934971+00:00"
-    }
-  }
+  "failures_5xx": {}
 }
