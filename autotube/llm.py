@@ -221,18 +221,24 @@ def _gemini(model: str, system: str, user: str, temperature: float, images: list
 
 def _openai_compatible(base: str, key: str | None, model: str, system: str, user: str,
                        temperature: float, json_mode: bool = True, extra_headers: dict | None = None,
-                       extra_body: dict | None = None, images: list[bytes] | None = None) -> str:
+                       extra_body: dict | None = None, images: list[bytes] | None = None,
+                       image_url_as_string: bool = False) -> str:
     headers = {"Content-Type": "application/json"}
     if key:
         headers["Authorization"] = f"Bearer {key}"
     if extra_headers:
         headers.update(extra_headers)
+    user_content: str | list[dict[str, Any]] = user
+    if images:
+        image_parts = []
+        for image in images:
+            data_url = "data:image/jpeg;base64," + base64.b64encode(image).decode()
+            image_url = data_url if image_url_as_string else {"url": data_url}
+            image_parts.append({"type": "image_url", "image_url": image_url})
+        user_content = [{"type": "text", "text": user}, *image_parts]
     body: dict[str, Any] = {
         "model": model,
-        "messages": [{"role": "system", "content": system}, {"role": "user", "content": user if not images else
-                     [{"type": "text", "text": user}] + [
-                         {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(i).decode()}}
-                         for i in images]}],
+        "messages": [{"role": "system", "content": system}, {"role": "user", "content": user_content}],
         "temperature": temperature,
     }
     if json_mode:
@@ -310,7 +316,7 @@ def _mistral(model, system, user, temperature, images=None):
     if not key:
         raise LLMError("no MISTRAL_API_KEY")
     return _openai_compatible("https://api.mistral.ai/v1/chat/completions", key, model, system, user,
-                              temperature, images=images)
+                              temperature, images=images, image_url_as_string=True)
 
 
 def cloudflare_creds() -> tuple[str | None, str | None]:

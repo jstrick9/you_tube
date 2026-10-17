@@ -234,6 +234,47 @@ def test_failure_classification_preserves_diagnostics_without_raw_errors():
     assert classify_failure("script_draft", "ReadTimeout") == "provider_transient_network"
 
 
+def test_mistral_vision_payload_uses_documented_string_image_url(monkeypatch):
+    """Mistral's Chat Completions Vision API takes image_url as a data-URL string."""
+    import autotube.llm as L
+
+    captured = {}
+
+    class Response:
+        status_code = 200
+
+        @staticmethod
+        def json():
+            return {"choices": [{"message": {"content": '{"color":"red"}'}}]}
+
+    class FakeHTTP:
+        def post(self, url, *, headers, json, timeout):
+            captured.update(url=url, headers=headers, body=json, timeout=timeout)
+            return Response()
+
+    monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
+    monkeypatch.setattr(L, "http", lambda: FakeHTTP())
+
+    result = L._mistral("ministral-8b-2512", "system", "inspect this", 0.1,
+                        images=[bytes([255])])
+
+    assert result == '{"color":"red"}'
+    assert captured["url"] == "https://api.mistral.ai/v1/chat/completions"
+    assert captured["headers"]["Authorization"] == "Bearer test-key"
+    assert captured["body"]["messages"][1]["content"] == [
+        {"type": "text", "text": "inspect this"},
+        {"type": "image_url", "image_url": "data:image/jpeg;base64,/w=="},
+    ]
+    assert captured["body"]["response_format"] == {"type": "json_object"}
+    assert captured["timeout"] == 120
+
+    L._openai_compatible("https://example.test/v1", None, "other-model", "system", "inspect this", 0.1,
+                         images=[bytes([255])])
+    assert captured["body"]["messages"][1]["content"][1] == {
+        "type": "image_url", "image_url": {"url": "data:image/jpeg;base64,/w=="}
+    }
+
+
 def test_provider_read_timeout_is_skipped_for_rest_of_run(monkeypatch, memory_provider_circuits):
     """A dead endpoint must not consume two long request timeouts for every topic."""
     import requests

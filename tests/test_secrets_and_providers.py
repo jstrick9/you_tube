@@ -436,14 +436,16 @@ def test_the_writer_actually_uses_the_lane_rule():
 
 
 def test_vision_is_not_a_single_point_of_failure():
-    """Vision is a hard gate: no vision model, no video, however good the script.
+    """Keep independent image-verdict fallbacks without weakening the visual gate.
 
-    Gemini was the only provider that could serve it, and a 429 there ended two of the
-    last three full runs *after* the script had been written and verified. A second
-    keyed provider is the difference between a slow run and a lost one.
+    Run 152 had no available route after provider quotas and a network timeout. The priced
+    Mistral route is last, after the existing providers; every candidate and final render
+    still needs the same valid vision verdicts.
     """
     vis = CFG["llm"]["vision_providers"]
     assert len(vis) >= 2, f"vision has only {vis} — one rate limit discards finished work"
+    assert vis[-1] == "mistral", "the priced vision fallback must remain last"
+    assert CFG["llm"]["mistral_vision_models"] == ["ministral-8b-2512"]
     # Derived, not literal. A hardcoded set here is the same bug this suite exists to
     # catch: it silently falls behind the router every time a provider is added.
     import autotube.llm as L
