@@ -131,10 +131,11 @@ def test_long_retry_after_opens_provider_circuit_instead_of_retrying_early(
     assert client.circuits.is_open("fake")
     row = client.circuits.snapshot()["fake"]
     assert row["reason"] == "rate_limited"
-    assert row["cooldown_seconds"] == llm.DEFAULT_429_COOLDOWN_SECONDS
+    assert row["cooldown_seconds"] == 70
+    assert row["retry_after_seconds"] == 70
 
 
-def test_repeated_generic_429_uses_two_hour_circuit(monkeypatch, memory_provider_circuits):
+def test_repeated_generic_429_uses_default_circuit(monkeypatch, memory_provider_circuits):
     from autotube import llm
 
     calls, slept = [], []
@@ -160,7 +161,7 @@ def test_repeated_generic_429_uses_two_hour_circuit(monkeypatch, memory_provider
     assert slept == [27]
     row = client.circuits.snapshot()["fake"]
     assert row["reason"] == "rate_limited"
-    assert row["cooldown_seconds"] == 2 * 60 * 60
+    assert row["cooldown_seconds"] == llm.DEFAULT_429_COOLDOWN_SECONDS == 20 * 60
 
 
 def test_explicit_quota_exhaustion_uses_day_long_circuit_without_retry(

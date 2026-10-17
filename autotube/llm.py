@@ -637,12 +637,11 @@ class LLM:
                                                     retry_after)
                                 break
                             # Never retry earlier than the provider's stated wait. If it
-                            # exceeds our bounded in-run wait, persist at least the conservative
-                            # rolling-window hold so the next top-up does not immediately repeat it.
+                            # exceeds our bounded in-run wait, open a persisted cooldown.
                             if retry_after is not None and retry_after > 45:
                                 self._dead.add(tag)
                                 self._open_provider(pname, status, "rate_limited",
-                                                    max(DEFAULT_429_COOLDOWN_SECONDS, retry_after), retry_after)
+                                                    retry_after, retry_after)
                                 break
                             if not last_try:
                                 time.sleep(_retry_after(msg, 6 + 6 * attempt, retry_after))
