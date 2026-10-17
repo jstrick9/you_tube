@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-17T17:56:53.895666+00:00",
+  "updated": "2026-10-17T21:46:15.538774+00:00",
   "videos_total": 43,
   "videos_7d": 0,
   "views_7d": 0,
@@ -20,14 +20,14 @@
           "n": 1
         },
         {
+          "arm": "mysteries",
+          "mean": 0.487,
+          "n": 1
+        },
+        {
           "arm": "animals",
           "mean": 0.487,
           "n": 2
-        },
-        {
-          "arm": "mysteries",
-          "mean": 0.486,
-          "n": 1
         },
         {
           "arm": "history",
@@ -92,7 +92,7 @@
         },
         {
           "arm": "plot_twist",
-          "mean": 0.486,
+          "mean": 0.487,
           "n": 1
         },
         {
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 34,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 34,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -656,7 +656,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10084,
+    "views_90d": 10086,
     "per_1k_views": 2.68,
     "videos": 34,
     "denominator_basis": "engaged_views",
@@ -667,12 +667,12 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10084,
+    "engaged_views_90d": 10086,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003361,
-    "current_full_threshold_progress": 0.001008,
+    "expanded_threshold_progress": 0.003362,
+    "current_full_threshold_progress": 0.001009,
     "feb_2027_full_threshold_progress": 0.000504,
     "public_videos": 34,
     "videos_with_metric": 34,
