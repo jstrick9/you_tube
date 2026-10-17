@@ -1,213 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261014-230242-3822",
-    "workflow_run_id": "38651467108",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-14T23:02:42.603583+00:00",
-    "finished_at": "2026-10-14T23:26:45.435800+00:00",
-    "duration_seconds": 1442.832,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 2,
-      "topic_production": 1,
-      "topic_validation": 6,
-      "script_research": 8,
-      "script_draft": 4,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "El delineador de Cleopatra contenía VENENO!",
-        "topic_key": "el delineador de cleopatra contena veneno",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "They Fired A Torpedo At Their Own President",
-        "topic_key": "they fired a torpedo at their own president",
-        "outcome": "rejected",
-        "stage": "topic_validation",
-        "failure_category": "current_trend_evidence_missing"
-      },
-      {
-        "index": 1,
-        "topic": "Who Reaches the Bottom of the Ocean First? Titanic isn't even close...",
-        "topic_key": "who reaches the bottom of the ocean first titanic isnt even close",
-        "outcome": "rejected",
-        "stage": "topic_validation",
-        "failure_category": "current_trend_evidence_missing"
-      },
-      {
-        "index": 1,
-        "topic": "Companies That Spent Millions Just to Get Revenge",
-        "topic_key": "companies that spent millions just to get revenge",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "canadiens vs capitals",
-        "topic_key": "canadiens vs capitals",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "new york city vs inter miami",
-        "topic_key": "new york city vs inter miami",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-14T23:09:28.711026+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-14T23:09:28.711214+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-14T23:09:28.711538+00:00",
-        "stage": "topic_validation",
-        "category": "current_trend_evidence_missing"
-      },
-      {
-        "at": "2026-10-14T23:09:28.711925+00:00",
-        "stage": "topic_validation",
-        "category": "current_trend_evidence_missing"
-      },
-      {
-        "at": "2026-10-14T23:16:43.509148+00:00",
-        "stage": "script_draft",
-        "category": "provider_transient_network",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-14T23:16:43.509262+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-14T23:22:18.933794+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-14T23:22:18.933937+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-14T23:26:45.430392+00:00",
-        "stage": "script_draft",
-        "category": "provider_transient_network",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-14T23:26:45.430523+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-14T23:26:45.430610+00:00",
-        "stage": "topic_selection",
-        "category": "topic_attempt_budget_exhausted",
-        "attempt": 6
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-14T23:02:42.672891+00:00",
-        "cooldown_until": "2026-10-14T23:35:31.837026+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-14T23:02:56.454913+00:00",
-        "cooldown_until": "2026-10-14T23:22:56.453940+00:00",
-        "retry_after_seconds": 29.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-14T23:04:05.385323+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-14T23:04:11.890982+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-14T23:05:08.329312+00:00",
-        "cooldown_until": "2026-10-14T23:25:08.328279+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-14T23:18:34.270953+00:00",
-        "cooldown_until": "2026-10-14T23:38:34.270019+00:00"
-      }
-    ],
-    "top_up": true,
-    "rate_limited_models": [
-      "gemini:gemini-flash-latest",
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261014-234017-3894",
     "workflow_run_id": "38655349496",
     "workflow_run_attempt": "1",
@@ -4527,6 +4320,123 @@
       "gemini:gemini-flash-latest",
       "groq:openai/gpt-oss-120b",
       "groq:openai/gpt-oss-20b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261017-011854-3643",
+    "workflow_run_id": "38990213520",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-17T01:18:54.226994+00:00",
+    "finished_at": "2026-10-17T01:24:24.661763+00:00",
+    "duration_seconds": 330.435,
+    "mode": "dry_run",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 1,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 1,
+      "script_research": 2,
+      "script_draft": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "This Shark Was Born Before America Even Existed",
+        "topic_key": "this shark was born before america even existed",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-17T01:24:24.660199+00:00",
+        "stage": "script_draft",
+        "category": "provider_transient_network",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-17T01:24:24.660325+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-17T01:24:24.660473+00:00",
+        "stage": "script",
+        "category": "all_text_providers_circuit_open_or_unusable"
+      }
+    ],
+    "retry_events": [],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-17T01:18:54.234521+00:00",
+        "cooldown_until": "2026-10-17T01:52:33.373195+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-17T01:19:37.743811+00:00",
+        "cooldown_until": "2026-10-17T01:39:37.743242+00:00",
+        "retry_after_seconds": 31.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-17T01:20:05.621441+00:00",
+        "cooldown_until": "2026-10-17T01:40:05.620902+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-17T01:20:12.126339+00:00",
+        "cooldown_until": "2026-10-17T01:40:12.125797+00:00"
+      },
+      {
+        "provider": "cloudflare",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-17T01:20:18.963261+00:00",
+        "cooldown_until": "2026-10-17T01:40:18.962679+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-17T01:24:24.659861+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "gemini:gemini-flash-latest",
+      "groq:openai/gpt-oss-120b",
       "mistral:mistral-small-latest"
     ]
   }

@@ -8,11 +8,30 @@
       "blocked_until": "2026-10-17T01:52:33.373195+00:00",
       "retry_after_seconds": 13.0
     },
+    "groq": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-17T01:19:37.743242+00:00",
+      "blocked_until": "2026-10-17T01:39:37.743242+00:00",
+      "retry_after_seconds": 31.0
+    },
     "gemini": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-17T00:44:48.528746+00:00",
-      "blocked_until": "2026-10-17T01:04:48.528746+00:00"
+      "recorded_at": "2026-10-17T01:20:05.620902+00:00",
+      "blocked_until": "2026-10-17T01:40:05.620902+00:00"
+    },
+    "mistral": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-17T01:20:12.125797+00:00",
+      "blocked_until": "2026-10-17T01:40:12.125797+00:00"
+    },
+    "cloudflare": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-17T01:20:18.962679+00:00",
+      "blocked_until": "2026-10-17T01:40:18.962679+00:00"
     }
   },
   "failures_5xx": {}
