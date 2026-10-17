@@ -13,6 +13,25 @@
       "recorded_at": "2026-10-17T01:53:09.732122+00:00",
       "blocked_until": "2026-10-18T01:53:09.732122+00:00",
       "retry_after_seconds": 10.0
+    },
+    "groq": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-17T04:17:42.051848+00:00",
+      "blocked_until": "2026-10-17T04:37:42.051848+00:00",
+      "retry_after_seconds": 27.0
+    },
+    "mistral": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-17T04:17:48.579102+00:00",
+      "blocked_until": "2026-10-17T04:37:48.579102+00:00"
+    },
+    "cloudflare": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-17T04:24:06.672763+00:00",
+      "blocked_until": "2026-10-17T04:44:06.672763+00:00"
     }
   },
   "failures_5xx": {}
