@@ -7,25 +7,6 @@
       "recorded_at": "2026-10-18T04:26:51.194694+00:00",
       "blocked_until": "2026-10-19T04:26:51.194694+00:00",
       "retry_after_seconds": 8.0
-    },
-    "groq": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-18T18:18:36.313299+00:00",
-      "blocked_until": "2026-10-18T18:38:36.313299+00:00",
-      "retry_after_seconds": 30.0
-    },
-    "cloudflare": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-18T18:18:44.126996+00:00",
-      "blocked_until": "2026-10-18T18:38:44.126996+00:00"
-    },
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-18T18:26:45.475974+00:00",
-      "blocked_until": "2026-10-18T18:46:45.475974+00:00"
     }
   },
   "failures_5xx": {}
