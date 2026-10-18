@@ -1,158 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261015-050231-3620",
-    "workflow_run_id": "38684528594",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-15T05:02:31.140629+00:00",
-    "finished_at": "2026-10-15T05:07:12.996569+00:00",
-    "duration_seconds": 281.856,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 2,
-      "topic_production": 1,
-      "topic_validation": 2,
-      "script_research": 4,
-      "script_draft": 4,
-      "script_review": 4,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Ancient Mysteries Unearthed After 1,000 Years!",
-        "topic_key": "ancient mysteries unearthed after 1000 years",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "The Giant Stone Sphere",
-        "topic_key": "the giant stone sphere",
-        "outcome": "rejected",
-        "stage": "script_review",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-15T05:02:50.517045+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-15T05:02:50.517176+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-15T05:06:15.630517+00:00",
-        "stage": "script_review",
-        "category": "script_quality_rejected",
-        "attempt": 4
-      },
-      {
-        "at": "2026-10-15T05:06:15.630573+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-15T05:07:12.993216+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 2,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 3,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-15T05:02:31.142127+00:00",
-        "cooldown_until": "2026-10-15T23:45:36.134744+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-15T05:02:45.988151+00:00",
-        "cooldown_until": "2026-10-15T05:22:45.817104+00:00",
-        "retry_after_seconds": 32.0
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-15T05:03:01.083100+00:00",
-        "cooldown_until": "2026-10-15T05:23:01.082482+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-15T05:03:30.077076+00:00",
-        "cooldown_until": "2026-10-15T05:23:30.076484+00:00"
-      },
-      {
-        "provider": "cloudflare",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-15T05:03:36.479970+00:00",
-        "cooldown_until": "2026-10-15T05:23:36.479281+00:00"
-      }
-    ],
-    "top_up": true,
-    "rate_limited_models": [
-      "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-      "gemini:gemini-flash-latest",
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261015-052601-3636",
     "workflow_run_id": "38686561915",
     "workflow_run_attempt": "1",
@@ -4261,6 +4109,228 @@
         "action": "circuit_open",
         "at": "2026-10-18T04:53:20.503823+00:00",
         "cooldown_until": "2026-10-18T05:13:20.503154+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct",
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261018-140411-3840",
+    "workflow_run_id": "39134238205",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-18T14:04:11.284183+00:00",
+    "finished_at": "2026-10-18T14:27:59.650256+00:00",
+    "duration_seconds": 1428.366,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 5,
+      "script_research": 10,
+      "script_draft": 6,
+      "script_review": 4,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "This Shark Was Born Before America Even Existed",
+        "topic_key": "this shark was born before america even existed",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "First Real Video of Another Solar System!",
+        "topic_key": "first real video of another solar system",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Where Does Tattoo Ink Go?",
+        "topic_key": "where does tattoo ink go",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "The Space Explosion We Saw 74 Million Years Later",
+        "topic_key": "the space explosion we saw 74 million years later",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "FLAME THAT NEVER DIED",
+        "topic_key": "flame that never died",
+        "outcome": "rejected",
+        "stage": "script_review",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-18T14:07:21.525976+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-18T14:07:21.526087+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-18T14:14:25.788248+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-18T14:14:25.788413+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-18T14:16:00.868176+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-18T14:16:00.868297+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-18T14:17:53.266490+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-18T14:17:53.266614+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-18T14:27:59.645390+00:00",
+        "stage": "script_review",
+        "category": "script_quality_rejected",
+        "attempt": 4
+      },
+      {
+        "at": "2026-10-18T14:27:59.645460+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-18T14:27:59.645618+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 1,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 2,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 3,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-18T14:04:11.285079+00:00",
+        "cooldown_until": "2026-10-19T04:26:51.194694+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-18T14:05:10.635808+00:00",
+        "cooldown_until": "2026-10-18T14:25:10.635262+00:00",
+        "retry_after_seconds": 28.0
+      },
+      {
+        "provider": "cloudflare",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-18T14:05:18.055430+00:00",
+        "cooldown_until": "2026-10-18T14:25:18.054959+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-18T14:07:18.133179+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-18T14:12:47.461176+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-18T14:12:53.852201+00:00",
+        "cooldown_until": "2026-10-18T14:32:53.851584+00:00"
       }
     ],
     "grounding_repairs": [],
