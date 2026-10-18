@@ -105,6 +105,35 @@ def test_every_line_gets_an_image_approved_for_that_line(patched, tmp_path):
     assert not any("building" in sh["credit"]["title"] or "street" in sh["credit"]["title"] for sh in v["shots"])
 
 
+def test_visual_description_overlap_flags_repeated_closeups_not_different_scenes():
+    assert media._visual_description_overlap(
+        "A small flame burning inside a rock wall with dripping water",
+        "A small flame burning in a rocky alcove with little water") >= 0.42
+    assert media._visual_description_overlap(
+        "Close-up of shale rock layers with water flowing and flame",
+        "Vertical view of shale layers with a small flame visible") >= 0.42
+    assert media._visual_description_overlap(
+        "Wide waterfall with a tiny flame far below",
+        "Close-up of a dinosaur egg in a museum") < 0.42
+
+
+def test_long_segment_uses_one_image_when_verified_descriptions_repeat(patched, tmp_path):
+    patched["q-fire"] = [cand("fire", 1), cand("fire", 2)]
+    patched["q-rock"] = [cand("rock", 3)]
+    patched["q-water"] = [cand("water", 4)]
+    lines = segs(("A small fire burns behind the water.", "q-fire"),
+                 ("A rock layer forms the shelf.", "q-rock"),
+                 ("A waterfall spills over the rock.", "q-water"))
+
+    visuals = media.gather(SRC, lines, CFG, tmp_path, llm=FakeLLM(), seg_durs=[6.0, 3.0, 3.0])
+
+    first_segment = [shot for shot in visuals["shots"] if shot["seg"] == 0]
+    assert len(first_segment) == 1
+    assert visuals["need"][0] == 6.45
+    assert visuals["alts"][0] == []
+    assert len(visuals["shots"]) == 3
+
+
 def test_pixazo_is_suppressed_without_synthetic_disclosure(patched, tmp_path, monkeypatch):
     cfg = copy.deepcopy(CFG)
     cfg["media"]["sources"] = ["pixazo"]  # even an accidental config entry must not leak through
@@ -314,6 +343,21 @@ def test_coverage_check_rejects_unapproved_or_missing():
     assert any("wasn't approved" in i for i in issues)
 
 
+def test_sequence_representatives_counts_one_midpoint_per_rendered_shot():
+    items = [
+        {"seg": 0, "path": "clip.mp4", "sample": 1, "samples": 3},
+        {"seg": 0, "path": "clip.mp4", "sample": 2, "samples": 3},
+        {"seg": 0, "path": "clip.mp4", "sample": 3, "samples": 3},
+        {"seg": 0, "path": "still.jpg", "sample": 1, "samples": 1},
+        {"seg": 1, "path": "next.jpg", "sample": 1, "samples": 1},
+    ]
+
+    representatives = qa._sequence_representatives(items)
+
+    assert [(item["seg"], item["path"]) for item in representatives] == [
+        (0, "clip.mp4"), (0, "still.jpg"), (1, "next.jpg")]
+
+
 class QALLM:
     last_used = "fake:qa"
 
@@ -370,6 +414,13 @@ def test_final_qa_passes_and_fails_per_frame(tiny_video):
     assert "synthetic generated illustration: yes" in prompts
     assert "unmistakably stylized and non-photorealistic" in prompts
     assert "AI ILLUSTRATION" in prompts
+    audit_prompt = next(user for _system, user in llm.prompts if "ADVERSARIAL SECOND LOOK" in user)
+    sequence_prompt = next(user for _system, user in llm.prompts if "SEQUENCE-LEVEL VISUAL VARIETY REVIEW" in user)
+    audit_text = " ".join(audit_prompt.lower().split())
+    sequence_text = " ".join(sequence_prompt.lower().split())
+    assert "ignore only the video's intentional overlays" in audit_text
+    assert "do not ignore text, labels, maps, diagrams" in audit_text
+    assert "ignore the video's intentional burned-in captions" in sequence_text
     bad = qa.verify(tiny_video, tl, shots, tts, script, "T", "HOOK", "Whiskers", QALLM(bad_frames=[2]), CFG)
     assert not bad["passed"] and bad["failed"] == [(1, "b")]
 

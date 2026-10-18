@@ -37,10 +37,11 @@ QA_SYSTEM = ("You are the final quality inspector for an educational short-video
              "Check identifiable people, event, place, era and subject carefully; asset titles are context, not proof. "
              "Be strict: when unsure, fail the frame. Return strict JSON only.")
 QA_AUDIT_SYSTEM = ("You are an adversarial second-look inspector for an educational short-video channel. Your job is to find "
-                   "false-positive image matches. Independently inspect the pixels; do not trust file titles, captions, "
-                   "or a prior positive verdict. Check the exact person, event, era, place and setting against the "
-                   "narration and intended shot. If relevance is not visually defensible, return match=false. "
-                   "Return strict JSON only.")
+                   "false-positive image matches. Independently inspect the pixels; do not trust file titles, asset "
+                   "captions, or a prior positive verdict. The rendered video has intentional overlays; ignore those "
+                   "when judging the underlying photo, but do not ignore text or graphics that are part of the asset "
+                   "itself. Check the exact person, event, era, place and setting against the narration and intended shot. "
+                   "If relevance is not visually defensible, return match=false. Return strict JSON only.")
 QA_SEQUENCE_SYSTEM = ("You are the sequence-level visual pacing inspector for an educational Short. Inspect every tile in "
                       "chronological order. Do not confuse subject consistency with visual variety: the core subject may "
                       "recur, but near-identical views/compositions should not dominate the video. Identify redundant "
@@ -412,13 +413,17 @@ Synthetic generated illustration: {"yes" if ctx["synthetic"] else "no"}
 Exact narration while this frame is visible: "{it['spoken']}"
 Full factual line: "{it['line']}"
 
-The attached image is the actual rendered frame. Independently try to DISPROVE the match: check whether the pixels
-show the correct named subject, person, event, place and historical era. Do not trust asset titles, the selected-image
-description, or a prior positive decision. A generic meeting is not proof of a specific treaty negotiation; a modern
-photo of unrelated leaders is not a historical scene. Mark match=false if the scene is irrelevant, misleading, or
-not visually defensible. If "Synthetic generated illustration" is yes, it must also look unmistakably stylized and
-non-photorealistic; fail it if an ordinary viewer could mistake it for archival footage, an eyewitness image, or a
-real documentary record. If uncertain, fail it.
+The attached image is the actual rendered frame. Ignore only the video's intentional overlays when judging the
+underlying photo: burned-in narration captions, the small channel name, progress bar, hook-title box, animated numbers,
+"PROVEN" stamp/source card, "AI ILLUSTRATION" disclosure badge, countdown digits, white flash and blurred background
+fill. These are renderer graphics, not evidence in the source image; the hook and title are checked separately. Do not
+ignore text, labels, maps, diagrams, watermarks or misleading content that are actually part of the selected asset.
+Independently try to DISPROVE the match: check whether the pixels show the correct named subject, person, event, place
+and historical era. Do not trust asset titles, the selected-image description, or a prior positive decision. A generic
+meeting is not proof of a specific treaty negotiation; a modern photo of unrelated leaders is not a historical scene.
+Mark match=false if the scene is irrelevant, misleading, or not visually defensible. If "Synthetic generated illustration"
+is yes, it must also look unmistakably stylized and non-photorealistic; fail it if an ordinary viewer could mistake it
+for archival footage, an eyewitness image, or a real documentary record. If uncertain, fail it.
 Return JSON: {{"frames": [{{"n": 1, "shows": "<= 12 words", "match": true, "score": 0-10, "issue": ""}}]}}"""
 
             def validate_single(o):
@@ -488,11 +493,14 @@ CURRENT TREND ANGLE: {trend_angle or "not recorded"}
 
 The attached sheet shows one midpoint frame from EACH shot in the finished video, in chronological order, numbered
 1-{len(sequence_items)} in yellow boxes. Assess the whole sequence, not just whether each image is individually relevant.
-The same reservoir, animal, artifact or historical subject may recur; do not demand unrelated imagery. But multiple
-near-identical reservoir aerials, repeated static views, or several frames with the same composition and no new visual
-information make a Short feel like a slideshow, even when each picture is technically relevant. A repeated visual motif
-is fine once or twice when it serves the story; it should not dominate. Prefer truthful variety in scale, angle, action,
-map/diagram, close detail, process or documented context—never a generic or misleading substitute.
+Ignore the video's intentional burned-in captions, channel name, progress bar, hook-title box, animated numbers, source
+card/stamp, synthetic-media badge, countdown digits, flash and blurred background fill; judge the underlying selected
+photos or footage. Do not count renderer overlays as new visual information, and do not mistake them for text embedded in
+the source asset. The same reservoir, animal, artifact or historical subject may recur; do not demand unrelated imagery.
+But multiple near-identical reservoir aerials, repeated static views, or several frames with the same composition and no
+new visual information make a Short feel like a slideshow, even when each picture is technically relevant. A repeated
+visual motif is fine once or twice when it serves the story; it should not dominate. Prefer truthful variety in scale,
+angle, action, map/diagram, close detail, process or documented context—never a generic or misleading substitute.
 
 SHOT ORDER AND CONTEXT:
 {sequence_rows}

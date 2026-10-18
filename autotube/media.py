@@ -706,6 +706,43 @@ def _usable_image(a: dict, work: Path) -> Path | None:
     return p
 
 
+_VISUAL_DESCRIPTION_STOPWORDS = frozenset(
+    "a an and are as at behind by for from in inside into is it its of on or over the through to under with"
+    .split()
+)
+
+
+def _visual_description_overlap(left: str, right: str) -> float:
+    """Estimate whether two approved descriptions depict the same composition.
+
+    Used only to decide whether a long narration line really has two visually distinct shots. It is
+    intentionally conservative about synonyms: image embeddings and the final sequence judge remain
+    authoritative, and a single good shot is preferable to padding a line with near-identical views.
+    """
+    def terms(value: str) -> set[str]:
+        out = set()
+        for token in re.findall(r"[a-z0-9]+", str(value or "").lower()):
+            if token in _VISUAL_DESCRIPTION_STOPWORDS:
+                continue
+            if token == "rocky":
+                token = "rock"
+            elif token.endswith("ies") and len(token) > 4:
+                token = token[:-3] + "y"
+            elif token.endswith("ing") and len(token) > 5:
+                token = token[:-3]
+            elif token.endswith("ed") and len(token) > 4:
+                token = token[:-2]
+            elif token.endswith("s") and len(token) > 4:
+                token = token[:-1]
+            out.add(token)
+        return out
+
+    a, b = terms(left), terms(right)
+    if not a or not b:
+        return 0.0
+    return len(a & b) / min(len(a), len(b))
+
+
 CTA_RE = re.compile(r"\b(follow (?:for|us|me|along)|subscribe|like (?:and|for)|see you (?:next|tomorrow))\b", re.I)
 
 
@@ -888,24 +925,37 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
                                             + (video_bonus if c.get("kind") == "video" else 0)
                                             + shape_bonus(c, shape_w)))
 
-    used: list[dict] = []          # {"url","hash","emb","title","seg"}
+    used: list[dict] = []          # {"url","hash","emb","title","shows","seg"}
     shots: list[dict] = []
     alts: dict[int, list[dict]] = {}
 
-    def is_used(c, allow_seg_gap: int | None = None):
+    def is_used(c):
         for u in used:
+            same_segment = u["seg"] == i
             dup = (c["url"] == u["url"] or vision.same_image(c["_hash"], u["hash"])
-                   or vision.near_duplicate(c.get("_emb"), u["emb"], t1=c.get("title", ""), t2=u["title"]))
+                   or vision.near_duplicate(c.get("_emb"), u["emb"],
+                                             thr=0.88 if same_segment else 0.93,
+                                             t1=c.get("title", ""), t2=u["title"])
+                   or (same_segment and _visual_description_overlap(c.get("vshows", ""), u.get("shows", "")) >= 0.42))
             if dup:
                 return u
         return None
+
+    def same_segment_duplicate(c, other) -> bool:
+        h1, h2 = c.get("_hash"), other.get("_hash")
+        same_pixels = h1 is not None and h2 is not None and vision.same_image(h1, h2)
+        return (same_pixels
+                or vision.near_duplicate(c.get("_emb"), other.get("_emb"), thr=0.88,
+                                         t1=c.get("title", ""), t2=other.get("title", ""))
+                or _visual_description_overlap(c.get("vshows", ""), other.get("vshows", "")) >= 0.42)
 
     def add_shot(c, i, want, reused=False) -> bool:
         p = _usable(c, work, need_by_seg.get(i, 4.0), max_mb)
         if not p:
             return False
         if not reused:
-            used.append({"url": c["url"], "hash": c["_hash"], "emb": c.get("_emb"), "title": c.get("title", ""), "seg": i})
+            used.append({"url": c["url"], "hash": c["_hash"], "emb": c.get("_emb"),
+                         "title": c.get("title", ""), "shows": c.get("vshows", ""), "seg": i})
         credit = {k: v for k, v in c.items() if not k.startswith("_") and k not in
                   ("vscore", "vshows", "vjudge", "clip", "clip_cos", "thumb", "variants", "t_ref", "window")}
         shots.append({"path": p, "credit": credit, "seg": i, "score": c["vscore"], "shows": c.get("vshows", ""),
@@ -933,19 +983,45 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
         need_by_seg[i] = round(seg_len / want_n + 0.45, 2)        # + crossfade overlap and a little slack
 
         def place(good, want, limit=None):
-            """Place approved, usable assets; an explicit limit caps generated inserts at one."""
-            target_n = want_n if limit is None else max(0, min(want_n, int(limit)))
-            got, spare, dup, bad = 0, [], 0, 0
+            """Place verified assets, without using two redundant views to pad one narration line."""
+            requested_n = want_n if limit is None else max(0, min(want_n, int(limit)))
+            unique, spare, dup, bad, got = [], [], 0, 0, 0
             for c in good:
-                if is_used(c):
+                if is_used(c) or any(same_segment_duplicate(c, prior) for prior in unique):
                     dup += 1
-                elif got < target_n:
+                else:
+                    unique.append(c)
+
+            target_n = min(requested_n, len(unique))
+            if limit is None:
+                # If only one distinct composition is available for a long line, let it carry the
+                # whole segment (animated stills or a full-length clip), rather than cutting a clip
+                # to half-length and then repeating the same view.
+                need_by_seg[i] = round(seg_len / target_n + 0.45, 2) if target_n else round(seg_len + 0.45, 2)
+
+            placed = []
+            for c in unique:
+                if got < target_n:
                     if add_shot(c, i, want):
                         got += 1
+                        placed.append((c, shots[-1]))
                     else:
                         bad += 1
                 else:
                     spare.append(c)
+
+            if limit is None and target_n > 1 and got == 1:
+                # A second distinct candidate can still fail during download/clip preparation. If so,
+                # recut the surviving video to the full narration window instead of letting it freeze.
+                need_by_seg[i] = round(seg_len + 0.45, 2)
+                candidate, shot = placed[0]
+                if candidate.get("kind") == "video":
+                    full_clip = _usable(candidate, work, need_by_seg[i], max_mb)
+                    if full_clip:
+                        shot["path"] = full_clip
+                        shot["poster"] = candidate.get("_poster")
+                        shot["window"] = candidate.get("window")
+
             if not got:
                 # every approved match for this line is already on screen elsewhere → repeat the best one,
                 # but never right after the line that already shows it
@@ -953,6 +1029,8 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
                     u = is_used(c)
                     if u and abs(u["seg"] - i) > 1 and add_shot(c, i, want, reused=True):
                         got = 1
+                        if limit is None and want_n > 1:
+                            need_by_seg[i] = round(seg_len + 0.45, 2)
                         break
             if good and not got:
                 log.info("    seg %d: %d approved image(s) but none placeable (%d already shown, %d unusable)",
