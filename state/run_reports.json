@@ -1,139 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261015-043843-3838",
-    "workflow_run_id": "38682415971",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-15T04:38:43.786367+00:00",
-    "finished_at": "2026-10-15T04:42:55.924450+00:00",
-    "duration_seconds": 252.138,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 1,
-      "topic_production": 1,
-      "topic_validation": 2,
-      "script_research": 4,
-      "script_draft": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Ancient Mysteries Unearthed After 1,000 Years!",
-        "topic_key": "ancient mysteries unearthed after 1000 years",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "The Crazy Evolution of cycles",
-        "topic_key": "the crazy evolution of cycles",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-15T04:39:05.126522+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-15T04:39:05.126625+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-15T04:42:55.919526+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-15T04:42:55.919757+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-15T04:42:55.919915+00:00",
-        "stage": "script",
-        "category": "all_text_providers_circuit_open_or_unusable"
-      }
-    ],
-    "retry_events": [],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-15T04:38:43.787939+00:00",
-        "cooldown_until": "2026-10-15T23:45:36.134744+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-15T04:39:00.210513+00:00",
-        "cooldown_until": "2026-10-15T04:59:00.209882+00:00",
-        "retry_after_seconds": 29.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-15T04:40:43.045865+00:00",
-        "cooldown_until": "2026-10-15T05:00:43.045379+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-15T04:40:49.539753+00:00",
-        "cooldown_until": "2026-10-15T05:00:49.539262+00:00"
-      },
-      {
-        "provider": "cloudflare",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-15T04:40:55.834926+00:00",
-        "cooldown_until": "2026-10-15T05:00:55.834444+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-15T04:42:55.919088+00:00"
-      }
-    ],
-    "top_up": true,
-    "rate_limited_models": [
-      "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-      "gemini:gemini-flash-latest",
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261015-050231-3620",
     "workflow_run_id": "38684528594",
     "workflow_run_attempt": "1",
@@ -4153,6 +4020,253 @@
     "grounding_repairs": [],
     "top_up": true,
     "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261018-042158-3775",
+    "workflow_run_id": "39096748038",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-18T04:21:58.243358+00:00",
+    "finished_at": "2026-10-18T04:53:27.106461+00:00",
+    "duration_seconds": 1888.863,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 6,
+      "script_research": 12,
+      "script_draft": 3,
+      "script_review": 2,
+      "tts": 2,
+      "visuals": 2,
+      "music": 2,
+      "render_qa": 6,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "This Shark Was Born Before America Even Existed",
+        "topic_key": "this shark was born before america even existed",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "A 75-Million-Year-Old Dinosaur Egg Hidden Inside Rock",
+        "topic_key": "a 75millionyearold dinosaur egg hidden inside rock",
+        "outcome": "rejected",
+        "stage": "render_qa",
+        "failure_category": "visual_repair_budget_exhausted"
+      },
+      {
+        "index": 1,
+        "topic": "Viking Facts You Never Knew",
+        "topic_key": "viking facts you never knew",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "The British Army Still Uses This Ancient Tool!",
+        "topic_key": "the british army still uses this ancient tool",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "FLAME THAT NEVER DIED",
+        "topic_key": "flame that never died",
+        "outcome": "rejected",
+        "stage": "render_qa",
+        "failure_category": "visual_repair_budget_exhausted"
+      },
+      {
+        "index": 1,
+        "topic": "First Real Video of Another Solar System!",
+        "topic_key": "first real video of another solar system",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-18T04:26:51.195647+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-18T04:26:51.195784+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-18T04:42:15.618523+00:00",
+        "stage": "render_qa",
+        "category": "visual_repair_budget_exhausted",
+        "attempt": 3
+      },
+      {
+        "at": "2026-10-18T04:43:18.696553+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-18T04:43:18.696691+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-18T04:43:19.534668+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-18T04:43:19.534803+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-18T04:53:24.853568+00:00",
+        "stage": "render_qa",
+        "category": "visual_repair_budget_exhausted",
+        "attempt": 3
+      },
+      {
+        "at": "2026-10-18T04:53:27.075872+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-18T04:53:27.075961+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-18T04:53:27.076082+00:00",
+        "stage": "topic_selection",
+        "category": "topic_attempt_budget_exhausted",
+        "attempt": 6
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "visual_repair",
+        "attempt": 1,
+        "limit": 3,
+        "action": "replace_rejected_shots_and_rerender"
+      },
+      {
+        "stage": "visual_repair",
+        "attempt": 2,
+        "limit": 3,
+        "action": "replace_rejected_shots_and_rerender"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "visual_repair",
+        "attempt": 1,
+        "limit": 3,
+        "action": "replace_rejected_shots_and_rerender"
+      },
+      {
+        "stage": "visual_repair",
+        "attempt": 2,
+        "limit": 3,
+        "action": "replace_rejected_shots_and_rerender"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-18T04:22:56.594615+00:00",
+        "cooldown_until": "2026-10-18T04:42:56.594038+00:00",
+        "retry_after_seconds": 28.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-18T04:23:11.452183+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-18T04:24:49.544947+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-18T04:24:55.910428+00:00",
+        "cooldown_until": "2026-10-18T04:44:55.909866+00:00"
+      },
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "circuit_open",
+        "at": "2026-10-18T04:26:51.195297+00:00",
+        "cooldown_until": "2026-10-19T04:26:51.194694+00:00",
+        "retry_after_seconds": 8.0
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-18T04:36:25.476568+00:00"
+      },
+      {
+        "provider": "cloudflare",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-18T04:53:20.503823+00:00",
+        "cooldown_until": "2026-10-18T05:13:20.503154+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct",
       "groq:openai/gpt-oss-120b",
       "mistral:mistral-small-latest"
     ]
