@@ -1,174 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261016-035302-3812",
-    "workflow_run_id": "38847602514",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-16T03:53:02.983950+00:00",
-    "finished_at": "2026-10-16T03:58:51.470566+00:00",
-    "duration_seconds": 348.487,
-    "mode": "dry_run",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 2,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 3,
-      "script_research": 6,
-      "script_draft": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "They Drilled 12 KM Into Earth And It Got EXTREMELY Hot Kola Superdeep Part 1",
-        "topic_key": "they drilled 12 km into earth and it got extremely hot kola superdeep part 1",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "a Mysterious Green Light Appeared on Jupiter!",
-        "topic_key": "a mysterious green light appeared on jupiter",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Hundreds of Bats Hidden Under One Roof",
-        "topic_key": "hundreds of bats hidden under one roof",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-16T03:53:23.121845+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-16T03:53:23.121969+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-16T03:53:24.580330+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-16T03:53:24.580457+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-16T03:58:33.557820+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-16T03:58:33.557983+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-16T03:58:51.468869+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-16T03:53:02.985204+00:00",
-        "cooldown_until": "2026-10-17T01:52:33.373195+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-16T03:53:18.319894+00:00",
-        "cooldown_until": "2026-10-16T04:13:18.319184+00:00",
-        "retry_after_seconds": 29.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-16T03:54:18.001037+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-16T03:54:20.135087+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-16T03:56:02.653457+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "route_circuit_open",
-        "at": "2026-10-16T03:56:02.654164+00:00",
-        "cooldown_until": "2026-10-16T04:06:02.653501+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-16T03:56:09.498001+00:00",
-        "cooldown_until": "2026-10-16T04:16:09.497349+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-16T03:58:33.557331+00:00"
-      }
-    ],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261016-145621-3829",
     "workflow_run_id": "38919586877",
     "workflow_run_attempt": "1",
@@ -4145,5 +3977,203 @@
     "retry_events": [],
     "provider_events": [],
     "preflight_skip_reason": "delayed_schedule_superseded"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261019-015847-3617",
+    "workflow_run_id": "39187689482",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-19T01:58:47.513586+00:00",
+    "finished_at": "2026-10-19T02:06:15.018289+00:00",
+    "duration_seconds": 447.505,
+    "mode": "dry_run",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 4,
+      "script_research": 8,
+      "script_draft": 2,
+      "script_review": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "The Crusader Sword: What X-Rays Revealed Beneath the Sea",
+        "topic_key": "the crusader sword what xrays revealed beneath the sea",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "A 75-Million-Year-Old Dinosaur Egg Hidden Inside Rock",
+        "topic_key": "a 75millionyearold dinosaur egg hidden inside rock",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "First Real Video of Another Solar System!",
+        "topic_key": "first real video of another solar system",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Ikan yang Tidur Bertahun-tahun Tanpa Air",
+        "topic_key": "ikan yang tidur bertahuntahun tanpa air",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-19T02:00:20.847342+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-19T02:00:20.847471+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-19T02:05:33.125286+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 2
+      },
+      {
+        "at": "2026-10-19T02:05:33.125390+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-19T02:05:41.540716+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-19T02:05:41.813949+00:00",
+        "stage": "script_research",
+        "category": "source_grounding_failed"
+      },
+      {
+        "at": "2026-10-19T02:05:41.813978+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-19T02:06:15.017295+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-19T02:06:15.017349+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-19T02:06:15.017418+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 1,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-19T01:58:47.514971+00:00",
+        "cooldown_until": "2026-10-19T04:26:51.194694+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-19T02:00:12.069060+00:00",
+        "cooldown_until": "2026-10-19T02:20:12.068412+00:00",
+        "retry_after_seconds": 21.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-19T02:00:34.564486+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-19T02:00:46.223681+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-19T02:02:27.516432+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-19T02:02:38.432608+00:00",
+        "cooldown_until": "2026-10-19T02:22:38.432027+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-19T02:05:33.124968+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]
