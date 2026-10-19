@@ -1148,18 +1148,54 @@ def gather(source: dict, segments: list[dict], cfg: dict, work: Path, llm=None,
 
 QA_REQUERY_SYSTEM = (
     "You repair a failed visual search for a factual educational Short. Keep the narration unchanged. "
-    "Return strict JSON only."
+    "Return strict JSON only. Never use a map, chart, graph, diagram, schematic, timeline, plot, infographic, "
+    "or symbolic light-trail as evidence. For an astronomical distance/light-travel claim, show the source-named "
+    "galaxy or object itself, not a drawn route or beams."
 )
 _REQUERY_SUBJECT_STOPWORDS = frozenset(
     "a an and are as at by for from how in into is it its of on or the their this to under with why"
     .split()
 )
+_FINAL_QA_UNREADABLE_VISUAL_RE = re.compile(
+    r"\b(?:map|chart|graph|diagram|schematic|timeline|plot|infographic)\b", re.IGNORECASE)
 
 
 def _required_requery_subject_terms(subject: str) -> set[str]:
     """Keep the concrete named subject or place from vanishing into a generic substitute."""
     return {token for token in re.findall(r"[a-z0-9]+", str(subject or "").casefold())
             if token not in _REQUERY_SUBJECT_STOPWORDS}
+
+
+def _required_segment_entity_terms(segment: dict) -> set[str]:
+    """Extract source-specific names/designations from this beat's evidence and narration.
+
+    Final-QA repair used to preserve only the channel-wide subject. That let a repair
+    for the kilonova replace its named host galaxy, NGC 4993, with any generic space
+    image. Keep compact catalog designations and multiword proper names in both the
+    replacement shot request and at least one search query.
+    """
+    if not isinstance(segment, dict):
+        return set()
+    visual = segment.get("visual") if isinstance(segment.get("visual"), dict) else {}
+    text = "\n".join(str(value or "") for value in (
+        segment.get("evidence"), segment.get("text"), visual.get("shows")))
+    patterns = (
+        r"\b[A-Z]{2,}\s*\d+[A-Za-z0-9]*\b",       # NGC 4993, AT2017gfo, GW170817
+        r"\b[A-Z]{1,8}[- ]?\d+[A-Za-z0-9]*\b",     # M38A1, Voyager-style catalog IDs
+        r"\b[A-Z][a-z]+\s+\d+[A-Z0-9]*\b",        # Voyager 1, Apollo 11
+        r"\b[A-Z][a-z]+(?:[-'][A-Z]?[a-z]+)*(?:\s+(?:[A-Z][a-z]+|[A-Z]{2,})){1,3}\b",
+    )
+    leading_stopwords = {"a", "an", "the", "this", "that", "these", "those"}
+    required: set[str] = set()
+    for pattern in patterns:
+        for match in re.finditer(pattern, text):
+            words = match.group(0).split()
+            while words and words[0].casefold() in leading_stopwords:
+                words.pop(0)
+            if len(words) < 2 and not any(any(char.isdigit() for char in word) for word in words):
+                continue
+            required.update(_required_requery_subject_terms(" ".join(words)))
+    return required
 
 
 def _has_requery_subject_terms(text: str, terms: set[str]) -> bool:
@@ -1187,7 +1223,9 @@ place, object, denomination, species, and historical period. Every required sour
 "shows" and together in at least one search query; if that cannot be done, return empty output rather than
 broadening to a look-alike. Never substitute a generic look-alike, unrelated person/object, fabricated reenactment,
 or symbolic stock photo. For a past event that cannot be photographed, use a documented depiction or a directly
-relevant real place/object only if it remains honest about what the image shows. Do not add unnecessary staging
+relevant real place/object only if it remains honest about what the image shows. Never repair with a map, chart,
+graph, diagram, schematic, timeline, plot, infographic, or symbolic light-trail. For astronomical distance/light-travel
+claims, show the named source or host galaxy itself instead of drawn beams or a route. Do not add unnecessary staging
 (for example, a hand holding an object) when a clear close-up is better.
 
 Return JSON: {{"shows": "revised, literal shot request", "queries": ["up to 3 short searches, 2-4 words each"]}}.
@@ -1202,6 +1240,9 @@ If no defensible visual can be suggested, return {{"shows": "", "queries": []}} 
     queries = [query.strip() for query in result["queries"]]
     if not shows or not queries:
         return "", []
+    unreadable = _FINAL_QA_UNREADABLE_VISUAL_RE.search(" ".join([shows, *queries]))
+    if unreadable:
+        raise ValueError(f"visual requery proposed unreadable {unreadable.group(0)!r}")
     if required_terms and (not _has_requery_subject_terms(shows, required_terms)
                            or not any(_has_requery_subject_terms(query, required_terms) for query in queries)):
         raise ValueError("visual requery dropped required source-specific subject/place terms")
@@ -1262,6 +1303,7 @@ def _find_final_qa_alternative(visuals: dict, seg: int, bad_path: str, work: Pat
     source_title = str(source.get("title") or "").strip()
     subject = str(visual_subject or source_title).strip()
     required_terms = _required_requery_subject_terms(subject)
+    required_terms.update(_required_segment_entity_terms(segment))
     try:
         want, queries = _requery_after_final_qa(
             llm, subject, line, str(shot.get("want", "")), failed_asset, feedback,

@@ -1167,7 +1167,7 @@ def source_supports_angle(angle: str, subject: str, source_text: str) -> bool:
     return len(supported) >= required and core_claims.issubset(supported)
 
 UNREADABLE_SHOTS = ("infographic", "chart", "graph", "diagram", "schematic", "timeline",
-                    "bar chart", "pie chart", "screenshot", "table of", "map showing",
+                    "bar chart", "pie chart", "screenshot", "table of", "map showing", "map",
                     "contour map", "sonar map", "bathymetry", "bathymetric", "plot of",
                     "statistics", "data visualisation", "data visualization")
 
@@ -1185,7 +1185,7 @@ def unreadable_shot_request(script: dict) -> str | None:
         vis = seg.get("visual") or {}
         blob = " ".join([str(vis.get("shows", ""))] + [str(q) for q in (vis.get("queries") or [])]).lower()
         for bad in UNREADABLE_SHOTS:
-            if bad in blob:
+            if (re.search(r"\bmap\b", blob) if bad == "map" else bad in blob):
                 return bad
     return None
 
@@ -1844,7 +1844,9 @@ For each segment give:
      "queries": 2-3 short photo-library searches (2-4 words each) that ALWAYS include the physical thing's noun
                 (e.g. "cat whiskers close-up", "kitten face macro") — never a bare topic word that could also be
                 a place, business, film or brand name. Never ask for text, charts, maps or abstract ideas; for an
-                abstract line, show the video's main subject in a way that fits it. Hook/CTA: show the main subject.
+                abstract line, show the video's main subject in a way that fits it. A distance/light-travel fact is
+                not a license to invent beams, routes or a diagram: show the named source, host galaxy or object itself.
+                Hook/CTA: show the main subject.
   "evidence": a VERBATIM {ev_len} word quote copied from the SOURCE TEXT that supports the segment ("" only for hook/CTA).
 
 FINAL SHAPE CHECK before emitting JSON: use five beats unless four is editorially cleaner;

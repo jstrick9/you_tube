@@ -1586,8 +1586,12 @@ def test_rejects_shot_requests_no_phone_viewer_can_read():
         {"visual": {"shows": "Mariana Trench depth infographic", "queries": ["mariana trench depth"]}}]}
     assert unreadable_shot_request(shipped) == "infographic"
 
-    for bad in ("sonar map of the seafloor", "a bathymetric survey", "a bar chart of sales"):
+    for bad in ("sonar map of the seafloor", "a bathymetric survey", "a bar chart of sales",
+                "light beams traveling across a galaxy map"):
         assert unreadable_shot_request({"segments": [{"visual": {"shows": bad, "queries": []}}]})
+
+    maple = {"segments": [{"visual": {"shows": "a maple leaf macro photo", "queries": ["maple leaf"]}}]}
+    assert unreadable_shot_request(maple) is None  # the generic map check must use word boundaries
 
     clean = {"segments": [
         {"visual": {"shows": "a Nintendo DS console held open", "queries": ["nintendo ds"]}},

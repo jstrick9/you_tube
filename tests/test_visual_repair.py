@@ -126,6 +126,40 @@ def test_final_qa_requery_preserves_named_place_in_shot_and_queries():
             dropped, "Bracken Cave", "Bats roost beneath the cave roof.", "bats under one roof",
             "exiting-bats photo", "wrong behavior", required_terms=required)
 
+    diagram = Requery({"shows": "NGC 4993 on a galaxy map", "queries": ["NGC 4993 galaxy map"]})
+    with pytest.raises(ValueError, match="unreadable 'map'"):
+        media._requery_after_final_qa(
+            diagram, "Kilonova", "Its light reached Earth from NGC 4993.", "light beams across a galaxy map",
+            "acceleration diagram", "wrong visual", required_terms={"kilonova", "ngc", "4993"})
+
+
+def test_final_qa_requery_includes_named_places_from_segment_evidence(monkeypatch, tmp_path):
+    from autotube import media
+
+    captured = {}
+
+    def requery(_llm, subject, line, want, failed_asset, feedback, *, segment_subject="", required_terms=None):
+        captured.update(subject=subject, line=line, want=want, failed_asset=failed_asset,
+                        feedback=feedback, segment_subject=segment_subject,
+                        required_terms=set(required_terms or ()))
+        return "", []
+
+    monkeypatch.setattr(media, "_requery_after_final_qa", requery)
+    old_path = tmp_path / "rejected-map.jpg"
+    visuals = {"shots": [{"seg": 3, "path": old_path, "want": "light beams on a galaxy map",
+                           "shows": "acceleration diagram", "credit": {"title": "bad illustration"}}],
+               "alts": {3: []}, "need": {3: 2}, "max_mb": 80}
+    segment = {"text": "Its light traveled 140 million light-years to reach us.",
+               "evidence": "The event was precisely located in the nearby host galaxy NGC 4993.",
+               "visual": {"shows": "light beams traveling across a galaxy map"}}
+
+    assert not media._find_final_qa_alternative(
+        visuals, 3, str(old_path), tmp_path, {"title": "Kilonova"}, segment,
+        {"media": {"requery": True}}, object(), "rendered a constant-acceleration diagram",
+        visual_subject="kilonova")
+    assert captured["segment_subject"] == "light beams traveling across a galaxy map"
+    assert captured["required_terms"] == {"kilonova", "ngc", "4993"}
+
 
 def test_final_qa_requery_fails_closed_below_strong_match_threshold(monkeypatch, tmp_path):
     from autotube import media, vision
