@@ -1,136 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261016-032635-3607",
-    "workflow_run_id": "38845409091",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-16T03:26:35.194236+00:00",
-    "finished_at": "2026-10-16T03:42:17.995043+00:00",
-    "duration_seconds": 942.801,
-    "mode": "dry_run",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 1,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 1,
-      "script_research": 2,
-      "script_draft": 2,
-      "script_review": 2,
-      "tts": 1,
-      "visuals": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "They Drilled 12 KM Into Earth And It Got EXTREMELY Hot Kola Superdeep Part 1",
-        "topic_key": "they drilled 12 km into earth and it got extremely hot kola superdeep part 1",
-        "outcome": "rejected",
-        "stage": "visuals",
-        "failure_category": "vision_unavailable"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-16T03:42:17.991731+00:00",
-        "stage": "visuals",
-        "category": "vision_unavailable",
-        "exception_type": "VisionUnavailable",
-        "attempt": 1
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-16T03:26:35.195244+00:00",
-        "cooldown_until": "2026-10-17T01:52:33.373195+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-16T03:26:50.711504+00:00",
-        "cooldown_until": "2026-10-16T03:46:50.710956+00:00",
-        "retry_after_seconds": 31.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-16T03:27:30.136608+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-16T03:27:39.165224+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-16T03:28:03.273809+00:00",
-        "cooldown_until": "2026-10-16T03:48:03.273263+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-16T03:29:16.777679+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-16T03:29:25.469248+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-16T03:31:48.909055+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-16T03:36:37.012963+00:00"
-      }
-    ],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261016-035302-3812",
     "workflow_run_id": "38847602514",
     "workflow_run_attempt": "1",
@@ -4248,5 +4118,32 @@
       "groq:openai/gpt-oss-120b",
       "mistral:mistral-small-latest"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "39186619124",
+    "workflow_run_id": "39186619124",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-19T01:43:16.996701+00:00",
+    "finished_at": "2026-10-19T01:43:16.996701+00:00",
+    "duration_seconds": 0,
+    "mode": "workflow_fallback",
+    "top_up": true,
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "superseded",
+    "stage": "preflight",
+    "stage_entries": {
+      "preflight": 1
+    },
+    "retry_budgets": {},
+    "topic_attempts": [],
+    "failures": [],
+    "retry_events": [],
+    "provider_events": [],
+    "preflight_skip_reason": "delayed_schedule_superseded"
   }
 ]
