@@ -94,6 +94,7 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     assert "trend context (discovery only): viral Short now: 2,000,000 views in 20h" in llm.prompt
     assert "source lane=science_nature" in llm.prompt
     assert '"script_subject"' in llm.prompt and "never copy their headline" in llm.prompt
+    assert "literal overlap, not a" in llm.prompt and "translation" in llm.prompt
     assert "Do not stop at four" in llm.prompt and "inflate scores" in llm.prompt and "pad below the floor" in llm.prompt
     assert "deep-sea exploration" in llm.prompt and "photographable" in llm.prompt
     assert "explicit `risk`=`none|low|high`" in llm.prompt
@@ -140,6 +141,14 @@ def test_selector_requires_a_concrete_subject_connected_to_the_live_trend():
 
     unrelated = dict(base, script_subject="Stereopsis")
     assert ScriptWriter(CFG, LLMPicks([unrelated]), Strat()).select_topics([candidate], 1, set()) == []
+
+    # A malformed backup must not invalidate a valid sibling pick; each candidate is
+    # still individually gated, so only the concrete, trend-connected subject survives.
+    resilient = ScriptWriter(CFG, LLMPicks([unrelated, base]), Strat()).select_topics([candidate], 1, set())
+    assert len(resilient) == 1 and resilient[0]["script_subject"] == "octopus"
+    malformed_backup = ScriptWriter(CFG, LLMPicks(["not a pick object", base]), Strat()) \
+        .select_topics([candidate], 1, set())
+    assert len(malformed_backup) == 1 and malformed_backup[0]["script_subject"] == "octopus"
 
     too_long = dict(base, script_subject="octopus senses food with chemical receptor cells")
     assert ScriptWriter(CFG, LLMPicks([too_long]), Strat()).select_topics([candidate], 1, set()) == []

@@ -1424,8 +1424,9 @@ FORMATS we can make (choose 2-4 that the specific article honestly supports; myt
 
 For each pick:
 - `script_subject`: 1-6 words naming a photographable object, creature, person, place, or artifact from the trend;
-  share a meaningful trend word and explicitly show it. Never substitute the background article or use abstract framing
-  (“deep-sea exploration,” “discovery,” “history”); reject vague trends.
+  it must contain at least one meaningful token written exactly in that candidate's title (literal overlap, not a
+  translation). If no concrete subject fits that rule, omit the pick. Explicitly show it; never substitute the
+  Wikipedia/background article's title or use abstract framing (“deep-sea exploration,” “discovery,” “history”).
 - `angle`: one specific factual sentence, independently worded; trend evidence is not proof. Grounded research must verify it.
 - `wiki_query`: the MOST SPECIFIC English Wikipedia article supporting it, not a broad category (e.g. Bou Craa,
   not “Conveyor belt”); reject the candidate if none supports it.
@@ -1443,28 +1444,9 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
         def validate(o):
             assert isinstance(o, dict), "selection response must be a JSON object"
             assert isinstance(o.get("picks"), list) and o["picks"], "no picks"
-            assert all(isinstance(pick, dict) for pick in o["picks"]), "every pick must be a JSON object"
-            required = ("index", "viral_score", "category", "script_subject", "angle",
-                        "wiki_query", "formats", "risk")
-            for i, pick in enumerate(o["picks"]):
-                # A high-risk pick is dropped immediately; only its risk verdict is
-                # needed. Every potentially usable pick must carry the full schema.
-                risk = pick.get("risk")
-                assert isinstance(risk, str) and risk in {"none", "low", "high"}, \
-                    f"pick {i} needs an explicit risk verdict: none, low, or high"
-                if risk == "high":
-                    continue
-                missing = [key for key in required if key != "risk" and key not in pick]
-                assert not missing, f"pick {i} is missing required field(s): {', '.join(missing)}"
-                index = pick.get("index")
-                subject = pick.get("script_subject")
-                if type(index) is int and 0 <= index < len(pool):
-                    assert isinstance(subject, str) and subject.strip() and 1 <= len(subject.split()) <= 6, \
-                        f"pick {i} script_subject must be a concise, concrete label"
-                    subject_terms = set(originality.tokens(subject))
-                    trend_terms = set(originality.tokens(pool[index]["topic"]))
-                    assert subject_terms and trend_terms and subject_terms & trend_terms, \
-                        f"pick {i} script_subject must name the trend candidate, not a background article"
+            # Only validate the batch envelope here. A malformed backup must not make
+            # the adapter discard a valid sibling; every pick is still filtered through
+            # the strict per-candidate gates immediately below.
 
         try:
             res = self.llm.json(SELECT_SYSTEM, user, temperature=0.4, validate=validate)
@@ -1476,6 +1458,9 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
         picks, dropped = [], []
         seen_topics: set[str] = set()
         for p in res["picks"]:
+            if not isinstance(p, dict):
+                dropped.append("(malformed pick object)")
+                continue
             try:
                 idx = p.get("index")
                 if type(idx) is not int or not 0 <= idx < len(pool):
@@ -1567,6 +1552,8 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                 continue
         accepted_keys = {pick["topic_key"] for pick in picks}
         for response_pick in res["picks"]:
+            if not isinstance(response_pick, dict):
+                continue
             idx = response_pick.get("index")
             if type(idx) is int and 0 <= idx < len(pool):
                 key = pool[idx].get("topic_key")
