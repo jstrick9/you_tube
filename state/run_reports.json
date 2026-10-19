@@ -1,184 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261016-215134-3822",
-    "workflow_run_id": "38971990913",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-16T21:51:34.437719+00:00",
-    "finished_at": "2026-10-16T22:03:27.742926+00:00",
-    "duration_seconds": 713.305,
-    "mode": "dry_run",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 2,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 4,
-      "script_research": 8,
-      "script_draft": 2,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "a Mysterious Green Light Appeared on Jupiter!",
-        "topic_key": "a mysterious green light appeared on jupiter",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "A Shocking Discovery in the Deep Sea",
-        "topic_key": "a shocking discovery in the deep sea",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "These are the Sticky Glowing Balls",
-        "topic_key": "these are the sticky glowing balls",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "This Jeep Could Launch A Nuke",
-        "topic_key": "this jeep could launch a nuke",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-16T21:57:39.834909+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-16T21:57:39.835085+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-16T21:58:07.093314+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-16T21:58:07.093375+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-16T21:58:08.885323+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-16T21:58:08.885414+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-16T22:03:21.500294+00:00",
-        "stage": "script_draft",
-        "category": "provider_transient_network",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-16T22:03:21.500417+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-16T22:03:27.741661+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-16T21:51:34.438901+00:00",
-        "cooldown_until": "2026-10-17T01:52:33.373195+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-16T21:51:50.098805+00:00",
-        "cooldown_until": "2026-10-16T22:11:50.098286+00:00",
-        "retry_after_seconds": 44.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-16T21:53:42.156007+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-16T21:53:48.735823+00:00",
-        "cooldown_until": "2026-10-16T22:13:48.735196+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-16T22:03:21.499952+00:00"
-      },
-      {
-        "provider": "cloudflare",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-16T22:03:27.741343+00:00",
-        "cooldown_until": "2026-10-16T22:23:27.740755+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "38974259277",
     "workflow_run_id": "38974259277",
     "workflow_run_attempt": "1",
@@ -4212,5 +4034,228 @@
     "retry_events": [],
     "provider_events": [],
     "preflight_skip_reason": "delayed_schedule_superseded"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261019-230715-3828",
+    "workflow_run_id": "39339380818",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-19T23:07:15.305199+00:00",
+    "finished_at": "2026-10-19T23:35:27.663792+00:00",
+    "duration_seconds": 1692.359,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "topic_production": 1,
+      "topic_validation": 5,
+      "script_research": 10,
+      "script_draft": 3,
+      "script_review": 1,
+      "tts": 1,
+      "visuals": 1,
+      "music": 1,
+      "render_qa": 3,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "How Giant Ships Stop Without Brakes! Maritime Secrets All Facts Tamil",
+        "topic_key": "how giant ships stop without brakes maritime secrets all facts tamil",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Kedareshwar Temple, The mysteries of Kedareshwar Temple",
+        "topic_key": "kedareshwar temple the mysteries of kedareshwar temple",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "అడవల వడకకడ కల బర! Capybara Facts",
+        "topic_key": "capybara facts",
+        "outcome": "rejected",
+        "stage": "render_qa",
+        "failure_category": "visual_repair_budget_exhausted"
+      },
+      {
+        "index": 1,
+        "topic": "डसन अधरत मणस कस दसत? Mosquito Biological Radar Science",
+        "topic_key": "mosquito biological radar science",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "What Happens If You Bring Metal Into An MRI Room? Medical Facts All Facts Tamil",
+        "topic_key": "what happens if you bring metal into an mri room medical facts all facts tamil",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-19T23:07:27.264368+00:00",
+        "stage": "topic_selection",
+        "category": "no_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-19T23:08:09.022743+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-19T23:08:09.022832+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-19T23:13:23.708336+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-19T23:13:23.708523+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-19T23:33:25.325053+00:00",
+        "stage": "render_qa",
+        "category": "visual_repair_budget_exhausted",
+        "attempt": 3
+      },
+      {
+        "at": "2026-10-19T23:35:25.388938+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-19T23:35:25.389209+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-19T23:35:27.648708+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-19T23:35:27.648808+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-19T23:35:27.648926+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "visual_repair",
+        "attempt": 1,
+        "limit": 3,
+        "action": "replace_rejected_shots_and_rerender"
+      },
+      {
+        "stage": "visual_repair",
+        "attempt": 2,
+        "limit": 3,
+        "action": "replace_rejected_shots_and_rerender"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-19T23:07:15.306282+00:00",
+        "cooldown_until": "2026-10-20T04:41:46.518451+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-19T23:08:04.087633+00:00",
+        "cooldown_until": "2026-10-19T23:28:04.086997+00:00",
+        "retry_after_seconds": 26.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-19T23:11:26.491875+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-19T23:11:32.899251+00:00",
+        "cooldown_until": "2026-10-19T23:31:32.898594+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-19T23:18:30.578130+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-19T23:18:43.961392+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-19T23:26:07.868782+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]

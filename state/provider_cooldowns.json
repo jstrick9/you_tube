@@ -7,19 +7,6 @@
       "recorded_at": "2026-10-19T04:41:46.518451+00:00",
       "blocked_until": "2026-10-20T04:41:46.518451+00:00",
       "retry_after_seconds": 21.0
-    },
-    "groq": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-19T17:02:24.941575+00:00",
-      "blocked_until": "2026-10-19T17:22:24.941575+00:00",
-      "retry_after_seconds": 31.0
-    },
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-19T17:04:58.720118+00:00",
-      "blocked_until": "2026-10-19T17:24:58.720118+00:00"
     }
   },
   "failures_5xx": {}
