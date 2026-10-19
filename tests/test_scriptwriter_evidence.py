@@ -28,6 +28,9 @@ def test_visual_subject_resolves_nonvisual_modifiers_to_concrete_subjects():
         {"script_subject": "Lost 1,000‑Year‑Old City"}, grounded_city,
     ) == "Derinkuyu underground city"
     assert visual_subject_for_topic(
+        {"script_subject": "A 75-Million-Year-Old Dinosaur Egg"}, {"title": "Dinosaur egg"},
+    ) == "Dinosaur Egg"
+    assert visual_subject_for_topic(
         {"script_subject": "Cleopatra eyeliner poison"}, {"title": "Kohl"},
     ) == "Cleopatra eyeliner"
     assert visual_subject_for_topic(
