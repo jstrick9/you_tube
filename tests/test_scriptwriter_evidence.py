@@ -65,6 +65,12 @@ def test_visual_subject_resolves_nonvisual_modifiers_to_concrete_subjects():
     ) == "Mariana Trench"
 
 
+def test_plural_secret_framing_is_not_part_of_the_photographic_subject():
+    assert visual_subject_for_topic(
+        {"script_subject": "Skeleton Secrets!"}, {"title": "Bone remodeling"},
+    ) == "Skeleton"
+
+
 def test_abstract_deep_sea_exploration_is_not_mistaken_for_a_visual_subject():
     abstract = visual_subject_for_topic(
         {"script_subject": "Deep-sea exploration"}, {"title": "Deep-sea exploration"},

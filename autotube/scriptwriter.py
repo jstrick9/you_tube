@@ -722,7 +722,7 @@ _VISUAL_SUBJECT_MODIFIERS = frozenset("""
 a an after and are at ancient by crazy deep discovery discoveries discovered discover evolution evolving fast
 for from giant hidden huge impossible in into insane jump jumps jumping last lost goodbye farewell loves love massive mystery mysteries
 mysterious of old on or poison poisoned pressure sea ocean light lights green missile missiles launcher launchers
-secret shocking survive survives survival terrifying the to toxic unearthed venom weird with years year
+secret secrets shocking survive survives survival terrifying the to toxic unearthed venom weird with years year
 hundred hundreds thousand thousands million millions billion billions trillion trillions
 explore explored exploring exploration explorations observation observations research researching study studies
 call calls called calling sleep sleepy drowsy drowsiness detection warning warnings alert alerts
