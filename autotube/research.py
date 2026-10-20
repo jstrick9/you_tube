@@ -222,7 +222,8 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
 
     Wikipedia resolves and anchors the subject; `research.extra_sources` then widens what we can
     verify against (see autotube/sources.py). A narrow `research_query` may prioritize a matching
-    PubMed abstract without replacing Wikipedia or changing any evidence checks. Safety screening is
+    PubMed abstract and place it in the writer's bounded excerpt without replacing Wikipedia or changing
+    any evidence checks. Safety screening is
     context-aware (autotube/safety.py).
     """
     title = None
@@ -273,6 +274,8 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
     extra_credits: list[dict] = []
     rcfg = ((cfg or {}).get("research") or {})
     enabled = list(rcfg.get("extra_sources") or [])
+    specific_query = research_query.strip()[:180] if isinstance(research_query, str) else ""
+    specific_pubmed = bool(specific_query and "pubmed" in enabled)
     if enabled:
         # Always reach past Wikipedia, not only when the article is thin. A long article is exactly
         # the case where a NASA caption or a peer-reviewed abstract adds something Wikipedia lacks —
@@ -280,8 +283,7 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
         # itself part of not looking mass-produced. Long articles just get a smaller budget.
         full = int(rcfg.get("enrich_max_chars", 4000))
         budget = full if len(text) < int(rcfg.get("enrich_below_chars", 7000)) else max(1200, full // 3)
-        specific_query = research_query.strip()[:180] if isinstance(research_query, str) else ""
-        if specific_query and "pubmed" in enabled:
+        if specific_pubmed:
             # If the exact trend has a known primary paper, fetch it first with a tight query,
             # then let the other configured corpora use only the remaining character budget.
             # This avoids a broad "Dog" PubMed search winning the budget with unrelated abstracts.
@@ -298,7 +300,9 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
         if block:
             log.info("  %r → +%d chars from %s", title, len(block),
                      ", ".join(sorted({c["publisher"] for c in extra_credits})))
-            text = text + "\n" + block
+            # A specific primary abstract must not disappear beyond the writer's bounded source excerpt.
+            # Place it first for this narrow query; it remains labeled and still passes the same source checks.
+            text = f"{block}\n{text}" if specific_pubmed else text + "\n" + block
     if len(text) < 3000:
         # short article (common for viral oddities like "Hunger stone"): add what other articles say about it
         extra, also = mentions(title, lang)

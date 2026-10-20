@@ -49,6 +49,8 @@ def test_ground_prioritizes_exact_pubmed_query_and_spends_only_the_remaining_bud
     assert calls[1][0] == "Dog"
     assert "pubmed" not in calls[1][1]  # never spend the remaining budget on a broad PubMed search
     assert calls[1][2] < calls[0][2]
+    assert source["text"].startswith(primary)
+    assert source["text"][:2600].startswith(primary)  # even the lite model's excerpt sees the primary abstract
     assert "acceleration-driven open pumping" in source["text"] or "study details" in source["text"]
     assert any("PNAS" in credit["title"] for credit in source["also"])
 

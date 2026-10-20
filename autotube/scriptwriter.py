@@ -1804,7 +1804,7 @@ history. If the angle names a specific surprise, that surprise IS the video):
 {structure_line}{comment_line}{turn_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
 CHANNEL: {self.cfg['channel']['name']}
 {persona_line}
-SOURCE TEXT (Wikipedia: "{source['title']}") — the ONLY allowed source of facts:
+GROUNDED SOURCE TEXT (Wikipedia anchor: "{source['title']}"; supplementary passages are labeled inline) — the ONLY allowed factual source material. Preserve the source attribution from each labeled passage:
 \"\"\"{source['text'][:self.src_chars]}\"\"\"
 
 {HOOK_RULES.format(hook_min=ccfg.get('hook_words_min', 6), hook_max=ccfg.get('hook_words_max', 9))}
