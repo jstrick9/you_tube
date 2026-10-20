@@ -11,33 +11,33 @@
     "groq": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-20T15:11:40.403380+00:00",
-      "blocked_until": "2026-10-20T15:31:40.403380+00:00",
-      "retry_after_seconds": 30.0
-    },
-    "cloudflare": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-20T15:12:09.648456+00:00",
-      "blocked_until": "2026-10-20T15:32:09.648456+00:00"
+      "recorded_at": "2026-10-20T15:52:12.826618+00:00",
+      "blocked_until": "2026-10-20T16:12:12.826618+00:00",
+      "retry_after_seconds": 43.0
     },
     "gemini": {
       "reason": "repeated_http_5xx",
       "status_code": 503,
-      "recorded_at": "2026-10-20T15:17:03.782987+00:00",
-      "blocked_until": "2026-10-20T15:27:03.782987+00:00"
+      "recorded_at": "2026-10-20T15:54:21.133120+00:00",
+      "blocked_until": "2026-10-20T16:04:21.133120+00:00"
     },
     "mistral": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-20T15:17:10.298525+00:00",
-      "blocked_until": "2026-10-20T15:37:10.298525+00:00"
+      "recorded_at": "2026-10-20T15:54:27.563731+00:00",
+      "blocked_until": "2026-10-20T16:14:27.563731+00:00"
+    },
+    "cloudflare": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-20T15:54:33.884303+00:00",
+      "blocked_until": "2026-10-20T16:14:33.884303+00:00"
     }
   },
   "failures_5xx": {
     "gemini": {
       "count": 3,
-      "last_at": "2026-10-20T15:17:03.782969+00:00"
+      "last_at": "2026-10-20T15:54:21.133097+00:00"
     }
   }
 }
