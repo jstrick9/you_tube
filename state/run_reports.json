@@ -1,191 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261017-014254-3613",
-    "workflow_run_id": "38991931776",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-17T01:42:54.132775+00:00",
-    "finished_at": "2026-10-17T02:01:46.833303+00:00",
-    "duration_seconds": 1132.701,
-    "mode": "dry_run",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 3,
-      "script_research": 6,
-      "script_draft": 3,
-      "script_review": 2,
-      "tts": 1,
-      "visuals": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "This Shark Was Born Before America Even Existed",
-        "topic_key": "this shark was born before america even existed",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "This Jeep Could Launch A Nuke",
-        "topic_key": "this jeep could launch a nuke",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Voyager 1's Last Goodbye, The Loneliest Spacecraft",
-        "topic_key": "voyager 1s last goodbye the loneliest spacecraft",
-        "outcome": "rejected",
-        "stage": "visuals",
-        "failure_category": "vision_unavailable"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-17T01:44:47.993921+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-17T01:44:47.993984+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-17T01:47:15.593085+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-17T01:50:30.809059+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-17T01:50:30.809214+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-17T01:53:09.732915+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-17T02:01:46.830471+00:00",
-        "stage": "visuals",
-        "category": "vision_unavailable",
-        "exception_type": "VisionUnavailable",
-        "attempt": 3
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-17T01:42:54.164558+00:00",
-        "cooldown_until": "2026-10-17T01:52:33.373195+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-17T01:43:30.513549+00:00",
-        "cooldown_until": "2026-10-17T02:03:30.512943+00:00",
-        "retry_after_seconds": 27.0
-      },
-      {
-        "provider": "cloudflare",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-17T01:43:57.848208+00:00",
-        "cooldown_until": "2026-10-17T02:03:57.847592+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-17T01:44:58.758186+00:00",
-        "cooldown_until": "2026-10-17T02:04:58.757563+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-17T01:45:05.271366+00:00",
-        "cooldown_until": "2026-10-17T02:05:05.270835+00:00"
-      },
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "circuit_open",
-        "at": "2026-10-17T01:53:09.732715+00:00",
-        "cooldown_until": "2026-10-18T01:53:09.732122+00:00",
-        "retry_after_seconds": 10.0
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-17T02:01:46.830205+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct",
-      "gemini:gemini-flash-latest",
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261017-041705-3644",
     "workflow_run_id": "39001866788",
     "workflow_run_attempt": "1",
@@ -4751,6 +4566,147 @@
     "top_up": true,
     "rate_limited_models": [
       "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261020-190241-3629",
+    "workflow_run_id": "39479846663",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-20T19:02:41.512343+00:00",
+    "finished_at": "2026-10-20T19:08:56.042358+00:00",
+    "duration_seconds": 374.53,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 2,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 1,
+      "script_research": 2,
+      "script_draft": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Dog Paani Kaise Peeta Hai? Tongue Ka Asli Secret!",
+        "topic_key": "dog paani kaise peeta hai tongue ka asli secret",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-20T19:08:56.036861+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-20T19:08:56.037043+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-20T19:08:56.037382+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-20T19:02:41.514046+00:00",
+        "cooldown_until": "2026-10-21T05:12:25.676374+00:00"
+      },
+      {
+        "provider": "cloudflare",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-20T19:03:10.039913+00:00",
+        "cooldown_until": "2026-10-20T19:23:10.039324+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-20T19:05:10.230620+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-20T19:06:23.510762+00:00",
+        "cooldown_until": "2026-10-20T19:26:23.510118+00:00",
+        "retry_after_seconds": 39.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-20T19:06:24.010548+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-20T19:06:32.662014+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-20T19:06:33.611426+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "route_circuit_open",
+        "at": "2026-10-20T19:06:33.612096+00:00",
+        "cooldown_until": "2026-10-20T19:16:33.611467+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-20T19:06:40.072238+00:00",
+        "cooldown_until": "2026-10-20T19:26:40.071623+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct",
       "groq:openai/gpt-oss-120b",
       "mistral:mistral-small-latest"
     ]

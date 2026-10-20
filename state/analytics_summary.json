@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-20T15:51:50.177772+00:00",
+  "updated": "2026-10-20T19:02:40.595232+00:00",
   "videos_total": 43,
   "videos_7d": 0,
   "views_7d": 0,
@@ -466,8 +466,8 @@
     "n": 33,
     "gate_pct": 70.0,
     "metric": "average_view_percentage",
-    "passing": 10,
-    "pass_rate": 0.303,
+    "passing": 11,
+    "pass_rate": 0.333,
     "median_avg_view_pct": 59.43,
     "learning_qualified": {
       "minimum_sample_views": 50,
@@ -478,18 +478,18 @@
       "median_avg_view_pct": 57.83
     },
     "provisional_n": 5,
-    "provisional_below_target": 3,
-    "verdict": "10/33 measured videos clear the internal 70% average-view target (median 59%). This is average watch percentage, not the share of viewers who reached the end. 28/33 meet the configured ≥50-view learning sample; 5 low- or unknown-sample reading(s) are provisional."
+    "provisional_below_target": 2,
+    "verdict": "11/33 measured videos clear the internal 70% average-view target (median 59%). This is average watch percentage, not the share of viewers who reached the end. 28/33 meet the configured ≥50-view learning sample; 5 low- or unknown-sample reading(s) are provisional."
   },
   "average_view_watchlist": {
     "gate_pct": 70.0,
     "minimum_sample_views": 50,
     "evaluated": 33,
-    "below_target": 23,
+    "below_target": 22,
     "qualified_evaluated": 28,
     "qualified_below_target": 20,
     "provisional_evaluated": 5,
-    "provisional_below_target": 3,
+    "provisional_below_target": 2,
     "shown": 10,
     "videos": [
       {
@@ -656,7 +656,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10089,
+    "views_90d": 10090,
     "per_1k_views": 2.68,
     "videos": 34,
     "denominator_basis": "engaged_views",
@@ -667,7 +667,7 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10089,
+    "engaged_views_90d": 10090,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
