@@ -25,7 +25,6 @@ SCRIPT = {
         {"text": "The river itself warns you when the drought returns",
          "evidence": "Hunger stones were embedded into a river to commemorate droughts"},
         {"text": "That inscription tells river travellers to weep when the stone appears",
-         "aside": "Cheerful bunch.",
          "evidence": "One stone in the Elbe reads 'If you see me, then weep'"},
         {"text": "Severe droughts expose these warnings when the riverbed falls into view",
          "evidence": "People carved the stones during severe droughts when the water level was low"},
@@ -41,15 +40,16 @@ class ReviewLLM:
     lite = False
     last_used = "fake:review"
 
-    def __init__(self, coherence=8):
+    def __init__(self, coherence=8, naturalness=9):
         self.coherence = coherence
+        self.naturalness = naturalness
 
     def json(self, system, user, **kwargs):
         result = {
             "score": 9,
             "hook_strength": 9,
             "entertainment": 8,
-            "coherence": self.coherence,
+            "coherence": self.coherence, "naturalness": self.naturalness,
             "factual_errors": [],
             "misleading_title": False,
             "advertiser_friendly": True,
@@ -63,10 +63,11 @@ class ReviewLLM:
         return result
 
 
-def _writer(coherence):
+def _writer(coherence, naturalness=9):
     cfg = copy.deepcopy(load_config())
     cfg["content"]["min_coherence"] = 6
-    writer = ScriptWriter(cfg, ReviewLLM(coherence), object())
+    cfg["content"]["min_naturalness"] = 8
+    writer = ScriptWriter(cfg, ReviewLLM(coherence, naturalness), object())
     writer._history = []
     return writer
 
@@ -86,6 +87,22 @@ def test_coherence_at_the_configured_threshold_can_pass():
     assert ok, review
     assert review["coherence"] == 6
     assert len(writer._history) == 1
+
+
+def test_low_naturalness_fails_even_when_the_story_and_facts_pass():
+    writer = _writer(8, naturalness=7)
+    ok, review = writer.check(copy.deepcopy(SCRIPT), SOURCE)
+    assert not ok
+    assert review["naturalness"] == 7
+    assert any("unnatural or fragmentary" in issue for issue in review["issues"])
+    assert writer._history == [], "unnatural narration must not be registered as approved"
+
+
+def test_naturalness_at_its_configured_floor_can_pass():
+    writer = _writer(8, naturalness=8)
+    ok, review = writer.check(copy.deepcopy(SCRIPT), SOURCE)
+    assert ok, review
+    assert review["naturalness"] == 8
 
 
 def test_missing_coherence_score_fails_closed():

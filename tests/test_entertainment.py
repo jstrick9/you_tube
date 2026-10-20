@@ -1,5 +1,4 @@
-"""Entertainment layer: persona asides (jokes never smuggle in facts), formats that fit the topic, seasonal formats,
-kinetic captions (count-ups, reveal flash, countdown, PROVEN stamp) and procedural sound effects."""
+"""Entertainment layer: natural persona, topic-fitting formats, kinetic captions and procedural sound effects."""
 import sys
 import wave
 from pathlib import Path
@@ -52,7 +51,7 @@ class ReviewLLM:
 
     def json(self, system, user, **kw):
         self.prompts.append(user)
-        o = {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "loops": True,
+        o = {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "naturalness": 9, "loops": True,
              "factual_errors": [], "policy_concerns": [], "misleading_title": False,
              "advertiser_friendly": True,
              "value_add": "The viewer learns how hunger stones recorded droughts.", "fixes": []}
@@ -81,13 +80,12 @@ def _script(aside):
     ]}
 
 
-def test_reviewer_sees_asides_labelled_as_jokes():
+def test_detached_aside_is_rejected_before_the_reviewer():
     llm = ReviewLLM()
     ok, review = ScriptWriter(CFG, llm, Strat()).check(_script("Cheerful bunch."), SOURCE)
-    assert ok, review
-    p = llm.prompts[-1]
-    assert "[ASIDE - joke/opinion, not a factual claim] Cheerful bunch." in p
-    assert "ASIDES are humour, not claims" in p and "entertainment" in p
+    assert not ok
+    assert any("detached asides are disabled" in issue for issue in review["issues"])
+    assert not llm.prompts, "a fragmentary aside should fail before spending a review call"
 
 
 def test_numbers_in_asides_are_still_fact_checked():
@@ -341,7 +339,7 @@ def test_flat_scripts_are_rewritten():
             o = super().json(system, user, **kw)
             o["entertainment"] = 5
             return o
-    ok, review = ScriptWriter(CFG, Flat(), Strat()).check(_script("Cheerful bunch."), SOURCE)
+    ok, review = ScriptWriter(CFG, Flat(), Strat()).check(_script(""), SOURCE)
     assert not ok and any("not entertaining enough" in i for i in review["issues"])
 
 

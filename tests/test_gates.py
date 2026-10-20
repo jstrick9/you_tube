@@ -231,13 +231,13 @@ def test_scriptwriter_flags_a_non_independent_review():
 
         def review_json(self, system, user, avoid=None, **kw):
             self.user = user
-            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8,
+            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8, "naturalness": 9,
                     "loops": True, "factual_errors": [], "misleading_title": False,
                     "advertiser_friendly": True, "policy_concerns": [],
                     "value_add": "A concise explanation of how the hive dries nectar.", "fixes": []}
 
         def json(self, *a, **k):
-            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8,
+            return {"score": 9, "hook_strength": 9, "entertainment": 9, "coherence": 8, "naturalness": 9,
                     "loops": True, "factual_errors": [], "misleading_title": False,
                     "advertiser_friendly": True, "policy_concerns": [],
                     "value_add": "A concise explanation of how the hive dries nectar.", "fixes": []}
@@ -249,7 +249,7 @@ def test_scriptwriter_flags_a_non_independent_review():
     src = {"title": "Bees", "text": "Bees make honey from nectar and visit two million flowers for one honey jar. " * 30}
     script = {"title": "Honey", "_writer_model": "gemini:g-1", "segments": [
         {"text": "Bees visit two million flowers for one honey jar"},
-        {"text": "A worker bee makes one twelfth of a teaspoon in life", "aside": "Busy little things."},
+        {"text": "A worker bee makes one twelfth of a teaspoon in life"},
         {"text": "The hive fans its wings to dry the nectar down"},
         {"text": "so the jar in your cupboard will never spoil"}]}
     ok, review = w.check(script, src)

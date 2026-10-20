@@ -563,6 +563,7 @@ def _passing_review_scores(review: dict, cfg: dict) -> dict[str, dict[str, float
         "hook_strength": content.get("min_hook_score", 7),
         "entertainment": content.get("min_entertainment", 6),
         "coherence": content.get("min_coherence", 6),
+        "naturalness": content.get("min_naturalness", 8),
         "trend_alignment": content.get("min_trend_alignment", 8),
     }
     passed = {}
@@ -615,7 +616,7 @@ def reviewer_schema_issues(value, has_trend: bool = False) -> list[str]:
     if not isinstance(value, dict):
         return ["response must be a JSON object"]
     issues = []
-    for key in ("score", "hook_strength", "entertainment", "coherence"):
+    for key in ("score", "hook_strength", "entertainment", "coherence", "naturalness"):
         number = value.get(key)
         if not _valid_review_score(number):
             issues.append(f"{key} must be a finite number from 0 to 10")
@@ -1631,7 +1632,9 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                 "finish on a new, surprising source-backed fact or outcome that completes the concrete curiosity gap; "
                 "no call to action")
         persona = self.cfg.get("persona") or {}
-        max_asides = int(persona.get("max_asides", 2)) if persona.get("asides", True) else 0
+        # Detached two-to-five-word jokes produced clipped captions and awkward voiceover.
+        # Keep optional asides disabled; humour must come naturally from the actual explanation.
+        max_asides = 0
         # The series remit, so episodes conform to the show's promise rather than merely
         # carrying its label. Without this the numbering is a prefix stapled to whatever
         # the trend feed produced, which is the opposite of what a series is for.
@@ -1644,17 +1647,9 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
         reveal_rule = ('  "reveal": true on exactly ONE segment — the line with the biggest surprise/answer/twist (the video adds '
                        'a beat of silence, a riser and a flash right before it). Never the hook; usually the last BODY line.\n')
         aside_rule = (
-            f'  "aside" (REQUIRED: at least 1, at most {max_asides} in the whole script, never on the hook): a 2-5 word deadpan\n'
-            '     reaction the narrator says right AFTER that line. If using a second aside, keep all aside words combined\n'
-            '     to 8 or fewer so sourced narration keeps the word budget. It MUST react to something specific in THAT\n'
-            '     line - name the thing, the number or the absurdity it just described. A reaction that would fit\n'
-            '     any video at all ("Nature, please.", "Rude.", "Bold plan.", "No airbags.") is generic filler: it spends\n'
-            '     words without adding a topic-specific reaction. Reusing canned reactions weakens the episode\'s\n'
-            '     distinct voice; this is an internal writing standard, not a fixed YouTube policy threshold. It is a\n'
-            '     JOKE/OPINION ONLY: no facts, numbers, names, dates or claims; never mean about real people, groups or\n'
-            '     victims; family-friendly. Include a specific narrator reaction so the script sounds like Archive 13,\n'
-            '     not a bare list of sourced facts. Make it actually funny.\n'
-        ) if max_asides else ""
+            '  "aside": "" — no detached commentary or one-off joke fragments; keep every spoken word in the\n'
+            '     connected, complete-sentence narration.\n'
+        )
         # A living person reached this point only because safety.check_person approved one specific
         # professional angle. The writer has to be told what that angle is, or the model will drift
         # back to whatever made the person trend — which is usually the thing we just refused.
@@ -1776,7 +1771,8 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
         prior_scores = topic.get("_prior_review_scores")
         score_labels = {
             "score": "overall quality", "hook_strength": "hook", "entertainment": "entertainment",
-            "coherence": "story coherence", "trend_alignment": "current-trend alignment",
+            "coherence": "story coherence", "naturalness": "spoken naturalness",
+            "trend_alignment": "current-trend alignment",
         }
         score_rows = []
         if isinstance(prior_scores, dict):
@@ -1803,7 +1799,7 @@ history. If the angle names a specific surprise, that surprise IS the video):
 {feedback_line}{prior_line}{prior_scores_line}FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
 {hook_line}
 {structure_line}{comment_line}{turn_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
-WORD-BUDGET PLAN: Aim for 44-48 spoken words TOTAL, including every aside; do not write to the ceiling. For five beats, a feasible count is roughly 7 hook + 9 turn + 9 + 9 escalation + 7 payoff + one 3-word aside = 44. For four beats, reallocate within each beat's stated limits. Use one specific 2-5 word aside (or two totaling no more than 8 words), then count all text and asides together before returning JSON.
+WORD-BUDGET PLAN: Aim for 44-48 spoken words TOTAL, with no asides. Use five complete conversational sentences; a workable plan is 8-9 words for the hook, 9-11 for each middle beat, and 6-9 for the payoff. For four beats, reallocate within the stated per-beat limits. Count every spoken word, then read the whole narration aloud before returning JSON.
 CHANNEL: {self.cfg['channel']['name']}
 {persona_line}
 GROUNDED SOURCE TEXT (Wikipedia anchor: "{source['title']}"; supplementary passages are labeled inline) — the ONLY allowed factual source material. Preserve the source attribution from each labeled passage:
@@ -1811,6 +1807,13 @@ GROUNDED SOURCE TEXT (Wikipedia anchor: "{source['title']}"; supplementary passa
 
 {HOOK_RULES.format(hook_min=ccfg.get('hook_words_min', 6), hook_max=ccfg.get('hook_words_max', 9))}
 {retention_guidance(self.cfg)}
+VOICE DELIVERY — HARD REQUIREMENT: This is a person explaining one idea aloud, not notes for an editor. Write
+natural, everyday spoken English. Every segment must be one complete sentence with a clear subject and verb; the
+sentences must connect smoothly when read as one short paragraph. No fragments, headline phrasing, noun labels,
+telegraphic clauses, or abrupt jargon. Prefer familiar words and active verbs. If a scientific term is essential,
+explain what it means in the same sentence. Do not force jokes, asides, or commentary. The viewer should understand
+what is happening, how it works, and why the final fact matters without relying on the title or captions.
+
 Write the script as exactly 4 or 5 segments. Prefer exactly FIVE by default, in this
 order: HOOK, TURN, ESCALATION, ESCALATION, PAYOFF. FOUR is allowed only when one
 escalation is enough; never return fewer than four. Each beat has a DIFFERENT job — do not
@@ -1845,14 +1848,14 @@ Create ONE concrete curiosity gap from the source-backed hook and close it in th
 optional. Segment 2 must add new value, not repeat the hook or explain basic background. Do not withhold the
 subject's identity just to manufacture suspense.
 The trend subject and angle are discovery labels, not factual sources — do NOT repeat their claims or numbers unless the SOURCE TEXT states them.
-{person_rule}{series_rule}{lane_rule}ENTERTAIN: write it like a friend telling the most unbelievable true story they know — conversational, vivid, with
-comic timing and personality (reactions, contrast, "and it gets worse"). The facts stay 100% exact; the humour comes
-from HOW you tell them and from the asides, never from changing what happened.
-TOTAL narration (text + asides) MUST be {words_lo}-{words_hi} words — that is about {per_seg} words per segment,
-which is ONE short spoken sentence each, not two. Both ends are rejected: too short AND too long.
-The factual "text" in every turn/escalation must independently contain {body_min}-{body_max} words, and the payoff text
-{payoff_min}-{payoff_max}; asides do not count toward those beat ranges. Every beat must be a complete, grammatical
-sentence. Never end on a fragment such as "All 215 million years ago".
+{person_rule}{series_rule}{lane_rule}ENTERTAIN: write it like a friend explaining an unbelievable true detail — conversational, vivid, and easy to follow.
+Use natural transitions and a clear contrast or consequence; do not rely on detached jokes or stock reactions. Facts stay
+100% exact, and every line must sound natural when spoken aloud.
+TOTAL narration MUST be {words_lo}-{words_hi} words — that is about {per_seg} words per segment, which is ONE short,
+complete spoken sentence each, not a label or fragment. Both ends are rejected: too short AND too long.
+Each turn/escalation sentence must independently contain {body_min}-{body_max} spoken words, and the payoff
+{payoff_min}-{payoff_max}. Every beat must be one complete, grammatical sentence with a clear subject and action;
+never end on a fragment such as "All 215 million years ago". The "aside" field must remain an empty string.
 The ceiling is the hard one. Write the whole thing, then count, then cut until it fits before you answer.
 For each segment give:
   "text": the spoken line (facts),
@@ -1872,9 +1875,11 @@ For each segment give:
                 Hook/CTA: show the main subject.
   "evidence": a VERBATIM {ev_len} word quote copied from the SOURCE TEXT that supports the segment ("" only for hook/CTA).
 
-FINAL SHAPE CHECK before emitting JSON: use five beats unless four is editorially cleaner;
-never use three. Repeat the full segment object shape for every beat. No segment may omit
-its visual object: each needs a non-empty "shows" string and 2-3 non-empty query strings.
+FINAL SHAPE CHECK before emitting JSON: use five beats unless four is editorially cleaner; never use three.
+Repeat the full segment object shape for every beat. Read every "text" field aloud, in sequence, as one paragraph.
+Rewrite anything that sounds like notes, fragments, an odd word choice, a broken transition, or a sentence a person would not naturally say. Confirm every line explains the same concrete thing shown in that segment's "visual.shows"; do not promise one subject and show another. Confirm names, actions, and facts are accurate to SOURCE TEXT, and that no line requires the title or captions to make sense. Only then return the JSON.
+every segment must be a complete natural sentence, each sentence must lead clearly to the next, and every aside
+must be empty. No segment may omit its visual object: each needs a non-empty "shows" string and 2-3 non-empty query strings.
 Keep each evidence value a string; use an empty string only for the hook/CTA.
 
 Return JSON:
@@ -1896,6 +1901,12 @@ Return JSON:
             assert all(isinstance(s, dict) for s in segs), "every segment must be a JSON object"
             assert all(isinstance(s.get("text"), str) and s["text"].strip() for s in segs), "empty segment"
             assert all("aside" not in s or isinstance(s["aside"], str) for s in segs), "aside must be text"
+            assert all(not str(s.get("aside") or "").strip() for s in segs), (
+                "detached asides are disabled; write the idea as one natural, complete narration sentence instead")
+            incomplete = [i + 1 for i, s in enumerate(segs)
+                          if not re.search(r"[.!?][\"'’”)}\]]*$", s["text"].strip())]
+            assert not incomplete, (
+                f"segments {incomplete} do not end as complete sentences; write one full spoken sentence per beat")
             evidence_min, evidence_max = (5, 9) if self.llm.lite else (8, 15)
             attached_evidence = _attach_missing_evidence(
                 segs, str(source.get("text") or ""), evidence_min, evidence_max)
@@ -2047,6 +2058,8 @@ Write YouTube metadata for this Short. Return JSON:
         # numbers + blocked words are checked on EVERYTHING spoken (asides included); evidence only on facts
         narration = " ".join(spoken_text(s) for s in script["segments"])
         issues = []
+        if any(str(seg.get("aside") or "").strip() for seg in script.get("segments", []) if isinstance(seg, dict)):
+            issues.append("detached asides are disabled; every spoken line must be a complete narration sentence")
         trend_angle = str((topic or {}).get("angle") or "").strip()
         if topic is not None and not trend_angle:
             issues.append("no specific current-trend angle was supplied; do not publish a generic subject video")
@@ -2157,6 +2170,7 @@ The script must deliver the selected angle, not just repeat the trend headline o
             "min_hook": content_cfg.get("min_hook_score", 7),
             "min_ent": content_cfg.get("min_entertainment", 6),
             "min_coh": content_cfg.get("min_coherence", 6),
+            "min_nat": content_cfg.get("min_naturalness", 8),
             "min_alignment": content_cfg.get("min_trend_alignment", 8),
             "min_review": compliance_cfg.get("quality_gate_min_score", 7),
         }
@@ -2166,6 +2180,7 @@ The script must deliver the selected angle, not just repeat the trend headline o
         min_hook = float(thresholds["min_hook"])
         min_ent = float(thresholds["min_ent"])
         min_coh = float(thresholds["min_coh"])
+        min_naturalness = float(thresholds["min_nat"])
         min_trend_alignment = float(thresholds["min_alignment"])
         min_review_score = float(thresholds["min_review"])
         trend_rubric = (f"\ntrend_alignment — score whether the script tells the CURRENT TREND CONTEXT's specific selected angle, not merely its broad topic. "
@@ -2182,14 +2197,14 @@ The script must deliver the selected angle, not just repeat the trend headline o
         user = f"""{trend_context}{turn_context}SOURCE TEXT:\n\"\"\"{source['text'][:self.src_chars]}\"\"\"\n
 SCRIPT TITLE: {script['title']}
 SCRIPT DESCRIPTION: {script.get('description', '')}
-SCRIPT NARRATION (lines marked ASIDE are the narrator's jokes, spoken right after the line above them):
+SCRIPT NARRATION (read as one continuous spoken explanation):
 {narration_list}
 
 Evaluate. Verify that the script offers a specific viewer takeaway and an original treatment in its own words, not a bare restatement of the headline or a close copy of source phrasing. If you cannot identify a concrete takeaway, leave value_add empty; if originality is doubtful, say so in policy_concerns or fixes.
 TITLE-CONTENT GATE: compare the title with the spoken narration itself, not the description or source article. Set misleading_title=true if any concrete promise or answer is missing, unsupported, or only implied. A title framed as “How X survives/works” must explain the mechanism; “Why X” must give the reason. Broad subject overlap is not enough.
 Return JSON: {{"factual_errors": ["..."], "misleading_title": true|false, "advertiser_friendly": true|false,
 "policy_concerns": ["..."], "value_add": "<specific takeaway the viewer learns>", "hook_strength": 0-10, "entertainment": 0-10,
-"score": 0-10, "loops": true|false, "coherence": 0-10{trend_schema},
+"score": 0-10, "loops": true|false, "coherence": 0-10, "naturalness": 0-10{trend_schema},
 "turn_strength": 0-10 or null, "turn_strength_reason": "one concise explanation or empty string", "fixes": ["..."]}}
 Score 9-10 = accurate, engaging, clearly valuable; 7-8 = good; below {min_review_score:g} = do not publish.
 turn_strength is optional TELEMETRY ONLY: score segment 2 (TURN) for immediacy, source-backed escalation and whether it follows its assigned treatment. 0-3 = setup/repetition/delayed, 4-6 = some progress but soft or padded, 7-8 = immediate and clearly escalates, 9-10 = unusually sharp and fully delivered. It must not change approval, the overall score, or "fixes"; do not add a fix solely for this diagnostic. Return null/empty if it cannot be judged. Missing or malformed turn fields are ignored.
@@ -2203,16 +2218,21 @@ reordered without the script breaking: if they could, it is a list. 8-10 = each 
 themed, some connective tissue. 0-3 = unrelated facts in a row (Egypt built pyramids / used Nile flooding /
 signed a peace treaty). A list of true facts is accurate and still unwatchable, so score it on structure, not
 truth, and put the re-ordering or the missing causal link in "fixes". Need at least {min_coh:g}/10.
+naturalness — read the full narration aloud as a viewer would hear it. Score 9-10 when every beat is a complete,
+conversational sentence and the sequence sounds like one person clearly explaining one idea. Score 8 when it is
+natural and understandable with only minor stiffness. Score 6-7 for clipped wording, unnatural phrasing, unexplained
+technical terms, or weak transitions. Score 0-5 for fragments, note-like labels, confusing grammar, or sentences
+that do not make sense when spoken. Need at least {min_naturalness:g}/10. If below the floor, put the exact awkward or
+fragmentary lines in "fixes" and offer complete natural rewrites without changing any facts.
 Read EVERY sentence literally, word by word: if its literal meaning is false or garbled (e.g. the wrong subject doing
 the action — "rivers carved warnings" when people carved them; a date or place attached to the wrong thing), list
 it in factual_errors even if the gist is right.
-ASIDES are humour, not claims: never list an aside in factual_errors for being a joke, exaggerated opinion or
-sarcasm. Put an aside in policy_concerns ONLY if it states a new specific fact as true, mocks real people, groups,
-victims or a tragedy, or is not family-friendly. A joke must never change what the facts say.
+No detached aside should appear; judge only the complete narration sentences. Any fragment or awkward spoken line
+must lower naturalness and be named in "fixes" even when its factual gist is correct.
 entertainment — BE HARSH, this channel competes with comedians: a list of accurate facts read in a neutral tone is 5
 at most, however interesting. 7 = has a story shape (setup, escalation, payoff) and personality. 8 = also at least one
 genuinely funny or gasp-out-loud moment. 9-10 = you would send it to a friend. If entertainment < {min_ent:g}, put a concrete TRUE rewrite
-idea in "fixes" (story tension, comic contrast, a sharper aside, a stronger reveal).
+idea in "fixes" (story tension, natural contrast, clearer explanation, or a stronger reveal).
 hook_strength: 9-10 = the first line is concise, specific and surprising, and by beat two the viewer can name the
 subject without relying on the title; 7-8 = decent; <=6 = vague, overlong, generic, or slow setup. A literal question
 is optional; clarity and an immediate source-backed reason to keep watching are not.
@@ -2305,6 +2325,13 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
                 f"this is a list of facts, not a story ({coh:.0f}/10, need {min_coh:.0f}) — "
                 "make each line follow from the one before it: because of it, despite it, or "
                 "revealing what it really meant")
+        naturalness = float(r["naturalness"])
+        review["naturalness"] = naturalness
+        if naturalness < min_naturalness:
+            review["issues"].append(
+                f"spoken narration is unnatural or fragmentary ({naturalness:.0f}/10, need {min_naturalness:.0f}) — "
+                "rewrite it as complete, conversational sentences a person would naturally say aloud; "
+                "use plain words and explain the idea clearly")
         loops = r.get("loops")
         review["loops"] = loops
         if loops is False and self.cfg["content"].get("require_loop", False):
@@ -2318,14 +2345,15 @@ Be internally consistent: if a fix says the last line must be rewritten to loop,
             review["issues"].append(fix_issue)
         llm_issues = r.get("issues", [])
         review_issues = list(review.get("issues") or []) + [x.strip() for x in llm_issues if x.strip()]
-        ok = (ent >= min_ent and hook >= min_hook and coh >= min_coh and alignment_ok
+        ok = (ent >= min_ent and hook >= min_hook and coh >= min_coh
+              and naturalness >= min_naturalness and alignment_ok
               and score >= min_review_score and not r["factual_errors"]
               and not r["misleading_title"] and r["advertiser_friendly"]
               and not r["policy_concerns"] and not fixes and not review_issues)
         # Preserve only reviewer decisions we explicitly validate. Extra provider keys must not
         # overwrite orchestration metadata such as reviewer identity, independence, or availability.
         for key in ("score", "hook_strength", "entertainment", "factual_errors", "misleading_title",
-                    "advertiser_friendly", "policy_concerns", "value_add", "loops"):
+                    "advertiser_friendly", "policy_concerns", "value_add", "loops", "naturalness"):
             review[key] = r[key]
         # Optional diagnostic only: deliberately normalized after `ok` is decided, so a missing,
         # string-valued, NaN, or out-of-range turn score cannot become a new publication veto.

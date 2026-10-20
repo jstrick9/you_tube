@@ -56,16 +56,18 @@ def test_chunks_are_in_ascending_time_order(text):
     assert starts == sorted(starts)
 
 
-def test_the_payoff_word_is_not_stranded_alone():
-    chunks = _chunk_words(mk("Whatever lives down there evolved completely alone."))
-    assert words_of(chunks[-1]) == "completely alone."
+def test_a_complete_sentence_is_kept_on_one_caption_card():
+    sentence = "Whatever lives down there evolved completely alone."
+    chunks = _chunk_words(mk(sentence))
+    assert len(chunks) == 1
+    assert words_of(chunks[0]) == sentence
 
 
-def test_a_card_does_not_end_on_a_dangling_function_word_when_it_can_be_moved():
-    chunks = _chunk_words(mk("A lake sealed off from the sky for fifteen million years."))
-    texts = [words_of(c) for c in chunks]
-    assert "from the sky for" not in texts
-    assert any(t.startswith("for ") for t in texts), texts
+def test_a_complete_sentence_is_not_split_after_a_function_word():
+    sentence = "A lake sealed off from the sky for fifteen million years."
+    chunks = _chunk_words(mk(sentence))
+    assert len(chunks) == 1
+    assert words_of(chunks[0]) == sentence
 
 
 def test_asides_are_never_merged_into_a_spoken_card():
@@ -78,6 +80,26 @@ def test_asides_are_never_merged_into_a_spoken_card():
 def test_chunker_handles_degenerate_input():
     assert _chunk_words([]) == []
     assert len(_chunk_words(mk("Wow."))) == 1
+
+
+def test_full_sentence_remains_visible_across_karaoke_highlights(tmp_path):
+    from autotube import render
+
+    sentence = "Dogs curl their tongues backward to pull up water."
+    segs, t = [], 0.0
+    ws = []
+    for word in sentence.split():
+        ws.append({"word": word, "start": round(t, 2), "end": round(t + 0.3, 2)})
+        t += 0.3
+    segs.append({"text": sentence, "start": 0.0, "end": round(t, 2), "words": ws})
+    out = render.build_ass(segs, "DOGS DRINK DIFFERENTLY", "Archive 13", 1080, 1920,
+                           render.THEMES[0], "Anton", tmp_path / "whole-sentence.ass", t,
+                           fx={"kinetic": True}, arch=render.ARCHETYPES[0])
+    events = [line for line in out.read_text().split("[Events]")[1].splitlines() if ",Cap," in line]
+    assert events
+    for event in events:
+        visible = re.sub(r"\{[^}]*\}", "", event).upper()
+        assert sentence.upper() in visible, f"caption broke the spoken sentence: {event}"
 
 
 # ── hook card ────────────────────────────────────────────────────────────────

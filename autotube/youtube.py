@@ -14,6 +14,7 @@ from __future__ import annotations
 import logging
 import math
 import os
+import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,6 +30,7 @@ DELETE_SCOPE = "https://www.googleapis.com/auth/youtube.force-ssl"
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube.readonly",
+    DELETE_SCOPE,
     "https://www.googleapis.com/auth/yt-analytics.readonly",
 ]
 
@@ -70,6 +72,54 @@ def video_status(video_id: str) -> dict | None:
         "publish_at": status.get("publishAt"),
         "rejection_reason": status.get("rejectionReason"),
     }
+
+
+def granted_scopes() -> set[str]:
+    """Read scopes from Google's tokeninfo endpoint; the OAuth object was intentionally created with scopes=None."""
+    creds = credentials()
+    from .common import http
+
+    response = http().get("https://oauth2.googleapis.com/tokeninfo",
+                          params={"access_token": creds.token}, timeout=15)
+    response.raise_for_status()
+    info = response.json()
+    return set(str(info.get("scope") or "").split())
+
+
+def unschedule(video_id: str) -> dict:
+    """Make a video private and clear any scheduled publish time, then verify the readback.
+
+    This is a narrow corrective action for an existing upload. It never deletes the video or changes its
+    title/description. YouTube requires youtube.force-ssl (or the broader youtube scope) for videos.update.
+    """
+    video_id = str(video_id or "").strip()
+    if not re.fullmatch(r"[A-Za-z0-9_-]{11}", video_id):
+        raise ValueError("video_id must be an 11-character YouTube ID")
+    scopes = granted_scopes()
+    if not ({DELETE_SCOPE, "https://www.googleapis.com/auth/youtube"} & scopes):
+        raise RuntimeError("YouTube token lacks youtube.force-ssl; re-authorize with that scope before modifying an existing video")
+
+    yt = service()
+    items = yt.videos().list(part="status", id=video_id, maxResults=1).execute().get("items", [])
+    if not items:
+        raise RuntimeError(f"YouTube returned no video resource for {video_id}; nothing was changed")
+    current = items[0].get("status") or {}
+    # videos.update replaces mutable fields in the requested part. Preserve the channel's existing
+    # disclosure, license, and display settings while omitting publishAt to cancel the schedule.
+    mutable = ("privacyStatus", "license", "embeddable", "publicStatsViewable",
+               "selfDeclaredMadeForKids", "containsSyntheticMedia")
+    updated = {key: current[key] for key in mutable if key in current}
+    updated["privacyStatus"] = "private"
+    updated.pop("publishAt", None)
+    if current.get("privacyStatus") != "private" or current.get("publishAt"):
+        yt.videos().update(part="status", body={"id": video_id, "status": updated}).execute()
+
+    observed = video_status(video_id)
+    if (not observed or observed.get("video_id") != video_id
+            or observed.get("privacy_status") != "private" or observed.get("publish_at")):
+        raise RuntimeError(f"YouTube did not confirm the unscheduled private state for {video_id}")
+    log.info("verified YouTube video %s is private and unscheduled", video_id)
+    return observed
 
 
 def verify_upload(video_id: str, publish_at: datetime | None, cfg: dict) -> dict:
@@ -390,10 +440,9 @@ def can_delete() -> bool:
     that the scope is missing.
     """
     try:
-        c = credentials()
+        granted = granted_scopes()
     except Exception:  # noqa: BLE001
         return False
-    granted = set(getattr(c, "scopes", None) or [])
     return bool(granted & {DELETE_SCOPE, "https://www.googleapis.com/auth/youtube"})
 
 

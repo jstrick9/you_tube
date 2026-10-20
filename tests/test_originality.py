@@ -1,9 +1,8 @@
-"""Anti-bulk-production defences.
+"""Originality and commentary telemetry.
 
-Enforcement against faceless channels is channel-wide and retroactive, so these checks
-have to run before publication - by the time a strike lands the back catalogue is
-already the evidence. Two triggers are in scope: scripts that repeat each other, and
-scripts with no narrator voice at all.
+Scripts are checked for repetition, and the amount of narrator commentary is measured
+for later analysis. Production scripts now use complete narration sentences rather than
+detached asides, so the shipped minimum-aside gate is disabled.
 """
 import sys
 from pathlib import Path
@@ -106,9 +105,10 @@ def test_a_script_with_no_aside_has_no_voice_of_its_own():
     assert o.commentary_ratio(sc("one two three four five six")) == 0.0
 
 
-def test_one_real_aside_satisfies_the_shipped_requirement():
-    for script in (LIGHTHOUSE, BLOOD):
-        assert not any("no narrator voice" in i for i in o.check(script, CFG, []))
+def test_shipped_config_does_not_require_detached_asides():
+    assert CFG["content"]["min_asides"] == 0
+    plain = sc("One complete narration sentence", "Another complete narration sentence")
+    assert not any("no narrator voice" in i for i in o.check(plain, CFG, []))
 
 
 def test_the_requirement_is_a_count_not_a_percentage():
@@ -151,10 +151,10 @@ def test_check_passes_a_genuinely_new_episode():
     assert o.check(LIGHTHOUSE, CFG, hist) == []
 
 
-def test_check_flags_a_script_with_no_commentary():
+def test_check_does_not_require_commentary_asides_in_shipped_config():
     plain = sc("Antarctica has a waterfall that runs blood red",
                "It is iron in ancient brine oxidising the instant it meets air")
-    assert any("no narrator voice" in i for i in o.check(plain, CFG, []))
+    assert not any("no narrator voice" in i for i in o.check(plain, CFG, []))
 
 
 def test_commentary_ratio_is_still_measured_even_though_it_is_not_a_gate():
@@ -187,10 +187,12 @@ def test_only_the_configured_window_of_recent_episodes_is_compared():
     assert o.check(REWRITE, cfg, hist) == [], "an episode 30 uploads ago is outside the window"
 
 
-def test_shipped_config_actually_enables_both_defences():
+def test_shipped_config_enforces_originality_without_requiring_detached_asides():
     c = CFG["content"]
     assert c["max_script_similarity"] < 1.0
-    assert c["min_asides"] >= 1
+    assert c["min_asides"] == 0
+    assert CFG["persona"]["asides"] is False
+    assert CFG["persona"]["max_asides"] == 0
 
 
 # ── channel-level audit ─────────────────────────────────────────────────────

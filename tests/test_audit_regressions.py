@@ -21,7 +21,7 @@ class _Rev:
     lite = False
 
     def json(self, *a, **k):
-        return {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8,
+        return {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "naturalness": 9,
                 "loops": True, "factual_errors": [], "misleading_title": False,
                 "advertiser_friendly": True, "policy_concerns": [],
                 "value_add": "A concise explanation of the source-backed mystery.", "fixes": []}
@@ -38,10 +38,10 @@ def _writer(history=None):
 SRC = {"title": "S", "text": "keepers vanished lighthouse coats door bolted "* 40}
 
 
-def _script(title, aside="Tidy of them."):
+def _script(title):
     return {"title": title, "segments": [
         {"text": "Three lighthouse keepers vanished from a locked station"},
-        {"text": "Two coats were missing, but one still hung beside the door", "aside": aside},
+        {"text": "Two coats were missing, but one still hung beside the door"},
         {"text": "The logbook gave no warning or reason to explain their absence"},
         {"text": "so the locked door never explained their disappearance"}]}
 
@@ -53,7 +53,7 @@ def test_two_near_identical_scripts_in_one_run_are_caught():
     lane, same format pool. Before the fix both of these were approved."""
     w = _writer()
     assert w.check(_script("T1"), SRC)[0] is True
-    ok, review = w.check(_script("T2", aside="Tidy indeed."), SRC)
+    ok, review = w.check(_script("T2"), SRC)
     assert ok is False
     assert any("too close to a published episode" in i for i in review["issues"])
 
@@ -64,7 +64,7 @@ def test_a_genuinely_different_second_video_in_the_same_run_still_passes():
     assert w.check(_script("T1"), SRC)[0] is True
     other = {"title": "T2", "segments": [
         {"text": "Seawater lets Roman concrete heal its cracks"},
-        {"text": "Saltwater feeds crystals that grow through the damaged stone", "aside": "Show off."},
+        {"text": "Saltwater feeds crystals that grow through the damaged stone"},
         {"text": "They fill the gap until the seawall is sealed again"},
         {"text": "so the break becomes part of the repair"}]}
     assert w.check(other, {"title": "S2", "text": "roman concrete seawater crystals " * 40})[0] is True
@@ -74,7 +74,8 @@ def test_a_rejected_draft_is_not_held_against_its_own_rewrite():
     """A rejected draft is about to be rewritten on the same topic. Registering it
     would guarantee the retry collides with it and the topic would be abandoned."""
     w = _writer()
-    bad = _script("T1", aside="")          # no aside -> rejected for having no voice
+    bad = _script("T1")
+    bad["segments"][0]["text"] = ""  # deterministic shape rejection; this draft must not enter history
     assert w.check(bad, SRC)[0] is False
     assert w.check(_script("T1"), SRC)[0] is True, "the rewrite must not collide with the draft it replaces"
 

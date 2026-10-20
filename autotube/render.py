@@ -322,56 +322,34 @@ def fit_hook(text: str, max_lines: int = HOOK_MAX_LINES) -> str:
 DANGLERS = {"a", "an", "the", "and", "or", "but", "of", "to", "in", "on", "at", "for", "from",
             "with", "by", "as", "is", "was", "are", "were", "that", "this", "it", "its", "into",
             "over", "under", "than", "then", "so", "if", "when", "while", "because", "about"}
-CHUNK_MAX_WORDS = 4
-CHUNK_MAX_CHARS = 24
+CHUNK_MAX_WORDS = 20
+CHUNK_MAX_CHARS = 160
 
 
 def _chunk_words(words: list[dict], max_words: int = CHUNK_MAX_WORDS,
                  max_chars: int = CHUNK_MAX_CHARS) -> list[list[dict]]:
-    """Group timed words into caption cards of 2-4 words.
+    """Keep a complete spoken sentence on screen as one caption card.
 
-    Greedy filling alone produces two bad cards. It strands a single word at the end of a segment -
-    usually the payoff, flashed alone for a fraction of a second - and it breaks after function
-    words, so a card ends on "FOR" and the sentence appears to stop mid-thought. Both are fixed by
-    a rebalancing pass rather than by changing the fill, because the fill is what keeps cards
-    readable at speaking pace.
+    The word timings still drive a subtle active-word highlight, but the entire sentence stays
+    visible throughout the beat. This avoids the old 2–4-word cards that made fluent narration
+    look like disconnected fragments. Sentence stops and optional aside boundaries are preserved.
     """
     def chars(ch):
         return len(" ".join(x["word"] for x in ch))
 
     chunks, cur = [], []
-    for wi_, w in enumerate(words):
-        cur.append(w)
-        nxt_aside = words[wi_ + 1].get("_aside") if wi_ + 1 < len(words) else None
-        txt_len = chars(cur)
-        hard_stop = w["word"][-1:] in ".!?"          # only sentence ends break a card; commas read badly
-        if ((nxt_aside is not None and nxt_aside != w.get("_aside"))
-                or len(cur) >= max_words or (len(cur) >= 2 and txt_len >= 18)
-                or (hard_stop and len(cur) >= 2) or txt_len > max_chars):
+    for i, word in enumerate(words):
+        cur.append(word)
+        nxt = words[i + 1] if i + 1 < len(words) else None
+        aside_boundary = (nxt is not None and nxt.get("_aside") != word.get("_aside"))
+        sentence_end = word["word"].rstrip('"”\'’)]}').endswith((".", "!", "?"))
+        limit_reached = len(cur) >= max_words or chars(cur) > max_chars
+        if aside_boundary or sentence_end or limit_reached:
             chunks.append(cur)
             cur = []
     if cur:
         chunks.append(cur)
-
-    # ── push a dangling function word onto the card that completes the thought ──
-    for i in range(len(chunks) - 1):
-        a, b = chunks[i], chunks[i + 1]
-        if len(a) < 2 or a[-1].get("_aside") != b[0].get("_aside"):
-            continue
-        # a few characters of overflow is cheaper than a card that ends on "for"
-        if _norm_word(a[-1]["word"]) in DANGLERS and len(b) < max_words and chars(b) + len(a[-1]["word"]) + 1 <= max_chars + 4:
-            b.insert(0, a.pop())
-
-    # ── never leave a single word alone on the last card of a segment ──
-    if len(chunks) >= 2 and len(chunks[-1]) == 1:
-        prev, last = chunks[-2], chunks[-1]
-        if prev[-1].get("_aside") == last[0].get("_aside"):
-            if len(prev) + 1 <= max_words and chars(prev) + chars(last) + 1 <= max_chars + 6:
-                prev.extend(last)            # short enough to read as one card
-                chunks.pop()
-            elif len(prev) >= 3:
-                last.insert(0, prev.pop())   # otherwise split 4+1 into 3+2
-    return [c for c in chunks if c]
+    return [chunk for chunk in chunks if chunk]
 
 
 def build_ass(segments: list[dict], hook_text: str, channel: str, W: int, H: int, theme: dict,

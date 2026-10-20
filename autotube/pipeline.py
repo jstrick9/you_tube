@@ -935,6 +935,7 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
                        "source": trends.primary_source(res["topic"].get("sources", []))},
             **_history_trend(res["topic"]),
             "review_score": res["review"].get("score"),
+            "naturalness_score": res["review"].get("naturalness"),
             # Optional reviewer telemetry: stored for later analysis, never part of the publish decision.
             "turn_strength": res["review"].get("turn_strength"),
             "turn_strength_status": res["review"].get("turn_strength_status", "missing"),

@@ -84,10 +84,10 @@ def test_passing_score_guardrails_require_an_independent_programmatic_pass():
     cfg = common.load_config()
     review = {
         "programmatic_ok": True, "independent": True, "score": 8, "hook_strength": 8,
-        "entertainment": 7, "coherence": 5, "trend_alignment": 9,
+        "entertainment": 7, "coherence": 5, "naturalness": 9, "trend_alignment": 9,
     }
     scores = scriptwriter._passing_review_scores(review, cfg)
-    assert set(scores) == {"score", "hook_strength", "entertainment", "trend_alignment"}
+    assert set(scores) == {"score", "hook_strength", "entertainment", "naturalness", "trend_alignment"}
     review["independent"] = False
     assert scriptwriter._passing_review_scores(review, cfg) == {}
     review["independent"] = True
@@ -168,7 +168,7 @@ def test_unresolved_review_feedback_survives_programmatic_rewrite_failures(monke
 
     reviews = [
         (False, {"programmatic_ok": True, "independent": True, "score": 5, "hook_strength": 6,
-                 "entertainment": 5, "coherence": 7, "trend_alignment": 9,
+                 "entertainment": 5, "coherence": 7, "naturalness": 9, "trend_alignment": 9,
                  "issues": ["not entertaining enough (5/10, need 6)",
                             "overall review score too low (5/10, need 7)"]}),
         (False, {"programmatic_ok": False,
@@ -199,6 +199,7 @@ def test_unresolved_review_feedback_survives_programmatic_rewrite_failures(monke
     assert "not entertaining enough" in calls[1]["_draft_feedback"]
     assert calls[1]["_prior_review_scores"] == {
         "coherence": {"score": 7.0, "minimum": 6.0},
+        "naturalness": {"score": 9.0, "minimum": 8.0},
         "trend_alignment": {"score": 9.0, "minimum": 8.0},
     }
     assert calls[2]["_rewrite_attempt"] == 3
@@ -222,14 +223,14 @@ def test_review_retry_preserves_passed_scores_while_targeting_middle_tension(mon
 
     reviews = [
         (False, {"programmatic_ok": True, "independent": True, "score": 4, "hook_strength": 6, "entertainment": 4,
-                 "coherence": 7, "trend_alignment": 9,
+                 "coherence": 7, "naturalness": 9, "trend_alignment": 9,
                  "issues": ["hook too weak (6/10, need 7)", "not entertaining enough (4/10, need 6)"]}),
         (False, {"programmatic_ok": True, "independent": True, "score": 8, "hook_strength": 8, "entertainment": 7,
-                 "coherence": 7, "trend_alignment": 9,
+                 "coherence": 7, "naturalness": 9, "trend_alignment": 9,
                  "issues": ["independent reviewer still requests a rewrite: "
                             "Enhance narrative tension in the middle segments to boost entertainment value above 6."]}),
         (True, {"programmatic_ok": True, "independent": True, "score": 8, "hook_strength": 8, "entertainment": 8,
-                "coherence": 7, "trend_alignment": 9, "issues": []}),
+                "coherence": 7, "naturalness": 9, "trend_alignment": 9, "issues": []}),
     ]
 
     def fake_check(_script, _source, _topic):
@@ -257,6 +258,7 @@ def test_review_retry_preserves_passed_scores_while_targeting_middle_tension(mon
         "hook_strength": {"score": 8.0, "minimum": 7.0},
         "entertainment": {"score": 7.0, "minimum": 6.0},
         "coherence": {"score": 7.0, "minimum": 6.0},
+        "naturalness": {"score": 9.0, "minimum": 8.0},
         "trend_alignment": {"score": 9.0, "minimum": 8.0},
     }
     assert "narrative tension" in calls[2]["_draft_feedback"]
@@ -315,7 +317,7 @@ def test_writer_visual_gate_targets_trend_subject_not_research_article():
                         "queries": ["iPhone Duo rear camera", "iPhone Duo camera module"]},
              "evidence": "The iPhone Duo uses two camera views for depth mapping."},
             {"text": "Two camera lenses capture the same scene from different positions.",
-             "aside": "Two eyes, pocket-sized.", "emphasis": [], "reveal": False,
+             "aside": "", "emphasis": [], "reveal": False,
              "visual": {"shows": "two lenses on the iPhone Duo",
                         "queries": ["iPhone Duo dual cameras", "iPhone Duo camera close-up"]},
              "evidence": "Two camera views capture the same scene from different positions."},

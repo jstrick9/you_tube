@@ -29,10 +29,10 @@ persona:
   catchphrase: "Every file is real. That's the problem."
   character: >-
     a dry-witted, slightly incredulous narrator who finds real facts more ridiculous than fiction. Talks to ONE
-    viewer like a friend ("okay, this one is unhinged"), reacts with short deadpan asides, is never mean to real
-    people or groups, and never exaggerates the facts themselves — the facts are wild enough.
-  asides: true                     # 1-2 short humorous reactions per script (fact-checked as jokes, never as facts)
-  max_asides: 2
+    viewer like a friend, using natural reactions within complete explanatory sentences. Never uses detached asides,
+    mocks real people or groups, or exaggerates the facts themselves — the facts are wild enough.
+  asides: false                    # detached reactions are disabled; humor must come from the connected explanation
+  max_asides: 0
   proof_stamp: true                # end card: "PROVEN ✓" rubber stamp + the source, with a stamp sound
   stamp_seconds: 2.0
   # Creative identity choice: keep one primary narrator. This is not a platform requirement or performance guarantee.
@@ -98,12 +98,9 @@ content:
   max_script_similarity: 0.25
   similarity_window: 25       # how many recent episodes a new draft is compared against
   audit_window: 25            # how many recent episodes the channel-level audit looks at
-  # A count, not a percentage: a ratio floor makes the requirement depend on how wordy
-  # the rest of the script is, and a script landing exactly on a float threshold gets
-  # rejected by rounding. One aside is the whole ask - deliberately not a quota, because
-  # a rejected draft burns a retry and can lose the topic entirely. The ratio is still
-  # measured and stored per video as telemetry. 0 disables.
-  min_asides: 1
+  # Detached asides are disabled to keep narration complete, coherent, and captionable.
+  # The ratio remains recorded as telemetry; no aside quota is part of production QA.
+  min_asides: 0
 
   # ── Recurring series ──
   # CASE and FIELD are Archive 13 editorial series; numbering is a creative convention, not a subscriber-growth claim.
@@ -143,6 +140,7 @@ content:
                                          # the 5 was "Some fish spend three quarters of life on land / they
                                          # crawl / they breathe through skin / they leap 61cm", which is a
                                          # list with no chain. 6 rejects that and leaves the other two.
+  min_naturalness: 8                     # complete conversational sentences, read-aloud flow, and plain language are hard gates
   min_trend_alignment: 8                 # independent reviewer must confirm the specific trend angle is actually delivered
   min_entertainment: 6                   # reviewer's (harsh) entertainment score; flat fact-lists are rewritten
                                          # Was 7. Same recalibration: independent scores ran 5/10 x24, 6/10 x19,

@@ -28,7 +28,7 @@ class Reviewer:
             "score": 9,
             "hook_strength": 9,
             "entertainment": 8,
-            "coherence": 8,
+            "coherence": 8, "naturalness": 9,
             "loops": True,
             "factual_errors": [],
             "misleading_title": False,
@@ -206,7 +206,7 @@ def test_non_actionable_no_changes_text_does_not_block(monkeypatch):
 def test_missing_reviewer_fixes_array_fails_closed(monkeypatch):
     writer = _writer(monkeypatch, alignment=9)
     writer.llm.json = lambda *a, **k: {
-        "score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8,
+        "score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "naturalness": 9,
         "loops": True, "factual_errors": [], "misleading_title": False,
         "advertiser_friendly": True, "policy_concerns": [],
         "value_add": "A clear explanation of the specific display trick.", "trend_alignment": 9,
@@ -226,7 +226,7 @@ def test_missing_reviewer_fixes_array_fails_closed(monkeypatch):
 def test_malformed_reviewer_decisions_fail_closed(monkeypatch, defect):
     writer = _writer(monkeypatch, alignment=9)
     valid = {
-        "score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "loops": True,
+        "score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "naturalness": 9, "loops": True,
         "factual_errors": [], "misleading_title": False, "advertiser_friendly": True,
         "policy_concerns": [], "value_add": "A clear explanation of the specific display trick.",
         "fixes": [], "trend_alignment": 9,
@@ -263,7 +263,7 @@ def test_malformed_reviewer_decisions_fail_closed(monkeypatch, defect):
 def test_any_reviewer_issue_blocks_even_when_all_scores_are_high(monkeypatch):
     writer = _writer(monkeypatch, alignment=9)
     writer.llm.json = lambda *a, **k: {
-        "score": 10, "hook_strength": 10, "entertainment": 10, "coherence": 10, "loops": True,
+        "score": 10, "hook_strength": 10, "entertainment": 10, "coherence": 10, "naturalness": 9, "loops": True,
         "factual_errors": [], "misleading_title": False, "advertiser_friendly": True,
         "policy_concerns": [], "value_add": "A clear explanation of the specific display trick.",
         "fixes": [], "issues": ["The final line still needs a rewrite."],
@@ -330,7 +330,7 @@ def test_unrecognized_reviewer_fields_cannot_override_orchestration_metadata(mon
     script = _script()
     script["_writer_model"] = writer.llm.last_used
     writer.llm.json = lambda *a, **k: {
-        "score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "loops": True,
+        "score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "naturalness": 9, "loops": True,
         "factual_errors": [], "misleading_title": False, "advertiser_friendly": True,
         "policy_concerns": [], "value_add": "A clear explanation of the specific display trick.",
         "fixes": [], "trend_alignment": 9,
@@ -367,7 +367,7 @@ def test_unavailable_reviewer_never_passes_even_if_legacy_toggle_is_disabled(mon
 def test_optional_loop_is_not_an_implicit_publish_gate(monkeypatch):
     writer = _writer(monkeypatch, alignment=9)
     result = {
-        "score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8,
+        "score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "naturalness": 9,
         "loops": False, "factual_errors": [], "misleading_title": False,
         "advertiser_friendly": True, "policy_concerns": [],
         "value_add": "The source explains how developers simulated depth.", "fixes": [],
@@ -390,7 +390,7 @@ def test_required_loop_issue_itself_vetoes_an_otherwise_clean_review(monkeypatch
     writer.cfg["content"]["require_loop"] = True
     monkeypatch.setattr(scriptwriter, "reviewer_schema_issues", lambda *a, **k: [])
     writer.llm.json = lambda *a, **k: {
-        "score": 10, "hook_strength": 10, "entertainment": 10, "coherence": 10,
+        "score": 10, "hook_strength": 10, "entertainment": 10, "coherence": 10, "naturalness": 9,
         "loops": False, "factual_errors": [], "misleading_title": False,
         "advertiser_friendly": True, "policy_concerns": [],
         "value_add": "The source explains the strange choice behind the story.", "fixes": [],

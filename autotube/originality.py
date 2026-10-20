@@ -104,14 +104,10 @@ def check(script: dict, cfg: dict, history: list[dict] | None = None) -> list[st
     ccfg = (cfg.get("content") or {})
     issues: list[str] = []
 
-    # Enforced as a count, not as a ratio. The first version of this compared
-    # commentary_ratio against a 0.04 floor and rejected a script sitting exactly on it:
-    # two aside words in fifty is 0.04, which is not representable in binary and landed
-    # one ULP low. Worse than the bug was what it revealed - a percentage floor also
-    # makes the requirement depend on how wordy the rest of the script is, so the same
-    # aside passes in a short episode and fails in a long one. The configured aside count
-    # is an internal voice/value-add choice, not a YouTube policy threshold. The ratio is
-    # still computed and recorded per video as telemetry, but is not used as a policy claim.
+    # Production sets min_asides=0 because detached commentary is disabled: each spoken
+    # beat must be a complete sentence that naturally explains the subject. Retain this
+    # optional count gate for explicit custom configurations, but never infer that a
+    # positive aside count is required by YouTube policy. Commentary ratio remains telemetry.
     need = int(ccfg.get("min_asides", 0))
     if need > 0:
         have = sum(1 for s_ in (script.get("segments") or []) if (s_.get("aside") or "").strip())

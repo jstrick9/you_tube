@@ -1,0 +1,57 @@
+name: Withdraw a YouTube video
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_id:
+        description: "YouTube video ID to make private and unschedule"
+        required: true
+        type: string
+      confirm:
+        description: "Explicitly confirm the corrective action"
+        required: true
+        type: choice
+        options:
+          - NO
+          - UNSCHEDULE
+        default: NO
+
+concurrency:
+  group: autotube
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  withdraw:
+    if: ${{ inputs.confirm == 'UNSCHEDULE' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+      YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+      YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+      VIDEO_ID: ${{ inputs.video_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install YouTube API dependencies
+        run: pip install -q google-api-python-client==2.201.0 google-auth==2.62.0 requests==2.34.2 pyyaml==6.0.3
+      - name: Read current status and confirm update authorization without changing the video
+        run: python scripts/check_video_status.py "$VIDEO_ID"
+      - name: Make private, clear publish time, and verify
+        run: python scripts/unschedule_video.py "$VIDEO_ID"
+      - name: Commit reconciled channel history
+        run: |
+          git config user.name "AutoTube Agent"
+          git config user.email "autotube-agent@users.noreply.github.com"
+          git add state/history.json
+          if ! git diff --cached --quiet; then
+            git commit -m "state: withdraw video after content quality review"
+            git push origin main
+          fi

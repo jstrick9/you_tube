@@ -720,7 +720,7 @@ def test_weak_hook_is_rejected_and_rewritten():
         lite = False
 
         def json(self, system, user, **kw):
-            return {"score": 9, "hook_strength": 6, "entertainment": 8, "coherence": 8, "loops": True,
+            return {"score": 9, "hook_strength": 6, "entertainment": 8, "coherence": 8, "naturalness": 9, "loops": True,
                     "factual_errors": [], "misleading_title": False, "advertiser_friendly": True,
                     "policy_concerns": [], "value_add": "A concise explanation of the supported fact.", "fixes": []}
 
@@ -729,11 +729,10 @@ def test_weak_hook_is_rejected_and_rewritten():
     cfg_c = dict(CFG["content"], require_grounding=False)
     w.cfg = {**CFG, "content": cfg_c}
     src = {"title": "X", "text": "Bees make honey and visit two million flowers for one honey jar. " * 50}
-    # gate-clean script: the ONLY thing wrong with it is the reviewer's hook_strength of 6
-    # One aside: content.min_commentary_ratio rejects narration with no narrator voice.
+    # Gate-clean script: the ONLY thing wrong with it is the reviewer's hook_strength of 6.
     segs = [{"text": "Bees need two million flowers for one honey jar"},
             {"text": "A worker bee makes one twelfth of a teaspoon in life"},
-            {"text": "The hive beats its wings to dry the nectar into honey", "aside": "Busy little things."},
+            {"text": "The hive beats its wings to dry the nectar into honey"},
             {"text": "A wax seal keeps the stored honey from absorbing moisture"},
             {"text": "so the jar in your cupboard could outlive you"}]
     ok, review = w.check({"title": "Honey", "segments": segs}, src)
@@ -745,7 +744,7 @@ def test_titles_are_screened_for_shock_bait_not_vocabulary():
         lite = False
 
         def json(self, system, user, **kw):
-            return {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8,
+            return {"score": 9, "hook_strength": 9, "entertainment": 8, "coherence": 8, "naturalness": 9,
                     "loops": True, "factual_errors": [], "misleading_title": False,
                     "advertiser_friendly": True, "policy_concerns": [],
                     "value_add": "A concise explanation of the supported fact.", "fixes": []}
@@ -756,8 +755,7 @@ def test_titles_are_screened_for_shock_bait_not_vocabulary():
     src = {"title": "Hunger stone", "text": "stones during the Thirty Years War " * 40}
     seg = [{"text": "The Thirty Years War stone still warns us"},
            {"text": "It only appears when the river drops to a record low"},
-           {"text": "The oldest marking on it is older than anyone alive",
-            "aside": "Cheerful bunch."},   # min_commentary_ratio: narration needs a voice
+           {"text": "The oldest marking on it is older than anyone alive"},
            {"text": "Each line records a season nobody wanted to repeat"},
            {"text": "so by reading it, the drought has already returned"}]
     # This test reuses one body of segments to isolate the title as the only variable.

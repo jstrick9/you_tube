@@ -706,10 +706,12 @@ def _capture_prompt(category="history"):
     return seen.get("user", "")
 
 
-def test_writer_prompt_aims_below_the_hard_word_ceiling_and_keeps_asides_short():
+def test_writer_prompt_requires_complete_natural_sentences_and_disables_asides():
     prompt = _capture_prompt("science")
     assert "Aim for 44-48 spoken words TOTAL" in prompt
-    assert "one specific 2-5 word aside" in prompt
+    assert "Every segment must be one complete sentence" in prompt
+    assert "no detached commentary or one-off joke fragments" in prompt
+    assert 'Read every "text" field aloud, in sequence, as one paragraph' in prompt
     assert "FINAL SHAPE CHECK before emitting JSON" in prompt
 
 
@@ -876,13 +878,13 @@ def test_script_validator_fails_closed_on_malformed_generated_shape():
 
     validate = _grab_validator()
     base = _validator_ready({"title": "The Montauk Monster remains unidentified", "segments": [
-        {"text": "The Montauk Monster washed ashore without a clear identity",
+        {"text": "The Montauk Monster washed ashore without a clear identity.",
          "visual": {"shows": "the Montauk Monster carcass", "queries": ["Montauk Monster", "monster carcass"]}},
-        {"text": "Biologists argued over its remains, but no test settled anything",
+        {"text": "Biologists argued over its remains, but no test settled anything.",
          "visual": {"shows": "the Montauk Monster remains", "queries": ["monster remains", "Montauk Monster"]}},
-        {"text": "The body disappeared before anyone could identify the creature",
+        {"text": "The body disappeared before anyone could identify the creature.",
          "visual": {"shows": "the Montauk Monster carcass", "queries": ["monster carcass", "Montauk Monster"]}},
-        {"text": "The Montauk Monster remains unidentified decades later",
+        {"text": "The Montauk Monster remains unidentified decades later.",
          "visual": {"shows": "the Montauk Monster shoreline", "queries": ["Montauk Monster", "monster shoreline"]}},
     ]})
     cases = []
@@ -895,6 +897,9 @@ def test_script_validator_fails_closed_on_malformed_generated_shape():
     malformed_aside = copy.deepcopy(base)
     malformed_aside["segments"][0]["aside"] = False
     cases.append((malformed_aside, "aside must be text"))
+    fragment = copy.deepcopy(base)
+    fragment["segments"][0]["text"] = "The Montauk Monster washed ashore without a clear identity"
+    cases.append((fragment, "do not end as complete sentences"))
     one_query = copy.deepcopy(base)
     one_query["segments"][1]["visual"]["queries"] = ["one query"]
     cases.append((one_query, "need a"))
@@ -1056,7 +1061,7 @@ def test_canned_aside_is_rejected_by_the_real_validator():
         {"text": "Nobody has identified it in eighteen years since.",
          "visual": {"shows": "shore", "queries": ["shore"]}},
     ]}
-    with pytest.raises(AssertionError, match="canned filler"):
+    with pytest.raises(AssertionError, match="detached asides are disabled"):
         v(_validator_ready(script))
 
 
@@ -1310,25 +1315,31 @@ def test_the_writer_is_told_to_build_one_chain_not_a_list():
     assert "peace treaty" in p, "the Egypt fact-list is the BAD example"
 
 
-def test_the_reviewer_scores_coherence():
+def test_the_reviewer_scores_coherence_and_naturalness():
     src = (ROOT / "autotube" / "scriptwriter.py").read_text()
     assert '"coherence": 0-10' in src, "coherence must be in the review schema"
+    assert '"naturalness": 0-10' in src, "naturalness must be in the review schema"
     assert "A list of true facts is accurate and still unwatchable" in src, \
         "the reviewer must be told to score structure, not truth"
+    assert "read the full narration aloud as a viewer would hear it" in src
 
 
-def test_coherence_is_recorded_and_part_of_the_approval_boolean():
+def test_coherence_and_naturalness_are_hard_recorded_approval_gates():
     import yaml as _y
 
     src = (ROOT / "autotube" / "scriptwriter.py").read_text()
     assert 'review["coherence"] = coh' in src, "every script's score must be recorded"
-    assert '"min_coh": content_cfg.get("min_coherence", 6)' in src, "threshold must be validated from config"
+    assert '"min_coh": content_cfg.get("min_coherence", 6)' in src, "coherence threshold must be validated"
     assert "coh >= min_coh" in src, "the configured coherence score must participate in final approval"
+    assert 'review["naturalness"] = naturalness' in src, "spoken naturalness must be recorded"
+    assert '"min_nat": content_cfg.get("min_naturalness", 8)' in src, "naturalness threshold must be validated"
+    assert "naturalness >= min_naturalness" in src, "naturalness must participate in final approval"
     assert 'reviewer_schema_issues(r, has_trend=topic is not None)' in src, \
-        "missing or malformed coherence values must be rejected at the reviewer-schema boundary"
+        "missing or malformed reviewer scores must be rejected at the schema boundary"
 
     cfg = _y.safe_load((ROOT / "config.yaml").read_text())
     assert cfg["content"]["min_coherence"] == 6
+    assert cfg["content"]["min_naturalness"] == 8
 
 
 # ── naming the subject, and the escalation ladder ──────────────────────────
