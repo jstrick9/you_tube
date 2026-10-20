@@ -7,6 +7,13 @@
       "recorded_at": "2026-10-19T04:41:46.518451+00:00",
       "blocked_until": "2026-10-20T04:41:46.518451+00:00",
       "retry_after_seconds": 21.0
+    },
+    "groq": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-20T02:08:21.853387+00:00",
+      "blocked_until": "2026-10-20T02:28:21.853387+00:00",
+      "retry_after_seconds": 1.0
     }
   },
   "failures_5xx": {}
