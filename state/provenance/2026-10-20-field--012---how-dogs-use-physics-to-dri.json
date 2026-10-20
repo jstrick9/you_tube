@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-20T20:22:51.544307+00:00",
+  "video": {
+    "title": "FIELD #012 — How Dogs Use Physics to Drink Water #shorts",
+    "video_id": "FL8HklUAOIk",
+    "series": "field",
+    "episode": 12,
+    "duration": 17.93004535147392,
+    "file": "20261020-1956-01-dog.mp4",
+    "published_at": "2026-10-20T21:22:00+00:00"
+  },
+  "selection": {
+    "topic": "Dog Paani Kaise Peeta Hai? Tongue Ka Asli Secret!",
+    "category": "science",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "source_families": [
+      "youtube"
+    ],
+    "trend_score": 0.9636,
+    "wikipedia_spike": null,
+    "angle": "Dogs curl their tongues to pull a larger liquid column into their mouths.",
+    "why_trending": "YouTube Short: 388,270 views in 40.2h (~9,665 views/hour), 84.8x channel subscribers",
+    "viral_score": 9.0,
+    "evidence": [
+      "viral Short now: 388,270 views in 40h, 85x its channel's subscribers"
+    ],
+    "signals": [
+      {
+        "source": "youtube_outliers",
+        "source_family": "youtube",
+        "topic": "Dog Paani Kaise Peeta Hai? Tongue Ka Asli Secret!",
+        "score": 0.9636,
+        "source_url": "https://www.youtube.com/watch?v=F9IluEaMjJ4",
+        "captured_at": "2026-10-20T19:57:01+00:00",
+        "context": [
+          "viral Short now: 388,270 views in 40h, 85x its channel's subscribers"
+        ],
+        "evidence": {
+          "views": 388270,
+          "hours": 40.2,
+          "vph": 9665,
+          "breakout": 84.8,
+          "video_id": "F9IluEaMjJ4",
+          "video_url": "https://www.youtube.com/watch?v=F9IluEaMjJ4",
+          "published_at": "2026-10-19T03:45:53Z",
+          "channel_title": "Devendra Insights",
+          "search_query": "animal facts",
+          "duration_seconds": 27,
+          "subscriber_count": 4580,
+          "channel_id": "UCoC95_VH-m5S3B50IGfX04Q",
+          "lane": "science_nature"
+        }
+      }
+    ],
+    "format": "myth_buster",
+    "hook_style": "question",
+    "turn_experiment_id": "early_turn_v1",
+    "turn_variant": "consequence_first"
+  },
+  "early_turn": {
+    "turn_segment_index": 2,
+    "turn_start_seconds": 3.012,
+    "turn_start_runtime_pct": 16.8,
+    "turn_factual_word_count": 9
+  },
+  "grounding": {
+    "primary": {
+      "title": "Dog",
+      "url": "https://en.wikipedia.org/wiki/Dog"
+    },
+    "corroboration": [
+      {
+        "title": "Europe PMC — Dogs lap using acceleration-driven open pumping.",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/26668382/"
+      },
+      {
+        "title": "NASA — Homing in on Hot Dogs",
+        "url": "https://images.nasa.gov/details/PIA15814"
+      }
+    ],
+    "claims": [
+      {
+        "says": "1 billion dogs use a weird physics trick.",
+        "evidence": ""
+      },
+      {
+        "says": "Incomplete cheeks mean dogs cannot suck up any liquid.",
+        "evidence": "Dogs lap because they have incomplete cheeks and cannot suck."
+      },
+      {
+        "says": "They curl their tongues to create larger liquid columns.",
+        "evidence": "suggests that dogs curl the tongue to create a larger liquid column."
+      },
+      {
+        "says": "Acceleration governs the lapping frequency of every dog.",
+        "evidence": "effects of acceleration govern lapping frequency"
+      }
+    ]
+  },
+  "script": {
+    "title": "How Dogs Use Physics to Drink Water",
+    "segments": [
+      "1 billion dogs use a weird physics trick.",
+      "Incomplete cheeks mean dogs cannot suck up any liquid.",
+      "They curl their tongues to create larger liquid columns.",
+      "Acceleration governs the lapping frequency of every dog."
+    ],
+    "asides": [
+      "totally broken cheeks.",
+      "liquid column magic."
+    ],
+    "commentary_ratio": 0.15
+  },
+  "review": {
+    "score": 9,
+    "coherence": 9.0,
+    "trend_alignment": 10.0,
+    "trend_alignment_reason": "The script specifically focuses on the tongue curling and liquid column mechanism as requested in the trend angle.",
+    "turn_strength": 10.0,
+    "turn_strength_status": "scored",
+    "turn_strength_reason": "Opens immediately with the concrete consequence (cannot suck liquid) without any lead-in, perfectly following the consequence_first treatment.",
+    "reviewer": "nvidia:google/gemma-4-31b-it",
+    "independent": false,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261020-1956"
+  },
+  "originality": {
+    "sketch": [
+      "049bd31eb969adfe",
+      "1ae02e1bbcffd81c",
+      "1e489f709b32b9c7",
+      "1f5a442b50e66fdd",
+      "23c3f4700c8c62ae",
+      "336c662855033fc0",
+      "3fbc0709b328b74f",
+      "44c33661b49fdfe2",
+      "45e83b02832dc94b",
+      "58570b041c6a8fff",
+      "597ad6283779e7f6",
+      "850d357943965fa9",
+      "869435f46849d0b2",
+      "8de74819464b7e6e",
+      "927eb9c426d686cf",
+      "9ada8209f51d7ab9",
+      "a15008b8ee1f27a9",
+      "ad5eaf6893da84e3",
+      "b4e9e18e0478d3ca",
+      "b6a1d391d8bb581b",
+      "bc790e379df21584",
+      "c4eee84985b1c604",
+      "c6bcf20daacf128f",
+      "dad215ff2c89ff2b",
+      "dc122d8fa29787fa",
+      "de46809cc7c9ca61",
+      "e3304ea0b47260ce",
+      "e8342d8b4385abbc",
+      "f79e289258e19565",
+      "f80af56780c88115",
+      "f8d7311978bc4fe1"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}
