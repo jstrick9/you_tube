@@ -1009,9 +1009,7 @@ def test_video_status_is_read_only_and_reports_scheduled_publish_state(monkeypat
 def test_delete_is_dry_run_by_default_and_checks_scope(monkeypatch):
     """Deleting a published video is irreversible, so it defaults to doing nothing.
 
-    And it must say the scope is missing rather than surface a raw 403: the stored
-    token holds youtube.upload, which is write-only for new uploads and cannot touch
-    anything already on the channel.
+    And it must say the required videos.delete scope is missing rather than surface a raw 403.
     """
     import pytest
     import autotube.youtube as Y
@@ -1019,7 +1017,7 @@ def test_delete_is_dry_run_by_default_and_checks_scope(monkeypatch):
     assert Y.delete(["abc", "def"]) == {"abc": "dry-run", "def": "dry-run"}
 
     monkeypatch.setattr(Y, "can_delete", lambda: False)
-    with pytest.raises(RuntimeError, match="youtube.upload only"):
+    with pytest.raises(RuntimeError, match="lacks a videos.delete scope"):
         Y.delete(["abc"], dry_run=False)
 
     assert "force-ssl" in Y.DELETE_SCOPE

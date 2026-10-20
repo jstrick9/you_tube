@@ -22,10 +22,9 @@ def main() -> int:
 
     scopes = youtube.granted_scopes()
     status = youtube.video_status(video_id)
-    update_authorized = bool(scopes & {
-        youtube.DELETE_SCOPE,
-        "https://www.googleapis.com/auth/youtube",
-    })
+    partner_scope = "https://www.googleapis.com/auth/youtubepartner"
+    full_scope = "https://www.googleapis.com/auth/youtube"
+    update_authorized = bool(scopes & {youtube.DELETE_SCOPE, full_scope, partner_scope})
     result = {
         "video_id": video_id,
         "exists": status is not None,
@@ -35,7 +34,8 @@ def main() -> int:
         "update_authorized": update_authorized,
         "scope_check": {
             "youtube_force_ssl": youtube.DELETE_SCOPE in scopes,
-            "youtube_full": "https://www.googleapis.com/auth/youtube" in scopes,
+            "youtube_full": full_scope in scopes,
+            "youtube_partner": partner_scope in scopes,
         },
     }
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))

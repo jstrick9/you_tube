@@ -90,14 +90,16 @@ def unschedule(video_id: str) -> dict:
     """Make a video private and clear any scheduled publish time, then verify the readback.
 
     This is a narrow corrective action for an existing upload. It never deletes the video or changes its
-    title/description. YouTube requires youtube.force-ssl (or the broader youtube scope) for videos.update.
+    title/description. YouTube accepts youtube.force-ssl, youtube, or youtubepartner for videos.update.
     """
     video_id = str(video_id or "").strip()
     if not re.fullmatch(r"[A-Za-z0-9_-]{11}", video_id):
         raise ValueError("video_id must be an 11-character YouTube ID")
     scopes = granted_scopes()
-    if not ({DELETE_SCOPE, "https://www.googleapis.com/auth/youtube"} & scopes):
-        raise RuntimeError("YouTube token lacks youtube.force-ssl; re-authorize with that scope before modifying an existing video")
+    update_scopes = {DELETE_SCOPE, "https://www.googleapis.com/auth/youtube",
+                     "https://www.googleapis.com/auth/youtubepartner"}
+    if not (update_scopes & scopes):
+        raise RuntimeError("YouTube token lacks a videos.update scope (youtube.force-ssl, youtube, or youtubepartner)")
 
     yt = service()
     items = yt.videos().list(part="status", id=video_id, maxResults=1).execute().get("items", [])
@@ -436,14 +438,15 @@ def can_delete() -> bool:
     """Does the stored refresh token actually carry delete permission?
 
     Checked rather than assumed: a token minted for youtube.upload will fail a delete
-    with a 403 that reads like a permissions bug in our code. Better to say plainly
-    that the scope is missing.
+    with a 403 that reads like a permissions bug in our code. Accept the scopes documented
+    for videos.delete instead of inferring access from upload permission.
     """
     try:
         granted = granted_scopes()
     except Exception:  # noqa: BLE001
         return False
-    return bool(granted & {DELETE_SCOPE, "https://www.googleapis.com/auth/youtube"})
+    return bool(granted & {DELETE_SCOPE, "https://www.googleapis.com/auth/youtube",
+                           "https://www.googleapis.com/auth/youtubepartner"})
 
 
 def delete(video_ids: list[str], dry_run: bool = True) -> dict:
@@ -463,8 +466,8 @@ def delete(video_ids: list[str], dry_run: bool = True) -> dict:
         return out
     if not can_delete():
         raise RuntimeError(
-            "the stored YouTube token cannot delete: it holds youtube.upload only. "
-            f"Re-authorise including {DELETE_SCOPE} and refresh YT_REFRESH_TOKEN.")
+            "the stored YouTube token lacks a videos.delete scope. Re-authorise with youtube.force-ssl "
+            "(or the broader youtube/youtubepartner scope where applicable) and refresh YT_REFRESH_TOKEN.")
     svc = service()
     for v in video_ids:
         try:

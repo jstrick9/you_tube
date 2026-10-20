@@ -74,7 +74,12 @@ def test_verify_immediate_upload_uses_configured_privacy_and_rejects_unexpected_
     assert result["publish_at"] is None
 
 
-def test_unschedule_clears_publish_time_preserves_disclosure_and_verifies_readback(monkeypatch):
+@pytest.mark.parametrize("scope", [
+    youtube.DELETE_SCOPE,
+    "https://www.googleapis.com/auth/youtube",
+    "https://www.googleapis.com/auth/youtubepartner",
+])
+def test_unschedule_clears_publish_time_preserves_disclosure_and_verifies_readback(monkeypatch, scope):
     video_id = "abcdefghijk"
     original = {
         "privacyStatus": "private",
@@ -108,7 +113,7 @@ def test_unschedule_clears_publish_time_preserves_disclosure_and_verifies_readba
         def videos(self):
             return Videos()
 
-    monkeypatch.setattr(youtube, "granted_scopes", lambda: {youtube.DELETE_SCOPE})
+    monkeypatch.setattr(youtube, "granted_scopes", lambda: {scope})
     monkeypatch.setattr(youtube, "service", lambda: Service())
     monkeypatch.setattr(youtube, "video_status", lambda _id: {
         "video_id": video_id, "privacy_status": "private", "upload_status": "processed", "publish_at": None,
@@ -130,7 +135,7 @@ def test_unschedule_fails_closed_without_existing_video_write_scope(monkeypatch)
     monkeypatch.setattr(youtube, "granted_scopes", lambda: {"https://www.googleapis.com/auth/youtube.readonly"})
     monkeypatch.setattr(youtube, "service", lambda: pytest.fail("must not mutate without scope"))
 
-    with pytest.raises(RuntimeError, match="lacks youtube.force-ssl"):
+    with pytest.raises(RuntimeError, match="lacks a videos.update scope"):
         youtube.unschedule(video_id)
 
 

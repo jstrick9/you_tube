@@ -184,8 +184,12 @@ def cmd_doctor(cfg: dict) -> int:
                 has = f"https://www.googleapis.com/auth/{sc}" in granted
                 print(f"  {'✓' if has else '✗'} {sc}{'' if has else '   ← MISSING: re-authorize with this scope'}")
                 ok &= has or sc == "yt-analytics.readonly"
-            can_manage_existing = DELETE_SCOPE in granted or "https://www.googleapis.com/auth/youtube" in granted
-            print(f"  {'✓' if can_manage_existing else '✗'} youtube.force-ssl (modify existing videos)")
+            can_manage_existing = bool(granted & {
+                DELETE_SCOPE, "https://www.googleapis.com/auth/youtube",
+                "https://www.googleapis.com/auth/youtubepartner",
+            })
+            print(f"  {'✓' if can_manage_existing else '✗'} videos.update scope "
+                  "(youtube.force-ssl, youtube, or youtubepartner)")
             items = service().channels().list(part="snippet,statistics", mine=True).execute().get("items", [])
             if items:
                 it = items[0]
