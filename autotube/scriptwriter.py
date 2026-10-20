@@ -1251,6 +1251,26 @@ def echoes_hook(first: str, last: str) -> float:
     return sum(1 for t in l if t in f) / len(l)
 
 
+def _curated_research_profile(topic: str) -> dict | None:
+    """Map one narrowly identified, live dog-lapping trend to its primary research source.
+
+    The viral title is discovery metadata, not evidence. This profile supplies the exact study query and a
+    testable angle; grounding, source-angle checks, script review, originality, safety, visual QA, and upload
+    gates remain mandatory. Keep matching narrow so it cannot rewrite unrelated animal trends.
+    """
+    terms = set(originality.tokens(topic or ""))
+    if (not terms.intersection({"dog", "dogs"}) or "tongue" not in terms
+            or not terms.intersection({"paani", "water", "lap", "laps", "lapped", "drink", "drinks",
+                                      "drinking", "peeta", "peeti"})):
+        return None
+    return {
+        "script_subject": "Dog",
+        "wiki_query": "Dog",
+        "angle": "Dogs curl their tongues to pull a larger liquid column into their mouths.",
+        "research_query": "Dogs lap using acceleration-driven open pumping",
+    }
+
+
 class ScriptWriter:
     def __init__(self, cfg: dict, llm: LLM, strategy: Strategy):
         self.cfg = cfg
@@ -1534,6 +1554,19 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                 if not fits:
                     dropped.append(f"{c['topic'][:40]} (no fitting format)")
                     continue
+                research_profile = _curated_research_profile(c["topic"])
+                if research_profile:
+                    # The LLM still has to provide a complete, low-risk, high-virality pick in an approved
+                    # lane with a usable format. For this exact known trend, do not let a broad/ambiguous
+                    # encyclopedia query decide what the episode is about; the final factual angle is
+                    # independently revalidated against the primary abstract in produce().
+                    angle = research_profile["angle"]
+                    wiki_query = research_profile["wiki_query"]
+                    script_subject = research_profile["script_subject"]
+                    if len(_angle_terms(angle, c["topic"])) < 2:
+                        dropped.append(f"{c['topic'][:40]} (curated research angle is not specific)")
+                        continue
+                    c["research_query"] = research_profile["research_query"]
                 c.update({"category": cat, "angle": angle, "wiki_query": wiki_query,
                           "script_subject": script_subject,
                           "formats": fits,
@@ -2421,7 +2454,7 @@ Return JSON only: {{"supported": true, "angle": "...", "source_quote": "..."}}""
         source = ground(topic["topic"], topic.get("wiki_query"), self.lang,
                         allow_living=self.cfg["content"]["allow_living_people"],
                         blocked=self.cfg["compliance"].get("blocked_topics"),
-                        cfg=self.cfg, llm=self.llm)
+                        cfg=self.cfg, llm=self.llm, research_query=topic.get("research_query"))
         if not source:
             if receipt:
                 receipt.note_failure("script_research", "source_grounding_failed")

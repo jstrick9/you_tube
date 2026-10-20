@@ -23,7 +23,7 @@ WF = ROOT / ".github" / "workflows"
 # optional read-only IDs, and GitHub-provided runtime metadata/summary paths.
 LOCAL_ONLY = {"AUTOTUBE_CONFIG", "AUTOTUBE_TTS", "AUTOTUBE_DEPTH_MODEL",
               "PIPER_DIR", "PIPER_VOICE", "YOUTUBE_STATUS_VIDEO_ID", "GITHUB_STEP_SUMMARY",
-              "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT"}
+              "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT", "AUTOTUBE_TOPIC_HINT"}
 
 
 def env_vars_read_by_code() -> set[str]:

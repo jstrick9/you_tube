@@ -35,6 +35,10 @@ on:
         description: "Only create videos still missing today (safe retry; never overfills the daily target)"
         type: boolean
         default: false
+      topic_hint:
+        description: "Optional exact topic title or live YouTube video ID focus; live trend and all quality gates still apply"
+        required: false
+        type: string
 
 concurrency:
   group: autotube
@@ -140,6 +144,8 @@ jobs:
         id: production
         if: steps.need.outputs.proceed == 'true'
         timeout-minutes: 350
+        env:
+          AUTOTUBE_TOPIC_HINT: ${{ github.event.inputs.topic_hint }}
         run: |
           ARGS=""
           if [ -n "${{ github.event.inputs.count }}" ]; then ARGS="$ARGS -n ${{ github.event.inputs.count }}"; fi

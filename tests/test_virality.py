@@ -106,6 +106,35 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     assert "Willie Mays" not in llm.prompt                                               # no Wikipedia-only fallback
 
 
+def test_dog_lapping_outlier_uses_narrow_primary_research_without_relaxing_live_gates():
+    topic = "Dog Paani Kaise Peeta Hai? Tongue Ka Asli Secret!"
+    video_id = "F9IluEaMjJ4"
+    candidate = {
+        "topic": topic, "topic_key": topic.lower(), "source": "youtube_outliers",
+        "sources": ["youtube_outliers"], "score": 0.95,
+        "context": ["viral Short: 388,032 views in 35.4h"], "lane": "science_nature",
+        "signals": [signal("youtube_outliers", f"https://www.youtube.com/shorts/{video_id}", {
+            "views": 388_032, "hours": 35.4, "vph": 10_961, "breakout": 84.7, "video_id": video_id,
+        })],
+    }
+    llm = LLMPicks([{
+        "index": 0, "viral_score": 8, "category": "animals", "risk": "low",
+        "script_subject": "Dog", "wiki_query": "Hair of the dog",
+        "angle": "Dogs pull a column of water into their mouths by curling their tongues.",
+        "formats": ["sounds_fake"],
+    }])
+
+    picks = ScriptWriter(CFG, llm, Strat()).select_topics([candidate], 1, set())
+
+    assert len(picks) == 1
+    assert picks[0]["script_subject"] == "Dog"
+    assert picks[0]["wiki_query"] == "Dog"                         # not the ambiguous idiom article
+    assert picks[0]["angle"] == "Dogs curl their tongues to pull a larger liquid column into their mouths."
+    assert picks[0]["research_query"] == "Dogs lap using acceleration-driven open pumping"
+    assert picks[0]["viral_score"] >= CFG["content"]["min_viral_score"]
+    assert picks[0]["lane"] == "science_nature"
+
+
 def test_selector_prompt_caps_candidates_to_a_bounded_live_shortlist():
     import copy
 

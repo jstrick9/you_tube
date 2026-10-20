@@ -216,11 +216,14 @@ def narrow_title(query: str, lang: str = "en"):
 
 
 def ground(topic: str, search_query: str | None, lang: str = "en", allow_living: bool = False,
-           blocked: list[str] | None = None, cfg: dict | None = None, llm=None) -> dict | None:
+           blocked: list[str] | None = None, cfg: dict | None = None, llm=None,
+           research_query: str | None = None) -> dict | None:
     """Return {'title','url','summary','text','images'} or None if unusable.
 
     Wikipedia resolves and anchors the subject; `research.extra_sources` then widens what we can
-    verify against (see autotube/sources.py). Safety screening is context-aware (autotube/safety.py).
+    verify against (see autotube/sources.py). A narrow `research_query` may prioritize a matching
+    PubMed abstract without replacing Wikipedia or changing any evidence checks. Safety screening is
+    context-aware (autotube/safety.py).
     """
     title = None
     for q in [search_query, topic]:
@@ -277,7 +280,21 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
         # itself part of not looking mass-produced. Long articles just get a smaller budget.
         full = int(rcfg.get("enrich_max_chars", 4000))
         budget = full if len(text) < int(rcfg.get("enrich_below_chars", 7000)) else max(1200, full // 3)
-        block, extra_credits = sources.enrich(title, enabled, budget)
+        specific_query = research_query.strip()[:180] if isinstance(research_query, str) else ""
+        if specific_query and "pubmed" in enabled:
+            # If the exact trend has a known primary paper, fetch it first with a tight query,
+            # then let the other configured corpora use only the remaining character budget.
+            # This avoids a broad "Dog" PubMed search winning the budget with unrelated abstracts.
+            block, extra_credits = sources.enrich(specific_query, ["pubmed"], budget)
+            remainder = max(0, budget - len(block) - (1 if block else 0))
+            other_sources = [name for name in enabled if name != "pubmed"]
+            if remainder and other_sources:
+                other_block, other_credits = sources.enrich(title, other_sources, remainder)
+                if other_block:
+                    block = f"{block}\n{other_block}" if block else other_block
+                extra_credits.extend(other_credits)
+        else:
+            block, extra_credits = sources.enrich(title, enabled, budget)
         if block:
             log.info("  %r → +%d chars from %s", title, len(block),
                      ", ".join(sorted({c["publisher"] for c in extra_credits})))

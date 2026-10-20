@@ -10,6 +10,7 @@ import hashlib
 import json
 import logging
 import math
+import os
 import random
 import re
 import shutil
@@ -43,6 +44,38 @@ def _report_failure(stage: str, category: str, exc: Exception | None = None, att
     if receipt:
         receipt.note_failure(stage, category, exception_type=type(exc).__name__ if exc else None,
                              attempt=attempt)
+
+
+def filter_topic_candidates_by_hint(candidates: list[dict], hint: str | None) -> list[dict]:
+    """Optionally focus selection on a live candidate, without creating or approving one.
+
+    The hint may be a topic-title phrase or an exact source identifier such as a YouTube video ID.
+    Matching is against trend metadata only; candidates still pass the normal live-evidence, approved-lane,
+    virality, safety, research, originality, and final-render gates after this discovery-time filter.
+    """
+    if not isinstance(candidates, list):
+        return []
+    hint_terms = set(originality.tokens(hint or ""))
+    if not hint_terms:
+        return candidates
+    matched = []
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            continue
+        parts = [str(candidate.get("topic") or ""), str(candidate.get("topic_key") or "")]
+        for context in candidate.get("context") or []:
+            if isinstance(context, str):
+                parts.append(context)
+        for signal in candidate.get("signals") or []:
+            if not isinstance(signal, dict):
+                continue
+            parts.extend(str(signal.get(key) or "") for key in ("topic", "source_url"))
+            evidence = signal.get("evidence")
+            if isinstance(evidence, dict):
+                parts.extend(str(evidence.get(key) or "") for key in ("video_id", "title", "url"))
+        if hint_terms.issubset(set(originality.tokens(" ".join(parts)))):
+            matched.append(candidate)
+    return matched
 
 
 def _slot_key(ts) -> str:
@@ -764,6 +797,13 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     cands = trends.collect(cfg)
     if not cands:
         _report_failure("trends", "no_live_trend_candidates")
+    topic_hint = os.environ.get("AUTOTUBE_TOPIC_HINT", "").strip()
+    if topic_hint:
+        found = len(cands)
+        cands = filter_topic_candidates_by_hint(cands, topic_hint)
+        log.info("topic focus matched %d/%d freshly collected candidate(s)", len(cands), found)
+        if not cands:
+            _report_failure("topic_selection", "topic_hint_no_live_match")
     _report_stage("topic_selection")
     picks = writer.select_topics(cands, n, recent) if cands else []
     if cands and not picks:
