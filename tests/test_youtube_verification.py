@@ -1,6 +1,12 @@
 from datetime import datetime, timezone
+from pathlib import Path
+import subprocess
+import sys
 
 import pytest
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from autotube import youtube
 
@@ -131,3 +137,13 @@ def test_unschedule_fails_closed_without_existing_video_write_scope(monkeypatch)
 def test_unschedule_rejects_malformed_video_ids():
     with pytest.raises(ValueError, match="11-character"):
         youtube.unschedule("not-a-youtube-id")
+
+
+@pytest.mark.parametrize("script", ["check_video_status.py", "unschedule_video.py"])
+def test_manual_youtube_scripts_import_project_from_the_workflow_cwd(script):
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / script), "--help"],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "usage:" in result.stdout.lower()
