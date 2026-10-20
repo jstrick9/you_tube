@@ -1,0 +1,39 @@
+name: Read YouTube publication schedule
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_id:
+        description: "Optional video ID to verify alongside the channel's scheduled uploads"
+        required: false
+        type: string
+        default: "FL8HklUAOIk"
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+      YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+      YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+      VIDEO_ID: ${{ inputs.video_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install YouTube API dependencies
+        run: pip install -q google-api-python-client==2.201.0 google-auth==2.62.0 requests==2.34.2 pyyaml==6.0.3
+      - name: Read current video status and all scheduled uploads
+        run: |
+          if [ -n "$VIDEO_ID" ]; then
+            python scripts/youtube_schedule_status.py --video-id "$VIDEO_ID"
+          else
+            python scripts/youtube_schedule_status.py
+          fi
