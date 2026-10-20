@@ -1,208 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261016-222921-3872",
-    "workflow_run_id": "38975902417",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-16T22:29:21.476565+00:00",
-    "finished_at": "2026-10-16T22:37:49.305710+00:00",
-    "duration_seconds": 507.829,
-    "mode": "dry_run",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 2,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 4,
-      "script_research": 8,
-      "script_draft": 2,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "a Mysterious Green Light Appeared on Jupiter!",
-        "topic_key": "a mysterious green light appeared on jupiter",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Hundreds of Bats Hidden Under One Roof",
-        "topic_key": "hundreds of bats hidden under one roof",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "This Jeep Could Launch A Nuke",
-        "topic_key": "this jeep could launch a nuke",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "A Shocking Discovery in the Deep Sea",
-        "topic_key": "a shocking discovery in the deep sea",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-16T22:30:35.271964+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-16T22:30:35.272046+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-16T22:30:37.036579+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-16T22:30:37.036689+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-16T22:33:46.357821+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-16T22:33:46.358017+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-16T22:35:06.301916+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-16T22:35:06.302041+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-16T22:37:49.304434+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-16T22:29:21.563924+00:00",
-        "cooldown_until": "2026-10-17T01:52:33.373195+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-16T22:29:40.045318+00:00",
-        "cooldown_until": "2026-10-16T22:49:40.044466+00:00",
-        "retry_after_seconds": 29.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-16T22:29:48.400852+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-16T22:30:01.201500+00:00"
-      },
-      {
-        "provider": "cloudflare",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-16T22:30:09.545056+00:00",
-        "cooldown_until": "2026-10-16T22:50:09.544203+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-16T22:30:44.191276+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-16T22:30:52.428972+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-16T22:33:11.415390+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-16T22:33:17.954549+00:00",
-        "cooldown_until": "2026-10-16T22:53:17.953597+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-16T22:37:49.304182+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct",
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261016-225508-3827",
     "workflow_run_id": "38978401495",
     "workflow_run_attempt": "1",
@@ -4320,6 +4118,198 @@
     "top_up": true,
     "rate_limited_models": [
       "groq:openai/gpt-oss-120b"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261020-025230-3644",
+    "workflow_run_id": "39361131058",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-20T02:52:30.907121+00:00",
+    "finished_at": "2026-10-20T02:57:16.086802+00:00",
+    "duration_seconds": 285.18,
+    "mode": "dry_run",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 5,
+      "script_research": 10,
+      "script_draft": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Dog Paani Kaise Peeta Hai? Tongue Ka Asli Secret!",
+        "topic_key": "dog paani kaise peeta hai tongue ka asli secret",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "WHY DIDN'T JAPAN TAKE AUSTRALIA?",
+        "topic_key": "why didnt japan take australia",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "The Crusader Sword: What X-Rays Revealed Beneath the Sea",
+        "topic_key": "the crusader sword what xrays revealed beneath the sea",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "shipwreck",
+        "topic_key": "shipwreck",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Skeleton Secrets!",
+        "topic_key": "skeleton secrets",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-20T02:52:43.274865+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-20T02:52:43.274978+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-20T02:53:35.938260+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-20T02:53:35.938395+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-20T02:53:38.964208+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-20T02:53:38.964272+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-20T02:53:40.802665+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-20T02:53:40.802735+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-20T02:57:16.084855+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-20T02:57:16.085022+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-20T02:57:16.085103+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-20T02:52:30.907827+00:00",
+        "cooldown_until": "2026-10-20T04:41:46.518451+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-20T02:52:58.263497+00:00",
+        "cooldown_until": "2026-10-20T03:12:58.262909+00:00",
+        "retry_after_seconds": 28.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 500,
+        "action": "transient_failure",
+        "at": "2026-10-20T02:52:58.509377+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-20T02:55:34.728116+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-20T02:55:41.443592+00:00",
+        "cooldown_until": "2026-10-20T03:15:41.442999+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
     ]
   }
 ]
