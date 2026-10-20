@@ -706,6 +706,13 @@ def _capture_prompt(category="history"):
     return seen.get("user", "")
 
 
+def test_writer_prompt_aims_below_the_hard_word_ceiling_and_keeps_asides_short():
+    prompt = _capture_prompt("science")
+    assert "Aim for 44-48 spoken words TOTAL" in prompt
+    assert "one specific 2-5 word aside" in prompt
+    assert "FINAL SHAPE CHECK before emitting JSON" in prompt
+
+
 def test_lane_voice_actually_reaches_the_prompt():
     """Grepping for "{lane_rule}" proves the placeholder exists, not that it is filled.
 

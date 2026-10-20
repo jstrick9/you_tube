@@ -1644,8 +1644,9 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
         reveal_rule = ('  "reveal": true on exactly ONE segment — the line with the biggest surprise/answer/twist (the video adds '
                        'a beat of silence, a riser and a flash right before it). Never the hook; usually the last BODY line.\n')
         aside_rule = (
-            f'  "aside" (REQUIRED: at least 1, at most {max_asides} in the whole script, never on the hook): a 2-8 word deadpan\n'
-            '     reaction the narrator says right AFTER that line. It MUST react to something specific in THAT\n'
+            f'  "aside" (REQUIRED: at least 1, at most {max_asides} in the whole script, never on the hook): a 2-5 word deadpan\n'
+            '     reaction the narrator says right AFTER that line. If using a second aside, keep all aside words combined\n'
+            '     to 8 or fewer so sourced narration keeps the word budget. It MUST react to something specific in THAT\n'
             '     line - name the thing, the number or the absurdity it just described. A reaction that would fit\n'
             '     any video at all ("Nature, please.", "Rude.", "Bold plan.", "No airbags.") is generic filler: it spends\n'
             '     words without adding a topic-specific reaction. Reusing canned reactions weakens the episode\'s\n'
@@ -1802,6 +1803,7 @@ history. If the angle names a specific surprise, that surprise IS the video):
 {feedback_line}{prior_line}{prior_scores_line}FORMAT: {fmt} — {FORMAT_GUIDE[fmt]}
 {hook_line}
 {structure_line}{comment_line}{turn_line}LENGTH: {words_lo}-{words_hi} words total narration ({lo}-{hi} seconds).
+WORD-BUDGET PLAN: Aim for 44-48 spoken words TOTAL, including every aside; do not write to the ceiling. For five beats, a feasible count is roughly 7 hook + 9 turn + 9 + 9 escalation + 7 payoff + one 3-word aside = 44. For four beats, reallocate within each beat's stated limits. Use one specific 2-5 word aside (or two totaling no more than 8 words), then count all text and asides together before returning JSON.
 CHANNEL: {self.cfg['channel']['name']}
 {persona_line}
 GROUNDED SOURCE TEXT (Wikipedia anchor: "{source['title']}"; supplementary passages are labeled inline) — the ONLY allowed factual source material. Preserve the source attribution from each labeled passage:
