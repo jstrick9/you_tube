@@ -1,19 +1,43 @@
 {
   "schema_version": 1,
   "providers": {
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-20T04:54:21.862925+00:00",
-      "blocked_until": "2026-10-20T05:14:21.862925+00:00"
-    },
     "pollinations": {
       "reason": "billing_or_entitlement",
       "status_code": 402,
       "recorded_at": "2026-10-20T05:12:25.676374+00:00",
       "blocked_until": "2026-10-21T05:12:25.676374+00:00",
       "retry_after_seconds": 8.0
+    },
+    "groq": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-20T15:11:40.403380+00:00",
+      "blocked_until": "2026-10-20T15:31:40.403380+00:00",
+      "retry_after_seconds": 30.0
+    },
+    "cloudflare": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-20T15:12:09.648456+00:00",
+      "blocked_until": "2026-10-20T15:32:09.648456+00:00"
+    },
+    "gemini": {
+      "reason": "repeated_http_5xx",
+      "status_code": 503,
+      "recorded_at": "2026-10-20T15:17:03.782987+00:00",
+      "blocked_until": "2026-10-20T15:27:03.782987+00:00"
+    },
+    "mistral": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-10-20T15:17:10.298525+00:00",
+      "blocked_until": "2026-10-20T15:37:10.298525+00:00"
     }
   },
-  "failures_5xx": {}
+  "failures_5xx": {
+    "gemini": {
+      "count": 3,
+      "last_at": "2026-10-20T15:17:03.782969+00:00"
+    }
+  }
 }
