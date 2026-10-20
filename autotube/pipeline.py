@@ -964,15 +964,28 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
             from . import youtube
             try:
                 entry["video_id"] = youtube.upload(res["file"], res["meta"], cfg, slot, res["thumb"])
-                entry["status"] = "scheduled"
-                if receipt:
-                    receipt.data["scheduled_count"] = int(receipt.data.get("scheduled_count", 0)) + 1
             except Exception as e:  # noqa: BLE001
                 _report_failure("upload", run_report.classify_failure("upload", str(e)), e)
                 if receipt:
                     receipt.data["upload_failure_count"] = int(receipt.data.get("upload_failure_count", 0)) + 1
                 log.error("upload failed: %s", e)
                 entry["status"] = f"upload_failed: {str(e)[:200]}"
+            else:
+                try:
+                    observed = youtube.verify_upload(entry["video_id"], slot, cfg)
+                except Exception as e:  # noqa: BLE001 — do not claim a schedule without a YouTube status read
+                    _report_failure("upload_verification", "youtube_status_unverified", e)
+                    if receipt:
+                        receipt.data["upload_failure_count"] = int(receipt.data.get("upload_failure_count", 0)) + 1
+                    log.error("uploaded %s but YouTube publication state was not verified: %s",
+                              entry["video_id"], str(e)[:200])
+                    entry["status"] = f"upload_failed_verification: {str(e)[:160]}"
+                else:
+                    entry["youtube_status"] = {key: observed.get(key) for key in
+                                               ("video_id", "privacy_status", "upload_status", "publish_at")}
+                    entry["status"] = "scheduled"
+                    if receipt:
+                        receipt.data["scheduled_count"] = int(receipt.data.get("scheduled_count", 0)) + 1
         else:
             entry["status"] = "rendered"
         res["entry"] = entry

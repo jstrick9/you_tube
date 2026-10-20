@@ -15,7 +15,7 @@ import logging
 import math
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 log = logging.getLogger("autotube.youtube")
@@ -70,6 +70,56 @@ def video_status(video_id: str) -> dict | None:
         "publish_at": status.get("publishAt"),
         "rejection_reason": status.get("rejectionReason"),
     }
+
+
+def verify_upload(video_id: str, publish_at: datetime | None, cfg: dict) -> dict:
+    """Confirm YouTube reports this exact upload as scheduled (or at its configured immediate privacy).
+
+    A successful insert response alone is not the publication state. Re-read the video through the
+    channel's OAuth credentials, retry one brief indexing delay, and fail closed on missing or mismatched
+    ID, privacy, upload state, or publish time.
+    """
+    video_id = str(video_id or "").strip()
+    if not video_id:
+        raise ValueError("video_id must not be empty")
+    expected_privacy = ("private" if publish_at else
+                        str(cfg.get("upload", {}).get("default_privacy", "public")).strip().lower())
+    expected_publish = None
+    if publish_at is not None:
+        if not isinstance(publish_at, datetime) or publish_at.tzinfo is None:
+            raise ValueError("scheduled publish time must be a timezone-aware datetime")
+        expected_publish = publish_at.astimezone(timezone.utc).replace(microsecond=0)
+    observed = None
+    last_error = None
+    for attempt in range(2):
+        try:
+            observed = video_status(video_id)
+            last_error = None
+        except Exception as exc:  # noqa: BLE001 — status lookup is a strict publish-verification gate
+            last_error = exc
+        valid = isinstance(observed, dict)
+        if valid:
+            valid = (str(observed.get("video_id") or "") == video_id
+                     and observed.get("privacy_status") == expected_privacy
+                     and observed.get("upload_status") in {"uploaded", "processed"})
+            if valid and expected_publish is not None:
+                try:
+                    actual_publish = datetime.fromisoformat(str(observed.get("publish_at") or "").replace(
+                        "Z", "+00:00")).astimezone(timezone.utc).replace(microsecond=0)
+                    valid = actual_publish == expected_publish
+                except (TypeError, ValueError, OverflowError):
+                    valid = False
+            elif valid and observed.get("publish_at"):
+                valid = False
+        if valid:
+            log.info("verified YouTube video id=%s privacy=%s upload_status=%s publish_at=%s",
+                     video_id, observed["privacy_status"], observed["upload_status"],
+                     observed.get("publish_at") or "immediate")
+            return observed
+        if attempt == 0:
+            time.sleep(1)
+    detail = f"; status read failed with {type(last_error).__name__}" if last_error else ""
+    raise RuntimeError(f"YouTube did not confirm the requested publication state for {video_id}{detail}")
 
 
 def upload(video: Path, meta: dict, cfg: dict, publish_at: datetime | None, thumb: Path | None = None) -> str:
