@@ -11,27 +11,27 @@
     "groq": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-21T16:38:08.972671+00:00",
-      "blocked_until": "2026-10-21T16:58:08.972671+00:00",
-      "retry_after_seconds": 1.0
+      "recorded_at": "2026-10-21T17:02:39.974813+00:00",
+      "blocked_until": "2026-10-21T17:22:39.974813+00:00",
+      "retry_after_seconds": 5.0
     },
     "gemini": {
       "reason": "repeated_http_5xx",
       "status_code": 503,
-      "recorded_at": "2026-10-21T16:38:19.412627+00:00",
-      "blocked_until": "2026-10-21T16:48:19.412627+00:00"
+      "recorded_at": "2026-10-21T17:03:09.422827+00:00",
+      "blocked_until": "2026-10-21T17:13:09.422827+00:00"
     },
     "mistral": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-21T16:38:26.045794+00:00",
-      "blocked_until": "2026-10-21T16:58:26.045794+00:00"
+      "recorded_at": "2026-10-21T17:03:16.228018+00:00",
+      "blocked_until": "2026-10-21T17:23:16.228018+00:00"
     }
   },
   "failures_5xx": {
     "gemini": {
-      "count": 4,
-      "last_at": "2026-10-21T16:38:19.412606+00:00"
+      "count": 5,
+      "last_at": "2026-10-21T17:03:09.422806+00:00"
     }
   }
 }
