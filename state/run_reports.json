@@ -1,33 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "39186619124",
-    "workflow_run_id": "39186619124",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-19T01:43:16.996701+00:00",
-    "finished_at": "2026-10-19T01:43:16.996701+00:00",
-    "duration_seconds": 0,
-    "mode": "workflow_fallback",
-    "top_up": true,
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "superseded",
-    "stage": "preflight",
-    "stage_entries": {
-      "preflight": 1
-    },
-    "retry_budgets": {},
-    "topic_attempts": [],
-    "failures": [],
-    "retry_events": [],
-    "provider_events": [],
-    "preflight_skip_reason": "delayed_schedule_superseded"
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261019-015847-3617",
     "workflow_run_id": "39187689482",
     "workflow_run_attempt": "1",
@@ -4833,5 +4806,32 @@
       "groq:openai/gpt-oss-120b",
       "mistral:mistral-small-latest"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "39688748263",
+    "workflow_run_id": "39688748263",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-21T22:45:26.233298+00:00",
+    "finished_at": "2026-10-21T22:45:26.233298+00:00",
+    "duration_seconds": 0,
+    "mode": "workflow_fallback",
+    "top_up": true,
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "superseded",
+    "stage": "preflight",
+    "stage_entries": {
+      "preflight": 1
+    },
+    "retry_budgets": {},
+    "topic_attempts": [],
+    "failures": [],
+    "retry_events": [],
+    "provider_events": [],
+    "preflight_skip_reason": "delayed_schedule_superseded"
   }
 ]
