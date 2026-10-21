@@ -2051,8 +2051,11 @@ Return JSON using this FIVE-OBJECT JSON SKELETON (all placeholder text must be r
         # Keep the two-call per-model cap: run 144 produced no valid draft after a third
         # schema attempt and later recorded a Cloudflare 429. Prefer clearer instructions
         # and provider failover over spending more calls on repeated malformed output.
+        # Workers AI documents a 256-token default for Llama 3.3 70B. This script's
+        # complete JSON shape needs more room; keep the explicit ceiling bounded and let
+        # local validation reject any malformed or semantically unsafe completion.
         script = self.llm.json(WRITER_SYSTEM, user, validate=validate,
-                               response_schema=SCRIPT_RESPONSE_SCHEMA)
+                               response_schema=SCRIPT_RESPONSE_SCHEMA, max_tokens=2048)
         validate(script)  # trust-boundary check even for custom routers that ignore the callback
         script["_writer_model"] = getattr(self.llm, "last_used", "")
         tidy(script, fmt, max_asides)

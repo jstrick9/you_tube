@@ -346,14 +346,15 @@ def _nvidia(model, system, user, temperature, images=None):
                               user, temperature, images=images)
 
 
-def _cloudflare(model, system, user, temperature, images=None, response_schema=None):
+def _cloudflare(model, system, user, temperature, images=None, response_schema=None, max_tokens=None):
     """Workers AI. 10,000 neurons/day free, no card, and it hard-blocks instead of billing."""
     key, acct = cloudflare_creds()
     if not (key and acct):
         raise LLMError("no CLOUDFLARE_API_TOKEN")
+    extra_body = {"max_tokens": int(max_tokens)} if max_tokens is not None else None
     return _openai_compatible(f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/v1/chat/completions",
-                              key, model, system, user, temperature, images=images,
-                              response_schema=response_schema)
+                              key, model, system, user, temperature, extra_body=extra_body,
+                              images=images, response_schema=response_schema)
 
 
 # Which env var gates each provider. Kept in one place because it was previously
@@ -546,7 +547,8 @@ class LLM:
     def json(self, system: str, user: str, temperature: float | None = None,
              validate=None, attempts_per_model: int = 2, images: list[bytes] | None = None,
              order: list[str] | None = None, models_of=None, avoid: str | None = None,
-             response_schema: dict[str, Any] | None = None) -> Any:
+             response_schema: dict[str, Any] | None = None,
+             max_tokens: int | None = None) -> Any:
         """Return parsed JSON. `validate(obj)` may raise to force a retry/failover.
 
         `avoid` is a provider:model tag to skip (used to keep the reviewer independent of the writer).
@@ -606,13 +608,18 @@ class LLM:
                         retry_temp = min(temp, 0.3) if feedback else temp
                         if vision_route:
                             raw = fn(model, system, prompt, retry_temp, images)
-                        elif (response_schema is not None and pname == "cloudflare"
-                              and model in (self.cfg.get("cloudflare_json_schema_models") or [])):
-                            # Workers AI documents JSON Schema mode for an explicit model
-                            # allowlist. Do not send this format to Scout or other providers;
-                            # unsupported routes retain the normal JSON-object fallback.
-                            raw = fn(model, system, prompt, retry_temp,
-                                     response_schema=response_schema)
+                        elif pname == "cloudflare" and (
+                                max_tokens is not None
+                                or (response_schema is not None
+                                    and model in (self.cfg.get("cloudflare_json_schema_models") or []))):
+                            # Workers AI defaults to only 256 completion tokens; a full
+                            # multi-beat script needs a larger explicit budget. JSON Schema
+                            # mode is separately sent only to its documented model allowlist.
+                            kwargs = {"max_tokens": max_tokens} if max_tokens is not None else {}
+                            if (response_schema is not None
+                                    and model in (self.cfg.get("cloudflare_json_schema_models") or [])):
+                                kwargs["response_schema"] = response_schema
+                            raw = fn(model, system, prompt, retry_temp, **kwargs)
                         else:
                             raw = fn(model, system, prompt, retry_temp)
                         obj = _extract_json(raw)

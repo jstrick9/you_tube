@@ -580,22 +580,22 @@ def test_cloudflare_json_schema_dispatch_and_request_shape(monkeypatch):
     received = []
 
     def fake_cloudflare(_model, _system, _user, _temperature, images=None,
-                        response_schema=None):
-        received.append(response_schema)
+                        response_schema=None, max_tokens=None):
+        received.append((response_schema, max_tokens))
         return '{"ok": true}'
 
     monkeypatch.setitem(L.PROVIDERS, "cloudflare", (fake_cloudflare, "cloudflare_models"))
     cfg = {"llm": {"providers": ["cloudflare"], "cloudflare_models": [model],
                     "cloudflare_json_schema_models": [model]}}
-    assert L.LLM(cfg).json("system", "user", response_schema=schema) == {"ok": True}
-    assert received == [schema]
+    assert L.LLM(cfg).json("system", "user", response_schema=schema, max_tokens=2048) == {"ok": True}
+    assert received == [(schema, 2048)]
 
     # Scout is a text fallback, but Cloudflare's current JSON-mode support list does not
     # include it. Do not optimistically send the constrained response format there.
     scout_cfg = {"llm": {"providers": ["cloudflare"], "cloudflare_models": [scout],
                          "cloudflare_json_schema_models": [model]}}
-    assert L.LLM(scout_cfg).json("system", "user", response_schema=schema) == {"ok": True}
-    assert received[-1] is None
+    assert L.LLM(scout_cfg).json("system", "user", response_schema=schema, max_tokens=2048) == {"ok": True}
+    assert received[-1] == (None, 2048)
 
 
 def test_cloudflare_transmits_json_schema_as_response_format(monkeypatch):
@@ -622,11 +622,12 @@ def test_cloudflare_transmits_json_schema_as_response_format(monkeypatch):
 
     monkeypatch.setattr(L, "http", lambda: FakeHTTP())
     result = L._cloudflare("@cf/meta/llama-3.3-70b-instruct-fp8-fast", "system", "user", 0.1,
-                           response_schema=schema)
+                           response_schema=schema, max_tokens=2048)
     assert result == '{"segments": []}'
     url, body = captured[0]
     assert "/accounts/test-account/ai/v1/chat/completions" in url
     assert body["response_format"] == {"type": "json_schema", "json_schema": schema}
+    assert body["max_tokens"] == 2048
 
 
 def test_cloudflare_does_not_silently_drop_a_rejected_schema(monkeypatch):
