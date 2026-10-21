@@ -171,6 +171,7 @@ def test_real_writer_validator_backfills_an_omitted_evidence_field():
         def json(self, _system, _user, validate=None, **_kwargs):
             captured["validate"] = validate
             captured["user"] = _user
+            captured["response_schema"] = _kwargs.get("response_schema")
             raise RuntimeError("capture the production validator")
 
     class FakeStrategy:
@@ -203,6 +204,10 @@ def test_real_writer_validator_backfills_an_omitted_evidence_field():
         captured["validate"]({"title": "Too short", "segments": [{"text": "A."}, {"text": "B."}, {"text": "C."}]})
 
     assert "CONCRETE SUBJECT TO NAME AND SHOW: Stone Sphere" in captured["user"]
+    schema = captured["response_schema"]
+    assert schema["properties"]["segments"]["minItems"] == 4
+    assert schema["properties"]["segments"]["maxItems"] == 5
+    assert "visual" in schema["properties"]["segments"]["items"]["required"]
     assert "Write the script as exactly 4 or 5 segments. Prefer exactly FIVE by default" in captured["user"]
     assert "FINAL SHAPE CHECK" in captured["user"]
     assert "FIVE-OBJECT JSON SKELETON" in captured["user"]

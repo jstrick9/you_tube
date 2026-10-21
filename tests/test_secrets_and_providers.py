@@ -567,6 +567,95 @@ def test_cloudflare_accepts_the_common_misspelling(monkeypatch):
     assert L._provider_key("cloudflare") is None
 
 
+def test_cloudflare_json_schema_dispatch_and_request_shape(monkeypatch):
+    """Only the documented Workers AI route gets the script's constrained shape."""
+    import autotube.llm as L
+
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "test-token")
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", "test-account")
+    model = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+    scout = "@cf/meta/llama-4-scout-17b-16e-instruct"
+    schema = {"type": "object", "properties": {"ok": {"type": "boolean"}},
+              "required": ["ok"], "additionalProperties": False}
+    received = []
+
+    def fake_cloudflare(_model, _system, _user, _temperature, images=None,
+                        response_schema=None):
+        received.append(response_schema)
+        return '{"ok": true}'
+
+    monkeypatch.setitem(L.PROVIDERS, "cloudflare", (fake_cloudflare, "cloudflare_models"))
+    cfg = {"llm": {"providers": ["cloudflare"], "cloudflare_models": [model],
+                    "cloudflare_json_schema_models": [model]}}
+    assert L.LLM(cfg).json("system", "user", response_schema=schema) == {"ok": True}
+    assert received == [schema]
+
+    # Scout is a text fallback, but Cloudflare's current JSON-mode support list does not
+    # include it. Do not optimistically send the constrained response format there.
+    scout_cfg = {"llm": {"providers": ["cloudflare"], "cloudflare_models": [scout],
+                         "cloudflare_json_schema_models": [model]}}
+    assert L.LLM(scout_cfg).json("system", "user", response_schema=schema) == {"ok": True}
+    assert received[-1] is None
+
+
+def test_cloudflare_transmits_json_schema_as_response_format(monkeypatch):
+    import autotube.llm as L
+
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "test-token")
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", "test-account")
+    captured = []
+    schema = {"type": "object", "properties": {"segments": {"type": "array", "minItems": 4,
+              "maxItems": 5}}, "required": ["segments"]}
+
+    class Response:
+        status_code = 200
+        text = ""
+
+        @staticmethod
+        def json():
+            return {"choices": [{"message": {"content": '{"segments": []}'}}]}
+
+    class FakeHTTP:
+        def post(self, url, headers=None, json=None, timeout=None):
+            captured.append((url, dict(json)))
+            return Response()
+
+    monkeypatch.setattr(L, "http", lambda: FakeHTTP())
+    result = L._cloudflare("@cf/meta/llama-3.3-70b-instruct-fp8-fast", "system", "user", 0.1,
+                           response_schema=schema)
+    assert result == '{"segments": []}'
+    url, body = captured[0]
+    assert "/accounts/test-account/ai/v1/chat/completions" in url
+    assert body["response_format"] == {"type": "json_schema", "json_schema": schema}
+
+
+def test_cloudflare_does_not_silently_drop_a_rejected_schema(monkeypatch):
+    import pytest
+    import autotube.llm as L
+
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "test-token")
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", "test-account")
+    calls = []
+    schema = {"type": "object", "properties": {"segments": {"type": "array"}}}
+
+    class Response:
+        status_code = 400
+        text = '{"error":{"code":"json_validate_failed"}}'
+        headers = {}
+
+    class FakeHTTP:
+        def post(self, url, headers=None, json=None, timeout=None):
+            calls.append(dict(json))
+            return Response()
+
+    monkeypatch.setattr(L, "http", lambda: FakeHTTP())
+    with pytest.raises(L.LLMError, match="HTTP 400"):
+        L._cloudflare("@cf/meta/llama-3.3-70b-instruct-fp8-fast", "system", "user", 0.1,
+                      response_schema=schema)
+    assert len(calls) == 1, "a rejected schema must fail over, not silently degrade to JSON mode"
+    assert calls[0]["response_format"]["type"] == "json_schema"
+
+
 def test_both_spellings_reach_the_workflows():
     for wf in ("daily.yml", "check.yml"):
         s = (WF / wf).read_text()

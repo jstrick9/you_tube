@@ -222,7 +222,8 @@ def _gemini(model: str, system: str, user: str, temperature: float, images: list
 def _openai_compatible(base: str, key: str | None, model: str, system: str, user: str,
                        temperature: float, json_mode: bool = True, extra_headers: dict | None = None,
                        extra_body: dict | None = None, images: list[bytes] | None = None,
-                       image_url_as_string: bool = False) -> str:
+                       image_url_as_string: bool = False,
+                       response_schema: dict[str, Any] | None = None) -> str:
     headers = {"Content-Type": "application/json"}
     if key:
         headers["Authorization"] = f"Bearer {key}"
@@ -242,11 +243,15 @@ def _openai_compatible(base: str, key: str | None, model: str, system: str, user
         "temperature": temperature,
     }
     if json_mode:
-        body["response_format"] = {"type": "json_object"}
+        body["response_format"] = (
+            {"type": "json_schema", "json_schema": response_schema}
+            if response_schema is not None else {"type": "json_object"}
+        )
     if extra_body:
         body.update(extra_body)
     r = http().post(base, headers=headers, json=body, timeout=120)
-    if r.status_code == 400 and json_mode and "json_validate" in r.text.lower():
+    if (r.status_code == 400 and json_mode and response_schema is None
+            and "json_validate" in r.text.lower()):
         # Reasoning models (Groq's gpt-oss family) reject response_format=json_object:
         # they emit a reasoning preamble that cannot satisfy strict JSON mode, so the
         # server rejects the request outright. The prompt already demands JSON and the
@@ -341,13 +346,14 @@ def _nvidia(model, system, user, temperature, images=None):
                               user, temperature, images=images)
 
 
-def _cloudflare(model, system, user, temperature, images=None):
+def _cloudflare(model, system, user, temperature, images=None, response_schema=None):
     """Workers AI. 10,000 neurons/day free, no card, and it hard-blocks instead of billing."""
     key, acct = cloudflare_creds()
     if not (key and acct):
         raise LLMError("no CLOUDFLARE_API_TOKEN")
     return _openai_compatible(f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/v1/chat/completions",
-                              key, model, system, user, temperature, images=images)
+                              key, model, system, user, temperature, images=images,
+                              response_schema=response_schema)
 
 
 # Which env var gates each provider. Kept in one place because it was previously
@@ -539,7 +545,8 @@ class LLM:
 
     def json(self, system: str, user: str, temperature: float | None = None,
              validate=None, attempts_per_model: int = 2, images: list[bytes] | None = None,
-             order: list[str] | None = None, models_of=None, avoid: str | None = None) -> Any:
+             order: list[str] | None = None, models_of=None, avoid: str | None = None,
+             response_schema: dict[str, Any] | None = None) -> Any:
         """Return parsed JSON. `validate(obj)` may raise to force a retry/failover.
 
         `avoid` is a provider:model tag to skip (used to keep the reviewer independent of the writer).
@@ -597,8 +604,17 @@ class LLM:
                                             if "this is not the story that trended" in feedback_lower or "angle was:" in feedback_lower else "")
                                          if feedback else "")
                         retry_temp = min(temp, 0.3) if feedback else temp
-                        raw = fn(model, system, prompt, retry_temp, images) if vision_route else fn(
-                            model, system, prompt, retry_temp)
+                        if vision_route:
+                            raw = fn(model, system, prompt, retry_temp, images)
+                        elif (response_schema is not None and pname == "cloudflare"
+                              and model in (self.cfg.get("cloudflare_json_schema_models") or [])):
+                            # Workers AI documents JSON Schema mode for an explicit model
+                            # allowlist. Do not send this format to Scout or other providers;
+                            # unsupported routes retain the normal JSON-object fallback.
+                            raw = fn(model, system, prompt, retry_temp,
+                                     response_schema=response_schema)
+                        else:
+                            raw = fn(model, system, prompt, retry_temp)
                         obj = _extract_json(raw)
                         if validate:
                             validate(obj)

@@ -261,6 +261,48 @@ WRITER_SYSTEM = (
     "numbers written as digits, no emojis, no hashtags in narration, no stage directions. Reply with JSON only."
 )
 
+# Simple response shape sent to Cloudflare Workers AI's documented JSON Schema
+# mode for its supported Llama 3.3 70B route. This only constrains structure; the local
+# validator below and all downstream fact, trend, safety, visual, and render gates remain
+# authoritative. JSON Schema mode is not a substitute for those checks.
+SCRIPT_RESPONSE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "title": {"type": "string", "minLength": 1, "maxLength": 60},
+        "segments": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 5,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "text": {"type": "string", "minLength": 1},
+                    "aside": {"type": "string"},
+                    "emphasis": {"type": "array", "minItems": 1, "maxItems": 2,
+                                  "items": {"type": "string", "minLength": 1}},
+                    "reveal": {"type": "boolean"},
+                    "visual": {
+                        "type": "object",
+                        "properties": {
+                            "shows": {"type": "string", "minLength": 1},
+                            "queries": {"type": "array", "minItems": 2, "maxItems": 3,
+                                         "items": {"type": "string", "minLength": 1}},
+                        },
+                        "required": ["shows", "queries"],
+                        "additionalProperties": False,
+                    },
+                    "evidence": {"type": "string"},
+                },
+                "required": ["text", "aside", "emphasis", "reveal", "visual", "evidence"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    "required": ["title", "segments"],
+    "additionalProperties": False,
+}
+
+
 REVIEW_SYSTEM = (
     "You are a strict YouTube policy and quality reviewer. You check a Shorts script against its SOURCE TEXT for "
     "factual accuracy, misleading claims, clickbait mismatch, advertiser-friendliness, originality and viewer value. "
@@ -2009,7 +2051,8 @@ Return JSON using this FIVE-OBJECT JSON SKELETON (all placeholder text must be r
         # Keep the two-call per-model cap: run 144 produced no valid draft after a third
         # schema attempt and later recorded a Cloudflare 429. Prefer clearer instructions
         # and provider failover over spending more calls on repeated malformed output.
-        script = self.llm.json(WRITER_SYSTEM, user, validate=validate)
+        script = self.llm.json(WRITER_SYSTEM, user, validate=validate,
+                               response_schema=SCRIPT_RESPONSE_SCHEMA)
         validate(script)  # trust-boundary check even for custom routers that ignore the callback
         script["_writer_model"] = getattr(self.llm, "last_used", "")
         tidy(script, fmt, max_asides)
