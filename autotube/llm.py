@@ -351,7 +351,12 @@ def _cloudflare(model, system, user, temperature, images=None, response_schema=N
     key, acct = cloudflare_creds()
     if not (key and acct):
         raise LLMError("no CLOUDFLARE_API_TOKEN")
-    extra_body = {"max_tokens": int(max_tokens)} if max_tokens is not None else None
+    # Workers AI model pages document a 256-token default. Review, visual-verdict, and
+    # metadata JSON can exceed that even when the script writer is not the caller; use a
+    # bounded 1024-token default for all Cloudflare requests, with scriptwriting overriding
+    # it to 2048 below. The cap is a ceiling, not a request to fill it.
+    completion_tokens = int(max_tokens) if max_tokens is not None else 1024
+    extra_body = {"max_tokens": completion_tokens}
     return _openai_compatible(f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/v1/chat/completions",
                               key, model, system, user, temperature, extra_body=extra_body,
                               images=images, response_schema=response_schema)

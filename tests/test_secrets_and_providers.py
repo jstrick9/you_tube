@@ -629,6 +629,12 @@ def test_cloudflare_transmits_json_schema_as_response_format(monkeypatch):
     assert body["response_format"] == {"type": "json_schema", "json_schema": schema}
     assert body["max_tokens"] == 2048
 
+    # Other Cloudflare calls (review, metadata, visual verdicts) must also avoid the
+    # provider's documented 256-token default, but keep a lower bounded cap than scripts.
+    L._cloudflare("@cf/meta/llama-4-scout-17b-16e-instruct", "system", "user", 0.1)
+    assert captured[1][1]["max_tokens"] == 1024
+    assert captured[1][1]["response_format"] == {"type": "json_object"}
+
 
 def test_cloudflare_does_not_silently_drop_a_rejected_schema(monkeypatch):
     import pytest

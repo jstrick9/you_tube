@@ -341,8 +341,8 @@ llm:
   # preflight, while the 70B text model returned two invalid segment-count drafts in run 139.
   cloudflare_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "@cf/meta/llama-4-scout-17b-16e-instruct"]
   # Workers AI JSON Mode docs (checked 2026-10-21) list Llama 3.3 70B as supporting
-  # response_format.type=json_schema; Scout is not on that list. Its model page also sets
-  # max_tokens default=256, which truncates the script JSON; the writer requests a bounded 2048.
+  # response_format.type=json_schema; Scout is not on that list. Workers AI's default max_tokens=256
+  # truncates larger JSON responses; the router sends a bounded 1024 by default and the writer 2048.
   # Schema adherence is not guaranteed, so local validation and every downstream QA gate remain mandatory.
   # https://developers.cloudflare.com/workers-ai/features/json-mode/
   cloudflare_json_schema_models: ["@cf/meta/llama-3.3-70b-instruct-fp8-fast"]
