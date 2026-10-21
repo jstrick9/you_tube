@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-21T06:33:11.004500+00:00",
+  "updated": "2026-10-21T15:21:52.653278+00:00",
   "videos_total": 44,
   "videos_7d": 1,
-  "views_7d": 617,
+  "views_7d": 646,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -251,7 +251,7 @@
         },
         {
           "arm": "challenge",
-          "mean": 0.489,
+          "mean": 0.49,
           "n": 1
         }
       ]
@@ -522,7 +522,7 @@
         "hook_style": "you_statement",
         "duration_seconds": 33.3,
         "avg_view_pct": 37.56,
-        "views": 329,
+        "views": 330,
         "engaged_views_90d": 59,
         "sample_size": 59,
         "sample_basis": "engaged_views_90d",
@@ -660,7 +660,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 26191,
+    "views_90d": 26223,
     "per_1k_views": 1.03,
     "videos": 35,
     "denominator_basis": "public_views_fallback",
