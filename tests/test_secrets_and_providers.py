@@ -444,9 +444,8 @@ def test_vision_is_not_a_single_point_of_failure():
     """
     vis = CFG["llm"]["vision_providers"]
     assert len(vis) >= 2, f"vision has only {vis} — one rate limit discards finished work"
-    assert vis[:2] == ["nvidia", "cloudflare"], (
-        "use the route that passed run 195 first; a Cloudflare vision 429 opens a provider-wide "
-        "circuit and can block its separate script-writing model")
+    assert vis[:3] == ["gemini", "nvidia", "cloudflare"], (
+        "prefer the routes that passed recent preflights and retain Cloudflare as a fallback")
     assert vis[-1] == "mistral", "the priced vision fallback must remain last"
     assert CFG["llm"]["mistral_vision_models"] == ["ministral-8b-2512"]
     # Derived, not literal. A hardcoded set here is the same bug this suite exists to

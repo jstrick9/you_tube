@@ -670,6 +670,23 @@ class LLM:
                                                     max(DEFAULT_QUOTA_COOLDOWN_SECONDS, retry_after or 0),
                                                     retry_after)
                                 break
+                            if pname == "cloudflare" and vision_route:
+                                # Scout vision and Llama text have distinct model routes.
+                                # Run 196 showed Scout's HTTP 429 opening a provider-wide
+                                # circuit before the healthy text writer could run. Retire
+                                # only this provider's vision route for the current run;
+                                # explicit exhausted-account quotas above remain global.
+                                self._dead.add(tag)
+                                route_set = "_blocked_vision_providers"
+                                if not hasattr(self, route_set):
+                                    setattr(self, route_set, set())
+                                getattr(self, route_set).add(pname)
+                                if receipt:
+                                    receipt.note_provider_event(pname, status, "vision_model_rate_limited",
+                                                                retry_after_seconds=retry_after)
+                                log.warning("skipping Cloudflare vision route after model HTTP 429; "
+                                            "text routes remain eligible")
+                                break
                             # Never retry earlier than the provider's stated wait. If it
                             # exceeds our bounded in-run wait, open a persisted cooldown.
                             if retry_after is not None and retry_after > 45:

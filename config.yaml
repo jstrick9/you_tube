@@ -371,13 +371,13 @@ llm:
   groq_review_models: [openai/gpt-oss-120b, qwen/qwen3.8-27b, openai/gpt-oss-20b]
   gemini_review_models: [gemini-flash-latest, gemini-flash-lite-latest]
   # Image-checking routes (keyless Pollinations cannot see images, so it is never used here).
-  # Run 195 (2026-10-21) confirmed NVIDIA's image route passed preflight while Cloudflare
-  # Scout returned HTTP 429; that provider-wide circuit then blocked Cloudflare's healthy text
-  # writer. Prefer the verified NVIDIA vision route first and retain Scout as a backup. Gemini
-  # follows; Mistral's documented image-capable Ministral is a priced last resort, used only
-  # when the earlier independent providers cannot return a valid verdict.
+  # Run 196 (2026-10-21) confirmed Gemini's vision route passed preflight; Run 195 confirmed
+  # NVIDIA also passed. Prefer Gemini, then NVIDIA. Cloudflare Scout remains a fallback; its
+  # vision-only 429 now retires only that route, not the separate text writer. Mistral's
+  # documented image-capable Ministral is a priced last resort, used only when earlier
+  # independent providers cannot return a valid verdict.
   # Candidate relevance, source-specific checks, and final-render QA remain mandatory for all.
-  vision_providers: [nvidia, cloudflare, gemini, mistral]
+  vision_providers: [gemini, nvidia, cloudflare, mistral]
   gemini_vision_models: [gemini-flash-lite-latest, gemini-flash-latest]   # gemini-2.5-* now return 404
   groq_vision_models: []
   temperature: 0.8

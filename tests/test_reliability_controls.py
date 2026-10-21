@@ -377,6 +377,44 @@ def test_repeated_text_5xx_circuit_does_not_disable_vision_route(monkeypatch, me
     assert not router.vision_available(), "provider-wide quota circuits still apply to vision"
 
 
+def test_cloudflare_vision_429_does_not_block_text_writer(monkeypatch, memory_provider_circuits):
+    """Scout's vision quota is model-specific; do not silence Cloudflare Llama text."""
+    import autotube.llm as L
+
+    calls = []
+
+    def cloudflare_routes(model, _system, _user, _temperature, images=None):
+        calls.append((model, images is not None))
+        if images is not None:
+            raise L.LLMError("cloudflare scout HTTP 429: rate limited", status_code=429,
+                             retry_after_seconds=0)
+        return '{"ok": true}'
+
+    monkeypatch.setitem(L.PROVIDERS, "cloudflare", (cloudflare_routes, "cloudflare_models"))
+    monkeypatch.setattr(L, "_provider_key", lambda _provider: "test-key")
+    monkeypatch.setattr(L.time, "sleep", lambda *_: None)
+    router = L.LLM.__new__(L.LLM)
+    router.cfg = {"cloudflare_models": ["llama-text"], "vision_providers": ["cloudflare"],
+                  "cloudflare_vision_models": ["scout-vision"]}
+    router.order = ["cloudflare"]
+    router.temperature = 0.7
+    router._dead = set()
+    router._blocked_providers = set()
+    router._blocked_text_providers = set()
+    router._blocked_vision_providers = set()
+    router.circuits = memory_provider_circuits()
+    router.last_used = ""
+
+    with pytest.raises(L.LLMError, match="All LLM providers failed"):
+        router.vision_json("vision system", "inspect this image", [b"jpeg"])
+    assert "cloudflare" in router._blocked_vision_providers
+    assert "cloudflare" not in router._blocked_providers
+    assert not router.circuits.is_open("cloudflare"), "a model-specific 429 must not persist provider-wide"
+
+    assert router.json("writer system", "write a script") == {"ok": True}
+    assert calls == [("scout-vision", True), ("llama-text", False)]
+
+
 def test_vision_schema_error_gets_one_same_model_correction(monkeypatch, memory_provider_circuits):
     import autotube.llm as L
 
