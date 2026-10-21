@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-21T16:07:56.230490+00:00",
+  "updated": "2026-10-21T16:22:45.671165+00:00",
   "videos_total": 44,
   "videos_7d": 1,
-  "views_7d": 645,
+  "views_7d": 648,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -46,7 +46,7 @@
         },
         {
           "arm": "culture",
-          "mean": 0.399,
+          "mean": 0.4,
           "n": 3
         }
       ]
@@ -660,7 +660,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 26222,
+    "views_90d": 26225,
     "per_1k_views": 1.03,
     "videos": 35,
     "denominator_basis": "public_views_fallback",
