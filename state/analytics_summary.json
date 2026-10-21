@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-21T20:33:34.676012+00:00",
+  "updated": "2026-10-21T22:04:50.045358+00:00",
   "videos_total": 44,
   "videos_7d": 1,
-  "views_7d": 648,
+  "views_7d": 655,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -16,7 +16,7 @@
         },
         {
           "arm": "space",
-          "mean": 0.533,
+          "mean": 0.532,
           "n": 1
         },
         {
@@ -72,7 +72,7 @@
         },
         {
           "arm": "would_you_survive",
-          "mean": 0.533,
+          "mean": 0.532,
           "n": 1
         },
         {
@@ -303,7 +303,7 @@
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
-      "views": 1183,
+      "views": 1184,
       "avg_view_pct": 41.66
     },
     {
@@ -554,7 +554,7 @@
         "hook_style": "question",
         "duration_seconds": 35.8,
         "avg_view_pct": 41.66,
-        "views": 1183,
+        "views": 1184,
         "engaged_views_90d": 602,
         "sample_size": 602,
         "sample_basis": "engaged_views_90d",
@@ -660,7 +660,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 26227,
+    "views_90d": 26235,
     "per_1k_views": 1.03,
     "videos": 35,
     "denominator_basis": "public_views_fallback",
