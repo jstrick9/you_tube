@@ -1876,16 +1876,28 @@ For each segment give:
   "evidence": a VERBATIM {ev_len} word quote copied from the SOURCE TEXT that supports the segment ("" only for hook/CTA).
 
 FINAL SHAPE CHECK before emitting JSON: use five beats unless four is editorially cleaner; never use three.
+Count the objects in the "segments" array explicitly: five objects by default, or four only when one escalation is editorially unnecessary. The JSON skeleton below contains five objects; replace every placeholder, do not copy the placeholder words, and do not collapse multiple beats into one object. If four is cleaner, remove only one ESCALATION object; keep HOOK, TURN, the remaining ESCALATION, and PAYOFF.
 Repeat the full segment object shape for every beat. Read every "text" field aloud, in sequence, as one paragraph.
 Rewrite anything that sounds like notes, fragments, an odd word choice, a broken transition, or a sentence a person would not naturally say. Confirm every line explains the same concrete thing shown in that segment's "visual.shows"; do not promise one subject and show another. Confirm names, actions, and facts are accurate to SOURCE TEXT, and that no line requires the title or captions to make sense. Only then return the JSON.
 every segment must be a complete natural sentence, each sentence must lead clearly to the next, and every aside
 must be empty. No segment may omit its visual object: each needs a non-empty "shows" string and 2-3 non-empty query strings.
 Keep each evidence value a string; use an empty string only for the hook/CTA.
+Set each "reveal" boolean exactly as required by REVEAL RULE above; the reveal is not automatically the payoff.
 
-Return JSON:
+Return JSON using this FIVE-OBJECT JSON SKELETON (all placeholder text must be replaced):
 {{"title": "<= 60 chars: names the concrete subject; every source-backed promise is explicitly answered in spoken narration (not merely implied or placed in the description). A 'How/Why' title must explain how/why; no emojis or clickbait lies",
- "segments": [{{"text": "...", "aside": "", "emphasis": ["..."], "reveal": false,
-               "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "..."}}]}}"""
+ "segments": [
+  {{"text": "HOOK_SENTENCE", "aside": "", "emphasis": ["..."], "reveal": false,
+   "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": ""}},
+  {{"text": "TURN_SENTENCE", "aside": "", "emphasis": ["..."], "reveal": false,
+   "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "VERBATIM_SOURCE_QUOTE"}},
+  {{"text": "ESCALATION_SENTENCE", "aside": "", "emphasis": ["..."], "reveal": false,
+   "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "VERBATIM_SOURCE_QUOTE"}},
+  {{"text": "ESCALATION_SENTENCE", "aside": "", "emphasis": ["..."], "reveal": false,
+   "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "VERBATIM_SOURCE_QUOTE"}},
+  {{"text": "PAYOFF_SENTENCE", "aside": "", "emphasis": ["..."], "reveal": false,
+   "visual": {{"shows": "...", "queries": ["...", "..."]}}, "evidence": "VERBATIM_SOURCE_QUOTE"}}
+ ]}}"""
 
         # The live trend remains the required story; this concrete core is used for
         # depiction and opening-name checks so modifiers such as "poison" or
@@ -1896,8 +1908,10 @@ Return JSON:
             segs = o.get("segments")
             assert isinstance(segs, list), "segments must be a JSON list of 4 or 5 objects"
             assert 4 <= len(segs) <= 5, (
-                f"need exactly 4 or 5 segments; received {len(segs)}. Merge or split the body "
-                "without dropping any source-backed claim, and keep the hook first and payoff last")
+                f"need exactly 4 or 5 segments; received {len(segs)}. The JSON array is too short: return "
+                "five complete segment objects by default (four only if one escalation is unnecessary). Add the missing "
+                "source-backed body object(s) with full visual and evidence fields; do not drop claims. Keep the hook "
+                "first and payoff last")
             assert all(isinstance(s, dict) for s in segs), "every segment must be a JSON object"
             assert all(isinstance(s.get("text"), str) and s["text"].strip() for s in segs), "empty segment"
             assert all("aside" not in s or isinstance(s["aside"], str) for s in segs), "aside must be text"

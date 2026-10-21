@@ -199,10 +199,18 @@ def test_real_writer_validator_backfills_an_omitted_evidence_field():
     ]}
     with pytest.raises(AssertionError, match="no shot shows"):
         captured["validate"](script)
+    with pytest.raises(AssertionError, match="five complete segment objects by default"):
+        captured["validate"]({"title": "Too short", "segments": [{"text": "A."}, {"text": "B."}, {"text": "C."}]})
 
     assert "CONCRETE SUBJECT TO NAME AND SHOW: Stone Sphere" in captured["user"]
     assert "Write the script as exactly 4 or 5 segments. Prefer exactly FIVE by default" in captured["user"]
     assert "FINAL SHAPE CHECK" in captured["user"]
+    assert "FIVE-OBJECT JSON SKELETON" in captured["user"]
+    assert "Count the objects in the \"segments\" array explicitly" in captured["user"]
+    assert captured["user"].count('"text": "HOOK_SENTENCE"') == 1
+    assert captured["user"].count('"text": "TURN_SENTENCE"') == 1
+    assert captured["user"].count('"text": "ESCALATION_SENTENCE"') == 2
+    assert captured["user"].count('"text": "PAYOFF_SENTENCE"') == 1
     assert "A 'How/Why' title must explain how/why" in captured["user"]
     assert script["segments"][0]["evidence"] == ""
     assert script["segments"][1]["evidence"] in SOURCE
