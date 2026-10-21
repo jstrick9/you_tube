@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-20T19:56:15.536841+00:00",
-  "videos_total": 43,
-  "videos_7d": 0,
-  "views_7d": 0,
+  "updated": "2026-10-21T04:35:30.687671+00:00",
+  "videos_total": 44,
+  "videos_7d": 1,
+  "views_7d": 617,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -36,12 +36,12 @@
         },
         {
           "arm": "science",
-          "mean": 0.459,
+          "mean": 0.46,
           "n": 6
         },
         {
           "arm": "geography",
-          "mean": 0.414,
+          "mean": 0.415,
           "n": 2
         },
         {
@@ -62,7 +62,7 @@
         },
         {
           "arm": "guess_reveal",
-          "mean": 0.542,
+          "mean": 0.541,
           "n": 1
         },
         {
@@ -102,7 +102,7 @@
         },
         {
           "arm": "myth_buster",
-          "mean": 0.459,
+          "mean": 0.46,
           "n": 1
         },
         {
@@ -285,7 +285,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1234,
+      "views": 1235,
       "avg_view_pct": 79.93
     },
     {
@@ -325,30 +325,30 @@
     "where": "hook",
     "verdict": "Largest relative watch-ratio drop: 20% of the opening level between 10% and 20% of runtime (opening). This is a ratio-curve change, not a percentage of viewers. Median average view percentage is 58% against the internal 70% target.",
     "avg_curve": [
-      1.4091,
-      1.3129,
-      1.0287,
+      1.4094,
+      1.313,
+      1.0288,
       0.8409,
-      0.7211,
+      0.7212,
       0.6503,
       0.5899,
-      0.5499,
-      0.5137,
-      0.4878,
-      0.4297
+      0.55,
+      0.5138,
+      0.488,
+      0.4303
     ],
     "median_avg_view_pct": 57.83,
     "worst_drop": {
-      "size_of_opening_ratio": 0.2017,
+      "size_of_opening_ratio": 0.2016,
       "from_pct": 10,
       "to_pct": 20
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
-    "usable_reports_returned": 0,
+    "attempted_videos": 34,
+    "usable_reports_returned": 1,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 33,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -380,10 +380,10 @@
     "assignment": "Randomized, shuffled two-variant blocks within each production run; each topic remains unique and both variants preserve the same factual/originality and publish criteria.",
     "status": "collecting",
     "minimum_mature_retention_videos_per_variant": 10,
-    "assigned_videos": 0,
+    "assigned_videos": 1,
     "by_variant": {
       "consequence_first": {
-        "assigned_videos": 0,
+        "assigned_videos": 1,
         "matured_videos": 0,
         "turn_score_n": 0,
         "turn_score_coverage": 0.0,
@@ -398,14 +398,16 @@
         "retention_n": 0,
         "median_average_view_percentage": null,
         "over_internal_average_view_target": 0,
-        "turn_start_n": 0,
-        "median_turn_start_runtime_pct": null,
+        "turn_start_n": 1,
+        "median_turn_start_runtime_pct": 16.8,
         "turn_strength_vs_average_view_percentage": {
           "n_pairs": 0,
           "spearman_r": null,
           "note": "Descriptive association only; uses matured videos with valid turn scores, clean averageViewPercentage, and at least the configured minimum engagedViews. Not a causal claim or publication gate."
         },
-        "category_counts": {},
+        "category_counts": {
+          "science": 1
+        },
         "definition": "Beat two leads with a source-backed consequence, cost, exception, or reversal."
       },
       "new_surprise_first": {
@@ -436,7 +438,7 @@
       }
     },
     "all_variants": {
-      "assigned_videos": 0,
+      "assigned_videos": 1,
       "matured_videos": 0,
       "turn_score_n": 0,
       "turn_score_coverage": 0.0,
@@ -451,14 +453,16 @@
       "retention_n": 0,
       "median_average_view_percentage": null,
       "over_internal_average_view_target": 0,
-      "turn_start_n": 0,
-      "median_turn_start_runtime_pct": null,
+      "turn_start_n": 1,
+      "median_turn_start_runtime_pct": 16.8,
       "turn_strength_vs_average_view_percentage": {
         "n_pairs": 0,
         "spearman_r": null,
         "note": "Descriptive association only; uses matured videos with valid turn scores, clean averageViewPercentage, and at least the configured minimum engagedViews. Not a causal claim or publication gate."
       },
-      "category_counts": {}
+      "category_counts": {
+        "science": 1
+      }
     },
     "interpretation": "Small samples and different trending topics, lanes, and posting times can affect outcomes. Treat these summaries as exploratory; no treatment is auto-selected and no score or retention metric adds a publication veto."
   },
@@ -656,12 +660,12 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10090,
-    "per_1k_views": 2.68,
-    "videos": 34,
-    "denominator_basis": "engaged_views",
+    "views_90d": 26191,
+    "per_1k_views": 1.03,
+    "videos": 35,
+    "denominator_basis": "public_views_fallback",
     "videos_with_engaged_views": 34,
-    "complete_engaged_view_coverage": true,
+    "complete_engaged_view_coverage": false,
     "days_to_500": 1666.7,
     "days_to_1000": 3333.3
   },
@@ -674,27 +678,27 @@
     "expanded_threshold_progress": 0.003363,
     "current_full_threshold_progress": 0.001009,
     "feb_2027_full_threshold_progress": 0.000504,
-    "public_videos": 34,
+    "public_videos": 35,
     "videos_with_metric": 34,
-    "coverage": 1.0,
-    "complete": true,
+    "coverage": 0.971,
+    "complete": false,
     "note": "Partial if coverage is below 100%; only YouTube Analytics engagedViews count toward this proxy."
   },
   "originality": {
-    "episodes_examined": 14,
+    "episodes_examined": 15,
     "window": 25,
     "mean_pairwise_similarity": 0.0,
     "max_pairwise_similarity": 0.0,
     "pairs_over_similarity_limit": 0,
     "most_common_format": {
       "name": "creepy_true",
-      "share": 0.286
+      "share": 0.267
     },
     "most_common_category": {
       "name": "nature",
-      "share": 0.357
+      "share": 0.333
     },
-    "share_with_narrator_commentary": 0.929,
+    "share_with_narrator_commentary": 0.933,
     "flags": [],
     "verdict": "looks like a show"
   }

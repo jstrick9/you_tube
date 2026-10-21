@@ -1,117 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261017-214616-3611",
-    "workflow_run_id": "39072246137",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-17T21:46:16.592326+00:00",
-    "finished_at": "2026-10-17T21:51:10.239280+00:00",
-    "duration_seconds": 293.647,
-    "mode": "upload",
-    "target_count": 2,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "topic_production": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [],
-    "failures": [
-      {
-        "at": "2026-10-17T21:49:38.799521+00:00",
-        "stage": "topic_selection",
-        "category": "no_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-17T21:50:27.282520+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-17T21:51:10.235302+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-17T21:51:10.235317+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "gemini",
-        "status_code": 429,
-        "action": "cooldown_skip",
-        "at": "2026-10-17T21:46:16.594443+00:00",
-        "cooldown_until": "2026-10-18T01:44:58.757563+00:00"
-      },
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-17T21:46:16.594459+00:00",
-        "cooldown_until": "2026-10-18T01:53:09.732122+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-17T21:46:53.483210+00:00",
-        "cooldown_until": "2026-10-17T22:06:53.482304+00:00",
-        "retry_after_seconds": 29.0
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-17T21:46:59.942546+00:00",
-        "cooldown_until": "2026-10-17T22:06:59.941606+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-17T21:49:38.799257+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261018-013348-3620",
     "workflow_run_id": "39086856302",
     "workflow_run_attempt": "1",
@@ -4605,5 +4494,253 @@
     "failures": [],
     "retry_events": [],
     "provider_events": []
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261021-043541-3819",
+    "workflow_run_id": "39544750976",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-21T04:35:41.669984+00:00",
+    "finished_at": "2026-10-21T04:51:55.738535+00:00",
+    "duration_seconds": 974.069,
+    "mode": "upload",
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "topic_production": 1,
+      "topic_validation": 7,
+      "script_research": 14,
+      "script_draft": 3,
+      "script_review": 2,
+      "tts": 1,
+      "visuals": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Why CIRCLE daggers? The Indian Chakram",
+        "topic_key": "why circle daggers the indian chakram",
+        "outcome": "rejected",
+        "stage": "visuals",
+        "failure_category": "no_verified_visual_match"
+      },
+      {
+        "index": 1,
+        "topic": "The ocean is a SOUP",
+        "topic_key": "the ocean is a soup",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Why Salt & Pepper Are BANNED in Space!",
+        "topic_key": "why salt pepper are banned in space",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Real Elephant Heads at Mysore Palace?! Shocking History",
+        "topic_key": "real elephant heads at mysore palace shocking history",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "What Happens If You Swallow Chewing Gum?",
+        "topic_key": "what happens if you swallow chewing gum",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "How old is Earth really? Not 6,000 years",
+        "topic_key": "how old is earth really not 6000 years",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 2,
+        "topic": "How Ice Helps Install Heavy Stone Steps",
+        "topic_key": "how ice helps install heavy stone steps",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-21T04:36:17.721176+00:00",
+        "stage": "topic_selection",
+        "category": "no_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-21T04:42:15.556003+00:00",
+        "stage": "visuals",
+        "category": "no_verified_visual_match",
+        "exception_type": "NoVisualMatch"
+      },
+      {
+        "at": "2026-10-21T04:42:26.562993+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-21T04:42:26.563158+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-21T04:43:00.739325+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-21T04:43:00.739425+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-21T04:43:02.481199+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-21T04:43:02.481347+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-21T04:43:03.799242+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-21T04:43:03.799394+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-21T04:43:07.365692+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-21T04:43:07.365772+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-21T04:43:07.365870+00:00",
+        "stage": "topic_selection",
+        "category": "topic_attempt_budget_exhausted",
+        "attempt": 6
+      },
+      {
+        "at": "2026-10-21T04:51:55.730922+00:00",
+        "stage": "script_draft",
+        "category": "provider_transient_network",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-21T04:51:55.731172+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-21T04:51:55.731291+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-10-21T04:51:55.731319+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 1,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-21T04:35:41.671437+00:00",
+        "cooldown_until": "2026-10-21T05:12:25.676374+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-21T04:36:16.631217+00:00",
+        "cooldown_until": "2026-10-21T04:56:16.630624+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-21T04:38:44.986956+00:00",
+        "cooldown_until": "2026-10-21T04:58:44.986351+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-21T04:48:23.826500+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-21T04:51:55.730482+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]
