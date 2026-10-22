@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-21T22:04:50.045358+00:00",
+  "updated": "2026-10-22T00:17:08.349672+00:00",
   "videos_total": 44,
   "videos_7d": 1,
   "views_7d": 655,
@@ -231,7 +231,7 @@
         },
         {
           "arm": "correction_bait",
-          "mean": 0.513,
+          "mean": 0.512,
           "n": 4
         },
         {
@@ -570,7 +570,7 @@
         "hook_style": "question",
         "duration_seconds": 38.4,
         "avg_view_pct": 45.65,
-        "views": 974,
+        "views": 975,
         "engaged_views_90d": 540,
         "sample_size": 540,
         "sample_basis": "engaged_views_90d",
@@ -660,7 +660,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 26235,
+    "views_90d": 26236,
     "per_1k_views": 1.03,
     "videos": 35,
     "denominator_basis": "public_views_fallback",

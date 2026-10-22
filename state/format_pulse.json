@@ -1,93 +1,96 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-21T04:35:48+00:00",
-  "sample": 132,
+  "updated": "2026-10-22T00:17:16+00:00",
+  "sample": 141,
   "hook_style": {
-    "bold_claim": 0.6015,
-    "question": 0.3229,
-    "you_statement": 0.0541,
-    "number_first": 0.0162,
-    "disbelief": 0.0054
+    "bold_claim": 0.5674,
+    "question": 0.3861,
+    "you_statement": 0.0243,
+    "disbelief": 0.0114,
+    "number_first": 0.0108
   },
   "title_hook_style": {
-    "bold_claim": 0.6015,
-    "question": 0.3229,
-    "you_statement": 0.0541,
-    "number_first": 0.0162,
-    "disbelief": 0.0054
+    "bold_claim": 0.5674,
+    "question": 0.3861,
+    "you_statement": 0.0243,
+    "disbelief": 0.0114,
+    "number_first": 0.0108
   },
   "videos": {
-    "bold_claim": 72,
-    "question": 51,
-    "number_first": 3,
-    "you_statement": 4,
-    "disbelief": 2
+    "question": 50,
+    "bold_claim": 81,
+    "disbelief": 4,
+    "you_statement": 3,
+    "number_first": 3
   },
-  "duration_sample": 132,
+  "duration_sample": 141,
   "duration_bands": {
-    "21_40s": 0.4847,
-    "over_60s": 0.3095,
-    "le_20s": 0.1562,
-    "41_60s": 0.0497
+    "21_40s": 0.4489,
+    "41_60s": 0.2329,
+    "over_60s": 0.1602,
+    "le_20s": 0.158
   },
   "by_lane": {
     "history_mystery": {
-      "sample": 61,
+      "sample": 59,
       "hook_style": {
-        "bold_claim": 0.5644,
-        "question": 0.3978,
-        "you_statement": 0.0321,
-        "number_first": 0.0057
+        "question": 0.5119,
+        "bold_claim": 0.462,
+        "number_first": 0.0156,
+        "you_statement": 0.0053,
+        "disbelief": 0.0051
       },
       "title_hook_style": {
-        "bold_claim": 0.5644,
-        "question": 0.3978,
-        "you_statement": 0.0321,
-        "number_first": 0.0057
+        "question": 0.5119,
+        "bold_claim": 0.462,
+        "number_first": 0.0156,
+        "you_statement": 0.0053,
+        "disbelief": 0.0051
       },
       "videos": {
-        "bold_claim": 36,
-        "question": 22,
-        "you_statement": 2,
-        "number_first": 1
+        "question": 20,
+        "bold_claim": 35,
+        "you_statement": 1,
+        "number_first": 2,
+        "disbelief": 1
       },
-      "duration_sample": 61,
+      "duration_sample": 59,
       "duration_bands": {
-        "over_60s": 0.4557,
-        "21_40s": 0.3842,
-        "41_60s": 0.084,
-        "le_20s": 0.0761
+        "41_60s": 0.3849,
+        "21_40s": 0.3091,
+        "over_60s": 0.1658,
+        "le_20s": 0.1402
       }
     },
     "science_nature": {
-      "sample": 71,
+      "sample": 82,
       "hook_style": {
-        "bold_claim": 0.6345,
-        "question": 0.2562,
-        "you_statement": 0.0736,
-        "number_first": 0.0255,
-        "disbelief": 0.0102
+        "bold_claim": 0.689,
+        "question": 0.2408,
+        "you_statement": 0.0463,
+        "disbelief": 0.0186,
+        "number_first": 0.0053
       },
       "title_hook_style": {
-        "bold_claim": 0.6345,
-        "question": 0.2562,
-        "you_statement": 0.0736,
-        "number_first": 0.0255,
-        "disbelief": 0.0102
+        "bold_claim": 0.689,
+        "question": 0.2408,
+        "you_statement": 0.0463,
+        "disbelief": 0.0186,
+        "number_first": 0.0053
       },
       "videos": {
-        "question": 29,
-        "bold_claim": 36,
-        "number_first": 2,
+        "question": 30,
+        "bold_claim": 46,
+        "disbelief": 3,
         "you_statement": 2,
-        "disbelief": 2
+        "number_first": 1
       },
-      "duration_sample": 71,
+      "duration_sample": 82,
       "duration_bands": {
-        "21_40s": 0.574,
-        "le_20s": 0.2275,
-        "over_60s": 0.1794,
-        "41_60s": 0.0191
+        "21_40s": 0.6103,
+        "le_20s": 0.1785,
+        "over_60s": 0.1537,
+        "41_60s": 0.0575
       }
     }
   },
