@@ -1092,6 +1092,21 @@ def _angle_terms(angle: str, subject: str = "") -> set[str]:
     return key
 
 
+_GENERIC_TOPIC_SUBJECT_TERMS = {
+    "amazing", "ancient", "best", "crazy", "episode", "fact", "facts", "funny", "historical",
+    "history", "human", "humanity", "mystery", "mysteries", "part", "photo", "photos", "picture",
+    "pictures", "rare", "rarest", "secret", "secrets", "series", "story", "stories", "top",
+    "unknown", "untold", "unbelievable", "weird", "wild", "world",
+}
+
+
+def _specific_subject_terms(text: str) -> set[str]:
+    """Keep only concrete, source-checkable subject terms; generic formats are not subjects."""
+    terms = set(originality.tokens(text or "")) - _GENERIC_TOPIC_SUBJECT_TERMS
+    forms = set().union(*(_angle_word_forms(term) for term in terms)) if terms else set()
+    return forms - _GENERIC_TOPIC_SUBJECT_TERMS
+
+
 def _angle_word_forms(word: str) -> set[str]:
     """Conservative inflection bridge for angle words (drilled ↔ drilling, hotter ↔ hot).
 
@@ -1491,10 +1506,10 @@ FORMATS we can make (choose 2-4 that the specific article honestly supports; myt
 {fmt_list}
 
 For each pick:
-- `script_subject`: 1-6 words naming a photographable object, creature, person, place, or artifact from the trend;
-  it must contain at least one meaningful token written exactly in that candidate's title (literal overlap, not a
-  translation). If no concrete subject fits that rule, omit the pick. Explicitly show it; never substitute the
-  Wikipedia/background article's title or use abstract framing (“deep-sea exploration,” “discovery,” “history”).
+- `script_subject`: 1-6 words naming a photographable object, creature, person, place, or artifact, with at least one
+  meaningful token written exactly in the trend title (literal overlap, not a translation); the specific article title
+  must name that same subject. Reject vague photo compilations/“Part N”; never invent unseen-photo contents or use
+  abstract subjects (“deep-sea exploration,” “discovery,” “history”). Explicitly show the subject.
 - `angle`: one specific factual sentence, independently worded; trend evidence is not proof. Grounded research must verify it.
 - `wiki_query`: the MOST SPECIFIC English Wikipedia article supporting it, not a broad category (e.g. Bou Craa,
   not “Conveyor belt”); reject the candidate if none supports it.
@@ -1614,6 +1629,14 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                         dropped.append(f"{c['topic'][:40]} (curated research angle is not specific)")
                         continue
                     c["research_query"] = research_profile["research_query"]
+                subject_terms = _specific_subject_terms(script_subject)
+                trend_subject_terms = _specific_subject_terms(c["topic"])
+                article_subject_terms = _specific_subject_terms(wiki_query)
+                if (not subject_terms or not (subject_terms & trend_subject_terms)
+                        or not (subject_terms & article_subject_terms)):
+                    dropped.append(
+                        f"{c['topic'][:40]} (grounding article does not name a concrete subject from the trend)")
+                    continue
                 c.update({"category": cat, "angle": angle, "wiki_query": wiki_query,
                           "script_subject": script_subject,
                           "formats": fits,

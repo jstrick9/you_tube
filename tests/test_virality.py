@@ -122,6 +122,31 @@ def test_selector_normalizes_topic_keys_before_applying_retry_exclusions():
     assert llm.prompt == "", "a recently rejected key must be removed before model selection"
 
 
+def test_selector_rejects_generic_compilations_and_mismatched_source_subjects():
+    candidate = cands()[2]
+    candidate.update({
+        "topic": "Rare Human History Photos (Part 49)",
+        "topic_key": common.normalize_topic_key("Rare Human History Photos (Part 49)"),
+    })
+    generic_pick = {
+        "index": 0, "viral_score": 9, "category": "history", "risk": "low",
+        "script_subject": "Rare Human History Photos", "wiki_query": "Area 51",
+        "angle": "A disputed historical photograph supposedly shows a hidden desert town.",
+        "formats": ["creepy_true"],
+    }
+    assert ScriptWriter(CFG, LLMPicks([generic_pick]), Strat()).select_topics([candidate], 1, set()) == []
+
+    candidate.update({"topic": "History of Pickles", "topic_key": "history of pickles"})
+    unsupported_page = {
+        "index": 0, "viral_score": 9, "category": "history", "risk": "low",
+        "script_subject": "Pickles", "wiki_query": "Military of ancient Rome",
+        "angle": "Ancient Roman soldiers carried pickled cucumbers in their rations.",
+        "formats": ["backstory"],
+    }
+    assert ScriptWriter(CFG, LLMPicks([unsupported_page]), Strat()).select_topics(
+        [candidate], 1, set()) == []
+
+
 def test_dog_lapping_outlier_uses_narrow_primary_research_without_relaxing_live_gates():
     topic = "Dog Paani Kaise Peeta Hai? Tongue Ka Asli Secret!"
     video_id = "F9IluEaMjJ4"
