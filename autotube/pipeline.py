@@ -47,11 +47,11 @@ def _report_failure(stage: str, category: str, exc: Exception | None = None, att
 
 
 def recently_failed_topic_keys(reports: list[dict], now: datetime | None = None,
-                               cooldown_hours: float = 6) -> set[str]:
+                               cooldown_hours: float = 24) -> set[str]:
     """Avoid retrying a rejected trend in back-to-back runs while keeping it eligible later.
 
     Failed Shorts were not in history.json, so every top-up could select the same broken
-    candidate again. Use only the bounded production receipts as a short retry cooldown;
+    candidate again. Use bounded production receipts for a one-day retry cooldown;
     successful uploads continue to use the longer history-based dedupe window. An explicit
     topic focus remains independently selectable and is handled separately by ``run``.
     """
@@ -856,9 +856,9 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
     # scheduled selection instead cools down recently rejected trend keys, preventing
     # repeated script/grounding failures from consuming the next run's provider budget.
     retry_exclusions = (set() if topic_hint else recently_failed_topic_keys(
-        read_json("run_reports.json", []), cooldown_hours=6))
+        read_json("run_reports.json", []), cooldown_hours=24))
     if retry_exclusions:
-        log.info("excluding %d recently rejected trend candidate(s) for the 6-hour retry cooldown",
+        log.info("excluding %d recently rejected trend candidate(s) for the 24-hour retry cooldown",
                  len(retry_exclusions))
     _report_stage("topic_selection")
     picks = writer.select_topics(cands, n, recent, exclude=retry_exclusions) if cands else []
