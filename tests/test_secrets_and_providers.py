@@ -391,6 +391,30 @@ def test_new_free_providers_are_wired_end_to_end():
             f"available_models() cannot verify {p} ids"
 
 
+def test_openrouter_uses_only_explicit_zero_cost_models_and_distinct_review_identity():
+    """Free-tier exhaustion needs one more zero-cost text/review path, not paid failover.
+
+    Pin exact :free model variants (not the random router and never a paid fallback),
+    both on the writer list and on the independent review route. The direct review pool
+    remains ahead of OpenRouter, and its OpenRouter review model differs from the writer.
+    """
+    import autotube.llm as L
+
+    llm = CFG["llm"]
+    assert "openrouter" in L.PROVIDERS and "openrouter" in L.KEYED_PROVIDERS
+    assert "openrouter" in llm["providers"] and "openrouter" in llm["review_providers"]
+    writer_models = llm.get("openrouter_models", [])
+    review_models = llm.get("openrouter_review_models", [])
+    assert writer_models == ["minimax/minimax-m3.1-flash:free"]
+    assert review_models == ["nvidia/nemotron-3-super-120b-a12b:free"]
+    assert all(model.endswith(":free") for model in writer_models + review_models), \
+        "OpenRouter must not silently route production to a paid model"
+    assert set(writer_models).isdisjoint(review_models), \
+        "the OpenRouter reviewer must never be the exact model that wrote the draft"
+    assert llm["providers"].index("openrouter") < llm["providers"].index("nvidia"), \
+        "try the verified free fallback before the slow text timeout route"
+
+
 # ── per-lane editorial profiles ─────────────────────────────────────────────
 def test_the_two_lanes_do_not_sound_like_one_channel():
     """A single house voice across every upload is measurable template similarity.
