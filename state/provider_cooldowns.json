@@ -1,12 +1,6 @@
 {
   "schema_version": 1,
   "providers": {
-    "gemini": {
-      "reason": "quota_exhausted",
-      "status_code": 429,
-      "recorded_at": "2026-10-21T22:16:01.159634+00:00",
-      "blocked_until": "2026-10-22T22:16:01.159634+00:00"
-    },
     "pollinations": {
       "reason": "billing_or_entitlement",
       "status_code": 402,
