@@ -26,7 +26,7 @@ from urllib.parse import parse_qs, quote, urlsplit
 
 import feedparser
 
-from .common import get_json, http, now_utc, read_json
+from .common import get_json, http, normalize_topic_key, now_utc, read_json
 
 log = logging.getLogger("autotube.trends")
 
@@ -969,9 +969,13 @@ def recent_topics(days: int) -> set[str]:
         try:
             from datetime import datetime
             if datetime.fromisoformat(h["created_at"]) >= cutoff:
-                keys.add(h.get("topic_key", "").lower())
+                key = normalize_topic_key(h.get("topic_key", ""))
+                if key:
+                    keys.add(key)
                 if h.get("wiki_title"):
-                    keys.add(h["wiki_title"].lower().replace(" ", "_"))
+                    wiki_key = normalize_topic_key(h["wiki_title"])
+                    if wiki_key:
+                        keys.add(wiki_key)
         except Exception:  # noqa: BLE001
             continue
     return keys
@@ -1021,7 +1025,7 @@ def collect(cfg: dict) -> list[dict]:
     merged: dict[str, dict] = {}
     captured_at = now_utc().isoformat(timespec="seconds")
     for r in raw:
-        key = re.sub(r"[^a-z0-9 ]", "", r["topic"].lower()).strip()
+        key = normalize_topic_key(r["topic"])
         if not key or len(key) < 3:
             continue
         signal = _signal_record(r, captured_at)

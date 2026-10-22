@@ -51,6 +51,17 @@ def slugify(text: str, max_len: int = 48) -> str:
     return s[:max_len].strip("-") or "video"
 
 
+def normalize_topic_key(value: Any) -> str:
+    """Canonical ASCII topic key shared by trend feeds, history, and retry receipts.
+
+    Removing punctuation can expose repeated spaces (e.g. ``&`` in a YouTube title).
+    Collapse whitespace after stripping punctuation so failed-topic exclusions match the
+    corresponding live candidate regardless of source-title spacing.
+    """
+    text = re.sub(r"[^a-z0-9 ]", "", str(value or "").lower())
+    return re.sub(r"\s+", " ", text).strip()
+
+
 # ── JSON state (committed back to the repo by the workflow = free persistence) ─
 def read_json(name: str, default: Any) -> Any:
     p = STATE_DIR / name

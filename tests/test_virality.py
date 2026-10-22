@@ -106,6 +106,22 @@ def test_select_keeps_only_viral_topics_and_ranks_them():
     assert "Willie Mays" not in llm.prompt                                               # no Wikipedia-only fallback
 
 
+def test_selector_normalizes_topic_keys_before_applying_retry_exclusions():
+    candidate = cands()[2]
+    candidate.update({
+        "topic": "How Astronauts Live, Sleep, Shower & Cry in Space!",
+        # Punctuation removal in raw YouTube titles can leave doubled spaces.
+        "topic_key": "how astronauts live sleep shower  cry in space",
+    })
+    llm = LLMPicks([])
+
+    picks = ScriptWriter(CFG, llm, Strat()).select_topics(
+        [candidate], 1, set(), exclude={"how astronauts live sleep shower cry in space"})
+
+    assert picks == []
+    assert llm.prompt == "", "a recently rejected key must be removed before model selection"
+
+
 def test_dog_lapping_outlier_uses_narrow_primary_research_without_relaxing_live_gates():
     topic = "Dog Paani Kaise Peeta Hai? Tongue Ka Asli Secret!"
     video_id = "F9IluEaMjJ4"

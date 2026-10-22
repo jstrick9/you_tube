@@ -128,10 +128,11 @@ class RunReceipt:
 
     def set_topic(self, topic: dict, index: int) -> None:
         self._last_failure = None
+        topic_key = topic.get("topic_key") if isinstance(topic, dict) else ""
         self._current_topic = {
             "index": max(0, int(index)),
             "topic": _bounded_text(topic.get("topic") if isinstance(topic, dict) else "", 100),
-            "topic_key": _bounded_text(topic.get("topic_key") if isinstance(topic, dict) else "", 120),
+            "topic_key": common.normalize_topic_key(topic_key)[:120],
         }
 
     def note_topic(self, outcome: str, stage: str | None = None, category: str | None = None) -> None:

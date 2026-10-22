@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
+from autotube.common import normalize_topic_key
 from autotube.pipeline import recently_failed_topic_keys
 
 
@@ -10,6 +11,10 @@ def test_failed_trends_stay_cooled_down_across_same_day_top_ups():
             "started_at": (now - timedelta(hours=2)).isoformat(),
             "topic_attempts": [
                 {"topic_key": "recent bad angle", "outcome": "rejected", "stage": "script_research"},
+                # Older receipts collapse title whitespace; live `&` removal used to
+                # leave a double space, so both sides must share the same canonicalizer.
+                {"topic_key": "how astronauts live sleep shower  cry in space",
+                 "outcome": "rejected", "stage": "script_research"},
                 {"topic_key": "recent good topic", "outcome": "accepted", "stage": "upload"},
                 {"topic_key": "upload failure", "outcome": "rejected", "stage": "upload"},
             ],
@@ -30,9 +35,14 @@ def test_failed_trends_stay_cooled_down_across_same_day_top_ups():
         },
     ]
 
-    assert recently_failed_topic_keys(reports, now=now) == {
-        "recent bad angle", "same day failed angle"}
-    assert recently_failed_topic_keys(reports, now=now, cooldown_hours=6) == {"recent bad angle"}
+    cooled = recently_failed_topic_keys(reports, now=now)
+    assert cooled == {
+        "recent bad angle", "same day failed angle",
+        "how astronauts live sleep shower cry in space",
+    }
+    assert normalize_topic_key("How Astronauts Live, Sleep, Shower & Cry in Space!") in cooled
+    assert recently_failed_topic_keys(reports, now=now, cooldown_hours=6) == {
+        "recent bad angle", "how astronauts live sleep shower cry in space"}
 
 
 def test_failed_topic_cooldown_fails_open_for_malformed_receipts_and_invalid_configuration():

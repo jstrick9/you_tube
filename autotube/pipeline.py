@@ -23,7 +23,7 @@ from . import series as series_mod
 from . import originality, provenance
 from .vision import VisionUnavailable
 from .target import daily_target
-from .common import OUTPUT_DIR, WORK_DIR, now_utc, read_json, slugify, write_json
+from .common import OUTPUT_DIR, WORK_DIR, now_utc, normalize_topic_key, read_json, slugify, write_json
 from .llm import LLM
 from .recovery import RecoveryBudgets
 from .scriptwriter import ScriptWriter, spoken_text, trend_evidence_summary, visual_subject_for_topic
@@ -88,7 +88,7 @@ def recently_failed_topic_keys(reports: list[dict], now: datetime | None = None,
                 continue
             if attempt.get("stage") not in retryable_stages:
                 continue
-            key = str(attempt.get("topic_key") or "").strip().lower()
+            key = normalize_topic_key(attempt.get("topic_key"))
             if key:
                 rejected.add(key)
     return rejected

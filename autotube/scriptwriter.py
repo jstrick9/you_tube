@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 
 from . import gates, originality, safety, series, run_report
 from . import lanes
-from .common import now_utc, read_json
+from .common import normalize_topic_key, now_utc, read_json
 from .llm import LLM, LLMError
 from .research import ground, unsupported_numbers
 from .recovery import MAX_SCRIPT_DRAFTS, RecoveryBudgets, bounded_attempts
@@ -1338,8 +1338,10 @@ class ScriptWriter:
             return []
         cats = self.cfg["channel"]["categories"]
         ccfg = self.cfg["content"]
-        exclude = (exclude if isinstance(exclude, set) else set()) | self._selection_rejected
-        recent = recent if isinstance(recent, set) else set()
+        raw_exclude = (exclude if isinstance(exclude, set) else set()) | self._selection_rejected
+        exclude = {normalize_topic_key(key) for key in raw_exclude if normalize_topic_key(key)}
+        recent = ({normalize_topic_key(key) for key in recent if normalize_topic_key(key)}
+                  if isinstance(recent, set) else set())
         min_viral_raw = ccfg.get("min_viral_score", 7)
         if not _finite_in_range(min_viral_raw, 7, 10):
             log.warning("minimum viral-score configuration must be finite and at least 7; no topics selected")
@@ -1380,7 +1382,7 @@ class ScriptWriter:
         def valid_candidate(candidate):
             return (isinstance(candidate, dict) and isinstance(candidate.get("topic"), str)
                     and bool(candidate["topic"].strip()) and isinstance(candidate.get("topic_key"), str)
-                    and bool(candidate["topic_key"].strip()) and isinstance(candidate.get("sources"), list)
+                    and bool(normalize_topic_key(candidate["topic_key"])) and isinstance(candidate.get("sources"), list)
                     and all(isinstance(source, str) and source for source in candidate["sources"])
                     and _finite_in_range(candidate.get("score"), 0, 1))
 
@@ -1433,7 +1435,9 @@ class ScriptWriter:
                      len(candidates) - len(eligible))
         # Keep the decision batch bounded for free-tier model context windows. Candidates
         # are already sorted by measured trend strength; 24 leaves ample choice and backups.
-        pool = [c for c in eligible if c["topic_key"] not in recent and c["topic_key"] not in exclude
+        pool = [c for c in eligible
+                if normalize_topic_key(c["topic_key"]) not in recent
+                and normalize_topic_key(c["topic_key"]) not in exclude
                 and c["score"] >= ccfg["min_trend_score"] * 0.5][:24]
         if not pool:
             return []
@@ -1620,21 +1624,22 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                 src_w = self.strategy.source_weight(primary_source(c.get("sources", [])))
                 c["priority"] = round(0.50 * vs / 10 + 0.25 * c["score"] + 0.125 * weights.get(cat, 0.5)
                                       + 0.125 * src_w, 4)
-                if c["topic_key"] in seen_topics:
+                candidate_key = normalize_topic_key(c["topic_key"])
+                if candidate_key in seen_topics:
                     dropped.append(f"{c['topic'][:40]} (duplicate selector result)")
                     continue
-                seen_topics.add(c["topic_key"])
+                seen_topics.add(candidate_key)
                 picks.append(c)
             except (KeyError, ValueError, TypeError):
                 continue
-        accepted_keys = {pick["topic_key"] for pick in picks}
+        accepted_keys = {normalize_topic_key(pick["topic_key"]) for pick in picks}
         for response_pick in res["picks"]:
             if not isinstance(response_pick, dict):
                 continue
             idx = response_pick.get("index")
             if type(idx) is int and 0 <= idx < len(pool):
-                key = pool[idx].get("topic_key")
-                if isinstance(key, str) and key not in accepted_keys:
+                key = normalize_topic_key(pool[idx].get("topic_key"))
+                if key and key not in accepted_keys:
                     self._selection_rejected.add(key)
         picks.sort(key=lambda c: -c["priority"])
         log.info("viral picks: %s", [
