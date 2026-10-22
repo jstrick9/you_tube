@@ -14,17 +14,11 @@
       "recorded_at": "2026-10-21T22:16:01.159634+00:00",
       "blocked_until": "2026-10-22T22:16:01.159634+00:00"
     },
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-22T04:57:28.450689+00:00",
-      "blocked_until": "2026-10-22T05:17:28.450689+00:00"
-    },
     "cloudflare": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-10-22T04:57:34.756938+00:00",
-      "blocked_until": "2026-10-22T05:17:34.756938+00:00"
+      "recorded_at": "2026-10-22T06:36:18.459294+00:00",
+      "blocked_until": "2026-10-22T06:56:18.459294+00:00"
     }
   },
   "failures_5xx": {}
