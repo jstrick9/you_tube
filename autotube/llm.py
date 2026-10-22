@@ -699,7 +699,12 @@ class LLM:
                             # Some APIs explicitly name the throttled model. Retire only
                             # that model and try the provider's configured sibling models;
                             # other providers and the quality gates are unchanged.
-                            model_scoped_limit = _model_scoped_rate_limit(msg)
+                            # Mistral documents completion limits per model. If the current
+                            # text model is rate-limited and a sibling is configured, try
+                            # that sibling before treating the whole account as unavailable.
+                            model_scoped_limit = (_model_scoped_rate_limit(msg)
+                                                  or (pname == "mistral" and len(models) > 1
+                                                      and model != models[-1]))
                             if retry_after is not None and retry_after > 45:
                                 self._dead.add(tag)
                                 if model_scoped_limit:

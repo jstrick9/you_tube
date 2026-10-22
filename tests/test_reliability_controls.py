@@ -199,6 +199,37 @@ def test_explicit_model_scoped_429_tries_sibling_model_without_provider_circuit(
     assert not client.circuits.is_open("fake")
 
 
+def test_mistral_primary_model_429_tries_configured_sibling(
+        monkeypatch, memory_provider_circuits):
+    from autotube import llm
+
+    calls, slept = [], []
+
+    def completion(model, system, user, temp):
+        calls.append(model)
+        if model == "mistral-small-latest":
+            raise llm.LLMError("HTTP 429: rate limit exceeded", status_code=429,
+                               retry_after_seconds=12)
+        return '{"ok": true}'
+
+    monkeypatch.setitem(llm.PROVIDERS, "mistral", (completion, "fake_models"))
+    monkeypatch.setattr(llm.time, "sleep", lambda seconds: slept.append(seconds))
+    client = llm.LLM.__new__(llm.LLM)
+    client.cfg = {"fake_models": ["mistral-small-latest", "ministral-8b-latest"]}
+    client.order = ["mistral"]
+    client.temperature = 0.7
+    client._dead = set()
+    client._blocked_providers = set()
+    client.circuits = memory_provider_circuits()
+    client.last_used = None
+
+    assert client.json("system", "user", attempts_per_model=2) == {"ok": True}
+    assert calls == ["mistral-small-latest", "mistral-small-latest", "ministral-8b-latest"]
+    assert slept == [12]
+    assert client.last_used == "mistral:ministral-8b-latest"
+    assert not client.circuits.is_open("mistral")
+
+
 def test_explicit_quota_exhaustion_uses_day_long_circuit_without_retry(
         monkeypatch, memory_provider_circuits):
     from autotube import llm
