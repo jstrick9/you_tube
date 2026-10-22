@@ -15,7 +15,7 @@ import random
 import re
 import shutil
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from . import media, music, qa, render, trends, run_report
@@ -44,6 +44,54 @@ def _report_failure(stage: str, category: str, exc: Exception | None = None, att
     if receipt:
         receipt.note_failure(stage, category, exception_type=type(exc).__name__ if exc else None,
                              attempt=attempt)
+
+
+def recently_failed_topic_keys(reports: list[dict], now: datetime | None = None,
+                               cooldown_hours: float = 6) -> set[str]:
+    """Avoid retrying a rejected trend in back-to-back runs while keeping it eligible later.
+
+    Failed Shorts were not in history.json, so every top-up could select the same broken
+    candidate again. Use only the bounded production receipts as a short retry cooldown;
+    successful uploads continue to use the longer history-based dedupe window. An explicit
+    topic focus remains independently selectable and is handled separately by ``run``.
+    """
+    try:
+        cooldown = float(cooldown_hours)
+    except (TypeError, ValueError, OverflowError):
+        return set()
+    if not math.isfinite(cooldown) or cooldown <= 0 or not isinstance(reports, list):
+        return set()
+    reference = now or now_utc()
+    if not isinstance(reference, datetime):
+        return set()
+    if reference.tzinfo is None:
+        reference = reference.replace(tzinfo=timezone.utc)
+    reference = reference.astimezone(timezone.utc)
+    cutoff = reference - timedelta(hours=cooldown)
+    rejected: set[str] = set()
+    retryable_stages = {"script_draft", "script_research", "topic_validation", "visuals", "render_qa"}
+    for report in reports:
+        if not isinstance(report, dict):
+            continue
+        raw_started = report.get("started_at") or report.get("finished_at")
+        try:
+            started = datetime.fromisoformat(str(raw_started).replace("Z", "+00:00"))
+            if started.tzinfo is None:
+                started = started.replace(tzinfo=timezone.utc)
+            started = started.astimezone(timezone.utc)
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if not cutoff <= started <= reference + timedelta(minutes=5):
+            continue
+        for attempt in report.get("topic_attempts", []):
+            if not isinstance(attempt, dict) or attempt.get("outcome") != "rejected":
+                continue
+            if attempt.get("stage") not in retryable_stages:
+                continue
+            key = str(attempt.get("topic_key") or "").strip().lower()
+            if key:
+                rejected.add(key)
+    return rejected
 
 
 def filter_topic_candidates_by_hint(candidates: list[dict], hint: str | None) -> list[dict]:
@@ -804,8 +852,16 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
         log.info("topic focus matched %d/%d freshly collected candidate(s)", len(cands), found)
         if not cands:
             _report_failure("topic_selection", "topic_hint_no_live_match")
+    # A focused manual retry can deliberately test one live candidate again. Normal
+    # scheduled selection instead cools down recently rejected trend keys, preventing
+    # repeated script/grounding failures from consuming the next run's provider budget.
+    retry_exclusions = (set() if topic_hint else recently_failed_topic_keys(
+        read_json("run_reports.json", []), cooldown_hours=6))
+    if retry_exclusions:
+        log.info("excluding %d recently rejected trend candidate(s) for the 6-hour retry cooldown",
+                 len(retry_exclusions))
     _report_stage("topic_selection")
-    picks = writer.select_topics(cands, n, recent) if cands else []
+    picks = writer.select_topics(cands, n, recent, exclude=retry_exclusions) if cands else []
     if cands and not picks:
         _report_failure("topic_selection", "no_eligible_trending_topics")
     tried: set[str] = set()
@@ -847,7 +903,8 @@ def run(cfg: dict, count: int | None = None, upload: bool | None = None, keep_wo
         rounds += 1
         # Exclude both attempted topics and any picks already waiting in the queue. Early
         # replenishment must not enqueue duplicates of the still-untried first-round picks.
-        exclude = tried | {str(row.get("topic_key") or "") for row in picks[pi:]}
+        exclude = (tried | retry_exclusions
+                   | {str(row.get("topic_key") or "") for row in picks[pi:]})
         more = writer.select_topics(cands, n - len(results), recent, exclude=exclude)
         if not more:
             _report_failure("topic_selection", "no_more_eligible_trending_topics")

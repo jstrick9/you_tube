@@ -185,20 +185,25 @@ def test_length_instruction_rejects_both_ends_not_just_short():
     assert "too short AND too long" in src.lower() or "Both ends are rejected" in src
 
 
-def test_rate_limited_runs_are_not_reported_as_broken_builds():
-    """Free-tier exhaustion is an operating condition, not a defect.
-
-    Both ended as "produced nothing, exit 1", so five rate-limited runs in one day sat
-    next to real failures and trained the red X to mean nothing. The alert must still
-    fire; only the exit code changes.
-    """
+def test_rate_limited_partial_runs_remain_visible_but_zero_output_fails_actions():
+    """429s may defer a partial top-up, but zero output must never be reported green."""
     import autotube.llm as L
+    from autotube.__main__ import _incomplete_exit_code
 
     src = (ROOT / "autotube" / "__main__.py").read_text()
     assert "rate_limited()" in src, "the run must distinguish rate limiting from failure"
-    assert "notify(" in src, "a rate-limited run must still alert; it just must not go red"
+    assert "notify(" in src, "a rate-limited run must still alert"
     assert "every provider was rate limited" not in src, "mixed provider/script failures must not be mislabeled"
-    assert "_write_github_summary" in src, "a green Actions run must visibly report zero/partial output"
+    assert "_write_github_summary" in src, "an incomplete run must state zero/partial output"
+    assert "return _incomplete_exit_code" in src, "the Actions status must follow verified production progress"
+    assert "(upload_requested and scheduled_count == 0)" in src, "unscheduled renders are not uploads"
+    assert _incomplete_exit_code(0, {"groq:openai/gpt-oss-20b"}) == 1
+    assert _incomplete_exit_code(1, {"groq:openai/gpt-oss-20b"}) == 0
+    assert _incomplete_exit_code(1, {"groq:openai/gpt-oss-20b"},
+                                 scheduled_count=0, upload_requested=True) == 1
+    assert _incomplete_exit_code(1, {"groq:openai/gpt-oss-20b"},
+                                 scheduled_count=1, upload_requested=True) == 0
+    assert _incomplete_exit_code(1, set()) == 1
 
     before = L.rate_limited()
     L.note_rate_limited("groq:openai/gpt-oss-20b")

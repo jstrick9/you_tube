@@ -26,6 +26,19 @@ def _receipt_run_id(now) -> str:
     return f"{now.strftime('%Y%m%d-%H%M%S')}-{os.getpid()}"
 
 
+def _incomplete_exit_code(produced_count: int, rate_limited: set[str] | None, *,
+                          scheduled_count: int | None = None, upload_requested: bool = False) -> int:
+    """Never green an attempt with no produced video or no successful YouTube schedule.
+
+    Partial progress may stay non-red when a free-tier 429 is the reason to defer the
+    remainder to an automated top-up; zero usable output is a failed attempt regardless.
+    """
+    progress = scheduled_count if upload_requested else produced_count
+    if not isinstance(progress, int) or progress <= 0:
+        return 1
+    return 0 if rate_limited else 1
+
+
 def _write_github_summary(produced: int, target: int, failed_uploads: int = 0,
                           rate_limited: set[str] | None = None, dry_run: bool = False) -> None:
     """Make partial/zero-output green runs explicit in GitHub Actions' run summary."""
@@ -322,7 +335,9 @@ def main(argv=None) -> int:
     run_report.deactivate(receipt_token)
     lines = [f"• {r['meta']['title']} → {r['entry'].get('video_id', r['entry']['status'])}" for r in res]
     limited = llm_mod.rate_limited() if len(res) < want else set()
-    incomplete = len(res) < want or bool(failed_uploads)
+    upload_requested = not a.dry_run and bool(cfg["upload"].get("enabled", True))
+    incomplete = (len(res) < want or bool(failed_uploads)
+                  or (upload_requested and scheduled_count == 0))
     message = "\n".join(lines) or "no videos produced"
     if incomplete:
         if limited:
@@ -333,17 +348,28 @@ def main(argv=None) -> int:
     _write_github_summary(len(res), want, len(failed_uploads), limited, a.dry_run)
     if res and not incomplete:
         return 0
-    # A green Actions conclusion must not imply a video exists. Keep a rate-limited
-    # run non-red so scheduled recovery can continue, but spell out that 429s are only
-    # one observed failure class; topic, other provider, validation and vision failures
-    # may also have prevented output. The run summary and failure alert retain the fact
-    # that production was incomplete.
+    # Rate limiting is not proof that no video was made. Partial output can stay
+    # non-red so the scheduled top-up can continue later, but no_output must never be
+    # mistaken for a successful Actions run.
     if incomplete and limited:
-        log.warning("production incomplete (%d/%d videos rendered); HTTP 429 responses were observed from %s. "
-                    "Other provider, topic, script or vision failures may also have contributed. "
-                    "Not failing this run so the scheduled top-up can retry.",
-                    len(res), want, ", ".join(sorted(limited)))
-        return 0
+        progress = scheduled_count if upload_requested else len(res)
+        if progress == 0:
+            if upload_requested and len(res) > 0:
+                log.error("%d video(s) rendered but none reached YouTube; HTTP 429 responses were observed from %s. "
+                          "Failing this run so an unscheduled render cannot look like production success.",
+                          len(res), ", ".join(sorted(limited)))
+            else:
+                log.error("production produced no video (%d/%d target); HTTP 429 responses were observed from %s. "
+                          "Other provider, topic, script or vision failures may also have contributed. "
+                          "Failing this run so no_output cannot look green; scheduled top-ups remain configured.",
+                          len(res), want, ", ".join(sorted(limited)))
+        else:
+            log.warning("production incomplete (%d/%d videos rendered); HTTP 429 responses were observed from %s. "
+                        "Other provider, topic, script or vision failures may also have contributed. "
+                        "Keeping partial progress non-red; scheduled top-ups remain configured.",
+                        len(res), want, ", ".join(sorted(limited)))
+        return _incomplete_exit_code(len(res), limited, scheduled_count=scheduled_count,
+                                     upload_requested=upload_requested)
     return 1
 
 
