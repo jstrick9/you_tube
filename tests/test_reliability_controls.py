@@ -164,6 +164,41 @@ def test_repeated_generic_429_uses_default_circuit(monkeypatch, memory_provider_
     assert row["cooldown_seconds"] == llm.DEFAULT_429_COOLDOWN_SECONDS == 20 * 60
 
 
+@pytest.mark.parametrize("retry_after,expected_sleep", [(21, [21]), (70, [])])
+def test_explicit_model_scoped_429_tries_sibling_model_without_provider_circuit(
+        monkeypatch, memory_provider_circuits, retry_after, expected_sleep):
+    from autotube import llm
+
+    calls, slept = [], []
+
+    def completion(model, system, user, temp):
+        calls.append(model)
+        if model == "openai/gpt-oss-120b":
+            raise llm.LLMError(
+                "HTTP 429: Rate limit reached for model `openai/gpt-oss-120b`",
+                status_code=429, retry_after_seconds=retry_after)
+        return '{"ok": true}'
+
+    monkeypatch.setitem(llm.PROVIDERS, "fake", (completion, "fake_models"))
+    monkeypatch.setattr(llm.time, "sleep", lambda seconds: slept.append(seconds))
+    client = llm.LLM.__new__(llm.LLM)
+    client.cfg = {"fake_models": ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]}
+    client.order = ["fake"]
+    client.temperature = 0.7
+    client._dead = set()
+    client._blocked_providers = set()
+    client.circuits = memory_provider_circuits()
+    client.last_used = None
+
+    assert client.json("system", "user", attempts_per_model=2) == {"ok": True}
+    assert calls == (["openai/gpt-oss-120b", "openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+                     if retry_after <= 45 else ["openai/gpt-oss-120b", "openai/gpt-oss-20b"])
+    assert slept == expected_sleep
+    assert client.last_used == "fake:openai/gpt-oss-20b"
+    assert "fake:openai/gpt-oss-120b" in client._dead
+    assert not client.circuits.is_open("fake")
+
+
 def test_explicit_quota_exhaustion_uses_day_long_circuit_without_retry(
         monkeypatch, memory_provider_circuits):
     from autotube import llm

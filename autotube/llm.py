@@ -86,6 +86,15 @@ def _quota_exhausted(message: str) -> bool:
     ))
 
 
+def _model_scoped_rate_limit(message: str) -> bool:
+    """Can another configured model on this provider still be healthy?"""
+    text = str(message or "").casefold()
+    return any(marker in text for marker in (
+        "rate limit reached for model", "rate limit exceeded for model",
+        "rate limited for model", "per-model rate limit", "model-specific rate limit",
+    ))
+
+
 def _retry_after_header(value: str | None) -> float | None:
     """Parse standard Retry-After delay-seconds or HTTP-date without guessing at resets."""
     text = str(value or "").strip()
@@ -687,19 +696,36 @@ class LLM:
                                 log.warning("skipping Cloudflare vision route after model HTTP 429; "
                                             "text routes remain eligible")
                                 break
-                            # Never retry earlier than the provider's stated wait. If it
-                            # exceeds our bounded in-run wait, open a persisted cooldown.
+                            # Some APIs explicitly name the throttled model. Retire only
+                            # that model and try the provider's configured sibling models;
+                            # other providers and the quality gates are unchanged.
+                            model_scoped_limit = _model_scoped_rate_limit(msg)
                             if retry_after is not None and retry_after > 45:
                                 self._dead.add(tag)
-                                self._open_provider(pname, status, "rate_limited",
-                                                    retry_after, retry_after)
+                                if model_scoped_limit:
+                                    if receipt:
+                                        receipt.note_provider_event(pname, status, "model_rate_limited",
+                                                                    retry_after_seconds=retry_after)
+                                    log.warning("skipping %s after a model-scoped HTTP 429; trying the next model",
+                                                tag)
+                                else:
+                                    # Never retry earlier than a provider-wide stated wait.
+                                    self._open_provider(pname, status, "rate_limited",
+                                                        retry_after, retry_after)
                                 break
                             if not last_try:
                                 time.sleep(_retry_after(msg, 6 + 6 * attempt, retry_after))
                                 continue
                             self._dead.add(tag)
-                            self._open_provider(pname, status, "rate_limited",
-                                                max(DEFAULT_429_COOLDOWN_SECONDS, retry_after or 0), retry_after)
+                            if model_scoped_limit:
+                                if receipt:
+                                    receipt.note_provider_event(pname, status, "model_rate_limited",
+                                                                retry_after_seconds=retry_after)
+                                log.warning("skipping %s after repeated model-scoped HTTP 429; "
+                                            "trying the next configured model", tag)
+                            else:
+                                self._open_provider(pname, status, "rate_limited",
+                                                    max(DEFAULT_429_COOLDOWN_SECONDS, retry_after or 0), retry_after)
                             break
                         if status in (401, 403):
                             self._dead.add(tag)
