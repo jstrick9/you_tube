@@ -1,33 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "39296984442",
-    "workflow_run_id": "39296984442",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-19T17:46:39.003472+00:00",
-    "finished_at": "2026-10-19T17:46:39.003472+00:00",
-    "duration_seconds": 0,
-    "mode": "workflow_fallback",
-    "top_up": true,
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "superseded",
-    "stage": "preflight",
-    "stage_entries": {
-      "preflight": 1
-    },
-    "retry_budgets": {},
-    "topic_attempts": [],
-    "failures": [],
-    "retry_events": [],
-    "provider_events": [],
-    "preflight_skip_reason": "delayed_schedule_superseded"
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261019-230715-3828",
     "workflow_run_id": "39339380818",
     "workflow_run_attempt": "1",
@@ -4409,6 +4382,115 @@
     "rate_limited_models": [
       "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
       "groq:openai/gpt-oss-120b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261022-045655-3612",
+    "workflow_run_id": "39725043867",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-22T04:56:55.269707+00:00",
+    "finished_at": "2026-10-22T04:59:34.863227+00:00",
+    "duration_seconds": 159.594,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 1,
+      "topic_production": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [],
+    "failures": [
+      {
+        "at": "2026-10-22T04:59:34.858749+00:00",
+        "stage": "topic_selection",
+        "category": "no_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-22T04:59:34.859223+00:00",
+        "stage": "script",
+        "category": "all_text_providers_circuit_open_or_unusable"
+      }
+    ],
+    "retry_events": [],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-22T04:56:55.271034+00:00",
+        "cooldown_until": "2026-10-22T15:32:08.448537+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 429,
+        "action": "cooldown_skip",
+        "at": "2026-10-22T04:56:55.271049+00:00",
+        "cooldown_until": "2026-10-22T22:16:01.159634+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-22T04:57:11.232153+00:00",
+        "retry_after_seconds": 28.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-22T04:57:21.836859+00:00",
+        "retry_after_seconds": 1.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_request_too_large",
+        "at": "2026-10-22T04:57:21.884955+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-22T04:57:28.451259+00:00",
+        "cooldown_until": "2026-10-22T05:17:28.450689+00:00"
+      },
+      {
+        "provider": "cloudflare",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-10-22T04:57:34.757536+00:00",
+        "cooldown_until": "2026-10-22T05:17:34.756938+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-22T04:59:34.858503+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
       "mistral:mistral-small-latest"
     ]
   }
