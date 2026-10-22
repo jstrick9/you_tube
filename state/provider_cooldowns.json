@@ -13,12 +13,6 @@
       "status_code": 429,
       "recorded_at": "2026-10-21T22:16:01.159634+00:00",
       "blocked_until": "2026-10-22T22:16:01.159634+00:00"
-    },
-    "cloudflare": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-22T12:57:06.903246+00:00",
-      "blocked_until": "2026-10-22T13:17:06.903246+00:00"
     }
   },
   "failures_5xx": {}
