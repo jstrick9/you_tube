@@ -1,242 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261020-031728-3638",
-    "workflow_run_id": "39363376930",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-20T03:17:28.838499+00:00",
-    "finished_at": "2026-10-20T03:25:43.601040+00:00",
-    "duration_seconds": 494.763,
-    "mode": "dry_run",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 6,
-      "script_research": 12,
-      "script_draft": 4,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "The Crusader Sword: What X-Rays Revealed Beneath the Sea",
-        "topic_key": "the crusader sword what xrays revealed beneath the sea",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "The Weirdest Bird Nests You’ve Ever Seen!",
-        "topic_key": "the weirdest bird nests youve ever seen",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "WHY DIDN'T JAPAN TAKE AUSTRALIA?",
-        "topic_key": "why didnt japan take australia",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Why Did No One Ever Dare to Conquer Britain?",
-        "topic_key": "why did no one ever dare to conquer britain",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Champawat Tiger Real Story",
-        "topic_key": "champawat tiger real story",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Why Salt & Pepper Are BANNED in Space!",
-        "topic_key": "why salt pepper are banned in space",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-20T03:17:51.809716+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-20T03:17:51.809842+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-20T03:20:29.374251+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-20T03:20:29.374437+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-20T03:21:42.533828+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-20T03:21:42.533989+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-20T03:24:27.153535+00:00",
-        "stage": "script_draft",
-        "category": "provider_transient_network",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-20T03:24:27.153609+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-20T03:25:21.545897+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-20T03:25:21.546012+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-20T03:25:43.599598+00:00",
-        "stage": "script_research",
-        "category": "no_depictable_source_asset"
-      },
-      {
-        "at": "2026-10-20T03:25:43.599720+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-20T03:25:43.599808+00:00",
-        "stage": "topic_selection",
-        "category": "topic_attempt_budget_exhausted",
-        "attempt": 6
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-20T03:17:28.839579+00:00",
-        "cooldown_until": "2026-10-20T04:41:46.518451+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-20T03:17:46.733118+00:00",
-        "cooldown_until": "2026-10-20T03:37:46.732527+00:00",
-        "retry_after_seconds": 30.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-20T03:18:03.737522+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-20T03:18:52.387496+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 500,
-        "action": "transient_failure",
-        "at": "2026-10-20T03:19:22.915772+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 500,
-        "action": "route_circuit_open",
-        "at": "2026-10-20T03:19:22.916411+00:00",
-        "cooldown_until": "2026-10-20T03:29:22.915812+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-20T03:19:29.515391+00:00",
-        "cooldown_until": "2026-10-20T03:39:29.514738+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-20T03:24:27.153296+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261020-034112-3770",
     "workflow_run_id": "39365466400",
     "workflow_run_attempt": "1",
@@ -4570,5 +4334,32 @@
     "rate_limited_models": [
       "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "39804034752",
+    "workflow_run_id": "39804034752",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-22T15:21:30.534775+00:00",
+    "finished_at": "2026-10-22T15:21:30.534775+00:00",
+    "duration_seconds": 0,
+    "mode": "workflow_fallback",
+    "top_up": true,
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "superseded",
+    "stage": "preflight",
+    "stage_entries": {
+      "preflight": 1
+    },
+    "retry_budgets": {},
+    "topic_attempts": [],
+    "failures": [],
+    "retry_events": [],
+    "provider_events": [],
+    "preflight_skip_reason": "delayed_schedule_superseded"
   }
 ]
