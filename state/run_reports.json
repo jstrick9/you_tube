@@ -1,254 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261020-045006-3814",
-    "workflow_run_id": "39371553091",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-20T04:50:06.676355+00:00",
-    "finished_at": "2026-10-20T05:12:25.685837+00:00",
-    "duration_seconds": 1339.009,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 6,
-      "script_research": 12,
-      "script_draft": 6,
-      "script_review": 5,
-      "tts": 1,
-      "visuals": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "First Real Video of Another Solar System!",
-        "topic_key": "first real video of another solar system",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Fish That Lives Inside a Sea Cucumber...",
-        "topic_key": "fish that lives inside a sea cucumber",
-        "outcome": "rejected",
-        "stage": "visuals",
-        "failure_category": "no_verified_visual_match"
-      },
-      {
-        "index": 1,
-        "topic": "The Crusader Sword: What X-Rays Revealed Beneath the Sea",
-        "topic_key": "the crusader sword what xrays revealed beneath the sea",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Why Salt & Pepper Are BANNED in Space!",
-        "topic_key": "why salt pepper are banned in space",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Why Does the Kiwi Bird Lay Such a Giant Egg?",
-        "topic_key": "why does the kiwi bird lay such a giant egg",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Champawat Tiger Real Story",
-        "topic_key": "champawat tiger real story",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-20T04:52:34.202774+00:00",
-        "stage": "script_research",
-        "category": "source_grounding_failed"
-      },
-      {
-        "at": "2026-10-20T04:52:34.202811+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-20T05:06:57.604411+00:00",
-        "stage": "visuals",
-        "category": "no_verified_visual_match",
-        "exception_type": "NoVisualMatch"
-      },
-      {
-        "at": "2026-10-20T05:07:06.510269+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-20T05:07:06.510386+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-20T05:07:07.852835+00:00",
-        "stage": "script_research",
-        "category": "no_depictable_source_asset"
-      },
-      {
-        "at": "2026-10-20T05:07:07.852975+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-20T05:07:07.996642+00:00",
-        "stage": "script_research",
-        "category": "source_grounding_failed"
-      },
-      {
-        "at": "2026-10-20T05:07:07.996674+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-20T05:12:25.677767+00:00",
-        "stage": "script_draft",
-        "category": "billing_or_entitlement",
-        "exception_type": "LLMError",
-        "attempt": 2
-      },
-      {
-        "at": "2026-10-20T05:12:25.678100+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-20T05:12:25.678213+00:00",
-        "stage": "script",
-        "category": "all_text_providers_circuit_open_or_unusable"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 2,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 3,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-20T04:50:21.622013+00:00",
-        "cooldown_until": "2026-10-20T05:10:21.621115+00:00",
-        "retry_after_seconds": 28.0
-      },
-      {
-        "provider": "cloudflare",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-20T04:50:31.742472+00:00",
-        "cooldown_until": "2026-10-20T05:10:31.741437+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-20T04:52:31.965425+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-20T04:54:15.367285+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-20T04:54:21.863815+00:00",
-        "cooldown_until": "2026-10-20T05:14:21.862925+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-20T05:11:08.482791+00:00"
-      },
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "circuit_open",
-        "at": "2026-10-20T05:12:25.677381+00:00",
-        "cooldown_until": "2026-10-21T05:12:25.676374+00:00",
-        "retry_after_seconds": 8.0
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct",
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261020-151125-3684",
     "workflow_run_id": "39445902797",
     "workflow_run_attempt": "1",
@@ -4370,6 +4122,175 @@
     "rate_limited_models": [
       "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
       "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct",
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261022-160256-3630",
+    "workflow_run_id": "39810342544",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-22T16:02:56.715044+00:00",
+    "finished_at": "2026-10-22T16:08:32.592289+00:00",
+    "duration_seconds": 335.877,
+    "mode": "upload",
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 2,
+      "script_research": 4,
+      "script_draft": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "How Astronauts Live, Sleep, Shower & Cry in Space!",
+        "topic_key": "how astronauts live sleep shower cry in space",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Ancient Mysteries Be Like",
+        "topic_key": "ancient mysteries be like",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-22T16:03:33.463672+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-22T16:03:33.463739+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-22T16:08:21.653277+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-22T16:08:21.653384+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-22T16:08:32.587574+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-22T16:08:32.587608+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-10-22T16:08:32.587679+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-10-22T16:08:32.587701+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "gemini",
+        "status_code": 429,
+        "action": "cooldown_skip",
+        "at": "2026-10-22T16:02:56.718174+00:00",
+        "cooldown_until": "2026-10-22T22:16:01.159634+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-22T16:03:57.701273+00:00",
+        "retry_after_seconds": 26.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-22T16:04:00.930943+00:00",
+        "retry_after_seconds": 5.0
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-22T16:04:32.806344+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-22T16:07:54.680144+00:00"
+      },
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "circuit_open",
+        "at": "2026-10-22T16:08:21.652982+00:00",
+        "cooldown_until": "2026-10-23T16:08:21.652298+00:00",
+        "retry_after_seconds": 4.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-22T16:08:23.312090+00:00",
+        "retry_after_seconds": 5.0
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
       "groq:openai/gpt-oss-120b",
       "groq:openai/gpt-oss-20b",
       "groq:qwen/qwen3.8-27b",

@@ -7,11 +7,12 @@
       "recorded_at": "2026-10-21T22:16:01.159634+00:00",
       "blocked_until": "2026-10-22T22:16:01.159634+00:00"
     },
-    "cloudflare": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-22T15:41:30.401614+00:00",
-      "blocked_until": "2026-10-22T16:01:30.401614+00:00"
+    "pollinations": {
+      "reason": "billing_or_entitlement",
+      "status_code": 402,
+      "recorded_at": "2026-10-22T16:08:21.652298+00:00",
+      "blocked_until": "2026-10-23T16:08:21.652298+00:00",
+      "retry_after_seconds": 4.0
     }
   },
   "failures_5xx": {}
