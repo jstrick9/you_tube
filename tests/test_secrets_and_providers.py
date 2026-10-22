@@ -56,8 +56,8 @@ def test_no_workflow_references_a_secret_the_code_never_reads():
     """Dead secret wiring is a slow trap: it looks configured and does nothing."""
     referenced = env_block("daily.yml") | env_block("analytics.yml")
     known = env_vars_read_by_code() | {
-        # notification sinks, read via common.notify
-        "NTFY_TOPIC", "DISCORD_WEBHOOK_URL",
+        # notification sinks, read via common.notify; workflow-derived preflight boolean
+        "NTFY_TOPIC", "DISCORD_WEBHOOK_URL", "AUTOTUBE_UPLOAD_CONFIGURED",
         # OAuth pair consumed by the google client, not via os.environ directly
         "YT_CLIENT_ID", "YT_CLIENT_SECRET",
     }
@@ -287,6 +287,26 @@ def test_top_up_cadence_stays_within_free_tier_budget():
 
 
 # ── scheduled top-up pre-flight ─────────────────────────────────────────────
+def test_production_preflight_counts_only_youtube_schedules():
+    from autotube.target import counted_history_statuses
+
+    assert counted_history_statuses(uploading=True) == {"scheduled"}
+    assert counted_history_statuses(uploading=False, require_upload=True) == {"scheduled"}
+    assert counted_history_statuses(uploading=False, require_upload=False) == {"scheduled", "rendered"}
+
+    workflow = yaml.safe_load((WF / "daily.yml").read_text())
+    steps = workflow["jobs"]["produce"]["steps"]
+    need_step = next(step for step in steps if step.get("id") == "need")
+    assert "AUTOTUBE_UPLOAD_CONFIGURED" in need_step["env"]
+    assert "AUTOTUBE_REQUIRE_UPLOAD" in need_step["env"]
+    production_step = next(step for step in steps if step.get("id") == "production")
+    assert "refusing to silently convert production into a render-only run" in production_step["run"]
+    watchdog = yaml.safe_load((WF / "watchdog.yml").read_text())
+    watchdog_steps = watchdog["jobs"]["recover"]["steps"]
+    watchdog_need = next(step for step in watchdog_steps if step.get("id") == "need")
+    assert watchdog_need["env"]["AUTOTUBE_REQUIRE_UPLOAD"] == "true"
+
+
 def test_preflight_gate_handles_a_videos_per_day_range(tmp_path):
     """Every scheduled top-up run died in 18 seconds before this.
 

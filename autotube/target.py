@@ -28,6 +28,15 @@ def now_utc() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def counted_history_statuses(uploading: bool, require_upload: bool = False) -> set[str]:
+    """Statuses that can satisfy a daily target for this kind of production run.
+
+    Explicit render-only runs may count ``rendered`` history; scheduled/production runs
+    must count only videos that actually reached YouTube, even if credentials are missing.
+    """
+    return {"scheduled"} if uploading or require_upload else {"scheduled", "rendered"}
+
+
 def daily_target(cfg: dict) -> int:
     """How many videos today. Accepts a fixed int or a [lo, hi] range in videos_per_day.
 

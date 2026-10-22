@@ -16,7 +16,7 @@ import yaml
 
 root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(root))
-from autotube.target import daily_target  # noqa: E402  (after sys.path is set)
+from autotube.target import daily_target, counted_history_statuses  # noqa: E402  (after sys.path is set)
 from autotube.watchdog import list_daily_runs, should_skip_delayed_schedule  # noqa: E402
 cfg = yaml.safe_load((root / "config.yaml").read_text())
 tz = ZoneInfo(cfg["channel"].get("timezone", "UTC"))
@@ -27,7 +27,8 @@ else:
     credentials_present = all(os.environ.get(k) for k in
                               ("YT_REFRESH_TOKEN", "YT_CLIENT_ID", "YT_CLIENT_SECRET"))
 uploading = cfg["upload"]["enabled"] and credentials_present
-ok = {"scheduled"} if uploading else {"scheduled", "rendered"}
+require_upload = os.environ.get("AUTOTUBE_REQUIRE_UPLOAD", "").lower() == "true"
+ok = counted_history_statuses(uploading, require_upload)
 hist_path = root / "state" / "history.json"
 hist = json.loads(hist_path.read_text()) if hist_path.exists() else []
 done = sum(1 for h in hist if h.get("status") in ok and h.get("created_at")

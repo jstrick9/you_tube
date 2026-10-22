@@ -97,6 +97,8 @@ jobs:
         id: need
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          AUTOTUBE_UPLOAD_CONFIGURED: ${{ secrets.YT_REFRESH_TOKEN != '' && secrets.YT_CLIENT_ID != '' && secrets.YT_CLIENT_SECRET != '' }}
+          AUTOTUBE_REQUIRE_UPLOAD: ${{ github.event_name == 'schedule' || github.event.inputs.dry_run != 'true' }}
         run: |
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.top_up }}" = "true" ]; then
             pip install -q pyyaml==6.0.3 && python scripts/needed_today.py   # pinned; full install stays below
@@ -149,9 +151,12 @@ jobs:
         run: |
           ARGS=""
           if [ -n "${{ github.event.inputs.count }}" ]; then ARGS="$ARGS -n ${{ github.event.inputs.count }}"; fi
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ] || [ -z "$YT_REFRESH_TOKEN" ] || [ -z "$YT_CLIENT_ID" ] || [ -z "$YT_CLIENT_SECRET" ]; then
-            echo "::notice::Dry run (render only): YouTube secrets incomplete or dry_run selected."
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "::notice::Explicit dry run: rendering only; nothing will be uploaded."
             ARGS="$ARGS --dry-run"
+          elif [ -z "$YT_REFRESH_TOKEN" ] || [ -z "$YT_CLIENT_ID" ] || [ -z "$YT_CLIENT_SECRET" ]; then
+            echo "::error::YouTube credentials are incomplete; refusing to silently convert production into a render-only run."
+            exit 1
           fi
           # Scheduled runs and explicit retries use --top-up so a delayed/overlapping run cannot exceed the daily target.
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.top_up }}" = "true" ]; then ARGS="$ARGS --top-up"; fi

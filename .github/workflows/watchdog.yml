@@ -38,6 +38,7 @@ jobs:
         id: need
         env:
           AUTOTUBE_UPLOAD_CONFIGURED: ${{ secrets.YT_REFRESH_TOKEN != '' && secrets.YT_CLIENT_ID != '' && secrets.YT_CLIENT_SECRET != '' }}
+          AUTOTUBE_REQUIRE_UPLOAD: 'true'
         run: python scripts/needed_today.py
 
       - name: Recover a missed or late production run
