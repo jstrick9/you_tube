@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-22T17:33:04.554491+00:00",
+  "updated": "2026-10-22T19:03:16.906241+00:00",
   "videos_total": 44,
   "videos_7d": 1,
   "views_7d": 701,
@@ -286,7 +286,7 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1236,
-      "avg_view_pct": 79.93
+      "avg_view_pct": 79.79
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 33,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 33,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -660,28 +660,28 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 26282,
-    "per_1k_views": 1.03,
+    "views_90d": 10220,
+    "per_1k_views": 2.64,
     "videos": 35,
-    "denominator_basis": "public_views_fallback",
-    "videos_with_engaged_views": 34,
-    "complete_engaged_view_coverage": false,
+    "denominator_basis": "engaged_views",
+    "videos_with_engaged_views": 35,
+    "complete_engaged_view_coverage": true,
     "days_to_500": 1666.7,
     "days_to_1000": 3333.3
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10090,
+    "engaged_views_90d": 10220,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003363,
-    "current_full_threshold_progress": 0.001009,
-    "feb_2027_full_threshold_progress": 0.000504,
+    "expanded_threshold_progress": 0.003407,
+    "current_full_threshold_progress": 0.001022,
+    "feb_2027_full_threshold_progress": 0.000511,
     "public_videos": 35,
-    "videos_with_metric": 34,
-    "coverage": 0.971,
-    "complete": false,
+    "videos_with_metric": 35,
+    "coverage": 1.0,
+    "complete": true,
     "note": "Partial if coverage is below 100%; only YouTube Analytics engagedViews count toward this proxy."
   },
   "originality": {
