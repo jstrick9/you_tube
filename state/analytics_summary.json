@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-23T16:29:30.048628+00:00",
+  "updated": "2026-10-23T21:52:07.549511+00:00",
   "videos_total": 44,
   "videos_7d": 1,
-  "views_7d": 718,
+  "views_7d": 719,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -11,7 +11,7 @@
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.562,
+          "mean": 0.561,
           "n": 6
         },
         {
@@ -41,7 +41,7 @@
         },
         {
           "arm": "geography",
-          "mean": 0.416,
+          "mean": 0.417,
           "n": 2
         },
         {
@@ -107,7 +107,7 @@
         },
         {
           "arm": "backstory",
-          "mean": 0.424,
+          "mean": 0.425,
           "n": 5
         }
       ]
@@ -286,7 +286,7 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1236,
-      "avg_view_pct": 79.79
+      "avg_view_pct": 79.82
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -304,7 +304,7 @@
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
       "views": 1184,
-      "avg_view_pct": 41.66
+      "avg_view_pct": 41.75
     },
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 1,
+    "attempted_videos": 33,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 1,
+    "reports_without_usable_rows": 33,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -396,7 +396,7 @@
         },
         "median_turn_strength": 10.0,
         "retention_n": 1,
-        "median_average_view_percentage": 67.93,
+        "median_average_view_percentage": 68.87,
         "over_internal_average_view_target": 0,
         "turn_start_n": 1,
         "median_turn_start_runtime_pct": 16.8,
@@ -451,7 +451,7 @@
       },
       "median_turn_strength": 10.0,
       "retention_n": 1,
-      "median_average_view_percentage": 67.93,
+      "median_average_view_percentage": 68.87,
       "over_internal_average_view_target": 0,
       "turn_start_n": 1,
       "median_turn_start_runtime_pct": 16.8,
@@ -553,10 +553,10 @@
         "format": "myth_vs_fact",
         "hook_style": "question",
         "duration_seconds": 35.8,
-        "avg_view_pct": 41.66,
+        "avg_view_pct": 41.75,
         "views": 1184,
-        "engaged_views_90d": 602,
-        "sample_size": 602,
+        "engaged_views_90d": 603,
+        "sample_size": 603,
         "sample_basis": "engaged_views_90d",
         "sample_qualified": true
       },
@@ -569,10 +569,10 @@
         "format": "backstory",
         "hook_style": "question",
         "duration_seconds": 38.4,
-        "avg_view_pct": 45.65,
+        "avg_view_pct": 45.75,
         "views": 975,
-        "engaged_views_90d": 540,
-        "sample_size": 540,
+        "engaged_views_90d": 541,
+        "sample_size": 541,
         "sample_basis": "engaged_views_90d",
         "sample_qualified": true
       },
@@ -660,7 +660,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10220,
+    "views_90d": 10231,
     "per_1k_views": 2.64,
     "videos": 35,
     "denominator_basis": "engaged_views",
@@ -671,13 +671,13 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10220,
+    "engaged_views_90d": 10231,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003407,
-    "current_full_threshold_progress": 0.001022,
-    "feb_2027_full_threshold_progress": 0.000511,
+    "expanded_threshold_progress": 0.00341,
+    "current_full_threshold_progress": 0.001023,
+    "feb_2027_full_threshold_progress": 0.000512,
     "public_videos": 35,
     "videos_with_metric": 35,
     "coverage": 1.0,
