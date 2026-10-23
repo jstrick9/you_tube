@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-23T01:59:26.969122+00:00",
+  "updated": "2026-10-23T04:39:07.466814+00:00",
   "videos_total": 44,
   "videos_7d": 1,
-  "views_7d": 714,
+  "views_7d": 718,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -46,7 +46,7 @@
         },
         {
           "arm": "culture",
-          "mean": 0.4,
+          "mean": 0.401,
           "n": 3
         }
       ]
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 1,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 1,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
