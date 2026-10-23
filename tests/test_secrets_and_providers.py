@@ -857,6 +857,7 @@ def test_writer_prompt_requires_complete_natural_sentences_and_disables_asides()
     prompt = _capture_prompt("science")
     assert "Aim for 44-48 spoken words TOTAL" in prompt
     assert "Every segment must be one complete sentence" in prompt
+    assert "period, question mark, or exclamation point" in prompt
     assert "no detached commentary or one-off joke fragments" in prompt
     assert 'Read every "text" field aloud, in sequence, as one paragraph' in prompt
     assert "FINAL SHAPE CHECK before emitting JSON" in prompt
@@ -1283,7 +1284,8 @@ def test_produce_never_drafts_for_an_undepictable_subject(monkeypatch):
     cfg = _y.safe_load((ROOT / "config.yaml").read_text())
     monkeypatch.setattr(SW, "ground", lambda *a, **k: {"title": "Stereopsis", "url": "u",
                                                        "text": "Two camera views create stereo depth maps.",
-                                                       "summary": "s", "images": ["related"]})
+                                                       "summary": "iPhone Duo cameras use two camera views to create stereo depth maps.",
+                                                       "images": ["related"]})
     checked = {}
 
     def not_depictable(subject, *_args, **_kwargs):

@@ -3,6 +3,7 @@ import re
 from autotube.scriptwriter import (
     _attach_missing_evidence,
     _source_evidence_quote,
+    _source_names_subject,
     has_specific_visual_subject,
     visual_subject_for_topic,
 )
@@ -42,6 +43,14 @@ def test_visual_subject_resolves_nonvisual_modifiers_to_concrete_subjects():
     assert visual_subject_for_topic(
         {"script_subject": "The Evolution of Cycles"}, {"title": "Bicycle"},
     ) == "Bicycle"
+    # A viral phrase like "comet snowfall" names the visual event, not a separately
+    # photographable object; show the comet itself while source/trend gates keep the angle.
+    assert visual_subject_for_topic(
+        {"script_subject": "Comet Snowfall"}, {"title": "Hartley 2"},
+    ) == "Comet"
+    assert visual_subject_for_topic(
+        {"script_subject": "Tipu Sultan rockets"}, {"title": "Mysorean rockets"},
+    ) == "Mysorean rockets"
     assert visual_subject_for_topic(
         {"script_subject": "Giant Stone Spheres"}, {"title": "Stone spheres"},
     ) == "Stone Spheres"
@@ -69,6 +78,12 @@ def test_plural_secret_framing_is_not_part_of_the_photographic_subject():
     assert visual_subject_for_topic(
         {"script_subject": "Skeleton Secrets!"}, {"title": "Bone remodeling"},
     ) == "Skeleton"
+
+
+def test_grounding_lead_must_name_every_concrete_subject_term():
+    assert _source_names_subject("Mysorean rockets", "The Mysorean rocket was developed in India.")
+    assert not _source_names_subject("Amazon Cachalot", "A cachalot is a species of toothed whale.")
+    assert not _source_names_subject("M38A1C Jeep", "The Willys M38A1 is a military jeep.")
 
 
 def test_abstract_deep_sea_exploration_is_not_mistaken_for_a_visual_subject():
@@ -114,6 +129,40 @@ def test_produce_skips_abstract_visual_subject_before_any_script_draft(monkeypat
         "script_subject": "Deep-sea exploration",
         "wiki_query": "Deep-sea exploration",
         "angle": "deep-sea exploration describes a broad activity",
+    }
+
+    assert writer.produce(topic, {"format": "sounds_fake", "hook_style": "bold_claim", "voice": "test"}) is None
+    assert llm.calls == 0
+
+
+def test_produce_rejects_subject_not_named_by_the_grounding_article(monkeypatch):
+    import yaml
+    from pathlib import Path
+    from autotube import scriptwriter
+
+    cfg = yaml.safe_load((Path(__file__).resolve().parents[1] / "config.yaml").read_text())
+    source = {
+        "title": "Cachalot",
+        "summary": "The cachalot is a species of toothed whale.",
+        "text": "A cachalot uses clicks to locate prey in dark water. " * 100,
+    }
+
+    class NoDraftLLM:
+        lite = False
+        calls = 0
+
+        def json(self, *_args, **_kwargs):
+            self.calls += 1
+            raise AssertionError("an unsupported compound subject must be rejected before drafting")
+
+    llm = NoDraftLLM()
+    monkeypatch.setattr(scriptwriter, "ground", lambda *_args, **_kwargs: source)
+    writer = scriptwriter.ScriptWriter(cfg, llm, object())
+    topic = {
+        "topic": "Amazon Cachalot Seen Near a River",
+        "script_subject": "Amazon Cachalot",
+        "wiki_query": "Cachalot",
+        "angle": "Amazon cachalots use clicks to locate prey in dark water",
     }
 
     assert writer.produce(topic, {"format": "sounds_fake", "hook_style": "bold_claim", "voice": "test"}) is None

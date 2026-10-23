@@ -604,6 +604,11 @@ class LLM:
                                             "Every segment needs a string evidence field (empty only for the hook/CTA) and a "
                                             "complete, non-null visual object."
                                             if "segment" in feedback_lower else "")
+                                         + (" PUNCTUATION REPAIR: keep each spoken sentence grammatically complete and add exactly one "
+                                            "terminal period, question mark, or exclamation point to every segment text that lacks it. "
+                                            "Do not rewrite its facts or alter its wording merely to add punctuation."
+                                            if "do not end as complete sentences" in feedback_lower
+                                            or "terminal punctuation" in feedback_lower else "")
                                          + (" Every segment must include visual={shows: non-empty string, queries: [2-3 non-empty strings]}; "
                                             "never omit the visual object. The subject-visual gate is also mandatory: in at least one "
                                             "segment, visual.shows must explicitly name the concrete subject itself and a query must "

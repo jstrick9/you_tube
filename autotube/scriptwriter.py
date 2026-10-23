@@ -765,7 +765,7 @@ _VISUAL_SUBJECT_MODIFIERS = frozenset("""
 a an after and are at ancient by crazy deep discovery discoveries discovered discover evolution evolving fast
 for from giant hidden huge impossible in into insane jump jumps jumping last lost goodbye farewell loves love massive mystery mysteries
 mysterious of old on or poison poisoned pressure sea ocean light lights green missile missiles launcher launchers
-secret secrets shocking survive survives survival terrifying the to toxic unearthed venom weird with years year
+secret secrets shocking survive survives survival terrifying snowfall snow the to toxic unearthed venom weird with years year
 hundred hundreds thousand thousands million millions billion billions trillion trillions
 explore explored exploring exploration explorations observation observations research researching study studies
 call calls called calling sleep sleepy drowsy drowsiness detection warning warnings alert alerts
@@ -823,9 +823,22 @@ def visual_subject_for_topic(topic: dict | None, source: dict | None = None) -> 
     raw = str(topic.get("script_subject") or "").strip()
     source_title = str(source.get("title") or "").strip()
     trend_core = _visual_subject_core(raw)
-    if trend_core and has_specific_visual_subject(" ".join(trend_core)):
-        return " ".join(trend_core)
     source_core = _visual_subject_core(source_title)
+    if trend_core and has_specific_visual_subject(" ".join(trend_core)):
+        # If the grounded article uses a canonical alias (Tipu Sultan's rockets → Mysorean
+        # rockets), name that source subject in visuals. Do not replace a physical subject
+        # with a one-word mechanism/person match (Car driver → Driver drowsiness detection).
+        trend_terms = _specific_subject_terms(" ".join(trend_core))
+        source_terms = _specific_subject_terms(source_title)
+        raw_core_terms = set(originality.tokens(" ".join(trend_core))) - _GENERIC_TOPIC_SUBJECT_TERMS
+        source_title_words = set(originality.tokens(source_title)) - _GENERIC_TOPIC_SUBJECT_TERMS
+        source_covers_subject = bool(raw_core_terms) and all(
+            any(_subject_forms(term) & _subject_forms(word) for word in source_title_words)
+            for term in raw_core_terms
+        )
+        if (len(source_core) >= 2 and trend_terms & source_terms and not source_covers_subject):
+            return " ".join(source_core)
+        return " ".join(trend_core)
     if source_core and has_specific_visual_subject(" ".join(source_core)):
         return " ".join(source_core)
     return raw or source_title
@@ -1093,10 +1106,10 @@ def _angle_terms(angle: str, subject: str = "") -> set[str]:
 
 
 _GENERIC_TOPIC_SUBJECT_TERMS = {
-    "amazing", "ancient", "best", "crazy", "episode", "fact", "facts", "funny", "historical",
-    "history", "human", "humanity", "mystery", "mysteries", "part", "photo", "photos", "picture",
-    "pictures", "rare", "rarest", "secret", "secrets", "series", "story", "stories", "top",
-    "unknown", "untold", "unbelievable", "weird", "wild", "world",
+    "amazing", "ancient", "best", "big", "crazy", "enormous", "episode", "fact", "facts", "funny", "giant",
+    "huge", "historical", "large", "massive", "history", "human", "humanity", "mystery", "mysteries", "part",
+    "photo", "photos", "picture", "pictures", "rare", "rarest", "secret", "secrets", "series", "story",
+    "stories", "snowfall", "top", "unknown", "untold", "unbelievable", "weird", "wild", "world",
 }
 
 
@@ -1105,6 +1118,16 @@ def _specific_subject_terms(text: str) -> set[str]:
     terms = set(originality.tokens(text or "")) - _GENERIC_TOPIC_SUBJECT_TERMS
     forms = set().union(*(_angle_word_forms(term) for term in terms)) if terms else set()
     return forms - _GENERIC_TOPIC_SUBJECT_TERMS
+
+
+def _source_names_subject(subject: str, source_text: str) -> bool:
+    """Require every concrete subject word in the fetched article title/lead (with inflections)."""
+    required = set(originality.tokens(str(subject or ""))) - _GENERIC_TOPIC_SUBJECT_TERMS
+    observed = set(originality.tokens(str(source_text or ""))) - _GENERIC_TOPIC_SUBJECT_TERMS
+    return bool(required) and all(
+        any(_subject_forms(term) & _subject_forms(word) for word in observed)
+        for term in required
+    )
 
 
 def _angle_word_forms(word: str) -> set[str]:
@@ -1506,10 +1529,11 @@ FORMATS we can make (choose 2-4 that the specific article honestly supports; myt
 {fmt_list}
 
 For each pick:
-- `script_subject`: 1-6 words naming a photographable object, creature, person, place, or artifact, with at least one
-  meaningful token written exactly in the trend title (literal overlap, not a translation); the specific article title
-  must name that same subject. Reject vague photo compilations/“Part N”; never invent unseen-photo contents or use
-  abstract subjects (“deep-sea exploration,” “discovery,” “history”). Explicitly show the subject.
+- `script_subject`: 1-6 words naming a photographable object, creature, person, place, or artifact. Require a
+  non-generic literal overlap, not a translation, with both trend and article titles; the fetched title/summary must
+  name it fully. Use its canonical name; never append an unsupported person/place/species. Reject vague photo
+  compilations/“Part N”, imagined photo contents, and abstract subjects (“deep-sea exploration,” “discovery,” “history”).
+  Explicitly show the source-named subject.
 - `angle`: one specific factual sentence, independently worded; trend evidence is not proof. Grounded research must verify it.
 - `wiki_query`: the MOST SPECIFIC English Wikipedia article supporting it, not a broad category (e.g. Bou Craa,
   not “Conveyor belt”); reject the candidate if none supports it.
@@ -1632,6 +1656,8 @@ Return JSON only, as an object with a `picks` array, best first. Each pick has e
                 subject_terms = _specific_subject_terms(script_subject)
                 trend_subject_terms = _specific_subject_terms(c["topic"])
                 article_subject_terms = _specific_subject_terms(wiki_query)
+                # Require a concrete, non-generic term to overlap both trend and article title; the
+                # full phrase is checked against the fetched article title/summary before drafting.
                 if (not subject_terms or not (subject_terms & trend_subject_terms)
                         or not (subject_terms & article_subject_terms)):
                     dropped.append(
@@ -1878,8 +1904,9 @@ GROUNDED SOURCE TEXT (Wikipedia anchor: "{source['title']}"; supplementary passa
 {HOOK_RULES.format(hook_min=ccfg.get('hook_words_min', 6), hook_max=ccfg.get('hook_words_max', 9))}
 {retention_guidance(self.cfg)}
 VOICE DELIVERY — HARD REQUIREMENT: This is a person explaining one idea aloud, not notes for an editor. Write
-natural, everyday spoken English. Every segment must be one complete sentence with a clear subject and verb; the
-sentences must connect smoothly when read as one short paragraph. No fragments, headline phrasing, noun labels,
+natural, everyday spoken English. Every segment must be one complete sentence with a clear subject and verb, ending
+with a period, question mark, or exclamation point; the sentences must connect smoothly when read as one short
+paragraph. No fragments, headline phrasing, noun labels,
 telegraphic clauses, or abrupt jargon. Prefer familiar words and active verbs. If a scientific term is essential,
 explain what it means in the same sentence. Do not force jokes, asides, or commentary. The viewer should understand
 what is happening, how it works, and why the final fact matters without relying on the title or captions.
@@ -1990,7 +2017,8 @@ Return JSON using this FIVE-OBJECT JSON SKELETON (all placeholder text must be r
             incomplete = [i + 1 for i, s in enumerate(segs)
                           if not re.search(r"[.!?][\"'’”)}\]]*$", s["text"].strip())]
             assert not incomplete, (
-                f"segments {incomplete} do not end as complete sentences; write one full spoken sentence per beat")
+                f"segments {incomplete} do not end as complete sentences; each text must end with a period, "
+                "question mark, or exclamation point; preserve a full grammatical spoken sentence per beat")
             evidence_min, evidence_max = (5, 9) if self.llm.lite else (8, 15)
             attached_evidence = _attach_missing_evidence(
                 segs, str(source.get("text") or ""), evidence_min, evidence_max)
@@ -2578,6 +2606,14 @@ Return JSON only: {{"supported": true, "angle": "...", "source_quote": "..."}}""
                 receipt.note_failure("script_research", "source_grounding_failed")
             return None
         topic["wiki_title"] = source["title"]
+        source_name_text = " ".join(str(source.get(key) or "") for key in ("title", "summary"))
+        concrete_subject = str(topic.get("script_subject") or source.get("title") or "")
+        if not _source_names_subject(concrete_subject, source_name_text):
+            if receipt:
+                receipt.note_failure("script_research", "source_subject_mismatch")
+            log.info("  ✗ concrete subject %r is not fully named by grounding article %r — skipping before draft",
+                     topic.get("script_subject"), source.get("title"))
+            return None
         visual_subject = visual_subject_for_topic(topic, source)
         if not has_specific_visual_subject(visual_subject):
             if receipt:

@@ -590,6 +590,41 @@ def test_word_count_validation_retry_gives_a_targeted_repair_instruction(monkeyp
     assert "preserve already-valid beats" in calls[1]
 
 
+def test_sentence_punctuation_failure_gets_an_explicit_same_model_repair(monkeypatch, memory_provider_circuits):
+    import autotube.llm as L
+
+    calls = []
+
+    def draft(_model, _system, user, temperature):
+        calls.append((user, temperature))
+        text = "The comet releases icy grains" if len(calls) == 1 else "The comet releases icy grains."
+        return json.dumps({"text": text})
+
+    def validate(value):
+        assert value["text"].endswith((".", "?", "!")), \
+            "segment 1 do not end as complete sentences; each text must end with terminal punctuation"
+
+    monkeypatch.setitem(L.PROVIDERS, "punctuation", (draft, "punctuation_models"))
+    monkeypatch.setattr(L.time, "sleep", lambda *_: None)
+    router = L.LLM.__new__(L.LLM)
+    router.cfg = {"punctuation_models": ["model"]}
+    router.order = ["punctuation"]
+    router.temperature = 0.8
+    router._dead = set()
+    router._blocked_providers = set()
+    router.circuits = memory_provider_circuits()
+    router.last_used = ""
+
+    result = router.json("system", "write one sentence", validate=validate)
+
+    assert result["text"] == "The comet releases icy grains."
+    assert len(calls) == 2, "punctuation correction must use the existing two-call model cap"
+    assert "VALIDATION FAILURE: segment 1 do not end as complete sentences" in calls[1][0]
+    assert "PUNCTUATION REPAIR" in calls[1][0]
+    assert "Do not rewrite its facts or alter its wording merely to add punctuation" in calls[1][0]
+    assert calls[0][1] == 0.8 and calls[1][1] == 0.3
+
+
 def test_visual_validation_retry_repeats_the_concrete_subject_requirement(monkeypatch, memory_provider_circuits):
     import autotube.llm as L
 

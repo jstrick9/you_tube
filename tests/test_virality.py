@@ -147,6 +147,39 @@ def test_selector_rejects_generic_compilations_and_mismatched_source_subjects():
         [candidate], 1, set()) == []
 
 
+def test_selector_rejects_compound_subject_from_only_a_generic_trend_adjective():
+    candidate = cands()[2]
+    candidate.update({
+        "topic": "We Thought We Knew the Ocean, Then This Giant Appeared!",
+        "topic_key": common.normalize_topic_key("We Thought We Knew the Ocean, Then This Giant Appeared!"),
+        "lane": "science_nature",
+    })
+    unsupported = {
+        "index": 0, "viral_score": 9, "category": "nature", "risk": "low",
+        "script_subject": "Amazon Cachalot", "wiki_query": "Cachalot",
+        "angle": "Amazon cachalots use clicks to find prey in dark water.",
+        "formats": ["sounds_fake"],
+    }
+    assert ScriptWriter(CFG, LLMPicks([unsupported]), Strat()).select_topics(
+        [candidate], 1, set()) == []
+
+    candidate.update({
+        "topic": "TIPU SULTAN'S ROCKETS THAT DEFEATED THE BRITISHERS!!",
+        "topic_key": common.normalize_topic_key("TIPU SULTAN'S ROCKETS THAT DEFEATED THE BRITISHERS!!"),
+        "lane": "history_mystery",
+    })
+    canonical_subject = {
+        "index": 0, "viral_score": 9, "category": "history", "risk": "low",
+        "script_subject": "Mysorean rockets", "wiki_query": "Mysorean rockets",
+        "angle": "Iron-cased Mysorean rockets forced the British to develop their own rocket artillery.",
+        "formats": ["backstory"],
+    }
+    picks = ScriptWriter(CFG, LLMPicks([canonical_subject]), Strat()).select_topics(
+        [candidate], 1, set())
+    assert len(picks) == 1
+    assert picks[0]["script_subject"] == "Mysorean rockets"
+
+
 def test_dog_lapping_outlier_uses_narrow_primary_research_without_relaxing_live_gates():
     topic = "Dog Paani Kaise Peeta Hai? Tongue Ka Asli Secret!"
     video_id = "F9IluEaMjJ4"
