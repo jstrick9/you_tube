@@ -38,7 +38,7 @@ jobs:
             --generate-hashes --quiet -o /tmp/check.txt
           if ! diff -q <(grep -v '^#' requirements.txt) <(grep -v '^#' /tmp/check.txt) > /dev/null; then
             echo "::error::requirements.txt is out of date. Run:"
-            echo "  uv pip compile requirements.in --python-version 3.12 --generate-hashes -o requirements.txt"
+            echo "  uv pip compile requirements.in --python-version 3.12 --generate-hashes --upgrade -o requirements.txt"
             diff <(grep -v '^#' requirements.txt) <(grep -v '^#' /tmp/check.txt) | head -40
             exit 1
           fi
