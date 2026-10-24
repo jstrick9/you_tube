@@ -1,242 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261021-162246-3891",
-    "workflow_run_id": "39634021069",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-21T16:22:46.716955+00:00",
-    "finished_at": "2026-10-21T16:30:07.657696+00:00",
-    "duration_seconds": 440.941,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 6,
-      "script_research": 12,
-      "script_draft": 2,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Why CIRCLE daggers? The Indian Chakram",
-        "topic_key": "why circle daggers the indian chakram",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "How Ice Helps Install Heavy Stone Steps",
-        "topic_key": "how ice helps install heavy stone steps",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "The Most Powerful Explosion in the Universe!",
-        "topic_key": "the most powerful explosion in the universe",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Life as a Grave Robber (yes, you always left the clothes behind)",
-        "topic_key": "life as a grave robber yes you always left the clothes behind",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "WHY Do Fishermen Throw Sea Snakes Back Into the Ocean?",
-        "topic_key": "why do fishermen throw sea snakes back into the ocean",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "How old is Earth really? Not 6,000 years",
-        "topic_key": "how old is earth really not 6000 years",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-21T16:27:29.050497+00:00",
-        "stage": "script_draft",
-        "category": "provider_transient_5xx",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-21T16:27:29.050665+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-21T16:27:36.619410+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-21T16:28:03.180081+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-21T16:28:03.180157+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-21T16:29:25.406055+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-21T16:29:25.406190+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-21T16:30:02.331958+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-21T16:30:02.332040+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-21T16:30:03.654691+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-21T16:30:03.654834+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-21T16:30:07.652664+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-21T16:30:07.652751+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-21T16:30:07.652846+00:00",
-        "stage": "topic_selection",
-        "category": "topic_attempt_budget_exhausted",
-        "attempt": 6
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-21T16:22:46.717822+00:00",
-        "cooldown_until": "2026-10-22T15:32:08.448537+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "cooldown_skip",
-        "at": "2026-10-21T16:22:46.717843+00:00",
-        "cooldown_until": "2026-10-21T16:28:35.380229+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "cooldown_skip",
-        "at": "2026-10-21T16:22:46.717854+00:00",
-        "cooldown_until": "2026-10-21T16:29:24.640782+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-21T16:24:07.487331+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-21T16:24:15.932389+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-21T16:24:16.109161+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "route_circuit_open",
-        "at": "2026-10-21T16:24:16.109774+00:00",
-        "cooldown_until": "2026-10-21T16:34:16.109206+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-21T16:27:29.050129+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:provider_cooldown",
-      "mistral:provider_cooldown"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261021-163715-3854",
     "workflow_run_id": "39636140191",
     "workflow_run_attempt": "1",
@@ -4171,5 +3935,213 @@
     "retry_events": [],
     "provider_events": [],
     "preflight_skip_reason": "delayed_schedule_superseded"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261024-020011-3576",
+    "workflow_run_id": "40052221518",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-24T02:00:11.850171+00:00",
+    "finished_at": "2026-10-24T02:03:01.396971+00:00",
+    "duration_seconds": 169.547,
+    "mode": "upload",
+    "target_count": 2,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 6,
+      "script_research": 12,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Where Does Gold Actually Come From",
+        "topic_key": "where does gold actually come from",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Why Do Fishermen Instantly Throw Venomous Snakes Back Into the Sea?",
+        "topic_key": "why do fishermen instantly throw venomous snakes back into the sea",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "how did japan, with a huge advantage, lose midway?",
+        "topic_key": "how did japan with a huge advantage lose midway",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Por Qué los Bebés Koala Comen la Popó de su Madre?",
+        "topic_key": "por qu los bebs koala comen la pop de su madre",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Why Do Fishermen Release Deadly Sea Snakes Back Into the Ocean?",
+        "topic_key": "why do fishermen release deadly sea snakes back into the ocean",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "8 Wonders ?",
+        "topic_key": "8 wonders",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-24T02:01:17.325427+00:00",
+        "stage": "script_research",
+        "category": "source_grounding_failed"
+      },
+      {
+        "at": "2026-10-24T02:01:17.325455+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-24T02:01:44.124019+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-24T02:01:44.124082+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-24T02:02:57.287142+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-24T02:02:57.287224+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-24T02:02:58.239043+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-10-24T02:02:58.239101+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-24T02:02:59.061896+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-24T02:02:59.061954+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-24T02:03:01.393983+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-10-24T02:03:01.394038+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-24T02:03:01.394092+00:00",
+        "stage": "topic_selection",
+        "category": "topic_attempt_budget_exhausted",
+        "attempt": 6
+      },
+      {
+        "at": "2026-10-24T02:03:01.394138+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-24T02:00:11.850502+00:00",
+        "cooldown_until": "2026-10-24T16:39:00.108327+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-24T02:01:00.029462+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-24T02:01:12.613941+00:00",
+        "retry_after_seconds": 32.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-24T02:02:51.665675+00:00",
+        "retry_after_seconds": 14.0
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b"
+    ]
   }
 ]
