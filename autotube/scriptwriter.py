@@ -1504,13 +1504,13 @@ class ScriptWriter:
         in_season = getattr(self.strategy, "formats_in_season", None)
         formats = in_season() if in_season else list(ccfg.get("formats", []))
         fmt_list = "\n".join(
-            f"  {f}: {_clip(FORMAT_GUIDE[f].split('. ', 1)[0], 72)}"
+            f"  {f}: {_clip(FORMAT_GUIDE[f].split('. ', 1)[0], 55)}"
             for f in formats if f in FORMAT_GUIDE)
         season = ""
         if "creepy_true" in (getattr(self.strategy, "seasonal_now", lambda: [])()):
             season = " October is spooky season; favour eerie-but-true subjects, never gore."
         user = f"""TODAY: {today:%A %B %d, %Y}.{season}
-CHANNEL: {self.cfg['channel']['niche']}
+CHANNEL: {_clip(self.cfg['channel']['niche'], 180)}
 HARD EDITORIAL SCOPE: ONLY history_mystery (documented history, archaeology, unresolved past events) and
 science_nature (science, space, animals, natural phenomena, geography). Exclude sports, gaming, current news or
 politics, celebrity gossip, living-person biographies and unrelated entertainment. Never relabel an off-scope trend.
@@ -1529,12 +1529,15 @@ FORMATS we can make (choose 2-4 that the specific article honestly supports; myt
 {fmt_list}
 
 For each pick:
-- `script_subject`: 1-6 words naming a photographable object, creature, person, place, or artifact. Require a
-  non-generic literal overlap, not a translation, with both trend and article titles; the fetched title/summary must
+- `script_subject`: 1-6 words naming the photographable object, creature, person, place, or artifact—not a shocking
+  action or material in the headline; name the creature or object, not its behavior. Require a non-generic literal
+  overlap, not a translation, with both trend and article titles; the fetched title/summary must
   name it fully. Use its canonical name; never append an unsupported person/place/species. Reject vague photo
   compilations/“Part N”, imagined photo contents, and abstract subjects (“deep-sea exploration,” “discovery,” “history”).
   Explicitly show the source-named subject.
-- `angle`: one specific factual sentence, independently worded; trend evidence is not proof. Grounded research must verify it.
+- `angle`: one independently worded, source-checkable factual sentence. Avoid causation, comparisons, exact timing/location,
+  or superlatives unless the selected article explicitly states them. Trend evidence is discovery only, never factual proof.
+  Choose a claim the most-specific article can directly verify; all existing source and script QA gates still apply.
 - `wiki_query`: the MOST SPECIFIC English Wikipedia article supporting it, not a broad category (e.g. Bou Craa,
   not “Conveyor belt”); reject the candidate if none supports it.
 - Never invent a serial/model/variant code in `script_subject`: each compact letter-digit code must appear exactly in the
@@ -1543,10 +1546,8 @@ For each pick:
   `why_trending` briefly cites the measured evidence above.
 - Use a valid channel `category`, 2-4 fitting formats, and explicit `risk`=`none|low|high`; use `high` for unresolved risks.
 
-Return JSON only, as an object with a `picks` array, best first. Each pick has exactly these fields:
-{{"picks":[{{"index":<candidate index>,"viral_score":<0-10>,"category":"<one of {', '.join(cats)}>",
-"script_subject":"<1-6 words>","angle":"<one specific sentence>","wiki_query":"<specific article or empty>",
-"formats":["<2-4 fitting names>"],"why_trending":"<brief evidence>","risk":"none|low|high"}}]}}"""
+Return JSON only. Exact fields per pick:
+{{"picks":[{{"index":<candidate index>,"viral_score":<0-10>,"category":"<one of {', '.join(cats)}>","script_subject":"<1-6 words>","angle":"<one sentence>","wiki_query":"<specific article or empty>","formats":["<2-4 names>"],"why_trending":"<measured evidence>","risk":"none|low|high"}}]}}"""
 
         def validate(o):
             assert isinstance(o, dict), "selection response must be a JSON object"
@@ -2597,10 +2598,16 @@ Return JSON only: {{"supported": true, "angle": "...", "source_quote": "..."}}""
                 receipt.note_failure("script_research", "trend_angle_insufficient")
             log.info("skip %r: no specific current-trend angle to deliver", topic.get("topic"))
             return None
+        focus_query = " ".join(
+            str(topic.get(key) or "").strip()
+            for key in ("topic", "script_subject", "angle", "wiki_query", "research_query")
+            if str(topic.get(key) or "").strip()
+        )
         source = ground(topic["topic"], topic.get("wiki_query"), self.lang,
                         allow_living=self.cfg["content"]["allow_living_people"],
                         blocked=self.cfg["compliance"].get("blocked_topics"),
-                        cfg=self.cfg, llm=self.llm, research_query=topic.get("research_query"))
+                        cfg=self.cfg, llm=self.llm, research_query=topic.get("research_query"),
+                        focus_query=focus_query)
         if not source:
             if receipt:
                 receipt.note_failure("script_research", "source_grounding_failed")

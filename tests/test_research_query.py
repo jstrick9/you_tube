@@ -78,3 +78,5 @@ def test_script_production_forwards_its_curated_research_query_to_grounding(monk
     # The intentionally unhelpful source fails the regular source-angle gate before any script draft.
     assert writer.produce(topic, {}) is None
     assert captured["research_query"] == DOG_LAPPING_QUERY
+    assert all(term in captured["focus_query"] for term in (
+        "Dog Paani Kaise Peeta Hai", "Dog", DOG_LAPPING_ANGLE, "Dog"))

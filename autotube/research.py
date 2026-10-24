@@ -7,7 +7,9 @@ AI hallucination / misinformation, which YouTube's policies (and viewers) punish
 from __future__ import annotations
 
 import logging
+import math
 import re
+import unicodedata
 from urllib.parse import quote
 
 from . import news, safety, sources
@@ -31,16 +33,159 @@ def search_title(query: str, lang: str = "en") -> str | None:
         return None
 
 
-def article_text(title: str, lang: str = "en", max_chars: int = 9000) -> str:
+_ARTICLE_FOCUS_STOPWORDS = frozenset("""
+    a an and are as at be been being but by can could did do does doing for from had has have he her here hers
+    him his how i if in into is it its may might more most my of on or our out over she should so than that the
+    their theirs them then there these they this those through to under up us was we were what when where which
+    while who why will with would you your actually amazing new viral video short shorts today trend trending
+""".split())
+
+_ARTICLE_FOCUS_EQUIVALENTS = {
+    "feces": frozenset({"feces", "faeces", "fecal", "faecal", "pap", "poop", "popo"}),
+    "faeces": frozenset({"feces", "faeces", "fecal", "faecal", "pap", "poop", "popo"}),
+    "fecal": frozenset({"feces", "faeces", "fecal", "faecal", "pap", "poop", "popo"}),
+    "faecal": frozenset({"feces", "faeces", "fecal", "faecal", "pap", "poop", "popo"}),
+    "poop": frozenset({"feces", "faeces", "fecal", "faecal", "pap", "poop", "popo"}),
+    "popo": frozenset({"feces", "faeces", "fecal", "faecal", "pap", "poop", "popo"}),
+    "codebreaker": frozenset({"codebreaker", "codebreakers", "codebreaking", "cryptanalyst", "cryptanalysts", "cryptanalysis"}),
+    "codebreakers": frozenset({"codebreaker", "codebreakers", "codebreaking", "cryptanalyst", "cryptanalysts", "cryptanalysis"}),
+    "cryptanalyst": frozenset({"codebreaker", "codebreakers", "codebreaking", "cryptanalyst", "cryptanalysts", "cryptanalysis"}),
+    "cryptanalysts": frozenset({"codebreaker", "codebreakers", "codebreaking", "cryptanalyst", "cryptanalysts", "cryptanalysis"}),
+}
+
+
+def _article_focus_word_forms(word: str) -> set[str]:
+    """Small retrieval-only inflection bridge; source validation remains unchanged."""
+    forms = {word}
+    if word.endswith("ies") and len(word) > 4:
+        forms.add(word[:-3] + "y")
+    elif word.endswith("s") and not word.endswith("ss") and len(word) > 4:
+        forms.add(word[:-1])
+    if word.endswith("ing") and len(word) > 5:
+        stem = word[:-3]
+        forms.update({stem, stem + "e"})
+    elif word.endswith("ed") and len(word) > 4:
+        forms.add(word[:-2])
+    return forms
+
+
+def _article_focus_tokens(value: str) -> list[str]:
+    ascii_text = unicodedata.normalize("NFKD", str(value or "")).encode("ascii", "ignore").decode()
+    return re.findall(r"[a-z0-9]+", ascii_text.casefold())
+
+
+def _article_focus_groups(query: str) -> list[frozenset[str]]:
+    groups: list[frozenset[str]] = []
+    seen: set[frozenset[str]] = set()
+    for word in _article_focus_tokens(query):
+        if len(word) < 3 or word in _ARTICLE_FOCUS_STOPWORDS:
+            continue
+        equivalents = _ARTICLE_FOCUS_EQUIVALENTS.get(word, frozenset({word}))
+        forms = set().union(*(_article_focus_word_forms(term) for term in equivalents))
+        group = frozenset(forms)
+        if group not in seen:
+            groups.append(group)
+            seen.add(group)
+    return groups
+
+
+def _focused_article_excerpt(text: str, focus_query: str, max_chars: int) -> str:
+    """Keep the lead plus source paragraphs relevant to a query, even when they occur deep in the article.
+
+    This only improves retrieval: the selected text is copied verbatim from the fetched article and
+    every existing source, safety, originality, and script QA gate still runs against it.
+    """
+    if not focus_query or max_chars <= 0:
+        return text[:max_chars]
+    groups = _article_focus_groups(focus_query)
+    if not groups:
+        return text[:max_chars]
+
+    paragraphs = [re.sub(r"\s+", " ", part).strip()
+                  for part in re.split(r"\n\s*\n+", text) if part.strip()]
+    if not paragraphs:
+        return text[:max_chars]
+
+    def is_heading(paragraph: str) -> bool:
+        return (len(paragraph) <= 120 and len(paragraph.split()) <= 14
+                and not re.search(r"[.!?;:]", paragraph)
+                and not paragraph.lower().startswith(("from ", "list of ")))
+
+    heading_at: list[int | None] = []
+    current_heading: int | None = None
+    for i, paragraph in enumerate(paragraphs):
+        if is_heading(paragraph):
+            current_heading = i
+        heading_at.append(current_heading)
+
+    first_heading = next((i for i, p in enumerate(paragraphs) if is_heading(p)), min(2, len(paragraphs)))
+    lead_parts: list[str] = []
+    lead_size = 0
+    lead_budget = min(3500, max_chars // 2)
+    for paragraph in paragraphs[:first_heading]:
+        if lead_size + len(paragraph) + 2 > lead_budget:
+            if not lead_parts and max_chars > 0:
+                # Keep at least a bounded beginning of a long lead instead of losing it entirely.
+                clipped = paragraph[:lead_budget]
+                lead_parts.append(clipped)
+                lead_size += len(clipped) + 2
+            break
+        lead_parts.append(paragraph)
+        lead_size += len(paragraph) + 2
+
+    token_sets = [set(_article_focus_tokens(paragraph)) for paragraph in paragraphs]
+    section_tokens = [
+        (tokens | (token_sets[heading_at[i]] if heading_at[i] is not None else set()))
+        for i, tokens in enumerate(token_sets)
+    ]
+    frequencies = [sum(bool(group & tokens) for tokens in section_tokens) for group in groups]
+    weights = [1.0 + math.log((len(paragraphs) + 1) / (frequency + 1))
+               for frequency in frequencies]
+    ranked: list[tuple[float, int, int]] = []
+    for i, paragraph in enumerate(paragraphs):
+        if is_heading(paragraph):
+            continue
+        matched = [j for j, group in enumerate(groups) if group & section_tokens[i]]
+        if matched:
+            ranked.append((sum(weights[j] for j in matched), len(matched), i))
+    if not ranked:
+        return text[:max_chars]
+
+    selected = set(range(len(lead_parts)))
+    used = lead_size
+    budget = max_chars - used
+    for _score, _matches, i in sorted(ranked, key=lambda item: (-item[0], -item[1], item[2])):
+        additions = []
+        heading = heading_at[i]
+        if heading is not None and heading not in selected:
+            additions.append(heading)
+        if i not in selected:
+            additions.append(i)
+        extra = sum(len(paragraphs[j]) + 2 for j in additions)
+        if extra <= budget:
+            selected.update(additions)
+            used += extra
+            budget -= extra
+        if budget < 240:
+            break
+
+    if not any(i >= first_heading for i in selected):
+        return text[:max_chars]
+    excerpt = "\n\n".join(paragraphs[i] for i in sorted(selected))
+    return excerpt[:max_chars]
+
+
+def article_text(title: str, lang: str = "en", max_chars: int = 9000,
+                 focus_query: str | None = None) -> str:
     data = get_json(API.format(lang=lang), params={
         "action": "query", "prop": "extracts", "explaintext": 1, "exsectionformat": "plain",
         "titles": title, "format": "json", "redirects": 1})
     pages = data.get("query", {}).get("pages", {})
     text = next(iter(pages.values()), {}).get("extract", "") if pages else ""
-    # drop reference-ish tail sections
+    # Drop reference-ish tail sections while preserving the article's paragraph boundaries.
     text = re.split(r"\n(See also|References|External links|Notes|Further reading|Bibliography)\n", text)[0]
-    text = re.sub(r"\n{2,}", "\n", text).strip()
-    return text[:max_chars]
+    text = re.sub(r"\n[ \t]*\n{2,}", "\n\n", text).strip()
+    return _focused_article_excerpt(text, focus_query or "", max_chars)
 
 
 def mentions(title: str, lang: str = "en", max_articles: int = 6, max_chars: int = 5000) -> tuple[str, list[str]]:
@@ -178,6 +323,11 @@ def _words(x: str) -> list:
     return [w for w in _re.findall(r"[\w\u00c0-\u024f]+", (x or "").lower()) if len(w) > 2]
 
 
+_GENERIC_NARROWING_TERMS = frozenset({
+    "origin", "history", "overview", "background", "introduction", "meaning", "guide", "summary",
+})
+
+
 def widened(query: str, title: str) -> bool:
     """Did Wikipedia search drop the distinguishing part of the request?
 
@@ -205,7 +355,8 @@ def narrow_title(query: str, lang: str = "en"):
     title = search_title(query, lang)
     if not title or not widened(query, title):
         return title
-    extra = [w for w in _words(query) if w not in set(_words(title))]
+    extra = [w for w in _words(query)
+             if w not in set(_words(title)) and w not in _GENERIC_NARROWING_TERMS]
     if not extra:
         return title
     retry = search_title(" ".join(extra), lang)
@@ -217,13 +368,14 @@ def narrow_title(query: str, lang: str = "en"):
 
 def ground(topic: str, search_query: str | None, lang: str = "en", allow_living: bool = False,
            blocked: list[str] | None = None, cfg: dict | None = None, llm=None,
-           research_query: str | None = None) -> dict | None:
+           research_query: str | None = None, focus_query: str | None = None) -> dict | None:
     """Return {'title','url','summary','text','images'} or None if unusable.
 
     Wikipedia resolves and anchors the subject; `research.extra_sources` then widens what we can
     verify against (see autotube/sources.py). A narrow `research_query` may prioritize a matching
     PubMed abstract and place it in the writer's bounded excerpt without replacing Wikipedia or changing
-    any evidence checks. Safety screening is
+    any evidence checks. `focus_query` selects relevant verbatim paragraphs from the full
+    article extract without changing or weakening later evidence checks. Safety screening is
     context-aware (autotube/safety.py).
     """
     title = None
@@ -269,7 +421,7 @@ def ground(topic: str, search_query: str | None, lang: str = "en", allow_living:
         if not ok:
             log.info("skip %r: %s", title, reason)
             return None
-    text = article_text(title, lang)
+    text = article_text(title, lang, focus_query=focus_query)
     also: list[str] = []
     extra_credits: list[dict] = []
     rcfg = ((cfg or {}).get("research") or {})

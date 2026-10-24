@@ -1439,6 +1439,21 @@ def test_narrow_title_retries_on_the_distinctive_words(monkeypatch):
     assert R.narrow_title("Bou Craa conveyor belt", "en") == "Conveyor belt"
 
 
+def test_narrow_title_does_not_replace_a_specific_article_with_a_generic_query_word(monkeypatch):
+    import autotube.research as R
+
+    calls = []
+
+    def fake_search(query, lang="en"):
+        calls.append(query)
+        return {"origin of gold": "Gold", "origin": "Origin"}.get(query.lower())
+
+    monkeypatch.setattr(R, "search_title", fake_search)
+
+    assert R.narrow_title("Origin of gold", "en") == "Gold"
+    assert calls == ["Origin of gold"], "a generic leftover must not trigger a disambiguation-page retry"
+
+
 def test_ground_uses_the_narrowing_resolver():
     src = (ROOT / "autotube" / "research.py").read_text()
     body = src.split("def ground(topic:")[1].split("\ndef ")[0]
