@@ -7,18 +7,7 @@
       "recorded_at": "2026-10-23T16:39:00.108327+00:00",
       "blocked_until": "2026-10-24T16:39:00.108327+00:00",
       "retry_after_seconds": 10.0
-    },
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-10-24T11:08:57.883250+00:00",
-      "blocked_until": "2026-10-24T11:28:57.883250+00:00"
     }
   },
-  "failures_5xx": {
-    "gemini": {
-      "count": 1,
-      "last_at": "2026-10-24T11:11:42.706299+00:00"
-    }
-  }
+  "failures_5xx": {}
 }
