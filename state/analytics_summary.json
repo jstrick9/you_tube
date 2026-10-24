@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-24T14:31:12.906266+00:00",
+  "updated": "2026-10-24T18:23:33.757528+00:00",
   "videos_total": 44,
   "videos_7d": 1,
-  "views_7d": 719,
+  "views_7d": 720,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -16,7 +16,7 @@
         },
         {
           "arm": "space",
-          "mean": 0.532,
+          "mean": 0.531,
           "n": 1
         },
         {
@@ -72,7 +72,7 @@
         },
         {
           "arm": "would_you_survive",
-          "mean": 0.532,
+          "mean": 0.531,
           "n": 1
         },
         {
