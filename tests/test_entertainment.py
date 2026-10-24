@@ -7,7 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from autotube import common, qa, render, sfx  # noqa: E402
 from autotube.pipeline import build_description, effects_plan, pause_plan  # noqa: E402
-from autotube.scriptwriter import ScriptWriter, spoken_text, tidy  # noqa: E402
+from autotube.scriptwriter import ScriptWriter, metadata_schema_issues, spoken_text, tidy  # noqa: E402
 from autotube.strategy import Strategy  # noqa: E402
 
 CFG = common.load_config()
@@ -263,9 +263,10 @@ def test_metadata_fails_closed_to_grounded_fallback_on_malformed_provider_output
 
     result = writer.metadata(script, SOURCE)
 
-    assert result["description"] == "Drought stones warn future generations."
-    assert result["tags"] == ["Hunger stone"] and result["hashtags"] == []
-    assert result["thumbnail_text"] == "The Hunger Stone"
+    assert "Drought stones warn future generations." in result["description"]
+    assert metadata_schema_issues(result) == []
+    assert 8 <= len(result["tags"]) <= 12
+    assert result["thumbnail_text"] == "HUNGER STONE"
 
 
 def test_metadata_accepts_only_a_complete_typed_schema():

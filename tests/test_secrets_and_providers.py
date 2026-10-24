@@ -108,7 +108,8 @@ def test_every_review_provider_can_actually_be_reached():
 def test_the_writer_model_is_recorded_and_excluded_from_review():
     """Independence is only real if the writer's exact model is passed as `avoid`."""
     src = (ROOT / "autotube" / "scriptwriter.py").read_text()
-    assert 'script["_writer_model"] = getattr(self.llm, "last_used", "")' in src
+    assert 'writer_model = getattr(self.llm, "last_used", "")' in src
+    assert 'script["_writer_model"] = writer_model' in src
     assert 'avoid=script.get("_writer_model")' in src
     assert 'isinstance(writer_model, str) and bool(writer_model)' in src, \
         "unknown writer identity must never be reported as an independent review"

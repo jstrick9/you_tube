@@ -211,6 +211,39 @@ def test_dog_lapping_outlier_uses_narrow_primary_research_without_relaxing_live_
     assert picks[0]["lane"] == "science_nature"
 
 
+def test_nokia_decline_outlier_is_pinned_to_the_phone_business_source_angle():
+    topic = "Kebangkitan dan Kebangkrutan Nokia"
+    candidate = {
+        "topic": topic, "topic_key": common.normalize_topic_key(topic),
+        "source": "youtube_outliers", "sources": ["youtube_outliers"], "score": 0.92,
+        "context": ["viral Short: 492,634 views in 33.6h"], "lane": "history_mystery",
+        "signals": [signal("youtube_outliers", "https://www.youtube.com/watch?v=h1i-SkdL8Tc", {
+            "views": 492_634, "hours": 33.6, "vph": 14_656, "breakout": 21.1,
+            "video_id": "h1i-SkdL8Tc",
+        })],
+    }
+    llm = LLMPicks([{
+        "index": 0, "viral_score": 10, "category": "history", "risk": "low",
+        # This was the production model's broad detour. The narrow profile must resolve the actual Nokia story.
+        "script_subject": "Nokia 3310", "wiki_query": "Nokia 3310",
+        "angle": "The Nokia 3310 became famous as an unusually durable phone.",
+        "formats": ["backstory"],
+    }])
+
+    picks = ScriptWriter(CFG, llm, Strat()).select_topics([candidate], 1, set())
+
+    assert len(picks) == 1
+    assert picks[0]["script_subject"] == "Nokia"
+    assert picks[0]["wiki_query"] == "Nokia"
+    assert picks[0]["curated_profile"] == "nokia_phone_decline_v1"
+    assert picks[0]["angle"] == (
+        "After Nokia adopted Windows Phone in 2011, Symbian demand fell; its 2013 Microsoft deal "
+        "helped avert a cash crisis."
+    )
+    assert picks[0]["viral_score"] == 10
+    assert picks[0]["lane"] == "history_mystery"
+
+
 def test_selector_prompt_caps_candidates_to_a_bounded_live_shortlist():
     import copy
 

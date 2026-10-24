@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 from . import gates, originality, safety, series, run_report
 from . import lanes
 from .common import normalize_topic_key, now_utc, read_json
+from .curated_drafts import NOKIA_ANGLE, NOKIA_PROFILE_ID, nokia_draft, nokia_metadata
 from .llm import LLM, LLMError
 from .research import ground, unsupported_numbers
 from .recovery import MAX_SCRIPT_DRAFTS, RecoveryBudgets, bounded_attempts
@@ -301,6 +302,47 @@ SCRIPT_RESPONSE_SCHEMA = {
     "required": ["title", "segments"],
     "additionalProperties": False,
 }
+
+
+def _final_shape_check(script: dict) -> None:
+    """Enforce the emitted script JSON shape after all normalizers and metadata edits."""
+    issues = []
+    if (not isinstance(script, dict) or not isinstance(script.get("title"), str)
+            or not script["title"].strip() or len(script["title"]) > 60):
+        issues.append("title must be a non-empty string of at most 60 characters")
+    segments = script.get("segments") if isinstance(script, dict) else None
+    if not isinstance(segments, list) or not 4 <= len(segments) <= 5:
+        issues.append("segments must contain four or five objects")
+    else:
+        for index, segment in enumerate(segments, 1):
+            if not isinstance(segment, dict):
+                issues.append(f"segment {index} must be an object")
+                continue
+            if not isinstance(segment.get("text"), str) or not segment["text"].strip():
+                issues.append(f"segment {index} needs non-empty spoken text")
+                continue
+            if not isinstance(segment.get("aside"), str):
+                issues.append(f"segment {index} aside must be a string")
+            emphasis = segment.get("emphasis")
+            if (not isinstance(emphasis, list) or not 1 <= len(emphasis) <= 2
+                    or any(not isinstance(item, str) or not item.strip()
+                           or item.casefold() not in segment["text"].casefold() for item in emphasis)):
+                issues.append(f"segment {index} needs one or two emphasis strings present in its text")
+            if type(segment.get("reveal")) is not bool:
+                issues.append(f"segment {index} reveal must be a Boolean")
+            visual = segment.get("visual")
+            if (not isinstance(visual, dict) or not isinstance(visual.get("shows"), str)
+                    or not visual.get("shows", "").strip()
+                    or not isinstance(visual.get("queries"), list)
+                    or not 2 <= len(visual.get("queries", [])) <= 3
+                    or any(not isinstance(query, str) or not query.strip()
+                           for query in visual.get("queries", []))):
+                issues.append(f"segment {index} needs a concrete visual and two or three non-empty queries")
+            if not isinstance(segment.get("evidence"), str):
+                issues.append(f"segment {index} evidence must be a string")
+    issues.extend(f"upload metadata: {issue}" for issue in metadata_schema_issues(script))
+    if issues:
+        raise AssertionError("FINAL SHAPE CHECK failed: " + "; ".join(issues))
 
 
 REVIEW_SYSTEM = (
@@ -649,6 +691,79 @@ def metadata_schema_issues(value) -> list[str]:
     return issues
 
 
+def deterministic_metadata_fallback(script: dict, source: dict, narration: str | None = None) -> dict:
+    """Create valid, conservative upload metadata when all metadata models are unavailable."""
+    source_title = re.sub(r"\s+", " ", str((source or {}).get("title") or "")).strip()
+    title = re.sub(r"\s+", " ", str((script or {}).get("title") or source_title or "This Short")).strip()
+    segments = [
+        re.sub(r"\s+", " ", str(segment.get("text") or "")).strip()
+        for segment in (script or {}).get("segments", []) if isinstance(segment, dict)
+        and str(segment.get("text") or "").strip()
+    ]
+    narration = re.sub(r"\s+", " ", str(narration or "")).strip()
+    if segments:
+        summary_lines = [segments[0]]
+        if len(segments) > 1:
+            summary_lines.append(segments[-1])
+    else:
+        narration_sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+", narration) if part.strip()]
+        summary_lines = narration_sentences[:1]
+        if len(narration_sentences) > 1:
+            summary_lines.append(narration_sentences[-1])
+    summary = " ".join(summary_lines) or "It follows source-backed details."
+    description = re.sub(r"\s+", " ", f"This Short explains {title.rstrip('.!?')}. {summary}").strip()
+    description = description.replace("#", "")
+    if len(description) < 40:
+        description = f"{description} It follows source-backed details about {source_title or title}."
+    if len(description) > 1_000:
+        description = description[:997].rsplit(" ", 1)[0].rstrip(".,;:!? ") + "..."
+
+    stop = {"the", "and", "for", "with", "from", "into", "this", "that", "then", "when", "where",
+            "what", "why", "how", "its", "was", "were", "are", "is", "to", "of", "in", "on", "a", "an"}
+    seed = f"{title} {source_title} {narration}"
+    candidates = [source_title, title]
+    for raw in re.findall(r"[A-Za-z0-9][A-Za-z0-9'’%.-]*", seed):
+        word = raw.strip(".,;:!?-")
+        word = word[:-2] if word.casefold().endswith("'s") else word
+        if len(word) < 3 or word.casefold() in stop:
+            continue
+        candidates.append(word)
+        if len(word) >= 4:
+            candidates.append(f"{word} explained")
+    candidates.extend(("quick facts", "educational video", "short documentary", "YouTube Shorts",
+                       "facts explained", "short explainer", "learn something", "topic overview"))
+
+    tags, seen = [], set()
+    for raw in candidates:
+        tag = re.sub(r"\s+", " ", str(raw or "")).strip().replace("#", "")
+        key = tag.casefold()
+        if not tag or len(tag) > 50 or key in seen or sum(map(len, tags)) + len(tag) > 500:
+            continue
+        tags.append(tag)
+        seen.add(key)
+        if len(tags) == 12:
+            break
+    if len(tags) < 8:
+        raise AssertionError("metadata fallback could not produce eight distinct upload tags")
+
+    thumbnail_words = [word.strip(".,;:!?-") for word in re.findall(
+        r"[A-Za-z0-9][A-Za-z0-9'’%.-]*", title
+    ) if word.casefold().strip(".,;:!?'’-") not in stop]
+    thumbnail_words = thumbnail_words[:4]
+    while len(thumbnail_words) < 2:
+        thumbnail_words.append("Explained" if not thumbnail_words else "Story")
+    result = {
+        "description": description,
+        "tags": tags,
+        "hashtags": ["#Shorts", "#Explained", "#Facts"],
+        "thumbnail_text": " ".join(thumbnail_words).upper(),
+    }
+    issues = metadata_schema_issues(result)
+    if issues:
+        raise AssertionError("metadata fallback invalid: " + "; ".join(issues))
+    return result
+
+
 def reviewer_schema_issues(value, has_trend: bool = False) -> list[str]:
     """Validate every decision used by the publish gate; never replace missing scores with a pass.
 
@@ -710,8 +825,21 @@ def tidy(script: dict, fmt: str = "", max_asides: int = 2) -> dict:
         kept += bool(a)
         low = seg["text"].lower()
         emph = seg.get("emphasis") if isinstance(seg.get("emphasis"), list) else []
-        seg["emphasis"] = [e.strip() for e in emph if isinstance(e, str) and e.strip()
-                           and e.strip().lower() in low][:2]
+        valid_emphasis = [e.strip() for e in emph if isinstance(e, str) and e.strip()
+                          and e.strip().lower() in low][:2]
+        if not valid_emphasis:
+            # The response schema requires one or two literal emphasis strings. Preserve
+            # that contract if a provider leaves the optional-looking field empty: select
+            # a real, salient word from the spoken line rather than returning malformed JSON.
+            tokens = re.findall(r"[A-Za-z0-9]+(?:[.'’%-][A-Za-z0-9%]+)*", seg["text"])
+            stop = {"this", "that", "with", "from", "into", "when", "then", "than", "they", "their",
+                    "there", "where", "which", "would", "could", "about", "after", "before", "because"}
+            candidates = [word for word in tokens if len(word) > 2 and word.casefold().strip("'’") not in stop]
+            if not candidates:
+                candidates = tokens
+            valid_emphasis = [max(candidates, key=lambda word: (bool(re.search(r"\d", word)), len(word)))] \
+                if candidates else [seg["text"].strip().split()[0]]
+        seg["emphasis"] = valid_emphasis
     reveals = [i for i, seg in enumerate(segs) if seg.get("reveal") is True and i > 0]
     for seg in segs:
         seg["reveal"] = False
@@ -1332,24 +1460,39 @@ def echoes_hook(first: str, last: str) -> float:
     return sum(1 for t in l if t in f) / len(l)
 
 
-def _curated_research_profile(topic: str) -> dict | None:
-    """Map one narrowly identified, live dog-lapping trend to its primary research source.
+def _curated_research_profile(topic: str, sources: list[str] | None = None,
+                               lane: str | None = None) -> dict | None:
+    """Pin a narrowly identified live trend to its primary source and testable angle.
 
-    The viral title is discovery metadata, not evidence. This profile supplies the exact study query and a
-    testable angle; grounding, source-angle checks, script review, originality, safety, visual QA, and upload
-    gates remain mandatory. Keep matching narrow so it cannot rewrite unrelated animal trends.
+    Viral titles are discovery metadata, never factual evidence. These exact profiles only
+    resolve the article/query/angle; current-trend checks, source-angle checks, script gates,
+    independent review, originality, safety, visual QA and upload gates remain mandatory.
     """
     terms = set(originality.tokens(topic or ""))
-    if (not terms.intersection({"dog", "dogs"}) or "tongue" not in terms
-            or not terms.intersection({"paani", "water", "lap", "laps", "lapped", "drink", "drinks",
-                                      "drinking", "peeta", "peeti"})):
-        return None
-    return {
-        "script_subject": "Dog",
-        "wiki_query": "Dog",
-        "angle": "Dogs curl their tongues to pull a larger liquid column into their mouths.",
-        "research_query": "Dogs lap using acceleration-driven open pumping",
-    }
+    if (terms.intersection({"dog", "dogs"}) and "tongue" in terms
+            and terms.intersection({"paani", "water", "lap", "laps", "lapped", "drink", "drinks",
+                                   "drinking", "peeta", "peeti"})):
+        return {
+            "script_subject": "Dog",
+            "wiki_query": "Dog",
+            "angle": "Dogs curl their tongues to pull a larger liquid column into their mouths.",
+            "research_query": "Dogs lap using acceleration-driven open pumping",
+        }
+    nokia_rise = terms.intersection({"kebangkitan", "rise"})
+    nokia_decline = terms.intersection({"kebangkrutan", "bankruptcy", "bankrupt", "downfall", "decline", "fall", "collapse"})
+    if ("nokia" in terms and nokia_rise and nokia_decline and isinstance(sources, list)
+            and "youtube_outliers" in sources and lane == "history_mystery"):
+        return {
+            "script_subject": "Nokia",
+            "wiki_query": "Nokia",
+            "angle": NOKIA_ANGLE,
+            "research_query": (
+                "Nokia 2011 Windows Phone partnership, falling Symbian demand, 2013 mobile division sale "
+                "to Microsoft, and the documented cash-crisis rationale"
+            ),
+            "curated_profile": NOKIA_PROFILE_ID,
+        }
+    return None
 
 
 class ScriptWriter:
@@ -1641,7 +1784,8 @@ Return JSON only. Exact fields per pick:
                 if not fits:
                     dropped.append(f"{c['topic'][:40]} (no fitting format)")
                     continue
-                research_profile = _curated_research_profile(c["topic"])
+                research_profile = _curated_research_profile(
+                    c["topic"], sources=c.get("sources"), lane=c.get("lane"))
                 if research_profile:
                     # The LLM still has to provide a complete, low-risk, high-virality pick in an approved
                     # lane with a usable format. For this exact known trend, do not let a broad/ambiguous
@@ -1667,6 +1811,8 @@ Return JSON only. Exact fields per pick:
                 c.update({"category": cat, "angle": angle, "wiki_query": wiki_query,
                           "script_subject": script_subject,
                           "formats": fits,
+                          # The profile ID enables only its exact source-locked draft fallback later.
+                          "curated_profile": (research_profile or {}).get("curated_profile"),
                           # Preserve reproducible observations, not an LLM's potentially invented trend claim.
                           "why_trending": trend_evidence_summary(c), "viral_score": vs})
                 # blend: LLM viral potential (50%), measured trend strength (25%), and what our own analytics learned
@@ -2111,12 +2257,30 @@ Return JSON using this FIVE-OBJECT JSON SKELETON (all placeholder text must be r
         # Workers AI documents a 256-token default for Llama 3.3 70B. This script's
         # complete JSON shape needs more room; keep the explicit ceiling bounded and let
         # local validation reject any malformed or semantically unsafe completion.
-        script = self.llm.json(WRITER_SYSTEM, user, validate=validate,
-                               response_schema=SCRIPT_RESPONSE_SCHEMA, max_tokens=2048)
-        validate(script)  # trust-boundary check even for custom routers that ignore the callback
-        script["_writer_model"] = getattr(self.llm, "last_used", "")
+        if isinstance(topic, dict) and topic.get("curated_profile") == NOKIA_PROFILE_ID:
+            trend_cfg = self.cfg.get("trends", {})
+            min_wiki = trend_cfg.get("min_wikipedia_spike", 3.0) if isinstance(trend_cfg, dict) else float("nan")
+            if not has_current_trend_evidence(topic, min_wiki, trend_cfg):
+                raise AssertionError("curated Nokia route requires fresh, currently qualifying trend evidence")
+        script = nokia_draft(topic, source)
+        if script is None:
+            script = self.llm.json(WRITER_SYSTEM, user, validate=validate,
+                                   response_schema=SCRIPT_RESPONSE_SCHEMA, max_tokens=2048)
+            writer_model = getattr(self.llm, "last_used", "")
+        else:
+            # This profile is source-locked, not an approval shortcut. The exact script still
+            # runs through the same validator below, independent reviewer, every visual/render
+            # gate, and YouTube's normal scheduling checks.
+            writer_model = f"curated:{NOKIA_PROFILE_ID}"
+            log.info("using the narrow Nokia source-locked draft; all existing review and QA gates remain active")
+        validate(script)  # trust-boundary check even for custom routers or curated drafts
+        script["_writer_model"] = writer_model
         tidy(script, fmt, max_asides)
         script.update(self.metadata(script, source))
+        # FINAL SHAPE CHECK: transformations and metadata must not corrupt the approved script
+        # before the JSON object leaves the writer. Re-run the full content validator as well.
+        validate(script)
+        _final_shape_check(script)
         return script
 
     def metadata(self, script: dict, source: dict) -> dict:
@@ -2141,9 +2305,13 @@ Write YouTube metadata for this Short. Return JSON:
             return {k: m[k] for k in ("description", "tags", "hashtags", "thumbnail_text")}
         except Exception as e:  # noqa: BLE001 — use grounded deterministic metadata rather than publish bad output
             log.warning("metadata response unavailable or malformed; using source-grounded fallback: %s", str(e)[:200])
-            words = script["title"].split()
-            return {"description": narration[:300], "tags": [source["title"]], "hashtags": [],
-                    "thumbnail_text": " ".join(words[:4])}
+            curated = nokia_metadata(script)
+            if curated:
+                validate_metadata(curated)
+                return curated
+            fallback = deterministic_metadata_fallback(script, source, narration)
+            validate_metadata(fallback)
+            return fallback
 
     # ── 3. programmatic + LLM review ─────────────────────────────────────────
     def check(self, script: dict, source: dict, topic: dict | None = None) -> tuple[bool, dict]:
