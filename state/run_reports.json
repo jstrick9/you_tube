@@ -1,102 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261022-032538-4076",
-    "workflow_run_id": "39716617133",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-22T03:25:38.670252+00:00",
-    "finished_at": "2026-10-22T03:28:21.180155+00:00",
-    "duration_seconds": 162.51,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 1,
-      "topic_production": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [],
-    "failures": [
-      {
-        "at": "2026-10-22T03:28:21.174816+00:00",
-        "stage": "topic_selection",
-        "category": "no_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-22T03:28:21.175429+00:00",
-        "stage": "script",
-        "category": "all_text_providers_circuit_open_or_unusable"
-      }
-    ],
-    "retry_events": [],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-22T03:25:38.671740+00:00",
-        "cooldown_until": "2026-10-22T15:32:08.448537+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 429,
-        "action": "cooldown_skip",
-        "at": "2026-10-22T03:25:38.671758+00:00",
-        "cooldown_until": "2026-10-22T22:16:01.159634+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-22T03:26:08.105349+00:00",
-        "cooldown_until": "2026-10-22T03:46:08.087768+00:00",
-        "retry_after_seconds": 21.0
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-22T03:26:14.632950+00:00",
-        "cooldown_until": "2026-10-22T03:46:14.632322+00:00"
-      },
-      {
-        "provider": "cloudflare",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-22T03:26:21.014904+00:00",
-        "cooldown_until": "2026-10-22T03:46:21.014308+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-22T03:28:21.174530+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-      "groq:openai/gpt-oss-120b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261022-045655-3612",
     "workflow_run_id": "39725043867",
     "workflow_run_attempt": "1",
@@ -4156,5 +4060,32 @@
       "groq:qwen/qwen3.8-27b",
       "mistral:mistral-small-latest"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "40205077098",
+    "workflow_run_id": "40205077098",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-25T15:03:10.813426+00:00",
+    "finished_at": "2026-10-25T15:03:10.813426+00:00",
+    "duration_seconds": 0,
+    "mode": "workflow_fallback",
+    "top_up": true,
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "superseded",
+    "stage": "preflight",
+    "stage_entries": {
+      "preflight": 1
+    },
+    "retry_budgets": {},
+    "topic_attempts": [],
+    "failures": [],
+    "retry_events": [],
+    "provider_events": [],
+    "preflight_skip_reason": "delayed_schedule_superseded"
   }
 ]
