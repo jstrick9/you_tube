@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-25T06:48:29.991637+00:00",
+  "updated": "2026-10-25T14:27:37.607271+00:00",
   "videos_total": 44,
   "videos_7d": 1,
   "views_7d": 720,
@@ -41,7 +41,7 @@
         },
         {
           "arm": "geography",
-          "mean": 0.417,
+          "mean": 0.418,
           "n": 2
         },
         {
@@ -62,12 +62,12 @@
         },
         {
           "arm": "guess_reveal",
-          "mean": 0.54,
+          "mean": 0.539,
           "n": 1
         },
         {
           "arm": "dumbest_decision",
-          "mean": 0.537,
+          "mean": 0.536,
           "n": 1
         },
         {
@@ -226,7 +226,7 @@
       "arms": [
         {
           "arm": "poll",
-          "mean": 0.519,
+          "mean": 0.518,
           "n": 4
         },
         {
@@ -261,7 +261,7 @@
     {
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
-      "views": 1566,
+      "views": 1567,
       "avg_view_pct": 114.20000000000002
     },
     {
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 34,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 34,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
