@@ -1,108 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261022-142614-3838",
-    "workflow_run_id": "39795441183",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-22T14:26:14.754172+00:00",
-    "finished_at": "2026-10-22T14:28:22.626971+00:00",
-    "duration_seconds": 127.873,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 2,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 1,
-      "script_research": 2,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Under water welding",
-        "topic_key": "under water welding",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-22T14:28:22.621553+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-22T14:28:22.621671+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-22T14:28:22.622007+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-22T14:26:14.755009+00:00",
-        "cooldown_until": "2026-10-22T15:32:08.448537+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 429,
-        "action": "cooldown_skip",
-        "at": "2026-10-22T14:26:14.755027+00:00",
-        "cooldown_until": "2026-10-22T22:16:01.159634+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-22T14:28:19.714966+00:00"
-      },
-      {
-        "provider": "cloudflare",
-        "status_code": 429,
-        "action": "vision_model_rate_limited",
-        "at": "2026-10-22T14:28:19.842596+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "39804034752",
     "workflow_run_id": "39804034752",
     "workflow_run_attempt": "1",
@@ -4130,6 +4028,171 @@
         "at": "2026-10-26T01:56:26.099304+00:00",
         "cooldown_until": "2026-10-27T01:56:26.098853+00:00",
         "retry_after_seconds": 7.0
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261026-043720-3798",
+    "workflow_run_id": "40269893969",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-26T04:37:20.763551+00:00",
+    "finished_at": "2026-10-26T04:46:37.447706+00:00",
+    "duration_seconds": 556.684,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 2,
+      "script_research": 4,
+      "script_draft": 1,
+      "script_review": 1,
+      "tts": 1,
+      "visuals": 1,
+      "music": 1,
+      "render_qa": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "How Fast Is Light Really",
+        "topic_key": "how fast is light really",
+        "outcome": "rejected",
+        "stage": "render_qa",
+        "failure_category": "no_verified_shot_replacement"
+      },
+      {
+        "index": 1,
+        "topic": "The Mysterious Stone Wheels of Hayuni, Peru",
+        "topic_key": "the mysterious stone wheels of hayuni peru",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-26T04:46:05.307472+00:00",
+        "stage": "render_qa",
+        "category": "no_verified_shot_replacement",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-26T04:46:11.706060+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-26T04:46:13.045820+00:00",
+        "stage": "script_research",
+        "category": "source_grounding_failed"
+      },
+      {
+        "at": "2026-10-26T04:46:13.045854+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-26T04:46:37.436703+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-26T04:46:37.436742+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-26T04:37:20.763944+00:00",
+        "cooldown_until": "2026-10-27T01:56:26.098853+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-26T04:37:37.431605+00:00",
+        "retry_after_seconds": 30.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-26T04:37:49.219015+00:00",
+        "retry_after_seconds": 32.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_request_too_large",
+        "at": "2026-10-26T04:37:49.308551+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-26T04:39:31.997661+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-26T04:39:38.345937+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-26T04:40:05.146794+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-26T04:43:11.843471+00:00"
       }
     ],
     "grounding_repairs": [],
