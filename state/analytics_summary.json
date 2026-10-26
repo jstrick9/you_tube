@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-26T16:50:25.290654+00:00",
+  "updated": "2026-10-26T23:22:33.397095+00:00",
   "videos_total": 44,
   "videos_7d": 1,
-  "views_7d": 721,
+  "views_7d": 722,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -41,7 +41,7 @@
         },
         {
           "arm": "geography",
-          "mean": 0.418,
+          "mean": 0.419,
           "n": 2
         },
         {
@@ -97,7 +97,7 @@
         },
         {
           "arm": "ranked_escalation",
-          "mean": 0.471,
+          "mean": 0.472,
           "n": 1
         },
         {
@@ -262,7 +262,7 @@
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
       "views": 1567,
-      "avg_view_pct": 114.20000000000002
+      "avg_view_pct": 114.06
     },
     {
       "title": "Why Beavers Bully Trees #shorts",
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 34,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 34,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -660,8 +660,8 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10245,
-    "per_1k_views": 2.64,
+    "views_90d": 10249,
+    "per_1k_views": 2.63,
     "videos": 35,
     "denominator_basis": "engaged_views",
     "videos_with_engaged_views": 35,
@@ -671,11 +671,11 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10245,
+    "engaged_views_90d": 10249,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003415,
+    "expanded_threshold_progress": 0.003416,
     "current_full_threshold_progress": 0.001025,
     "feb_2027_full_threshold_progress": 0.000512,
     "public_videos": 35,
