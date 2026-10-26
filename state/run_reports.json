@@ -1,243 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261022-125444-3572",
-    "workflow_run_id": "39782117570",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-22T12:54:44.520405+00:00",
-    "finished_at": "2026-10-22T13:08:04.628888+00:00",
-    "duration_seconds": 800.108,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 5,
-      "script_research": 10,
-      "script_draft": 5,
-      "script_review": 2,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Why CIRCLE daggers? The Indian Chakram",
-        "topic_key": "why circle daggers the indian chakram",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "1. Why Do Snakes Sometimes Crawl Over Sleeping People Without Biting?",
-        "topic_key": "1 why do snakes sometimes crawl over sleeping people without biting",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "IS This Giant Anaconda Real or Just a Replica?",
-        "topic_key": "is this giant anaconda real or just a replica",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "WHY Do Fishermen Throw Sea Snakes Back Into the Ocean?",
-        "topic_key": "why do fishermen throw sea snakes back into the ocean",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Mysterious Water Creature Hidden Inside a Log! Amazing Discovery",
-        "topic_key": "mysterious water creature hidden inside a log amazing discovery",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-22T12:59:50.112610+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-22T12:59:50.112793+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-22T13:06:47.322263+00:00",
-        "stage": "script_draft",
-        "category": "provider_transient_network",
-        "exception_type": "LLMError",
-        "attempt": 3
-      },
-      {
-        "at": "2026-10-22T13:06:47.322321+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-22T13:07:03.278429+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-22T13:07:31.256157+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-22T13:07:31.256286+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-22T13:07:48.260248+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-22T13:07:48.260339+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-22T13:08:04.625112+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-22T13:08:04.625179+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-22T13:08:04.625280+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 2,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-22T12:54:44.521285+00:00",
-        "cooldown_until": "2026-10-22T15:32:08.448537+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 429,
-        "action": "cooldown_skip",
-        "at": "2026-10-22T12:54:44.521302+00:00",
-        "cooldown_until": "2026-10-22T22:16:01.159634+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-22T12:55:51.471804+00:00",
-        "retry_after_seconds": 38.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-22T12:56:22.320344+00:00",
-        "retry_after_seconds": 40.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-22T12:56:25.372098+00:00",
-        "retry_after_seconds": 36.0
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-22T12:56:31.804940+00:00"
-      },
-      {
-        "provider": "cloudflare",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-22T12:57:06.904042+00:00",
-        "cooldown_until": "2026-10-22T13:17:06.903246+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-22T13:06:47.322041+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "groq:qwen/qwen3.8-27b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261022-142614-3838",
     "workflow_run_id": "39795441183",
     "workflow_run_attempt": "1",
@@ -4143,6 +3906,237 @@
       "groq:openai/gpt-oss-120b",
       "groq:openai/gpt-oss-20b",
       "groq:qwen/qwen3.8-27b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261026-014450-3592",
+    "workflow_run_id": "40255614122",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-26T01:44:50.724246+00:00",
+    "finished_at": "2026-10-26T01:58:38.062242+00:00",
+    "duration_seconds": 827.338,
+    "mode": "upload",
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 5,
+      "script_research": 10,
+      "script_draft": 3,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Why Nothing Can Survive Venus",
+        "topic_key": "why nothing can survive venus",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Did you know the Hunter's Moon actually helped us survive?",
+        "topic_key": "did you know the hunters moon actually helped us survive",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "నకషతరల లకషయగ dung beetle",
+        "topic_key": "dung beetle",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Tardigrade The Unkillable Animal",
+        "topic_key": "tardigrade the unkillable animal",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "This Is What a Wormhole Could Do to You!",
+        "topic_key": "this is what a wormhole could do to you",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-26T01:54:40.885336+00:00",
+        "stage": "script_draft",
+        "category": "provider_transient_network",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-26T01:54:40.885491+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-26T01:54:47.160357+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-26T01:54:47.408499+00:00",
+        "stage": "script_research",
+        "category": "source_grounding_failed"
+      },
+      {
+        "at": "2026-10-26T01:54:47.408513+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-26T01:56:26.099447+00:00",
+        "stage": "script_draft",
+        "category": "billing_or_entitlement",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-26T01:56:26.099510+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-26T01:58:35.464538+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-26T01:58:35.464661+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-26T01:58:38.058845+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-10-26T01:58:38.058925+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-26T01:58:38.059005+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-10-26T01:58:38.059022+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-10-26T01:58:38.059035+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-26T01:44:50.724512+00:00",
+        "cooldown_until": "2026-10-26T01:48:51.066327+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-26T01:45:37.736298+00:00",
+        "retry_after_seconds": 30.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-26T01:45:53.816579+00:00",
+        "retry_after_seconds": 31.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_request_too_large",
+        "at": "2026-10-26T01:45:53.864639+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-26T01:47:34.945069+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-26T01:47:41.373189+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-26T01:52:30.872563+00:00"
+      },
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "circuit_open",
+        "at": "2026-10-26T01:56:26.099304+00:00",
+        "cooldown_until": "2026-10-27T01:56:26.098853+00:00",
+        "retry_after_seconds": 7.0
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
       "mistral:mistral-small-latest"
     ]
   }
