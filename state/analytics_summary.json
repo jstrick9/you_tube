@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-27T06:48:57.049750+00:00",
+  "updated": "2026-10-27T16:28:33.026380+00:00",
   "videos_total": 44,
   "videos_7d": 1,
   "views_7d": 722,
@@ -11,12 +11,12 @@
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.561,
+          "mean": 0.56,
           "n": 6
         },
         {
           "arm": "space",
-          "mean": 0.531,
+          "mean": 0.53,
           "n": 1
         },
         {
@@ -46,7 +46,7 @@
         },
         {
           "arm": "culture",
-          "mean": 0.403,
+          "mean": 0.404,
           "n": 3
         }
       ]
@@ -72,17 +72,17 @@
         },
         {
           "arm": "would_you_survive",
-          "mean": 0.531,
+          "mean": 0.53,
           "n": 1
         },
         {
           "arm": "sounds_fake",
-          "mean": 0.511,
+          "mean": 0.51,
           "n": 3
         },
         {
           "arm": "creepy_true",
-          "mean": 0.509,
+          "mean": 0.508,
           "n": 3
         },
         {
