@@ -1,233 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261023-015928-3833",
-    "workflow_run_id": "39886972041",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-23T01:59:28.409298+00:00",
-    "finished_at": "2026-10-23T02:16:01.390732+00:00",
-    "duration_seconds": 992.981,
-    "mode": "upload",
-    "target_count": 3,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 5,
-      "script_research": 10,
-      "script_draft": 2,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Deer Antlers Shedding Mystery Revealed!",
-        "topic_key": "deer antlers shedding mystery revealed",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Por Qué los Bebés Koala Comen la Popó de su Madre?",
-        "topic_key": "por qu los bebs koala comen la pop de su madre",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "how did japan, with a huge advantage, lose midway?",
-        "topic_key": "how did japan with a huge advantage lose midway",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "A baby of an elephant",
-        "topic_key": "a baby of an elephant",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "This is what happens when you cry in space",
-        "topic_key": "this is what happens when you cry in space",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-23T02:08:23.185304+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-23T02:08:23.185502+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-23T02:08:29.076649+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-23T02:10:00.707597+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-23T02:10:00.707719+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-23T02:14:23.435477+00:00",
-        "stage": "script_draft",
-        "category": "provider_transient_network",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-23T02:14:23.435582+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-23T02:16:00.112115+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-23T02:16:00.112208+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-23T02:16:01.385780+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-23T02:16:01.385894+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-23T02:16:01.386023+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      },
-      {
-        "at": "2026-10-23T02:16:01.386062+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      },
-      {
-        "at": "2026-10-23T02:16:01.386097+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-23T01:59:28.409706+00:00",
-        "cooldown_until": "2026-10-23T16:08:21.652298+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-23T02:02:46.557673+00:00",
-        "retry_after_seconds": 40.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-23T02:03:19.789342+00:00",
-        "retry_after_seconds": 41.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_request_too_large",
-        "at": "2026-10-23T02:03:19.971006+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-23T02:04:56.640809+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-23T02:05:03.041430+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-23T02:08:23.184856+00:00"
-      },
-      {
-        "provider": "cloudflare",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-23T02:14:23.435179+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261023-043908-3691",
     "workflow_run_id": "39901351991",
     "workflow_run_attempt": "1",
@@ -4065,5 +3838,32 @@
       "groq:openai/gpt-oss-20b",
       "groq:qwen/qwen3.8-27b"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "40545006938",
+    "workflow_run_id": "40545006938",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-27T16:51:44.402289+00:00",
+    "finished_at": "2026-10-27T16:51:44.402289+00:00",
+    "duration_seconds": 0,
+    "mode": "workflow_fallback",
+    "top_up": true,
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "superseded",
+    "stage": "preflight",
+    "stage_entries": {
+      "preflight": 1
+    },
+    "retry_budgets": {},
+    "topic_attempts": [],
+    "failures": [],
+    "retry_events": [],
+    "provider_events": [],
+    "preflight_skip_reason": "delayed_schedule_superseded"
   }
 ]
