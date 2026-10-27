@@ -30,12 +30,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 775.4,
+      "hours_live": 778.4,
       "vph": 0.012,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -79,9 +79,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 769.9,
-      "vph": 0.764,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 772.9,
+      "vph": 0.761,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.4939,
       "watch_ratio_at_15pct": 1.0277,
@@ -101,7 +101,7 @@
       "first_below_half_watch_ratio_at": 0.99,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -156,9 +156,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 766.9,
-      "vph": 0.786,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 769.9,
+      "vph": 0.783,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.0814,
       "watch_ratio_at_15pct": 0.9136,
@@ -178,7 +178,7 @@
       "first_below_half_watch_ratio_at": 0.29,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -233,9 +233,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 751.4,
-      "vph": 0.623,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 754.4,
+      "vph": 0.62,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.2146,
       "watch_ratio_at_15pct": 1.118,
@@ -255,7 +255,7 @@
       "first_below_half_watch_ratio_at": 0.34,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -310,9 +310,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 745.9,
-      "vph": 0.476,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 748.9,
+      "vph": 0.474,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.291,
       "watch_ratio_at_15pct": 1.1271,
@@ -332,7 +332,7 @@
       "first_below_half_watch_ratio_at": 0.5,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -387,9 +387,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 742.9,
-      "vph": 0.669,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 745.9,
+      "vph": 0.666,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.0827,
       "watch_ratio_at_15pct": 0.6593,
@@ -409,7 +409,7 @@
       "first_below_half_watch_ratio_at": 0.19,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -464,9 +464,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 727.4,
-      "vph": 0.524,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 730.4,
+      "vph": 0.522,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.0971,
       "watch_ratio_at_15pct": 0.9554,
@@ -486,7 +486,7 @@
       "first_below_half_watch_ratio_at": 0.34,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -541,9 +541,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 721.9,
-      "vph": 0.758,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 724.9,
+      "vph": 0.755,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.3297,
       "watch_ratio_at_15pct": 1.0037,
@@ -563,7 +563,7 @@
       "first_below_half_watch_ratio_at": 0.45,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -618,9 +618,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 718.9,
-      "vph": 0.345,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 721.9,
+      "vph": 0.344,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.2379,
       "watch_ratio_at_15pct": 0.9637,
@@ -640,7 +640,7 @@
       "first_below_half_watch_ratio_at": 0.53,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -695,9 +695,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 703.4,
-      "vph": 0.448,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 706.4,
+      "vph": 0.446,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1186,
       "watch_ratio_at_15pct": 1.0032,
@@ -717,7 +717,7 @@
       "first_below_half_watch_ratio_at": 0.39,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -772,9 +772,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 697.9,
-      "vph": 0.768,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 700.9,
+      "vph": 0.765,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1556,
       "watch_ratio_at_15pct": 0.9013,
@@ -794,7 +794,7 @@
       "first_below_half_watch_ratio_at": 0.38,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -849,9 +849,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 694.9,
-      "vph": 0.389,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 697.9,
+      "vph": 0.387,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1623,
       "watch_ratio_at_15pct": 0.9434,
@@ -871,7 +871,7 @@
       "first_below_half_watch_ratio_at": 0.33,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -926,9 +926,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 679.4,
-      "vph": 0.796,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 682.4,
+      "vph": 0.793,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1571,
       "watch_ratio_at_15pct": 0.817,
@@ -948,7 +948,7 @@
       "first_below_half_watch_ratio_at": 0.25,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -1081,9 +1081,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 655.4,
+      "hours_live": 658.4,
       "vph": 0.09,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.0702,
       "watch_ratio_at_15pct": 0.6491,
@@ -1103,7 +1103,7 @@
       "first_below_half_watch_ratio_at": 0.19,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -1258,12 +1258,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 625.9,
+      "hours_live": 628.9,
       "vph": 0.006,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -1313,12 +1313,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 622.9,
+      "hours_live": 625.9,
       "vph": 0.005,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -1368,12 +1368,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 607.4,
+      "hours_live": 610.4,
       "vph": 0.002,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -1424,13 +1424,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 601.9,
-      "vph": 0.716,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 604.9,
+      "vph": 0.712,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "first_below_half_watch_ratio_at": 0.41,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-21T04:35:30.687671+00:00",
@@ -1514,9 +1514,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 598.9,
-      "vph": 1.069,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 601.9,
+      "vph": 1.063,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.4121,
       "watch_ratio_at_15pct": 1.0065,
@@ -1536,7 +1536,7 @@
       "first_below_half_watch_ratio_at": 0.6,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -1598,9 +1598,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 583.4,
-      "vph": 0.156,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 586.4,
+      "vph": 0.155,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.2584,
       "watch_ratio_at_15pct": 1.1011,
@@ -1620,7 +1620,7 @@
       "first_below_half_watch_ratio_at": 0.5,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -1681,9 +1681,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 577.9,
-      "vph": 0.22,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 580.9,
+      "vph": 0.219,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.4188,
       "watch_ratio_at_15pct": 1.0427,
@@ -1703,7 +1703,7 @@
       "first_below_half_watch_ratio_at": 0.78,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -1795,9 +1795,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 559.4,
-      "vph": 0.769,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 562.4,
+      "vph": 0.765,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.2353,
       "watch_ratio_at_15pct": 1.0381,
@@ -1817,7 +1817,7 @@
       "first_below_half_watch_ratio_at": 0.45,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -1881,9 +1881,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 574.9,
-      "vph": 1.223,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 577.9,
+      "vph": 1.216,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.6677,
       "watch_ratio_at_15pct": 1.406,
@@ -1903,7 +1903,7 @@
       "first_below_half_watch_ratio_at": null,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -2151,9 +2151,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 506.0,
-      "vph": 0.405,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 509.1,
+      "vph": 0.403,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.3299,
       "watch_ratio_at_15pct": 1.2132,
@@ -2173,7 +2173,7 @@
       "first_below_half_watch_ratio_at": 0.68,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -2274,9 +2274,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 502.3,
-      "vph": 0.456,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 505.4,
+      "vph": 0.453,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.4677,
       "watch_ratio_at_15pct": 1.2339,
@@ -2296,7 +2296,7 @@
       "first_below_half_watch_ratio_at": 0.78,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -2406,9 +2406,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 481.3,
-      "vph": 0.752,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 484.3,
+      "vph": 0.747,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1853,
       "watch_ratio_at_15pct": 1.0799,
@@ -2428,7 +2428,7 @@
       "first_below_half_watch_ratio_at": 0.48,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -2527,9 +2527,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 478.7,
-      "vph": 1.375,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 481.8,
+      "vph": 1.366,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 1.177,
       "watch_ratio_at_15pct": 1.8053,
@@ -2549,7 +2549,7 @@
       "first_below_half_watch_ratio_at": null,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -2654,9 +2654,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 463.3,
-      "vph": 0.259,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 466.4,
+      "vph": 0.257,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1842,
       "watch_ratio_at_15pct": 1.0965,
@@ -2676,7 +2676,7 @@
       "first_below_half_watch_ratio_at": 0.43,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -2783,9 +2783,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 457.7,
-      "vph": 0.19,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 460.8,
+      "vph": 0.189,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.6986,
       "watch_ratio_at_15pct": 1.5616,
@@ -2805,7 +2805,7 @@
       "first_below_half_watch_ratio_at": null,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -2903,9 +2903,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 455.5,
-      "vph": 0.522,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 458.6,
+      "vph": 0.519,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.4183,
       "watch_ratio_at_15pct": 1.1961,
@@ -2925,7 +2925,7 @@
       "first_below_half_watch_ratio_at": 0.77,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -3028,12 +3028,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 434.5,
-      "vph": 0.288,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 437.6,
+      "vph": 0.286,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "watch_ratio_at_15pct": 4.2556,
@@ -3148,12 +3148,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 431.5,
-      "vph": 0.392,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 434.6,
+      "vph": 0.389,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -3260,12 +3260,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 414.7,
-      "vph": 0.063,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 417.8,
+      "vph": 0.062,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -3426,12 +3426,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 386.5,
-      "vph": 0.093,
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "hours_live": 389.5,
+      "vph": 0.092,
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
@@ -3579,12 +3579,12 @@
       "rejection": null,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-10-26"
+        "end": "2026-10-27"
       },
-      "hours_live": 146.0,
-      "vph": 1.007,
+      "hours_live": 149.1,
+      "vph": 0.986,
       "vph_basis": "engaged_views",
-      "checked_at": "2026-10-26T23:22:33.397095+00:00",
+      "checked_at": "2026-10-27T02:26:54.846389+00:00",
       "retention_curve_last_attempt_at": "2026-10-26T16:50:25.290654+00:00",
       "a_views": 720,
       "engaged_views_90d": 147,

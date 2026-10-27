@@ -1,13 +1,5 @@
 {
   "schema_version": 1,
-  "providers": {
-    "pollinations": {
-      "reason": "billing_or_entitlement",
-      "status_code": 402,
-      "recorded_at": "2026-10-26T01:56:26.098853+00:00",
-      "blocked_until": "2026-10-27T01:56:26.098853+00:00",
-      "retry_after_seconds": 7.0
-    }
-  },
+  "providers": {},
   "failures_5xx": {}
 }
