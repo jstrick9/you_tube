@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-28T16:43:54.350442+00:00",
+  "updated": "2026-10-28T23:34:51.943520+00:00",
   "videos_total": 44,
   "videos_7d": 0,
   "views_7d": 0,
@@ -46,7 +46,7 @@
         },
         {
           "arm": "culture",
-          "mean": 0.404,
+          "mean": 0.405,
           "n": 3
         }
       ]
@@ -57,7 +57,7 @@
       "arms": [
         {
           "arm": "scale_shock",
-          "mean": 0.549,
+          "mean": 0.548,
           "n": 3
         },
         {
@@ -102,7 +102,7 @@
         },
         {
           "arm": "myth_buster",
-          "mean": 0.456,
+          "mean": 0.457,
           "n": 2
         },
         {
@@ -285,7 +285,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1237,
+      "views": 1238,
       "avg_view_pct": 79.82
     },
     {
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 34,
+    "attempted_videos": 1,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 34,
+    "reports_without_usable_rows": 1,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -660,7 +660,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10250,
+    "views_90d": 10251,
     "per_1k_views": 2.63,
     "videos": 35,
     "denominator_basis": "engaged_views",
@@ -671,7 +671,7 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10250,
+    "engaged_views_90d": 10251,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,

@@ -7,18 +7,7 @@
       "recorded_at": "2026-10-28T05:39:09.678696+00:00",
       "blocked_until": "2026-10-29T05:39:09.678696+00:00",
       "retry_after_seconds": 12.0
-    },
-    "gemini": {
-      "reason": "repeated_http_5xx",
-      "status_code": 503,
-      "recorded_at": "2026-10-28T16:49:03.968982+00:00",
-      "blocked_until": "2026-10-28T16:59:03.968982+00:00"
     }
   },
-  "failures_5xx": {
-    "gemini": {
-      "count": 3,
-      "last_at": "2026-10-28T16:49:03.968968+00:00"
-    }
-  }
+  "failures_5xx": {}
 }
