@@ -1,176 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261023-120107-3823",
-    "workflow_run_id": "39950045092",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-23T12:01:07.051635+00:00",
-    "finished_at": "2026-10-23T12:11:23.825661+00:00",
-    "duration_seconds": 616.774,
-    "mode": "upload",
-    "target_count": 2,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 2,
-      "script_research": 4,
-      "script_draft": 2,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Banana Peeling",
-        "topic_key": "banana peeling",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "We Thought We Knew the Ocean Then This Giant Appeared!",
-        "topic_key": "we thought we knew the ocean then this giant appeared",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-23T12:08:49.706737+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-23T12:08:49.706899+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-23T12:11:19.857929+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-23T12:11:19.858077+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-23T12:11:23.819968+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-23T12:11:23.820009+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      },
-      {
-        "at": "2026-10-23T12:11:23.820066+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-23T12:01:07.052595+00:00",
-        "cooldown_until": "2026-10-23T16:08:21.652298+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-23T12:02:45.441786+00:00",
-        "retry_after_seconds": 38.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-23T12:03:18.418042+00:00",
-        "retry_after_seconds": 41.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-23T12:03:21.729531+00:00",
-        "retry_after_seconds": 36.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-23T12:03:53.389622+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-23T12:05:31.441154+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-23T12:05:37.918023+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-23T12:08:49.706290+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "groq:qwen/qwen3.8-27b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "39976057490",
     "workflow_run_id": "39976057490",
     "workflow_run_attempt": "1",
@@ -3802,6 +3632,178 @@
     "rate_limited_models": [
       "groq:openai/gpt-oss-120b",
       "groq:openai/gpt-oss-20b"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261028-023609-3603",
+    "workflow_run_id": "40621768766",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-28T02:36:09.068644+00:00",
+    "finished_at": "2026-10-28T03:30:03.521291+00:00",
+    "duration_seconds": 3234.453,
+    "mode": "upload",
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 4,
+      "script_research": 8,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "THE BODY THAT WAITED 40 YEARS",
+        "topic_key": "the body that waited 40 years",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "provider_transient_5xx"
+      },
+      {
+        "index": 1,
+        "topic": "No One Knows How an eel is Born...",
+        "topic_key": "no one knows how an eel is born",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "provider_transient_5xx"
+      },
+      {
+        "index": 1,
+        "topic": "Did you know the Hunter's Moon actually helped us survive?",
+        "topic_key": "did you know the hunters moon actually helped us survive",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "provider_transient_5xx"
+      },
+      {
+        "index": 1,
+        "topic": "How Did Russia Sell Alaska for Just $7.2 Million?",
+        "topic_key": "how did russia sell alaska for just 72 million",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-28T02:43:01.026935+00:00",
+        "stage": "script_research",
+        "category": "provider_transient_5xx",
+        "exception_type": "RuntimeError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-28T02:48:00.822923+00:00",
+        "stage": "script_research",
+        "category": "provider_transient_5xx",
+        "exception_type": "RuntimeError",
+        "attempt": 2
+      },
+      {
+        "at": "2026-10-28T02:48:04.304558+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-28T02:59:00.964234+00:00",
+        "stage": "script_research",
+        "category": "provider_transient_5xx",
+        "exception_type": "RuntimeError",
+        "attempt": 3
+      },
+      {
+        "at": "2026-10-28T03:30:03.516826+00:00",
+        "stage": "script_research",
+        "category": "no_depictable_source_asset"
+      },
+      {
+        "at": "2026-10-28T03:30:03.517003+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-28T03:30:03.517080+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-10-28T03:30:03.517095+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-10-28T03:30:03.517106+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-28T02:36:09.068990+00:00",
+        "cooldown_until": "2026-10-28T05:01:24.129224+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-28T02:36:56.123679+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-28T02:37:04.192519+00:00",
+        "retry_after_seconds": 1.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-28T02:37:07.499175+00:00",
+        "retry_after_seconds": 17.0
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b"
     ]
   }
 ]

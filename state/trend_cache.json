@@ -1,91 +1,62 @@
 {
-  "yt_outliers_date": "2026-10-27",
+  "yt_outliers_date": "2026-10-28",
   "yt_outliers": [
-    {
-      "topic": "How Fast Is Light Really",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 1.0,
-      "context": [
-        "viral Short now: 1,005,888 views in 56h, 649x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=G33L_lR5mjw",
-      "video_id": "G33L_lR5mjw",
-      "published_at": "2026-10-24T18:31:42Z",
-      "channel_title": "Decode Mind",
-      "evidence": {
-        "views": 1005888,
-        "hours": 55.9,
-        "vph": 17987,
-        "breakout": 649.0,
-        "video_id": "G33L_lR5mjw",
-        "video_url": "https://www.youtube.com/watch?v=G33L_lR5mjw",
-        "published_at": "2026-10-24T18:31:42Z",
-        "channel_title": "Decode Mind",
-        "search_query": "space facts",
-        "duration_seconds": 31,
-        "subscriber_count": 1550,
-        "channel_id": "UCn-c1BnqiZ8RG9e23GdIVBw"
-      }
-    },
-    {
-      "topic": "No Caption",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9973,
-      "context": [
-        "viral Short now: 1,112,899 views in 61h, 518x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=k9yfxQg6kU4",
-      "video_id": "k9yfxQg6kU4",
-      "published_at": "2026-10-24T12:58:18Z",
-      "channel_title": "OD07 Fire🔥",
-      "evidence": {
-        "views": 1112899,
-        "hours": 61.5,
-        "vph": 18102,
-        "breakout": 517.6,
-        "video_id": "k9yfxQg6kU4",
-        "video_url": "https://www.youtube.com/watch?v=k9yfxQg6kU4",
-        "published_at": "2026-10-24T12:58:18Z",
-        "channel_title": "OD07 Fire🔥",
-        "search_query": "animal facts",
-        "duration_seconds": 31,
-        "subscriber_count": 2150,
-        "channel_id": "UCs9tD6un9GEW9vABoAeLtUA"
-      }
-    },
     {
       "topic": "RANKING FUNNIEST ANIMALS",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9947,
+      "score": 1.0,
       "context": [
-        "viral Short now: 451,997 views in 29h, 312x its channel's subscribers"
+        "viral Short now: 1,697,155 views in 53h, 496x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=2gGc_ro0Qvk",
       "video_id": "2gGc_ro0Qvk",
       "published_at": "2026-10-25T21:55:49Z",
       "channel_title": "Zilla Ranks",
       "evidence": {
-        "views": 451997,
-        "hours": 28.5,
-        "vph": 15848,
-        "breakout": 311.7,
+        "views": 1697155,
+        "hours": 52.7,
+        "vph": 32220,
+        "breakout": 496.2,
         "video_id": "2gGc_ro0Qvk",
         "video_url": "https://www.youtube.com/watch?v=2gGc_ro0Qvk",
         "published_at": "2026-10-25T21:55:49Z",
         "channel_title": "Zilla Ranks",
         "search_query": "animal facts",
         "duration_seconds": 38,
-        "subscriber_count": 1450,
+        "subscriber_count": 3420,
         "channel_id": "UC3TpLerK0mnHRUseOnISvrw"
+      }
+    },
+    {
+      "topic": "Why Did Britain Give Hong Kong Back to China?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.9972,
+      "context": [
+        "viral Short now: 606,044 views in 28h, 75x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=zwxH3BnfDp0",
+      "video_id": "zwxH3BnfDp0",
+      "published_at": "2026-10-26T22:37:27Z",
+      "channel_title": "History Index",
+      "evidence": {
+        "views": 606044,
+        "hours": 28.0,
+        "vph": 21660,
+        "breakout": 75.4,
+        "video_id": "zwxH3BnfDp0",
+        "video_url": "https://www.youtube.com/watch?v=zwxH3BnfDp0",
+        "published_at": "2026-10-26T22:37:27Z",
+        "channel_title": "History Index",
+        "search_query": "did you know history",
+        "duration_seconds": 180,
+        "subscriber_count": 8040,
+        "channel_id": "UCMUwKzEP6zOuDsjy8QednSw"
       }
     },
     {
@@ -94,26 +65,26 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "disbelief",
-      "score": 0.9921,
+      "score": 0.9944,
       "context": [
-        "viral Short now: 3,542,148 views in 25h, 4x its channel's subscribers"
+        "viral Short now: 4,595,126 views in 50h, 5x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=IQNLS4q2ZXQ",
       "video_id": "IQNLS4q2ZXQ",
       "published_at": "2026-10-26T01:00:18Z",
       "channel_title": "Unique Fact Official",
       "evidence": {
-        "views": 3542148,
-        "hours": 25.4,
-        "vph": 139201,
-        "breakout": 4.0,
+        "views": 4595126,
+        "hours": 49.6,
+        "vph": 92644,
+        "breakout": 5.0,
         "video_id": "IQNLS4q2ZXQ",
         "video_url": "https://www.youtube.com/watch?v=IQNLS4q2ZXQ",
         "published_at": "2026-10-26T01:00:18Z",
         "channel_title": "Unique Fact Official",
         "search_query": "animal facts",
         "duration_seconds": 73,
-        "subscriber_count": 896000,
+        "subscriber_count": 912000,
         "channel_id": "UCZSQxe8YnBzn2I4Z17UhujQ"
       }
     },
@@ -123,114 +94,114 @@
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "question",
-      "score": 0.9895,
+      "score": 0.9915,
       "context": [
-        "viral Short now: 855,958 views in 37h, 35x its channel's subscribers"
+        "viral Short now: 935,285 views in 62h, 38x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=i7GMSizCdCc",
       "video_id": "i7GMSizCdCc",
       "published_at": "2026-10-25T13:00:30Z",
       "channel_title": "Gloy Space",
       "evidence": {
-        "views": 855958,
-        "hours": 37.4,
-        "vph": 22860,
-        "breakout": 35.2,
+        "views": 935285,
+        "hours": 61.6,
+        "vph": 15184,
+        "breakout": 38.2,
         "video_id": "i7GMSizCdCc",
         "video_url": "https://www.youtube.com/watch?v=i7GMSizCdCc",
         "published_at": "2026-10-25T13:00:30Z",
         "channel_title": "Gloy Space",
         "search_query": "did you know history",
         "duration_seconds": 30,
-        "subscriber_count": 24300,
+        "subscriber_count": 24500,
         "channel_id": "UC3jDQv90PVNHnK_hCR_ce9g"
       }
     },
     {
-      "topic": "IKAN LELE SAMA BELUT",
+      "topic": "पतथर क चगर स सफट मचस तक क कहन",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.9888,
+      "context": [
+        "viral Short now: 379,998 views in 20h, 24x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=XcxRi3DchNw",
+      "video_id": "XcxRi3DchNw",
+      "published_at": "2026-10-27T06:31:44Z",
+      "channel_title": "LVK",
+      "evidence": {
+        "views": 379998,
+        "hours": 20.1,
+        "vph": 18928,
+        "breakout": 23.6,
+        "video_id": "XcxRi3DchNw",
+        "video_url": "https://www.youtube.com/watch?v=XcxRi3DchNw",
+        "published_at": "2026-10-27T06:31:44Z",
+        "channel_title": "LVK",
+        "search_query": "history facts",
+        "duration_seconds": 132,
+        "subscriber_count": 16100,
+        "channel_id": "UCqyPVuAkLLvL94wSYyYUDgA"
+      }
+    },
+    {
+      "topic": "THE BODY THAT WAITED 40 YEARS",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.986,
+      "context": [
+        "viral Short now: 241,521 views in 31h, 100x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=pdwp_ZmJfF8",
+      "video_id": "pdwp_ZmJfF8",
+      "published_at": "2026-10-26T20:00:31Z",
+      "channel_title": "The Art Behind",
+      "evidence": {
+        "views": 241521,
+        "hours": 30.6,
+        "vph": 7894,
+        "breakout": 100.2,
+        "video_id": "pdwp_ZmJfF8",
+        "video_url": "https://www.youtube.com/watch?v=pdwp_ZmJfF8",
+        "published_at": "2026-10-26T20:00:31Z",
+        "channel_title": "The Art Behind",
+        "search_query": "history facts",
+        "duration_seconds": 6,
+        "subscriber_count": 2410,
+        "channel_id": "UCex8x8c2uBKdZ5Dl7auWypw"
+      }
+    },
+    {
+      "topic": "Evolution of Tiger",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9868,
+      "score": 0.9831,
       "context": [
-        "viral Short now: 3,575,891 views in 58h, 4x its channel's subscribers"
+        "viral Short now: 197,919 views in 44h, 129x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=C_nXqPmMxhc",
-      "video_id": "C_nXqPmMxhc",
-      "published_at": "2026-10-24T16:29:18Z",
-      "channel_title": "Kakak Habibah",
+      "source_url": "https://www.youtube.com/watch?v=bd4NAMzLWpI",
+      "video_id": "bd4NAMzLWpI",
+      "published_at": "2026-10-26T07:00:28Z",
+      "channel_title": "Factszolic",
       "evidence": {
-        "views": 3575891,
-        "hours": 58.0,
-        "vph": 61693,
-        "breakout": 4.1,
-        "video_id": "C_nXqPmMxhc",
-        "video_url": "https://www.youtube.com/watch?v=C_nXqPmMxhc",
-        "published_at": "2026-10-24T16:29:18Z",
-        "channel_title": "Kakak Habibah",
+        "views": 197919,
+        "hours": 43.6,
+        "vph": 4540,
+        "breakout": 128.5,
+        "video_id": "bd4NAMzLWpI",
+        "video_url": "https://www.youtube.com/watch?v=bd4NAMzLWpI",
+        "published_at": "2026-10-26T07:00:28Z",
+        "channel_title": "Factszolic",
         "search_query": "animal facts",
-        "duration_seconds": 16,
-        "subscriber_count": 881000,
-        "channel_id": "UCYVwpevTpyYooRkUH45LP7w"
-      }
-    },
-    {
-      "topic": "Why Can’t Hippos Swim? The Surprising Truth",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9842,
-      "context": [
-        "viral Short now: 964,302 views in 62h, 43x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=GiYrcLER8iQ",
-      "video_id": "GiYrcLER8iQ",
-      "published_at": "2026-10-24T12:09:58Z",
-      "channel_title": "Facts Explorerr",
-      "evidence": {
-        "views": 964302,
-        "hours": 62.3,
-        "vph": 15482,
-        "breakout": 43.0,
-        "video_id": "GiYrcLER8iQ",
-        "video_url": "https://www.youtube.com/watch?v=GiYrcLER8iQ",
-        "published_at": "2026-10-24T12:09:58Z",
-        "channel_title": "Facts Explorerr",
-        "search_query": "animal facts",
-        "duration_seconds": 28,
-        "subscriber_count": 22400,
-        "channel_id": "UCHyhpcw1VXj8C0wqu5NdkuA"
-      }
-    },
-    {
-      "topic": "Animales Que Fueron Encontrados Dentro de la Comida PARTE 3",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9816,
-      "context": [
-        "viral Short now: 1,339,147 views in 56h, 15x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=zdb-_423ARY",
-      "video_id": "zdb-_423ARY",
-      "published_at": "2026-10-24T18:15:00Z",
-      "channel_title": "Curizoo",
-      "evidence": {
-        "views": 1339147,
-        "hours": 56.2,
-        "vph": 23828,
-        "breakout": 15.0,
-        "video_id": "zdb-_423ARY",
-        "video_url": "https://www.youtube.com/watch?v=zdb-_423ARY",
-        "published_at": "2026-10-24T18:15:00Z",
-        "channel_title": "Curizoo",
-        "search_query": "animal facts",
-        "duration_seconds": 62,
-        "subscriber_count": 89400,
-        "channel_id": "UCeA7iqicwLz3hdldQGgbYdw"
+        "duration_seconds": 36,
+        "subscriber_count": 1540,
+        "channel_id": "UCHQqs5y-GnrNgN_Df0E1ZHA"
       }
     },
     {
@@ -239,85 +210,114 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.9789,
+      "score": 0.9803,
       "context": [
-        "viral Short now: 174,016 views in 12h, 25x its channel's subscribers"
+        "viral Short now: 266,222 views in 36h, 36x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=V6ss6wGbyyE",
       "video_id": "V6ss6wGbyyE",
       "published_at": "2026-10-26T14:30:21Z",
       "channel_title": "Cosmic Thrust",
       "evidence": {
-        "views": 174016,
-        "hours": 11.9,
-        "vph": 14568,
-        "breakout": 24.8,
+        "views": 266222,
+        "hours": 36.1,
+        "vph": 7375,
+        "breakout": 36.1,
         "video_id": "V6ss6wGbyyE",
         "video_url": "https://www.youtube.com/watch?v=V6ss6wGbyyE",
         "published_at": "2026-10-26T14:30:21Z",
         "channel_title": "Cosmic Thrust",
         "search_query": "space facts",
         "duration_seconds": 8,
-        "subscriber_count": 7030,
+        "subscriber_count": 7370,
         "channel_id": "UChxidSpJ3ENEwRBRO9rw5jw"
       }
     },
     {
-      "topic": "lekrasathi kadasun khali utarleli aai! Hirkani fort history Marathi Facts HQ",
+      "topic": "5 Animals That Sleep in the STRANGEST Ways",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "number_first",
+      "score": 0.9775,
+      "context": [
+        "viral Short now: 1,042,051 views in 41h, 3x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=zKXuguZyCIw",
+      "video_id": "zKXuguZyCIw",
+      "published_at": "2026-10-26T09:30:34Z",
+      "channel_title": "informationfact",
+      "evidence": {
+        "views": 1042051,
+        "hours": 41.1,
+        "vph": 25357,
+        "breakout": 3.0,
+        "video_id": "zKXuguZyCIw",
+        "video_url": "https://www.youtube.com/watch?v=zKXuguZyCIw",
+        "published_at": "2026-10-26T09:30:34Z",
+        "channel_title": "informationfact",
+        "search_query": "animal facts",
+        "duration_seconds": 61,
+        "subscriber_count": 342000,
+        "channel_id": "UCZQpipSq81XzAZB9x1a7KUA"
+      }
+    },
+    {
+      "topic": "Mercedes Benz Had This Feature in the 1950s",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9762,
+      "score": 0.9747,
       "context": [
-        "viral Short now: 226,395 views in 43h, 133x its channel's subscribers"
+        "viral Short now: 630,471 views in 54h, 12x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=8ZKPMLWtrQU",
-      "video_id": "8ZKPMLWtrQU",
-      "published_at": "2026-10-25T07:14:38Z",
-      "channel_title": "Marathi Facts HQ",
+      "source_url": "https://www.youtube.com/watch?v=rwDGS1BBW2U",
+      "video_id": "rwDGS1BBW2U",
+      "published_at": "2026-10-25T21:00:35Z",
+      "channel_title": "Daily Dose Of History Facts",
       "evidence": {
-        "views": 226395,
-        "hours": 43.2,
-        "vph": 5240,
-        "breakout": 133.2,
-        "video_id": "8ZKPMLWtrQU",
-        "video_url": "https://www.youtube.com/watch?v=8ZKPMLWtrQU",
-        "published_at": "2026-10-25T07:14:38Z",
-        "channel_title": "Marathi Facts HQ",
+        "views": 630471,
+        "hours": 53.6,
+        "vph": 11764,
+        "breakout": 12.2,
+        "video_id": "rwDGS1BBW2U",
+        "video_url": "https://www.youtube.com/watch?v=rwDGS1BBW2U",
+        "published_at": "2026-10-25T21:00:35Z",
+        "channel_title": "Daily Dose Of History Facts",
         "search_query": "history facts",
-        "duration_seconds": 173,
-        "subscriber_count": 1700,
-        "channel_id": "UCW6sgJNdIeaVoCI48NiH93w"
+        "duration_seconds": 7,
+        "subscriber_count": 51700,
+        "channel_id": "UCYiNexH7DFdaA_LQRpGiU-Q"
       }
     },
     {
-      "topic": "Did you know? ബകകൽ കടടയല കടൽ തരങകങങൾ! (Part 1)",
+      "topic": "Most Unlucky Dad",
       "source": "youtube_outliers",
       "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.9736,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9719,
       "context": [
-        "viral Short now: 299,852 views in 61h, 117x its channel's subscribers"
+        "viral Short now: 502,400 views in 26h, 5x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=plK_jNScWmw",
-      "video_id": "plK_jNScWmw",
-      "published_at": "2026-10-24T13:18:00Z",
-      "channel_title": "cliptomedia",
+      "source_url": "https://www.youtube.com/watch?v=3ZLwGOByZHo",
+      "video_id": "3ZLwGOByZHo",
+      "published_at": "2026-10-27T00:30:23Z",
+      "channel_title": "Mahesh Malle",
       "evidence": {
-        "views": 299852,
-        "hours": 61.2,
-        "vph": 4903,
-        "breakout": 117.1,
-        "video_id": "plK_jNScWmw",
-        "video_url": "https://www.youtube.com/watch?v=plK_jNScWmw",
-        "published_at": "2026-10-24T13:18:00Z",
-        "channel_title": "cliptomedia",
-        "search_query": "did you know history",
-        "duration_seconds": 61,
-        "subscriber_count": 2560,
-        "channel_id": "UCh1QGf3pTKbDfJf1DRAjsBw"
+        "views": 502400,
+        "hours": 26.1,
+        "vph": 19250,
+        "breakout": 4.6,
+        "video_id": "3ZLwGOByZHo",
+        "video_url": "https://www.youtube.com/watch?v=3ZLwGOByZHo",
+        "published_at": "2026-10-27T00:30:23Z",
+        "channel_title": "Mahesh Malle",
+        "search_query": "space facts",
+        "duration_seconds": 80,
+        "subscriber_count": 109000,
+        "channel_id": "UCPUOLVD1BdnOIRQ8yE9Gr9Q"
       }
     },
     {
@@ -326,143 +326,27 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.971,
+      "score": 0.9691,
       "context": [
-        "viral Short now: 612,982 views in 33h, 7x its channel's subscribers"
+        "viral Short now: 763,614 views in 58h, 9x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=bgA89s-GKOk",
       "video_id": "bgA89s-GKOk",
       "published_at": "2026-10-25T17:00:32Z",
       "channel_title": "Арайлым Раушанова",
       "evidence": {
-        "views": 612982,
-        "hours": 33.4,
-        "vph": 18330,
-        "breakout": 7.2,
+        "views": 763614,
+        "hours": 57.6,
+        "vph": 13258,
+        "breakout": 8.8,
         "video_id": "bgA89s-GKOk",
         "video_url": "https://www.youtube.com/watch?v=bgA89s-GKOk",
         "published_at": "2026-10-25T17:00:32Z",
         "channel_title": "Арайлым Раушанова",
         "search_query": "science facts",
         "duration_seconds": 77,
-        "subscriber_count": 85600,
+        "subscriber_count": 86400,
         "channel_id": "UCnUA8UTQCgJB2tIjXDP5lUw"
-      }
-    },
-    {
-      "topic": "Wombats Could Build a Pyramid With Their Poop!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9684,
-      "context": [
-        "viral Short now: 872,978 views in 38h, 4x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=dqve1pwl3ao",
-      "video_id": "dqve1pwl3ao",
-      "published_at": "2026-10-25T12:38:09Z",
-      "channel_title": "Mr mogloo",
-      "evidence": {
-        "views": 872978,
-        "hours": 37.8,
-        "vph": 23085,
-        "breakout": 4.0,
-        "video_id": "dqve1pwl3ao",
-        "video_url": "https://www.youtube.com/watch?v=dqve1pwl3ao",
-        "published_at": "2026-10-25T12:38:09Z",
-        "channel_title": "Mr mogloo",
-        "search_query": "science facts",
-        "duration_seconds": 19,
-        "subscriber_count": 221000,
-        "channel_id": "UCmGBEsyaCxulo56RkSxuhyQ"
-      }
-    },
-    {
-      "topic": "Purane AC Wale Train",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9657,
-      "context": [
-        "viral Short now: 159,865 views in 61h, 408x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=f1xkSef50SU",
-      "video_id": "f1xkSef50SU",
-      "published_at": "2026-10-24T13:00:03Z",
-      "channel_title": "What The Work",
-      "evidence": {
-        "views": 159865,
-        "hours": 61.5,
-        "vph": 2602,
-        "breakout": 407.8,
-        "video_id": "f1xkSef50SU",
-        "video_url": "https://www.youtube.com/watch?v=f1xkSef50SU",
-        "published_at": "2026-10-24T13:00:03Z",
-        "channel_title": "What The Work",
-        "search_query": "science facts",
-        "duration_seconds": 36,
-        "subscriber_count": 392,
-        "channel_id": "UCMOiaRCNnk-z4cmbyuuaZdQ"
-      }
-    },
-    {
-      "topic": "Why Metal Tools Don’t Instantly Fuse Together in Space!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9631,
-      "context": [
-        "viral Short now: 240,964 views in 22h, 10x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=G0wPqB_hkqM",
-      "video_id": "G0wPqB_hkqM",
-      "published_at": "2026-10-26T04:02:51Z",
-      "channel_title": "Beyond Earth",
-      "evidence": {
-        "views": 240964,
-        "hours": 22.4,
-        "vph": 10756,
-        "breakout": 10.2,
-        "video_id": "G0wPqB_hkqM",
-        "video_url": "https://www.youtube.com/watch?v=G0wPqB_hkqM",
-        "published_at": "2026-10-26T04:02:51Z",
-        "channel_title": "Beyond Earth",
-        "search_query": "space facts",
-        "duration_seconds": 4,
-        "subscriber_count": 23700,
-        "channel_id": "UCHApHRwamenKgu7HOn7uLxw"
-      }
-    },
-    {
-      "topic": "Amazing Secret of the Musk Deer",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9604,
-      "context": [
-        "viral Short now: 639,606 views in 70h, 13x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=5g8TkP4Q-FY",
-      "video_id": "5g8TkP4Q-FY",
-      "published_at": "2026-10-24T04:31:39Z",
-      "channel_title": "Sadim Pulse",
-      "evidence": {
-        "views": 639606,
-        "hours": 69.9,
-        "vph": 9147,
-        "breakout": 12.7,
-        "video_id": "5g8TkP4Q-FY",
-        "video_url": "https://www.youtube.com/watch?v=5g8TkP4Q-FY",
-        "published_at": "2026-10-24T04:31:39Z",
-        "channel_title": "Sadim Pulse",
-        "search_query": "animal facts",
-        "duration_seconds": 5,
-        "subscriber_count": 50300,
-        "channel_id": "UCeFiklqV2BE-GntxCsLFUbg"
       }
     },
     {
@@ -471,230 +355,143 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "disbelief",
-      "score": 0.9578,
+      "score": 0.9663,
       "context": [
-        "viral Short now: 65,136 views in 20h, 343x its channel's subscribers"
+        "viral Short now: 125,877 views in 44h, 557x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=MQx-WnLKlAs",
       "video_id": "MQx-WnLKlAs",
       "published_at": "2026-10-26T06:24:42Z",
       "channel_title": "TapanGuy",
       "evidence": {
-        "views": 65136,
-        "hours": 20.0,
-        "vph": 3250,
-        "breakout": 342.8,
+        "views": 125877,
+        "hours": 44.2,
+        "vph": 2848,
+        "breakout": 557.0,
         "video_id": "MQx-WnLKlAs",
         "video_url": "https://www.youtube.com/watch?v=MQx-WnLKlAs",
         "published_at": "2026-10-26T06:24:42Z",
         "channel_title": "TapanGuy",
-        "search_query": "ocean facts",
+        "search_query": "animal facts",
         "duration_seconds": 37,
-        "subscriber_count": 190,
+        "subscriber_count": 226,
         "channel_id": "UC_gr2Bkowp38iEVIkusFzlQ"
       }
     },
     {
-      "topic": "How Did Russia Sell Alaska for Just $7.2 Million?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.9551,
-      "context": [
-        "viral Short now: 115,917 views in 20h, 20x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=qzZ1c_HriGs",
-      "video_id": "qzZ1c_HriGs",
-      "published_at": "2026-10-26T06:25:13Z",
-      "channel_title": "History Index",
-      "evidence": {
-        "views": 115917,
-        "hours": 20.0,
-        "vph": 5787,
-        "breakout": 19.7,
-        "video_id": "qzZ1c_HriGs",
-        "video_url": "https://www.youtube.com/watch?v=qzZ1c_HriGs",
-        "published_at": "2026-10-26T06:25:13Z",
-        "channel_title": "History Index",
-        "search_query": "did you know history",
-        "duration_seconds": 163,
-        "subscriber_count": 5880,
-        "channel_id": "UCMUwKzEP6zOuDsjy8QednSw"
-      }
-    },
-    {
-      "topic": "THE RITUAL A PILL ENDED",
+      "topic": "hazrat Noah's ark",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9525,
+      "score": 0.9634,
       "context": [
-        "viral Short now: 144,832 views in 53h, 63x its channel's subscribers"
+        "viral Short now: 78,549 views in 23h, 230x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=TjewW8pKYVU",
-      "video_id": "TjewW8pKYVU",
-      "published_at": "2026-10-24T21:00:23Z",
-      "channel_title": "The Art Behind",
+      "source_url": "https://www.youtube.com/watch?v=oZkTsCuBXZU",
+      "video_id": "oZkTsCuBXZU",
+      "published_at": "2026-10-27T03:25:23Z",
+      "channel_title": "Mojzaat",
       "evidence": {
-        "views": 144832,
-        "hours": 53.4,
-        "vph": 2710,
-        "breakout": 62.7,
-        "video_id": "TjewW8pKYVU",
-        "video_url": "https://www.youtube.com/watch?v=TjewW8pKYVU",
-        "published_at": "2026-10-24T21:00:23Z",
-        "channel_title": "The Art Behind",
-        "search_query": "history facts",
-        "duration_seconds": 6,
-        "subscriber_count": 2310,
-        "channel_id": "UCex8x8c2uBKdZ5Dl7auWypw"
+        "views": 78549,
+        "hours": 23.2,
+        "vph": 3388,
+        "breakout": 230.3,
+        "video_id": "oZkTsCuBXZU",
+        "video_url": "https://www.youtube.com/watch?v=oZkTsCuBXZU",
+        "published_at": "2026-10-27T03:25:23Z",
+        "channel_title": "Mojzaat",
+        "search_query": "unsolved mystery",
+        "duration_seconds": 10,
+        "subscriber_count": 341,
+        "channel_id": "UC2ynNBJVJxCXyRBwmFWBVKw"
       }
     },
     {
-      "topic": "The Crazy Evolution of the Bicycle!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "disbelief",
-      "score": 0.9499,
-      "context": [
-        "viral Short now: 792,961 views in 63h, 4x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=XYnUixMfewA",
-      "video_id": "XYnUixMfewA",
-      "published_at": "2026-10-24T11:30:10Z",
-      "channel_title": "Mahesh Universe",
-      "evidence": {
-        "views": 792961,
-        "hours": 62.9,
-        "vph": 12597,
-        "breakout": 3.5,
-        "video_id": "XYnUixMfewA",
-        "video_url": "https://www.youtube.com/watch?v=XYnUixMfewA",
-        "published_at": "2026-10-24T11:30:10Z",
-        "channel_title": "Mahesh Universe",
-        "search_query": "history facts",
-        "duration_seconds": 59,
-        "subscriber_count": 224000,
-        "channel_id": "UCPL71PQGB8YbMNA6YGsN9vQ"
-      }
-    },
-    {
-      "topic": "The greatest enemy of bees",
+      "topic": "Wombats Could Build a Pyramid With Their Poop!",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9473,
+      "score": 0.9606,
       "context": [
-        "viral Short now: 664,096 views in 60h, 4x its channel's subscribers"
+        "viral Short now: 970,131 views in 62h, 4x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=qN8ShaovUWw",
-      "video_id": "qN8ShaovUWw",
-      "published_at": "2026-10-24T14:00:27Z",
-      "channel_title": "Xfacto",
+      "source_url": "https://www.youtube.com/watch?v=dqve1pwl3ao",
+      "video_id": "dqve1pwl3ao",
+      "published_at": "2026-10-25T12:38:09Z",
+      "channel_title": "Mr mogloo",
       "evidence": {
-        "views": 664096,
-        "hours": 60.4,
-        "vph": 10987,
-        "breakout": 3.9,
-        "video_id": "qN8ShaovUWw",
-        "video_url": "https://www.youtube.com/watch?v=qN8ShaovUWw",
-        "published_at": "2026-10-24T14:00:27Z",
-        "channel_title": "Xfacto",
-        "search_query": "animal facts",
-        "duration_seconds": 89,
-        "subscriber_count": 172000,
-        "channel_id": "UCwpHeDn_5M3gJY0PvacSadA"
-      }
-    },
-    {
-      "topic": "Why Nothing Can Survive Venus",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9446,
-      "context": [
-        "viral Short now: 1,705,138 views in 69h, 0x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=tKikZXrcZCQ",
-      "video_id": "tKikZXrcZCQ",
-      "published_at": "2026-10-24T05:30:14Z",
-      "channel_title": "Facts' Mine",
-      "evidence": {
-        "views": 1705138,
-        "hours": 68.9,
-        "vph": 24731,
-        "breakout": 0.1,
-        "video_id": "tKikZXrcZCQ",
-        "video_url": "https://www.youtube.com/watch?v=tKikZXrcZCQ",
-        "published_at": "2026-10-24T05:30:14Z",
-        "channel_title": "Facts' Mine",
-        "search_query": "space facts",
-        "duration_seconds": 57,
-        "subscriber_count": 19300000,
-        "channel_id": "UCC6gbNO098rkQKCU0ZaLITQ"
-      }
-    },
-    {
-      "topic": "He Was Too Shy To Dance So He Use Fire",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.942,
-      "context": [
-        "viral Short now: 185,815 views in 58h, 30x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=2blauuUjcsg",
-      "video_id": "2blauuUjcsg",
-      "published_at": "2026-10-24T15:58:53Z",
-      "channel_title": "VortexX",
-      "evidence": {
-        "views": 185815,
-        "hours": 58.5,
-        "vph": 3178,
-        "breakout": 30.3,
-        "video_id": "2blauuUjcsg",
-        "video_url": "https://www.youtube.com/watch?v=2blauuUjcsg",
-        "published_at": "2026-10-24T15:58:53Z",
-        "channel_title": "VortexX",
-        "search_query": "history facts",
-        "duration_seconds": 7,
-        "subscriber_count": 6140,
-        "channel_id": "UCAaLcF_vpznkWFTaaHWIzOw"
-      }
-    },
-    {
-      "topic": "Lion vs Tiger आमन-समन",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9393,
-      "context": [
-        "viral Short now: 200,743 views in 59h, 25x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=QteEDi8lEHs",
-      "video_id": "QteEDi8lEHs",
-      "published_at": "2026-10-24T15:30:06Z",
-      "channel_title": "fmd planet",
-      "evidence": {
-        "views": 200743,
-        "hours": 58.9,
-        "vph": 3405,
-        "breakout": 24.8,
-        "video_id": "QteEDi8lEHs",
-        "video_url": "https://www.youtube.com/watch?v=QteEDi8lEHs",
-        "published_at": "2026-10-24T15:30:06Z",
-        "channel_title": "fmd planet",
-        "search_query": "animal facts",
+        "views": 970131,
+        "hours": 62.0,
+        "vph": 15655,
+        "breakout": 4.4,
+        "video_id": "dqve1pwl3ao",
+        "video_url": "https://www.youtube.com/watch?v=dqve1pwl3ao",
+        "published_at": "2026-10-25T12:38:09Z",
+        "channel_title": "Mr mogloo",
+        "search_query": "science facts",
         "duration_seconds": 19,
-        "subscriber_count": 8100,
-        "channel_id": "UCqKMgCe0zCZsu7W2ru5OfVA"
+        "subscriber_count": 222000,
+        "channel_id": "UCmGBEsyaCxulo56RkSxuhyQ"
+      }
+    },
+    {
+      "topic": "Why Does This Water Look Frozen?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9578,
+      "context": [
+        "viral Short now: 706,694 views in 61h, 7x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=fEdieRpcwog",
+      "video_id": "fEdieRpcwog",
+      "published_at": "2026-10-25T13:30:07Z",
+      "channel_title": "Qbatic",
+      "evidence": {
+        "views": 706694,
+        "hours": 61.1,
+        "vph": 11566,
+        "breakout": 6.9,
+        "video_id": "fEdieRpcwog",
+        "video_url": "https://www.youtube.com/watch?v=fEdieRpcwog",
+        "published_at": "2026-10-25T13:30:07Z",
+        "channel_title": "Qbatic",
+        "search_query": "science facts",
+        "duration_seconds": 26,
+        "subscriber_count": 103000,
+        "channel_id": "UCwIGIyJx6k8DY3jNe-aGdOQ"
+      }
+    },
+    {
+      "topic": "కగరస పరట ఎల పరరభమద? కగరస పరటన సథపచద ఎవర?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.955,
+      "context": [
+        "viral Short now: 405,604 views in 38h, 6x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=g3itu5nzCgU",
+      "video_id": "g3itu5nzCgU",
+      "published_at": "2026-10-26T12:30:39Z",
+      "channel_title": "curious",
+      "evidence": {
+        "views": 405604,
+        "hours": 38.1,
+        "vph": 10648,
+        "breakout": 5.8,
+        "video_id": "g3itu5nzCgU",
+        "video_url": "https://www.youtube.com/watch?v=g3itu5nzCgU",
+        "published_at": "2026-10-26T12:30:39Z",
+        "channel_title": "curious",
+        "search_query": "did you know history",
+        "duration_seconds": 97,
+        "subscriber_count": 69600,
+        "channel_id": "UCicOdoBHdyxhJQntlYQGx_Q"
       }
     },
     {
@@ -703,85 +500,114 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9367,
+      "score": 0.9522,
       "context": [
-        "viral Short now: 239,564 views in 10h, 0x its channel's subscribers"
+        "viral Short now: 904,707 views in 35h, 0x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=jhGSMosD5AU",
       "video_id": "jhGSMosD5AU",
       "published_at": "2026-10-26T16:06:16Z",
       "channel_title": "Vedant Sir",
       "evidence": {
-        "views": 239564,
-        "hours": 10.3,
-        "vph": 23154,
-        "breakout": 0.0,
+        "views": 904707,
+        "hours": 34.5,
+        "vph": 26223,
+        "breakout": 0.2,
         "video_id": "jhGSMosD5AU",
         "video_url": "https://www.youtube.com/watch?v=jhGSMosD5AU",
         "published_at": "2026-10-26T16:06:16Z",
         "channel_title": "Vedant Sir",
         "search_query": "science facts",
         "duration_seconds": 44,
-        "subscriber_count": 5130000,
+        "subscriber_count": 5140000,
         "channel_id": "UCJTIb3xaiAfBMoHMH74QuTg"
       }
     },
     {
-      "topic": "तम Insan नह हत pt89 Find Your Animal Name Facts Shorts",
+      "topic": "Why Metal Tools Don’t Instantly Fuse Together in Space!",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
-      "hook": "you_statement",
-      "score": 0.934,
+      "hook": "question",
+      "score": 0.9494,
       "context": [
-        "viral Short now: 895,843 views in 44h, 0x its channel's subscribers"
+        "viral Short now: 285,252 views in 47h, 12x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=MZGeK2RGojM",
-      "video_id": "MZGeK2RGojM",
-      "published_at": "2026-10-25T06:30:44Z",
-      "channel_title": "AI Universal Fact",
+      "source_url": "https://www.youtube.com/watch?v=G0wPqB_hkqM",
+      "video_id": "G0wPqB_hkqM",
+      "published_at": "2026-10-26T04:02:51Z",
+      "channel_title": "Beyond Earth",
       "evidence": {
-        "views": 895843,
-        "hours": 43.9,
-        "vph": 20388,
-        "breakout": 0.3,
-        "video_id": "MZGeK2RGojM",
-        "video_url": "https://www.youtube.com/watch?v=MZGeK2RGojM",
-        "published_at": "2026-10-25T06:30:44Z",
-        "channel_title": "AI Universal Fact",
-        "search_query": "animal facts",
-        "duration_seconds": 31,
-        "subscriber_count": 3120000,
-        "channel_id": "UCxmRkPu6vGkJkeo040tm6pg"
+        "views": 285252,
+        "hours": 46.6,
+        "vph": 6127,
+        "breakout": 11.8,
+        "video_id": "G0wPqB_hkqM",
+        "video_url": "https://www.youtube.com/watch?v=G0wPqB_hkqM",
+        "published_at": "2026-10-26T04:02:51Z",
+        "channel_title": "Beyond Earth",
+        "search_query": "space facts",
+        "duration_seconds": 4,
+        "subscriber_count": 24200,
+        "channel_id": "UCHApHRwamenKgu7HOn7uLxw"
       }
     },
     {
-      "topic": "The Mysterious Stone Wheels of Hayuni, Peru",
+      "topic": "தயன வயறறல கழநதயன இதயம எபபட உரவகறத? Tamil Science Facts",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9465,
+      "context": [
+        "viral Short now: 44,928 views in 16h, 72x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=Po_3V2-g9MU",
+      "video_id": "Po_3V2-g9MU",
+      "published_at": "2026-10-27T10:30:26Z",
+      "channel_title": "JS PAPA TV",
+      "evidence": {
+        "views": 44928,
+        "hours": 16.1,
+        "vph": 2791,
+        "breakout": 71.8,
+        "video_id": "Po_3V2-g9MU",
+        "video_url": "https://www.youtube.com/watch?v=Po_3V2-g9MU",
+        "published_at": "2026-10-27T10:30:26Z",
+        "channel_title": "JS PAPA TV",
+        "search_query": "science facts",
+        "duration_seconds": 61,
+        "subscriber_count": 626,
+        "channel_id": "UCiNZQrAxBFJszV7LrouT6mw"
+      }
+    },
+    {
+      "topic": "How Did Russia Sell Alaska for Just $7.2 Million?",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "history_mystery",
-      "hook": "bold_claim",
-      "score": 0.9314,
+      "hook": "question",
+      "score": 0.9438,
       "context": [
-        "viral Short now: 293,861 views in 70h, 17x its channel's subscribers"
+        "viral Short now: 177,486 views in 44h, 22x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=nEw46Hs4uDI",
-      "video_id": "nEw46Hs4uDI",
-      "published_at": "2026-10-24T04:00:27Z",
-      "channel_title": "Maze Runner",
+      "source_url": "https://www.youtube.com/watch?v=qzZ1c_HriGs",
+      "video_id": "qzZ1c_HriGs",
+      "published_at": "2026-10-26T06:25:13Z",
+      "channel_title": "History Index",
       "evidence": {
-        "views": 293861,
-        "hours": 70.4,
-        "vph": 4172,
-        "breakout": 17.0,
-        "video_id": "nEw46Hs4uDI",
-        "video_url": "https://www.youtube.com/watch?v=nEw46Hs4uDI",
-        "published_at": "2026-10-24T04:00:27Z",
-        "channel_title": "Maze Runner",
-        "search_query": "ancient mysteries",
-        "duration_seconds": 18,
-        "subscriber_count": 17300,
-        "channel_id": "UC6-viW0hl3NquPSCEPhgh5Q"
+        "views": 177486,
+        "hours": 44.2,
+        "vph": 4017,
+        "breakout": 22.1,
+        "video_id": "qzZ1c_HriGs",
+        "video_url": "https://www.youtube.com/watch?v=qzZ1c_HriGs",
+        "published_at": "2026-10-26T06:25:13Z",
+        "channel_title": "History Index",
+        "search_query": "history facts",
+        "duration_seconds": 163,
+        "subscriber_count": 8040,
+        "channel_id": "UCMUwKzEP6zOuDsjy8QednSw"
       }
     },
     {
@@ -790,27 +616,317 @@
       "is_fact": true,
       "lane": "history_mystery",
       "hook": "bold_claim",
-      "score": 0.9288,
+      "score": 0.941,
       "context": [
-        "viral Short now: 215,316 views in 38h, 9x its channel's subscribers"
+        "viral Short now: 312,240 views in 62h, 13x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=O5PLIhRnxNY",
       "video_id": "O5PLIhRnxNY",
       "published_at": "2026-10-25T12:17:51Z",
       "channel_title": "Rajasthan History & Mystery",
       "evidence": {
-        "views": 215316,
-        "hours": 38.2,
-        "vph": 5643,
-        "breakout": 8.9,
+        "views": 312240,
+        "hours": 62.3,
+        "vph": 5011,
+        "breakout": 12.8,
         "video_id": "O5PLIhRnxNY",
         "video_url": "https://www.youtube.com/watch?v=O5PLIhRnxNY",
         "published_at": "2026-10-25T12:17:51Z",
         "channel_title": "Rajasthan History & Mystery",
         "search_query": "history facts",
         "duration_seconds": 107,
-        "subscriber_count": 24100,
+        "subscriber_count": 24400,
         "channel_id": "UC-ycPx4exabkeftvnh9UOBQ"
+      }
+    },
+    {
+      "topic": "Amazing Kangaroo Life Fact! A Kangaroo Amazing Life How Baby Kangaroos Are Born",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.9381,
+      "context": [
+        "viral Short now: 98,638 views in 22h, 13x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=8uo596GO7xo",
+      "video_id": "8uo596GO7xo",
+      "published_at": "2026-10-27T04:12:22Z",
+      "channel_title": "AmtiazFishDealers",
+      "evidence": {
+        "views": 98638,
+        "hours": 22.4,
+        "vph": 4404,
+        "breakout": 12.5,
+        "video_id": "8uo596GO7xo",
+        "video_url": "https://www.youtube.com/watch?v=8uo596GO7xo",
+        "published_at": "2026-10-27T04:12:22Z",
+        "channel_title": "AmtiazFishDealers",
+        "search_query": "animal facts",
+        "duration_seconds": 45,
+        "subscriber_count": 7860,
+        "channel_id": "UCZ5TXTzJoAxkkbqAH5TbfiA"
+      }
+    },
+    {
+      "topic": "மனதன மதனமதலல தணய எபபட உரவககனன?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.9353,
+      "context": [
+        "viral Short now: 48,871 views in 22h, 39x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=0HZQ8G6-RzU",
+      "video_id": "0HZQ8G6-RzU",
+      "published_at": "2026-10-27T04:30:03Z",
+      "channel_title": "world history tamil",
+      "evidence": {
+        "views": 48871,
+        "hours": 22.1,
+        "vph": 2211,
+        "breakout": 38.8,
+        "video_id": "0HZQ8G6-RzU",
+        "video_url": "https://www.youtube.com/watch?v=0HZQ8G6-RzU",
+        "published_at": "2026-10-27T04:30:03Z",
+        "channel_title": "world history tamil",
+        "search_query": "did you know history",
+        "duration_seconds": 43,
+        "subscriber_count": 1260,
+        "channel_id": "UCLx3Xu2PZ072RrOHiwHQyGA"
+      }
+    },
+    {
+      "topic": "Le saviez vous ?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.9325,
+      "context": [
+        "viral Short now: 172,261 views in 32h, 7x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=4ijP-i_XtQo",
+      "video_id": "4ijP-i_XtQo",
+      "published_at": "2026-10-26T18:49:19Z",
+      "channel_title": "RealStory_3Dofficiel",
+      "evidence": {
+        "views": 172261,
+        "hours": 31.8,
+        "vph": 5420,
+        "breakout": 7.2,
+        "video_id": "4ijP-i_XtQo",
+        "video_url": "https://www.youtube.com/watch?v=4ijP-i_XtQo",
+        "published_at": "2026-10-26T18:49:19Z",
+        "channel_title": "RealStory_3Dofficiel",
+        "search_query": "did you know history",
+        "duration_seconds": 83,
+        "subscriber_count": 23800,
+        "channel_id": "UC6HIzkIuTm9TnxDo9pH05zw"
+      }
+    },
+    {
+      "topic": "How Did France Sell Half a Continent to America for Just $15 Million?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.9297,
+      "context": [
+        "viral Short now: 86,548 views in 20h, 11x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=12dHbEcM7vE",
+      "video_id": "12dHbEcM7vE",
+      "published_at": "2026-10-27T06:26:06Z",
+      "channel_title": "History Index",
+      "evidence": {
+        "views": 86548,
+        "hours": 20.2,
+        "vph": 4291,
+        "breakout": 10.8,
+        "video_id": "12dHbEcM7vE",
+        "video_url": "https://www.youtube.com/watch?v=12dHbEcM7vE",
+        "published_at": "2026-10-27T06:26:06Z",
+        "channel_title": "History Index",
+        "search_query": "history facts",
+        "duration_seconds": 172,
+        "subscriber_count": 8040,
+        "channel_id": "UCMUwKzEP6zOuDsjy8QednSw"
+      }
+    },
+    {
+      "topic": "Lốp Xe Làm Từ Cao Su Trắng Nhưng Lại Có Màu Đen? Bạn Coá Biết",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.9269,
+      "context": [
+        "viral Short now: 131,832 views in 14h, 2x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=qxPKcCELxQA",
+      "video_id": "qxPKcCELxQA",
+      "published_at": "2026-10-27T13:03:20Z",
+      "channel_title": "Bạn Coá Biết?",
+      "evidence": {
+        "views": 131832,
+        "hours": 13.5,
+        "vph": 9730,
+        "breakout": 1.9,
+        "video_id": "qxPKcCELxQA",
+        "video_url": "https://www.youtube.com/watch?v=qxPKcCELxQA",
+        "published_at": "2026-10-27T13:03:20Z",
+        "channel_title": "Bạn Coá Biết?",
+        "search_query": "did you know history",
+        "duration_seconds": 40,
+        "subscriber_count": 67800,
+        "channel_id": "UCvRkMcDCZyLzFD3NzupJwiw"
+      }
+    },
+    {
+      "topic": "WINDOWS AIMED AT GOD",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "bold_claim",
+      "score": 0.9241,
+      "context": [
+        "viral Short now: 116,721 views in 67h, 48x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=5CC_pQoTW0g",
+      "video_id": "5CC_pQoTW0g",
+      "published_at": "2026-10-25T08:00:29Z",
+      "channel_title": "The Art Behind",
+      "evidence": {
+        "views": 116721,
+        "hours": 66.6,
+        "vph": 1753,
+        "breakout": 48.4,
+        "video_id": "5CC_pQoTW0g",
+        "video_url": "https://www.youtube.com/watch?v=5CC_pQoTW0g",
+        "published_at": "2026-10-25T08:00:29Z",
+        "channel_title": "The Art Behind",
+        "search_query": "history facts",
+        "duration_seconds": 6,
+        "subscriber_count": 2410,
+        "channel_id": "UCex8x8c2uBKdZ5Dl7auWypw"
+      }
+    },
+    {
+      "topic": "What is Your Screen Time ?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9213,
+      "context": [
+        "viral Short now: 972,611 views in 66h, 0x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=_W9Vw-nJH_E",
+      "video_id": "_W9Vw-nJH_E",
+      "published_at": "2026-10-25T08:07:42Z",
+      "channel_title": "GYRUS SULCUS",
+      "evidence": {
+        "views": 972611,
+        "hours": 66.5,
+        "vph": 14631,
+        "breakout": 0.4,
+        "video_id": "_W9Vw-nJH_E",
+        "video_url": "https://www.youtube.com/watch?v=_W9Vw-nJH_E",
+        "published_at": "2026-10-25T08:07:42Z",
+        "channel_title": "GYRUS SULCUS",
+        "search_query": "science facts",
+        "duration_seconds": 74,
+        "subscriber_count": 2590000,
+        "channel_id": "UCpBRZ6j0oAkjyd3FLr4yPtA"
+      }
+    },
+    {
+      "topic": "Do you trust your best friend",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9184,
+      "context": [
+        "viral Short now: 365,943 views in 50h, 3x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=8TPbewuF1mw",
+      "video_id": "8TPbewuF1mw",
+      "published_at": "2026-10-26T00:30:38Z",
+      "channel_title": "Mahesh Malle",
+      "evidence": {
+        "views": 365943,
+        "hours": 50.1,
+        "vph": 7305,
+        "breakout": 3.4,
+        "video_id": "8TPbewuF1mw",
+        "video_url": "https://www.youtube.com/watch?v=8TPbewuF1mw",
+        "published_at": "2026-10-26T00:30:38Z",
+        "channel_title": "Mahesh Malle",
+        "search_query": "space facts",
+        "duration_seconds": 66,
+        "subscriber_count": 109000,
+        "channel_id": "UCPUOLVD1BdnOIRQ8yE9Gr9Q"
+      }
+    },
+    {
+      "topic": "மனதன மதனமதலல கணணடய எபபட கணடபடததன?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "history_mystery",
+      "hook": "question",
+      "score": 0.9156,
+      "context": [
+        "viral Short now: 57,385 views in 36h, 46x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=1D9-MQtTkEA",
+      "video_id": "1D9-MQtTkEA",
+      "published_at": "2026-10-26T14:30:19Z",
+      "channel_title": "world history tamil",
+      "evidence": {
+        "views": 57385,
+        "hours": 36.1,
+        "vph": 1590,
+        "breakout": 45.5,
+        "video_id": "1D9-MQtTkEA",
+        "video_url": "https://www.youtube.com/watch?v=1D9-MQtTkEA",
+        "published_at": "2026-10-26T14:30:19Z",
+        "channel_title": "world history tamil",
+        "search_query": "did you know history",
+        "duration_seconds": 41,
+        "subscriber_count": 1260,
+        "channel_id": "UCLx3Xu2PZ072RrOHiwHQyGA"
+      }
+    },
+    {
+      "topic": "तम Insan नह हत pt89 Find Your Animal Name Facts Shorts",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "you_statement",
+      "score": 0.9128,
+      "context": [
+        "viral Short now: 916,101 views in 68h, 0x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=MZGeK2RGojM",
+      "video_id": "MZGeK2RGojM",
+      "published_at": "2026-10-25T06:30:44Z",
+      "channel_title": "AI Universal Fact",
+      "evidence": {
+        "views": 916101,
+        "hours": 68.1,
+        "vph": 13454,
+        "breakout": 0.3,
+        "video_id": "MZGeK2RGojM",
+        "video_url": "https://www.youtube.com/watch?v=MZGeK2RGojM",
+        "published_at": "2026-10-25T06:30:44Z",
+        "channel_title": "AI Universal Fact",
+        "search_query": "animal facts",
+        "duration_seconds": 31,
+        "subscriber_count": 3130000,
+        "channel_id": "UCxmRkPu6vGkJkeo040tm6pg"
       }
     },
     {
@@ -819,201 +935,85 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9262,
+      "score": 0.91,
       "context": [
-        "viral Short now: 514,028 views in 36h, 1x its channel's subscribers"
+        "viral Short now: 583,884 views in 60h, 1x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=ZJdLUSPZDvM",
       "video_id": "ZJdLUSPZDvM",
       "published_at": "2026-10-25T14:22:48Z",
       "channel_title": "vatina dainika karunu",
       "evidence": {
-        "views": 514028,
-        "hours": 36.1,
-        "vph": 14250,
-        "breakout": 1.1,
+        "views": 583884,
+        "hours": 60.2,
+        "vph": 9695,
+        "breakout": 1.2,
         "video_id": "ZJdLUSPZDvM",
         "video_url": "https://www.youtube.com/watch?v=ZJdLUSPZDvM",
         "published_at": "2026-10-25T14:22:48Z",
         "channel_title": "vatina dainika karunu",
         "search_query": "animal facts",
         "duration_seconds": 16,
-        "subscriber_count": 482000,
+        "subscriber_count": 483000,
         "channel_id": "UC2HyN8jg6WCp-NK4wd1-VkA"
       }
     },
     {
-      "topic": "What If Everyone Threw Their Toenails Into the Ocean?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "question",
-      "score": 0.9235,
-      "context": [
-        "viral Short now: 97,488 views in 71h, 521x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=sCg2O96TsUE",
-      "video_id": "sCg2O96TsUE",
-      "published_at": "2026-10-24T03:31:37Z",
-      "channel_title": "The Lake facto",
-      "evidence": {
-        "views": 97488,
-        "hours": 70.9,
-        "vph": 1375,
-        "breakout": 521.3,
-        "video_id": "sCg2O96TsUE",
-        "video_url": "https://www.youtube.com/watch?v=sCg2O96TsUE",
-        "published_at": "2026-10-24T03:31:37Z",
-        "channel_title": "The Lake facto",
-        "search_query": "ocean facts",
-        "duration_seconds": 32,
-        "subscriber_count": 187,
-        "channel_id": "UCTrTZMZKb7zJTLMOcYTN7VA"
-      }
-    },
-    {
-      "topic": "This Is What a Wormhole Could Do to You!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "you_statement",
-      "score": 0.9208,
-      "context": [
-        "viral Short now: 292,440 views in 67h, 12x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=aM-CspU-IpY",
-      "video_id": "aM-CspU-IpY",
-      "published_at": "2026-10-24T07:53:01Z",
-      "channel_title": "Beyond Earth",
-      "evidence": {
-        "views": 292440,
-        "hours": 66.6,
-        "vph": 4393,
-        "breakout": 12.3,
-        "video_id": "aM-CspU-IpY",
-        "video_url": "https://www.youtube.com/watch?v=aM-CspU-IpY",
-        "published_at": "2026-10-24T07:53:01Z",
-        "channel_title": "Beyond Earth",
-        "search_query": "science facts",
-        "duration_seconds": 10,
-        "subscriber_count": 23700,
-        "channel_id": "UCHApHRwamenKgu7HOn7uLxw"
-      }
-    },
-    {
-      "topic": "Is Our Timeline A Total Fabrication?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.9182,
-      "context": [
-        "viral Short now: 299,311 views in 51h, 7x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=pRDXzq-GOf4",
-      "video_id": "pRDXzq-GOf4",
-      "published_at": "2026-10-24T23:15:39Z",
-      "channel_title": "Jim's Wormhole",
-      "evidence": {
-        "views": 299311,
-        "hours": 51.2,
-        "vph": 5847,
-        "breakout": 7.1,
-        "video_id": "pRDXzq-GOf4",
-        "video_url": "https://www.youtube.com/watch?v=pRDXzq-GOf4",
-        "published_at": "2026-10-24T23:15:39Z",
-        "channel_title": "Jim's Wormhole",
-        "search_query": "history facts",
-        "duration_seconds": 156,
-        "subscriber_count": 42300,
-        "channel_id": "UC7vTAkYNtAFuVx95lWXs4ww"
-      }
-    },
-    {
-      "topic": "How Did One Small Island Control a Quarter of the World?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.9156,
-      "context": [
-        "viral Short now: 166,250 views in 69h, 28x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=iDqcPid6yr8",
-      "video_id": "iDqcPid6yr8",
-      "published_at": "2026-10-24T05:44:50Z",
-      "channel_title": "History Index",
-      "evidence": {
-        "views": 166250,
-        "hours": 68.7,
-        "vph": 2420,
-        "breakout": 28.3,
-        "video_id": "iDqcPid6yr8",
-        "video_url": "https://www.youtube.com/watch?v=iDqcPid6yr8",
-        "published_at": "2026-10-24T05:44:50Z",
-        "channel_title": "History Index",
-        "search_query": "did you know history",
-        "duration_seconds": 163,
-        "subscriber_count": 5880,
-        "channel_id": "UCMUwKzEP6zOuDsjy8QednSw"
-      }
-    },
-    {
-      "topic": "Why Ancient Kings Built Massive Tombs?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.913,
-      "context": [
-        "viral Short now: 531,445 views in 59h, 2x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=NYrO8_VFQXE",
-      "video_id": "NYrO8_VFQXE",
-      "published_at": "2026-10-24T15:40:11Z",
-      "channel_title": "Prime Facts",
-      "evidence": {
-        "views": 531445,
-        "hours": 58.8,
-        "vph": 9041,
-        "breakout": 1.7,
-        "video_id": "NYrO8_VFQXE",
-        "video_url": "https://www.youtube.com/watch?v=NYrO8_VFQXE",
-        "published_at": "2026-10-24T15:40:11Z",
-        "channel_title": "Prime Facts",
-        "search_query": "history facts",
-        "duration_seconds": 34,
-        "subscriber_count": 315000,
-        "channel_id": "UCX7c6uYbsfZV2c75DtcXpGg"
-      }
-    },
-    {
-      "topic": "Barbirusa Funny Facts In Tamil",
+      "topic": "Peacock Spider Funny Facts In Tamil",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9103,
+      "score": 0.9072,
       "context": [
-        "viral Short now: 173,011 views in 40h, 8x its channel's subscribers"
+        "viral Short now: 120,942 views in 24h, 5x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=nMJhXQ91Ivk",
-      "video_id": "nMJhXQ91Ivk",
-      "published_at": "2026-10-25T10:44:43Z",
+      "source_url": "https://www.youtube.com/watch?v=_LY4pXe6Ols",
+      "video_id": "_LY4pXe6Ols",
+      "published_at": "2026-10-27T02:45:04Z",
       "channel_title": "@Think With Star",
       "evidence": {
-        "views": 173011,
-        "hours": 39.7,
-        "vph": 4357,
-        "breakout": 7.9,
-        "video_id": "nMJhXQ91Ivk",
-        "video_url": "https://www.youtube.com/watch?v=nMJhXQ91Ivk",
-        "published_at": "2026-10-25T10:44:43Z",
+        "views": 120942,
+        "hours": 23.9,
+        "vph": 5070,
+        "breakout": 5.2,
+        "video_id": "_LY4pXe6Ols",
+        "video_url": "https://www.youtube.com/watch?v=_LY4pXe6Ols",
+        "published_at": "2026-10-27T02:45:04Z",
         "channel_title": "@Think With Star",
         "search_query": "animal facts",
-        "duration_seconds": 52,
-        "subscriber_count": 21800,
+        "duration_seconds": 50,
+        "subscriber_count": 23100,
         "channel_id": "UCeQUK-HVjydAVfScKGVaL9w"
+      }
+    },
+    {
+      "topic": "How is a lustrous pearl formed?",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "question",
+      "score": 0.9044,
+      "context": [
+        "viral Short now: 301,488 views in 37h, 2x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=27YzJx5NpQ0",
+      "video_id": "27YzJx5NpQ0",
+      "published_at": "2026-10-26T14:00:10Z",
+      "channel_title": "Xfacto",
+      "evidence": {
+        "views": 301488,
+        "hours": 36.6,
+        "vph": 8237,
+        "breakout": 1.7,
+        "video_id": "27YzJx5NpQ0",
+        "video_url": "https://www.youtube.com/watch?v=27YzJx5NpQ0",
+        "published_at": "2026-10-26T14:00:10Z",
+        "channel_title": "Xfacto",
+        "search_query": "ocean facts",
+        "duration_seconds": 93,
+        "subscriber_count": 174000,
+        "channel_id": "UCwpHeDn_5M3gJY0PvacSadA"
       }
     },
     {
@@ -1022,143 +1022,143 @@
       "is_fact": true,
       "lane": "science_nature",
       "hook": "bold_claim",
-      "score": 0.9077,
+      "score": 0.9015,
       "context": [
-        "viral Short now: 498,797 views in 45h, 1x its channel's subscribers"
+        "viral Short now: 642,530 views in 69h, 1x its channel's subscribers"
       ],
       "source_url": "https://www.youtube.com/watch?v=OHxET_1muTU",
       "video_id": "OHxET_1muTU",
       "published_at": "2026-10-25T05:09:08Z",
       "channel_title": "Jamesboy เล่าเรื่อง",
       "evidence": {
-        "views": 498797,
-        "hours": 45.3,
-        "vph": 11011,
-        "breakout": 0.8,
+        "views": 642530,
+        "hours": 69.5,
+        "vph": 9251,
+        "breakout": 1.0,
         "video_id": "OHxET_1muTU",
         "video_url": "https://www.youtube.com/watch?v=OHxET_1muTU",
         "published_at": "2026-10-25T05:09:08Z",
         "channel_title": "Jamesboy เล่าเรื่อง",
         "search_query": "animal facts",
         "duration_seconds": 40,
-        "subscriber_count": 614000,
+        "subscriber_count": 615000,
         "channel_id": "UCSTZXyN-GmDJbzJFDXcIbjg"
       }
     },
     {
-      "topic": "Grand Canyon Kaise Banta Hai? Nature Ka Amazing Science!",
+      "topic": "Pensaron que los peces arruinarían el arroz... hasta que vieron esto",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "bold_claim",
+      "score": 0.8988,
+      "context": [
+        "viral Short now: 325,596 views in 72h, 6x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=KJDv9ytjhy4",
+      "video_id": "KJDv9ytjhy4",
+      "published_at": "2026-10-25T02:41:26Z",
+      "channel_title": "Heavenly Palace",
+      "evidence": {
+        "views": 325596,
+        "hours": 71.9,
+        "vph": 4528,
+        "breakout": 5.6,
+        "video_id": "KJDv9ytjhy4",
+        "video_url": "https://www.youtube.com/watch?v=KJDv9ytjhy4",
+        "published_at": "2026-10-25T02:41:26Z",
+        "channel_title": "Heavenly Palace",
+        "search_query": "science facts",
+        "duration_seconds": 74,
+        "subscriber_count": 57700,
+        "channel_id": "UCSncAFn0JZ26_5RqtiVWW-w"
+      }
+    },
+    {
+      "topic": "3 FAKTA HEWAN UNIK HEWAN ANEH!",
+      "source": "youtube_outliers",
+      "is_fact": true,
+      "lane": "science_nature",
+      "hook": "number_first",
+      "score": 0.896,
+      "context": [
+        "viral Short now: 183,550 views in 45h, 7x its channel's subscribers"
+      ],
+      "source_url": "https://www.youtube.com/watch?v=tyLXqDFY0vA",
+      "video_id": "tyLXqDFY0vA",
+      "published_at": "2026-10-26T05:53:11Z",
+      "channel_title": "Ree Tech",
+      "evidence": {
+        "views": 183550,
+        "hours": 44.7,
+        "vph": 4105,
+        "breakout": 6.5,
+        "video_id": "tyLXqDFY0vA",
+        "video_url": "https://www.youtube.com/watch?v=tyLXqDFY0vA",
+        "published_at": "2026-10-26T05:53:11Z",
+        "channel_title": "Ree Tech",
+        "search_query": "animal facts",
+        "duration_seconds": 57,
+        "subscriber_count": 28200,
+        "channel_id": "UCANEVDY-lvmB5KfvMzdgVSw"
+      }
+    },
+    {
+      "topic": "Why Astronauts Struggle to Walk After Returning From Space!",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
       "hook": "question",
-      "score": 0.9051,
+      "score": 0.8931,
       "context": [
-        "viral Short now: 45,622 views in 31h, 264x its channel's subscribers"
+        "viral Short now: 37,540 views in 23h, 33x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=RmahO0pEHOA",
-      "video_id": "RmahO0pEHOA",
-      "published_at": "2026-10-25T19:55:54Z",
-      "channel_title": "Fact Ka Dhamaka",
+      "source_url": "https://www.youtube.com/watch?v=naSFXPFIFcw",
+      "video_id": "naSFXPFIFcw",
+      "published_at": "2026-10-27T03:48:56Z",
+      "channel_title": "Infinity_Space 🌍",
       "evidence": {
-        "views": 45622,
-        "hours": 30.5,
-        "vph": 1495,
-        "breakout": 263.7,
-        "video_id": "RmahO0pEHOA",
-        "video_url": "https://www.youtube.com/watch?v=RmahO0pEHOA",
-        "published_at": "2026-10-25T19:55:54Z",
-        "channel_title": "Fact Ka Dhamaka",
-        "search_query": "science facts",
-        "duration_seconds": 47,
-        "subscriber_count": 173,
-        "channel_id": "UCpDFsXZi54tt_sguL7uEF5Q"
+        "views": 37540,
+        "hours": 22.8,
+        "vph": 1647,
+        "breakout": 32.6,
+        "video_id": "naSFXPFIFcw",
+        "video_url": "https://www.youtube.com/watch?v=naSFXPFIFcw",
+        "published_at": "2026-10-27T03:48:56Z",
+        "channel_title": "Infinity_Space 🌍",
+        "search_query": "space facts",
+        "duration_seconds": 9,
+        "subscriber_count": 1150,
+        "channel_id": "UCjmYAZC3oSmutELb3GSiLLg"
       }
     },
     {
-      "topic": "Tufted Tidmous Bird Funny Facts In Tamil",
+      "topic": "You've Seen India on Maps But Not Like This!",
       "source": "youtube_outliers",
       "is_fact": true,
       "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.9024,
+      "hook": "you_statement",
+      "score": 0.8903,
       "context": [
-        "viral Short now: 181,881 views in 47h, 8x its channel's subscribers"
+        "viral Short now: 51,371 views in 42h, 57x its channel's subscribers"
       ],
-      "source_url": "https://www.youtube.com/watch?v=A9A4BxlZ8YY",
-      "video_id": "A9A4BxlZ8YY",
-      "published_at": "2026-10-25T03:47:43Z",
-      "channel_title": "@Think With Star",
+      "source_url": "https://www.youtube.com/watch?v=8U_KLtqHuZo",
+      "video_id": "8U_KLtqHuZo",
+      "published_at": "2026-10-26T08:45:55Z",
+      "channel_title": "The Space Guide",
       "evidence": {
-        "views": 181881,
-        "hours": 46.7,
-        "vph": 3898,
-        "breakout": 8.3,
-        "video_id": "A9A4BxlZ8YY",
-        "video_url": "https://www.youtube.com/watch?v=A9A4BxlZ8YY",
-        "published_at": "2026-10-25T03:47:43Z",
-        "channel_title": "@Think With Star",
-        "search_query": "animal facts",
-        "duration_seconds": 51,
-        "subscriber_count": 21800,
-        "channel_id": "UCeQUK-HVjydAVfScKGVaL9w"
-      }
-    },
-    {
-      "topic": "The Real Sound of a Pulsar Star!",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "science_nature",
-      "hook": "bold_claim",
-      "score": 0.8997,
-      "context": [
-        "viral Short now: 100,573 views in 18h, 4x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=1OshVKuVSpI",
-      "video_id": "1OshVKuVSpI",
-      "published_at": "2026-10-26T08:03:12Z",
-      "channel_title": "Beyond Earth",
-      "evidence": {
-        "views": 100573,
-        "hours": 18.4,
-        "vph": 5467,
-        "breakout": 4.2,
-        "video_id": "1OshVKuVSpI",
-        "video_url": "https://www.youtube.com/watch?v=1OshVKuVSpI",
-        "published_at": "2026-10-26T08:03:12Z",
-        "channel_title": "Beyond Earth",
+        "views": 51371,
+        "hours": 41.8,
+        "vph": 1228,
+        "breakout": 57.1,
+        "video_id": "8U_KLtqHuZo",
+        "video_url": "https://www.youtube.com/watch?v=8U_KLtqHuZo",
+        "published_at": "2026-10-26T08:45:55Z",
+        "channel_title": "The Space Guide",
         "search_query": "space facts",
         "duration_seconds": 5,
-        "subscriber_count": 23700,
-        "channel_id": "UCHApHRwamenKgu7HOn7uLxw"
-      }
-    },
-    {
-      "topic": "पइप म लकज क पत कस लगत थ?",
-      "source": "youtube_outliers",
-      "is_fact": true,
-      "lane": "history_mystery",
-      "hook": "question",
-      "score": 0.8971,
-      "context": [
-        "viral Short now: 150,550 views in 61h, 18x its channel's subscribers"
-      ],
-      "source_url": "https://www.youtube.com/watch?v=PITbPikKr-E",
-      "video_id": "PITbPikKr-E",
-      "published_at": "2026-10-24T13:00:33Z",
-      "channel_title": "R_k_Roshan Facts",
-      "evidence": {
-        "views": 150550,
-        "hours": 61.4,
-        "vph": 2450,
-        "breakout": 18.4,
-        "video_id": "PITbPikKr-E",
-        "video_url": "https://www.youtube.com/watch?v=PITbPikKr-E",
-        "published_at": "2026-10-24T13:00:33Z",
-        "channel_title": "R_k_Roshan Facts",
-        "search_query": "history facts",
-        "duration_seconds": 119,
-        "subscriber_count": 8190,
-        "channel_id": "UCk89E7pzxjI2yhR_BN3XASQ"
+        "subscriber_count": 900,
+        "channel_id": "UCR8walb8Tlob2Npk_rnrg9g"
       }
     }
   ]
