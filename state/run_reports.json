@@ -1,33 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "40100702048",
-    "workflow_run_id": "40100702048",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-24T14:02:24.288544+00:00",
-    "finished_at": "2026-10-24T14:02:24.288544+00:00",
-    "duration_seconds": 0,
-    "mode": "workflow_fallback",
-    "top_up": true,
-    "target_count": 2,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "superseded",
-    "stage": "preflight",
-    "stage_entries": {
-      "preflight": 1
-    },
-    "retry_budgets": {},
-    "topic_attempts": [],
-    "failures": [],
-    "retry_events": [],
-    "provider_events": [],
-    "preflight_skip_reason": "delayed_schedule_superseded"
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261024-143114-3811",
     "workflow_run_id": "40102751088",
     "workflow_run_attempt": "1",
@@ -3928,5 +3901,161 @@
     "retry_events": [],
     "provider_events": [],
     "preflight_skip_reason": "delayed_schedule_superseded"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261029-233717-4469",
+    "workflow_run_id": "40974216208",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-29T23:37:17.104778+00:00",
+    "finished_at": "2026-10-29T23:43:54.889892+00:00",
+    "duration_seconds": 397.785,
+    "mode": "upload",
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 2,
+      "script_research": 4,
+      "script_draft": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Amazing Kangaroo Life Fact! A Kangaroo Amazing Life How Baby Kangaroos Are Born",
+        "topic_key": "amazing kangaroo life fact a kangaroo amazing life how baby kangaroos are born",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 2,
+        "topic": "Earth Looks Like a Water World But Here’s the Shocking Truth!",
+        "topic_key": "earth looks like a water world but heres the shocking truth",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-29T23:37:48.093516+00:00",
+        "stage": "script_research",
+        "category": "source_grounding_failed"
+      },
+      {
+        "at": "2026-10-29T23:37:48.093549+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-29T23:38:01.491323+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-29T23:43:54.882609+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-29T23:43:54.882811+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-29T23:43:54.882935+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-10-29T23:43:54.882965+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-29T23:37:52.208429+00:00",
+        "retry_after_seconds": 14.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-29T23:37:59.604794+00:00",
+        "retry_after_seconds": 28.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-29T23:40:29.937544+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-29T23:40:36.458130+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-29T23:43:37.729345+00:00"
+      },
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "circuit_open",
+        "at": "2026-10-29T23:43:54.882268+00:00",
+        "cooldown_until": "2026-10-30T23:43:54.881628+00:00",
+        "retry_after_seconds": 14.0
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]
