@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-30T05:37:58.468341+00:00",
+  "updated": "2026-10-30T07:42:44.366765+00:00",
   "videos_total": 44,
   "videos_7d": 0,
   "views_7d": 0,
@@ -62,7 +62,7 @@
         },
         {
           "arm": "guess_reveal",
-          "mean": 0.538,
+          "mean": 0.537,
           "n": 1
         },
         {
@@ -285,7 +285,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1241,
+      "views": 1242,
       "avg_view_pct": 79.83
     },
     {
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 1,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 1,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
