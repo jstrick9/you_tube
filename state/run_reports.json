@@ -1,142 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261024-182335-3674",
-    "workflow_run_id": "40120337657",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-24T18:23:35.278788+00:00",
-    "finished_at": "2026-10-24T18:25:46.661806+00:00",
-    "duration_seconds": 131.383,
-    "mode": "upload",
-    "target_count": 2,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "topic_production": 1,
-      "topic_validation": 2,
-      "script_research": 4,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Never Make This Mistake While Buying Turtles",
-        "topic_key": "never make this mistake while buying turtles",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Banana Peeling",
-        "topic_key": "banana peeling",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-24T18:23:59.112029+00:00",
-        "stage": "topic_selection",
-        "category": "no_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-24T18:25:41.264599+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-24T18:25:41.264715+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-24T18:25:46.657330+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-24T18:25:46.657450+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-24T18:25:46.657550+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      },
-      {
-        "at": "2026-10-24T18:25:46.657571+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-24T18:23:50.835945+00:00",
-        "retry_after_seconds": 41.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-24T18:23:57.710647+00:00",
-        "retry_after_seconds": 29.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_request_too_large",
-        "at": "2026-10-24T18:23:59.185882+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-24T18:25:36.639134+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261024-215458-3816",
     "workflow_run_id": "40136195277",
     "workflow_run_attempt": "1",
@@ -4417,6 +4281,182 @@
         "status_code": null,
         "action": "transient_network_failure",
         "at": "2026-10-30T05:46:36.432766+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261030-164448-3609",
+    "workflow_run_id": "41092425641",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-30T16:44:48.791868+00:00",
+    "finished_at": "2026-10-30T16:47:18.413960+00:00",
+    "duration_seconds": 149.622,
+    "mode": "upload",
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 3,
+      "script_research": 6,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "This Wasp Builds a Tiny Mud Pot for Its Baby",
+        "topic_key": "this wasp builds a tiny mud pot for its baby",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "A Bear Was Ejected From a Supersonic Jet",
+        "topic_key": "a bear was ejected from a supersonic jet",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Bulletproof Jacket Kaise Kaam Karti Hai? History",
+        "topic_key": "bulletproof jacket kaise kaam karti hai history",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-30T16:45:17.345953+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-10-30T16:45:17.346118+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-30T16:45:22.392504+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-10-30T16:45:22.392630+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-30T16:47:16.505844+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-30T16:47:18.409772+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-10-30T16:47:18.409879+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-30T16:47:18.409962+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-10-30T16:47:18.409984+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-10-30T16:47:18.410001+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-30T16:44:48.792603+00:00",
+        "cooldown_until": "2026-10-30T23:43:54.881628+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-30T16:45:02.954875+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-30T16:45:10.233689+00:00",
+        "retry_after_seconds": 30.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-30T16:45:11.836126+00:00",
+        "retry_after_seconds": 9.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-30T16:46:55.733698+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-30T16:47:02.230528+00:00"
       }
     ],
     "grounding_repairs": [],
