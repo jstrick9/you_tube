@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-30T16:44:35.263566+00:00",
+  "updated": "2026-10-30T23:15:23.529656+00:00",
   "videos_total": 44,
   "videos_7d": 0,
   "views_7d": 0,
@@ -11,7 +11,7 @@
       "arms": [
         {
           "arm": "nature",
-          "mean": 0.56,
+          "mean": 0.559,
           "n": 6
         },
         {
@@ -262,7 +262,7 @@
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
       "views": 1568,
-      "avg_view_pct": 114.06
+      "avg_view_pct": 113.92999999999999
     },
     {
       "title": "Why Beavers Bully Trees #shorts",
@@ -286,7 +286,7 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1242,
-      "avg_view_pct": 79.83
+      "avg_view_pct": 79.7
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -298,7 +298,7 @@
       "title": "How the Largest Animal Ever Eats Tiny Prey #shorts",
       "id": "1ed_FohPwqs",
       "views": 1204,
-      "avg_view_pct": 54.59
+      "avg_view_pct": 54.559999999999995
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 34,
+    "attempted_videos": 1,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 34,
+    "reports_without_usable_rows": 1,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -586,7 +586,7 @@
         "hook_style": "number_first",
         "duration_seconds": 37.9,
         "avg_view_pct": 49.14,
-        "views": 476,
+        "views": 477,
         "engaged_views_90d": 270,
         "sample_size": 270,
         "sample_basis": "engaged_views_90d",
@@ -660,7 +660,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10254,
+    "views_90d": 10261,
     "per_1k_views": 2.63,
     "videos": 35,
     "denominator_basis": "engaged_views",
@@ -671,12 +671,12 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10254,
+    "engaged_views_90d": 10261,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003418,
-    "current_full_threshold_progress": 0.001025,
+    "expanded_threshold_progress": 0.00342,
+    "current_full_threshold_progress": 0.001026,
     "feb_2027_full_threshold_progress": 0.000513,
     "public_videos": 35,
     "videos_with_metric": 35,
