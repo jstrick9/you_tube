@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-31T16:20:41.021413+00:00",
+  "updated": "2026-10-31T22:51:17.525295+00:00",
   "videos_total": 44,
   "videos_7d": 0,
   "views_7d": 0,
@@ -46,7 +46,7 @@
         },
         {
           "arm": "culture",
-          "mean": 0.406,
+          "mean": 0.407,
           "n": 3
         }
       ]
@@ -57,7 +57,7 @@
       "arms": [
         {
           "arm": "scale_shock",
-          "mean": 0.548,
+          "mean": 0.547,
           "n": 3
         },
         {
@@ -286,7 +286,7 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1242,
-      "avg_view_pct": 79.7
+      "avg_view_pct": 79.47
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -310,7 +310,7 @@
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
       "views": 1183,
-      "avg_view_pct": 50.39
+      "avg_view_pct": 50.34
     },
     {
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
@@ -345,10 +345,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 34,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 34,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -601,10 +601,10 @@
         "format": "facts3",
         "hook_style": "you_statement",
         "duration_seconds": 37.3,
-        "avg_view_pct": 50.39,
+        "avg_view_pct": 50.34,
         "views": 1183,
-        "engaged_views_90d": 536,
-        "sample_size": 536,
+        "engaged_views_90d": 537,
+        "sample_size": 537,
         "sample_basis": "engaged_views_90d",
         "sample_qualified": true
       },
@@ -660,7 +660,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10261,
+    "views_90d": 10266,
     "per_1k_views": 2.63,
     "videos": 35,
     "denominator_basis": "engaged_views",
@@ -671,12 +671,12 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10261,
+    "engaged_views_90d": 10266,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.00342,
-    "current_full_threshold_progress": 0.001026,
+    "expanded_threshold_progress": 0.003422,
+    "current_full_threshold_progress": 0.001027,
     "feb_2027_full_threshold_progress": 0.000513,
     "public_videos": 35,
     "videos_with_metric": 35,
