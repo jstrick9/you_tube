@@ -1,33 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "40205077098",
-    "workflow_run_id": "40205077098",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-25T15:03:10.813426+00:00",
-    "finished_at": "2026-10-25T15:03:10.813426+00:00",
-    "duration_seconds": 0,
-    "mode": "workflow_fallback",
-    "top_up": true,
-    "target_count": 3,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "superseded",
-    "stage": "preflight",
-    "stage_entries": {
-      "preflight": 1
-    },
-    "retry_budgets": {},
-    "topic_attempts": [],
-    "failures": [],
-    "retry_events": [],
-    "provider_events": [],
-    "preflight_skip_reason": "delayed_schedule_superseded"
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261025-183436-4053",
     "workflow_run_id": "40221785117",
     "workflow_run_attempt": "1",
@@ -4407,6 +4380,168 @@
         "status_code": null,
         "action": "transient_network_failure",
         "at": "2026-10-31T05:33:37.571870+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261031-154803-4084",
+    "workflow_run_id": "41216445585",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-31T15:48:03.225196+00:00",
+    "finished_at": "2026-10-31T15:55:42.861009+00:00",
+    "duration_seconds": 459.636,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 2,
+      "script_research": 4,
+      "script_draft": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Mountain Goat: Nature’s Cliff Climber!",
+        "topic_key": "mountain goat natures cliff climber",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "The Himalayas Look Unreal From Space!",
+        "topic_key": "the himalayas look unreal from space",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-31T15:54:16.280332+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-10-31T15:54:16.280482+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-31T15:54:31.195086+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-31T15:54:59.993482+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-10-31T15:54:59.993621+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-10-31T15:55:42.855764+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-31T15:55:42.855811+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-31T15:48:03.226047+00:00",
+        "cooldown_until": "2026-11-01T02:50:46.205255+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-31T15:48:50.858993+00:00",
+        "retry_after_seconds": 39.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-31T15:49:17.489845+00:00",
+        "retry_after_seconds": 1.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-31T15:49:20.344177+00:00",
+        "retry_after_seconds": 35.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-31T15:50:55.455436+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-31T15:51:02.072032+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-31T15:54:16.279927+00:00"
       }
     ],
     "grounding_repairs": [],
