@@ -1,233 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261025-142749-3589",
-    "workflow_run_id": "40202211617",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-25T14:27:49.683499+00:00",
-    "finished_at": "2026-10-25T14:37:44.955804+00:00",
-    "duration_seconds": 595.272,
-    "mode": "upload",
-    "target_count": 3,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 4,
-      "script_research": 8,
-      "script_draft": 3,
-      "script_review": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Why Do Fishermen Instantly Throw Venomous Snakes Back Into the Sea?",
-        "topic_key": "why do fishermen instantly throw venomous snakes back into the sea",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Amazing Secret of the Musk Deer",
-        "topic_key": "amazing secret of the musk deer",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Why Do Fishermen Release Deadly Sea Snakes Back Into the Ocean?",
-        "topic_key": "why do fishermen release deadly sea snakes back into the ocean",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Why Do Deer Scratch Their Antlers on Trees?",
-        "topic_key": "why do deer scratch their antlers on trees",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-25T14:28:01.611099+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-25T14:28:01.611228+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-25T14:28:46.195309+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-25T14:28:46.195443+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-25T14:34:42.101421+00:00",
-        "stage": "script_draft",
-        "category": "provider_transient_5xx",
-        "exception_type": "LLMError",
-        "attempt": 2
-      },
-      {
-        "at": "2026-10-25T14:34:42.101609+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-25T14:37:44.951335+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-10-25T14:37:44.951453+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-25T14:37:44.951550+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      },
-      {
-        "at": "2026-10-25T14:37:44.951576+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      },
-      {
-        "at": "2026-10-25T14:37:44.951596+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-10-25T14:27:49.683850+00:00",
-        "cooldown_until": "2026-10-26T01:48:51.066327+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-25T14:28:28.322320+00:00",
-        "retry_after_seconds": 27.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-25T14:28:38.235092+00:00",
-        "retry_after_seconds": 30.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-25T14:28:41.265447+00:00",
-        "retry_after_seconds": 13.0
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-10-25T14:29:05.010761+00:00",
-        "cooldown_until": "2026-10-25T14:49:05.010152+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-25T14:31:05.205162+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-25T14:31:05.570171+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-25T14:31:13.838618+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-10-25T14:31:29.675849+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "route_circuit_open",
-        "at": "2026-10-25T14:31:29.676431+00:00",
-        "cooldown_until": "2026-10-25T14:41:29.675888+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "groq:qwen/qwen3.8-27b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "40205077098",
     "workflow_run_id": "40205077098",
     "workflow_run_attempt": "1",
@@ -4463,6 +4236,177 @@
         "at": "2026-10-31T02:50:46.205782+00:00",
         "cooldown_until": "2026-11-01T02:50:46.205255+00:00",
         "retry_after_seconds": 21.0
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261031-052827-3838",
+    "workflow_run_id": "41172635765",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-10-31T05:28:27.282890+00:00",
+    "finished_at": "2026-10-31T05:38:14.815231+00:00",
+    "duration_seconds": 587.532,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "topic_production": 1,
+      "topic_validation": 1,
+      "script_research": 2,
+      "script_draft": 1,
+      "script_review": 1,
+      "tts": 1,
+      "visuals": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "This Whale Shark Swallows GALLONS of Water!",
+        "topic_key": "this whale shark swallows gallons of water",
+        "outcome": "rejected",
+        "stage": "visuals",
+        "failure_category": "no_verified_visual_match"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-10-31T05:28:34.341260+00:00",
+        "stage": "topic_selection",
+        "category": "no_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-31T05:38:01.372417+00:00",
+        "stage": "visuals",
+        "category": "no_verified_visual_match",
+        "exception_type": "NoVisualMatch"
+      },
+      {
+        "at": "2026-10-31T05:38:14.808396+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-10-31T05:38:14.808439+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-10-31T05:28:27.283289+00:00",
+        "cooldown_until": "2026-11-01T02:50:46.205255+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-31T05:29:03.973510+00:00",
+        "retry_after_seconds": 30.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-31T05:29:12.527059+00:00",
+        "retry_after_seconds": 2.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-31T05:29:15.427112+00:00",
+        "retry_after_seconds": 20.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-31T05:29:27.839876+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-31T05:29:36.397115+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-31T05:29:53.277585+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-31T05:30:01.639219+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-10-31T05:30:04.361578+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "route_circuit_open",
+        "at": "2026-10-31T05:30:04.362218+00:00",
+        "cooldown_until": "2026-10-31T05:40:04.361623+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-10-31T05:30:11.082746+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-10-31T05:33:37.571870+00:00"
       }
     ],
     "grounding_repairs": [],
