@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-01T08:06:57.463190+00:00",
+  "updated": "2026-11-01T16:51:34.354057+00:00",
   "videos_total": 44,
   "videos_7d": 0,
   "views_7d": 0,
@@ -20,18 +20,18 @@
           "n": 1
         },
         {
+          "arm": "mysteries",
+          "mean": 0.489,
+          "n": 1
+        },
+        {
           "arm": "animals",
           "mean": 0.489,
           "n": 2
         },
         {
-          "arm": "mysteries",
-          "mean": 0.488,
-          "n": 1
-        },
-        {
           "arm": "history",
-          "mean": 0.48,
+          "mean": 0.481,
           "n": 5
         },
         {
@@ -41,7 +41,7 @@
         },
         {
           "arm": "geography",
-          "mean": 0.422,
+          "mean": 0.423,
           "n": 2
         },
         {
@@ -62,7 +62,7 @@
         },
         {
           "arm": "guess_reveal",
-          "mean": 0.537,
+          "mean": 0.536,
           "n": 1
         },
         {
@@ -87,7 +87,7 @@
         },
         {
           "arm": "plot_twist",
-          "mean": 0.488,
+          "mean": 0.489,
           "n": 1
         },
         {
@@ -280,7 +280,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1242,
+      "views": 1243,
       "avg_view_pct": 79.47
     },
     {
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 34,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 34,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
