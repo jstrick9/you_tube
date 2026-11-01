@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-01T16:51:34.354057+00:00",
+  "updated": "2026-11-01T23:06:47.934717+00:00",
   "videos_total": 44,
   "videos_7d": 0,
   "views_7d": 0,
@@ -280,7 +280,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1243,
+      "views": 1244,
       "avg_view_pct": 79.47
     },
     {
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 34,
+    "attempted_videos": 1,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 34,
+    "reports_without_usable_rows": 1,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -580,10 +580,10 @@
         "format": "timeline",
         "hook_style": "number_first",
         "duration_seconds": 37.9,
-        "avg_view_pct": 49.14,
+        "avg_view_pct": 49.0,
         "views": 477,
-        "engaged_views_90d": 270,
-        "sample_size": 270,
+        "engaged_views_90d": 271,
+        "sample_size": 271,
         "sample_basis": "engaged_views_90d",
         "sample_qualified": true
       },
@@ -645,7 +645,7 @@
         "hook_style": "bold_claim",
         "duration_seconds": 19.6,
         "avg_view_pct": 52.78,
-        "views": 512,
+        "views": 513,
         "engaged_views_90d": 120,
         "sample_size": 120,
         "sample_basis": "engaged_views_90d",
@@ -655,7 +655,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10266,
+    "views_90d": 10267,
     "per_1k_views": 2.63,
     "videos": 35,
     "denominator_basis": "engaged_views",
@@ -666,7 +666,7 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10266,
+    "engaged_views_90d": 10267,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
