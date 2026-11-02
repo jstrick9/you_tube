@@ -4,9 +4,9 @@
     "pollinations": {
       "reason": "billing_or_entitlement",
       "status_code": 402,
-      "recorded_at": "2026-11-01T06:00:40.763048+00:00",
-      "blocked_until": "2026-11-02T06:00:40.763048+00:00",
-      "retry_after_seconds": 28.0
+      "recorded_at": "2026-11-02T06:02:00.087763+00:00",
+      "blocked_until": "2026-11-03T06:02:00.087763+00:00",
+      "retry_after_seconds": 16.0
     }
   },
   "failures_5xx": {}
