@@ -4,10 +4,15 @@
     "pollinations": {
       "reason": "billing_or_entitlement",
       "status_code": 402,
-      "recorded_at": "2026-11-02T06:02:00.087763+00:00",
-      "blocked_until": "2026-11-03T06:02:00.087763+00:00",
-      "retry_after_seconds": 16.0
+      "recorded_at": "2026-11-03T06:45:27.201962+00:00",
+      "blocked_until": "2026-11-04T06:45:27.201962+00:00",
+      "retry_after_seconds": 17.0
     }
   },
-  "failures_5xx": {}
+  "failures_5xx": {
+    "gemini": {
+      "count": 1,
+      "last_at": "2026-11-03T06:39:45.207046+00:00"
+    }
+  }
 }
