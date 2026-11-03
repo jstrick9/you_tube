@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-02T20:25:32.879086+00:00",
+  "updated": "2026-11-03T04:03:10.389503+00:00",
   "videos_total": 44,
   "videos_7d": 0,
   "views_7d": 0,
@@ -41,7 +41,7 @@
         },
         {
           "arm": "geography",
-          "mean": 0.423,
+          "mean": 0.424,
           "n": 2
         },
         {
@@ -102,7 +102,7 @@
         },
         {
           "arm": "backstory",
-          "mean": 0.428,
+          "mean": 0.429,
           "n": 5
         }
       ]
@@ -280,7 +280,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1245,
+      "views": 1248,
       "avg_view_pct": 79.47
     },
     {
@@ -298,7 +298,7 @@
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
-      "views": 1184,
+      "views": 1186,
       "avg_view_pct": 41.75
     },
     {
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 35,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 35,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -549,7 +549,7 @@
         "hook_style": "question",
         "duration_seconds": 35.8,
         "avg_view_pct": 41.75,
-        "views": 1184,
+        "views": 1186,
         "engaged_views_90d": 603,
         "sample_size": 603,
         "sample_basis": "engaged_views_90d",
