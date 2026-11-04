@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-03T17:55:33.617154+00:00",
+  "updated": "2026-11-04T00:13:15.523834+00:00",
   "videos_total": 44,
   "videos_7d": 0,
   "views_7d": 0,
@@ -46,7 +46,7 @@
         },
         {
           "arm": "culture",
-          "mean": 0.408,
+          "mean": 0.409,
           "n": 3
         }
       ]
@@ -310,7 +310,7 @@
     {
       "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
       "id": "M1QR18R35Bc",
-      "views": 1160,
+      "views": 1161,
       "avg_view_pct": 59.43000000000001
     }
   ],
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 35,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 35,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -655,7 +655,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10267,
+    "views_90d": 10268,
     "per_1k_views": 2.63,
     "videos": 35,
     "denominator_basis": "engaged_views",
@@ -666,11 +666,11 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10267,
+    "engaged_views_90d": 10268,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003422,
+    "expanded_threshold_progress": 0.003423,
     "current_full_threshold_progress": 0.001027,
     "feb_2027_full_threshold_progress": 0.000513,
     "public_videos": 35,
