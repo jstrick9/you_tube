@@ -1,173 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261029-053917-3701",
-    "workflow_run_id": "40824485653",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-10-29T05:39:17.981293+00:00",
-    "finished_at": "2026-10-29T05:42:56.381224+00:00",
-    "duration_seconds": 218.4,
-    "mode": "upload",
-    "target_count": 3,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 3,
-      "script_research": 6,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Tahu kah Kamu Kalo Salmon Bisa Berubah Menjadi Zombie?!!",
-        "topic_key": "tahu kah kamu kalo salmon bisa berubah menjadi zombie",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "5 Animals That Sleep in the STRANGEST Ways",
-        "topic_key": "5 animals that sleep in the strangest ways",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Remorse? Never Heard of Him Dark History & Art",
-        "topic_key": "remorse never heard of him dark history art",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-10-29T05:40:23.624832+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-10-29T05:40:23.624897+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-29T05:42:21.756306+00:00",
-        "stage": "script_research",
-        "category": "source_subject_mismatch"
-      },
-      {
-        "at": "2026-10-29T05:42:21.756432+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-29T05:42:54.931150+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-10-29T05:42:56.376841+00:00",
-        "stage": "script_research",
-        "category": "source_grounding_failed"
-      },
-      {
-        "at": "2026-10-29T05:42:56.376870+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-10-29T05:42:56.376970+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      },
-      {
-        "at": "2026-10-29T05:42:56.376993+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      },
-      {
-        "at": "2026-10-29T05:42:56.377010+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-29T05:39:35.614006+00:00",
-        "retry_after_seconds": 30.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-29T05:39:48.061966+00:00",
-        "retry_after_seconds": 32.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_request_too_large",
-        "at": "2026-10-29T05:39:48.125445+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-10-29T05:41:56.221175+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-10-29T05:42:02.670564+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261029-170124-3763",
     "workflow_run_id": "40916821396",
     "workflow_run_attempt": "1",
@@ -4198,5 +4031,228 @@
     "retry_events": [],
     "provider_events": [],
     "preflight_skip_reason": "delayed_schedule_superseded"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261105-003331-3906",
+    "workflow_run_id": "41941999407",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-05T00:33:31.234117+00:00",
+    "finished_at": "2026-11-05T00:41:59.794734+00:00",
+    "duration_seconds": 508.561,
+    "mode": "upload",
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 5,
+      "script_research": 10,
+      "script_draft": 2,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "A Dead Whale Becomes an Entire Ecosystem!",
+        "topic_key": "a dead whale becomes an entire ecosystem",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "The WWII Bomb That Skipped Across Water Like a Stone!",
+        "topic_key": "the wwii bomb that skipped across water like a stone",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "The Crazy Evolution of Umbrella",
+        "topic_key": "the crazy evolution of umbrella",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "சஙகம பல அலறம 1500 கல அசரன! World's Biggest Indian Gaur",
+        "topic_key": "1500 worlds biggest indian gaur",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Why is Australia called Australia?",
+        "topic_key": "why is australia called australia",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-11-05T00:34:38.000120+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-11-05T00:34:38.000251+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-05T00:40:07.313006+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-05T00:40:07.313195+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-05T00:40:33.227731+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-11-05T00:40:38.752267+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-11-05T00:40:38.752407+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-05T00:41:56.796389+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-05T00:41:56.796498+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-05T00:41:59.789438+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-11-05T00:41:59.789571+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-05T00:41:59.789701+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-11-05T00:41:59.789741+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-11-05T00:41:59.789772+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-11-05T00:33:31.234505+00:00",
+        "cooldown_until": "2026-11-05T18:11:53.506266+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-05T00:34:16.832295+00:00",
+        "retry_after_seconds": 28.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-05T00:34:30.780163+00:00",
+        "retry_after_seconds": 33.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-05T00:34:58.423914+00:00",
+        "retry_after_seconds": 32.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-05T00:36:36.061434+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-05T00:36:42.972838+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-05T00:40:07.312505+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]

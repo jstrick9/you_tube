@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-04T18:04:41.651586+00:00",
+  "updated": "2026-11-05T00:33:29.855345+00:00",
   "videos_total": 44,
   "videos_7d": 0,
   "views_7d": 0,
@@ -280,7 +280,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1248,
+      "views": 1249,
       "avg_view_pct": 79.47
     },
     {
@@ -299,7 +299,7 @@
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
       "views": 1186,
-      "avg_view_pct": 41.75
+      "avg_view_pct": 41.86
     },
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 35,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 35,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -548,10 +548,10 @@
         "format": "myth_vs_fact",
         "hook_style": "question",
         "duration_seconds": 35.8,
-        "avg_view_pct": 41.75,
+        "avg_view_pct": 41.86,
         "views": 1186,
-        "engaged_views_90d": 603,
-        "sample_size": 603,
+        "engaged_views_90d": 604,
+        "sample_size": 604,
         "sample_basis": "engaged_views_90d",
         "sample_qualified": true
       },
@@ -655,7 +655,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10268,
+    "views_90d": 10270,
     "per_1k_views": 2.63,
     "videos": 35,
     "denominator_basis": "engaged_views",
@@ -666,7 +666,7 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10268,
+    "engaged_views_90d": 10270,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
