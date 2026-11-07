@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-07T05:53:46.233367+00:00",
+  "updated": "2026-11-07T07:44:56.616927+00:00",
   "videos_total": 44,
   "videos_7d": 0,
   "views_7d": 0,
@@ -41,7 +41,7 @@
         },
         {
           "arm": "geography",
-          "mean": 0.426,
+          "mean": 0.427,
           "n": 2
         },
         {
@@ -280,7 +280,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1253,
+      "views": 1255,
       "avg_view_pct": 79.47
     },
     {
@@ -304,7 +304,7 @@
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
-      "views": 1183,
+      "views": 1184,
       "avg_view_pct": 50.34
     },
     {
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 35,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 35,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -597,7 +597,7 @@
         "hook_style": "you_statement",
         "duration_seconds": 37.3,
         "avg_view_pct": 50.34,
-        "views": 1183,
+        "views": 1184,
         "engaged_views_90d": 537,
         "sample_size": 537,
         "sample_basis": "engaged_views_90d",
