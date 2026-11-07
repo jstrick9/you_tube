@@ -1,13 +1,6 @@
 {
   "schema_version": 1,
   "providers": {
-    "pollinations": {
-      "reason": "billing_or_entitlement",
-      "status_code": 402,
-      "recorded_at": "2026-11-06T01:17:37.591212+00:00",
-      "blocked_until": "2026-11-07T01:17:37.591212+00:00",
-      "retry_after_seconds": 6.0
-    },
     "gemini": {
       "reason": "quota_exhausted",
       "status_code": 429,
@@ -15,10 +8,5 @@
       "blocked_until": "2026-11-07T23:59:29.237095+00:00"
     }
   },
-  "failures_5xx": {
-    "nvidia": {
-      "count": 1,
-      "last_at": "2026-11-07T00:16:50.199588+00:00"
-    }
-  }
+  "failures_5xx": {}
 }
