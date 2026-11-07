@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-07T16:31:19.009008+00:00",
+  "updated": "2026-11-07T23:02:20.488178+00:00",
   "videos_total": 44,
   "videos_7d": 0,
   "views_7d": 0,
@@ -262,7 +262,7 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1446,
+      "views": 1447,
       "avg_view_pct": 90.48
     },
     {
@@ -281,7 +281,7 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1255,
-      "avg_view_pct": 79.47
+      "avg_view_pct": 79.27
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 35,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 35,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -655,7 +655,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10272,
+    "views_90d": 10275,
     "per_1k_views": 2.63,
     "videos": 35,
     "denominator_basis": "engaged_views",
@@ -666,11 +666,11 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10272,
+    "engaged_views_90d": 10275,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003424,
+    "expanded_threshold_progress": 0.003425,
     "current_full_threshold_progress": 0.001027,
     "feb_2027_full_threshold_progress": 0.000514,
     "public_videos": 35,
