@@ -6,6 +6,25 @@
       "status_code": 429,
       "recorded_at": "2026-11-06T23:59:29.237095+00:00",
       "blocked_until": "2026-11-07T23:59:29.237095+00:00"
+    },
+    "mistral": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-11-07T16:32:19.804920+00:00",
+      "blocked_until": "2026-11-07T16:52:19.804920+00:00"
+    },
+    "cloudflare": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-11-07T16:37:40.627001+00:00",
+      "blocked_until": "2026-11-07T16:57:40.627001+00:00"
+    },
+    "pollinations": {
+      "reason": "billing_or_entitlement",
+      "status_code": 402,
+      "recorded_at": "2026-11-07T16:44:07.592345+00:00",
+      "blocked_until": "2026-11-08T16:44:07.592345+00:00",
+      "retry_after_seconds": 17.0
     }
   },
   "failures_5xx": {}
