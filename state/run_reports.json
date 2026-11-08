@@ -1,185 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261101-055312-3628",
-    "workflow_run_id": "41278555079",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-01T05:53:12.567880+00:00",
-    "finished_at": "2026-11-01T06:02:29.133857+00:00",
-    "duration_seconds": 556.566,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 3,
-      "script_research": 6,
-      "script_draft": 3,
-      "script_review": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Why Did Portugal Refuse to Give Up Macau?",
-        "topic_key": "why did portugal refuse to give up macau",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "HOW BIG IS THE SOLAR SYSTEM!",
-        "topic_key": "how big is the solar system",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "This Catfish Tricks Another Fish Into Raising Its Baby!",
-        "topic_key": "this catfish tricks another fish into raising its baby",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-11-01T06:00:40.763887+00:00",
-        "stage": "script_draft",
-        "category": "billing_or_entitlement",
-        "exception_type": "LLMError",
-        "attempt": 2
-      },
-      {
-        "at": "2026-11-01T06:00:40.764003+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-01T06:01:00.008829+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-11-01T06:01:00.008958+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-01T06:02:29.130330+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-11-01T06:02:29.130445+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-01T06:02:29.130524+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-01T05:53:37.552986+00:00",
-        "retry_after_seconds": 28.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-01T05:53:49.981592+00:00",
-        "retry_after_seconds": 32.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_request_too_large",
-        "at": "2026-11-01T05:53:50.044271+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-11-01T05:54:17.066774+00:00",
-        "cooldown_until": "2026-11-01T06:14:17.066271+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-01T05:56:17.260503+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-01T05:59:14.249254+00:00"
-      },
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "circuit_open",
-        "at": "2026-11-01T06:00:40.763612+00:00",
-        "cooldown_until": "2026-11-02T06:00:40.763048+00:00",
-        "retry_after_seconds": 28.0
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261101-165146-3838",
     "workflow_run_id": "41328366059",
     "workflow_run_attempt": "1",
@@ -4402,5 +4223,219 @@
     "retry_events": [],
     "provider_events": [],
     "preflight_skip_reason": "delayed_schedule_superseded"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261108-230959-3478",
+    "workflow_run_id": "42533741903",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-08T23:09:59.895047+00:00",
+    "finished_at": "2026-11-08T23:20:47.417492+00:00",
+    "duration_seconds": 647.522,
+    "mode": "upload",
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 4,
+      "script_research": 8,
+      "script_draft": 2,
+      "script_review": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "The Invention Of The H. L. Hunley Submarine",
+        "topic_key": "the invention of the h l hunley submarine",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 2,
+        "topic": "Baby Animal Transformation!",
+        "topic_key": "baby animal transformation",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 2,
+        "topic": "5 Animal Facts That Sound Completely Unreal",
+        "topic_key": "5 animal facts that sound completely unreal",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 2,
+        "topic": "8 Forgotten McDonald's fast foods you probably remember",
+        "topic_key": "8 forgotten mcdonalds fast foods you probably remember",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-11-08T23:19:50.318548+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 2
+      },
+      {
+        "at": "2026-11-08T23:19:50.318699+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-08T23:20:22.853697+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-11-08T23:20:45.782574+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-11-08T23:20:45.782694+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-08T23:20:47.139124+00:00",
+        "stage": "script_research",
+        "category": "no_depictable_source_asset"
+      },
+      {
+        "at": "2026-11-08T23:20:47.139251+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-08T23:20:47.414153+00:00",
+        "stage": "script_research",
+        "category": "source_grounding_failed"
+      },
+      {
+        "at": "2026-11-08T23:20:47.414186+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-08T23:20:47.414271+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-11-08T23:20:47.414287+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "script_review",
+        "attempt": 1,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-08T23:10:37.952431+00:00",
+        "retry_after_seconds": 28.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-08T23:10:50.147680+00:00",
+        "retry_after_seconds": 28.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-08T23:12:57.418131+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-08T23:13:03.938729+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-08T23:16:23.349094+00:00"
+      },
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "circuit_open",
+        "at": "2026-11-08T23:19:50.318276+00:00",
+        "cooldown_until": "2026-11-09T23:19:50.317631+00:00",
+        "retry_after_seconds": 23.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-08T23:19:52.872534+00:00",
+        "retry_after_seconds": 12.0
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-11-08T23:20:31.645605+00:00",
+        "cooldown_until": "2026-11-08T23:40:31.645009+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
+      "mistral:ministral-8b-latest",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]
