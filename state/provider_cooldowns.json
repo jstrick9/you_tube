@@ -8,17 +8,11 @@
       "blocked_until": "2026-11-08T16:44:07.592345+00:00",
       "retry_after_seconds": 17.0
     },
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-11-08T02:46:19.368375+00:00",
-      "blocked_until": "2026-11-08T03:06:19.368375+00:00"
-    },
     "cloudflare": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-11-08T02:55:29.595745+00:00",
-      "blocked_until": "2026-11-08T03:15:29.595745+00:00"
+      "recorded_at": "2026-11-08T05:56:44.503208+00:00",
+      "blocked_until": "2026-11-08T06:16:44.503208+00:00"
     }
   },
   "failures_5xx": {}
