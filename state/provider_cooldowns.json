@@ -8,11 +8,11 @@
       "blocked_until": "2026-11-09T23:19:50.317631+00:00",
       "retry_after_seconds": 23.0
     },
-    "mistral": {
+    "cloudflare": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-11-08T23:20:31.645009+00:00",
-      "blocked_until": "2026-11-08T23:40:31.645009+00:00"
+      "recorded_at": "2026-11-09T03:04:08.916950+00:00",
+      "blocked_until": "2026-11-09T03:24:08.916950+00:00"
     }
   },
   "failures_5xx": {}
