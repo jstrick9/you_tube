@@ -1,33 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "41330452086",
-    "workflow_run_id": "41330452086",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-01T17:14:42.117166+00:00",
-    "finished_at": "2026-11-01T17:14:42.117166+00:00",
-    "duration_seconds": 0,
-    "mode": "workflow_fallback",
-    "top_up": true,
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "superseded",
-    "stage": "preflight",
-    "stage_entries": {
-      "preflight": 1
-    },
-    "retry_budgets": {},
-    "topic_attempts": [],
-    "failures": [],
-    "retry_events": [],
-    "provider_events": [],
-    "preflight_skip_reason": "delayed_schedule_superseded"
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261101-230649-3831",
     "workflow_run_id": "41360355813",
     "workflow_run_attempt": "1",
@@ -4527,6 +4500,243 @@
       "groq:openai/gpt-oss-120b",
       "groq:openai/gpt-oss-20b",
       "groq:qwen/qwen3.8-27b",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261109-061002-3492",
+    "workflow_run_id": "42571243996",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-09T06:10:02.742033+00:00",
+    "finished_at": "2026-11-09T06:21:07.139795+00:00",
+    "duration_seconds": 664.398,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 6,
+      "script_research": 12,
+      "script_draft": 3,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Candi Borobudur pernah rubuh!?",
+        "topic_key": "candi borobudur pernah rubuh",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "They Found a Buried Ship in AntarcticaNow It’s Coming Home",
+        "topic_key": "they found a buried ship in antarcticanow its coming home",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "The Ancient Secret of Miswak",
+        "topic_key": "the ancient secret of miswak",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Top 5 Prehistoric PredatorsNumber 1 Is INSANE!",
+        "topic_key": "top 5 prehistoric predatorsnumber 1 is insane",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Living Fossils Creatures That Survived Millions of Years!",
+        "topic_key": "living fossils creatures that survived millions of years",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "History of Diwali and firecrackers Real Truth",
+        "topic_key": "history of diwali and firecrackers real truth",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-11-09T06:17:31.278846+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-09T06:17:31.279001+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-09T06:19:40.462471+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-09T06:19:40.462604+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-09T06:19:57.488023+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-11-09T06:19:57.488134+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-09T06:20:03.351566+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-11-09T06:20:03.351680+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-09T06:21:04.680268+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-09T06:21:04.680404+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-09T06:21:07.135338+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-11-09T06:21:07.135455+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-09T06:21:07.135533+00:00",
+        "stage": "topic_selection",
+        "category": "topic_attempt_budget_exhausted",
+        "attempt": 6
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-11-09T06:10:02.742716+00:00",
+        "cooldown_until": "2026-11-09T23:19:50.317631+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-09T06:11:48.564556+00:00",
+        "retry_after_seconds": 12.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-09T06:12:25.385002+00:00",
+        "retry_after_seconds": 44.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-09T06:12:28.374052+00:00",
+        "retry_after_seconds": 38.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-09T06:14:03.525189+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-09T06:14:10.059516+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-09T06:17:31.278518+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-11-09T06:18:33.251895+00:00",
+        "cooldown_until": "2026-11-09T06:38:33.251344+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
+      "mistral:ministral-8b-latest",
       "mistral:mistral-small-latest"
     ]
   }
