@@ -1,250 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261103-040311-3638",
-    "workflow_run_id": "41575662544",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-03T04:03:11.513507+00:00",
-    "finished_at": "2026-11-03T04:13:14.308944+00:00",
-    "duration_seconds": 602.795,
-    "mode": "upload",
-    "target_count": 3,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 6,
-      "script_research": 12,
-      "script_draft": 4,
-      "script_review": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Borealopelta: The Discovery of an Exceptionally Preserved Dinosaur",
-        "topic_key": "borealopelta the discovery of an exceptionally preserved dinosaur",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "How Sleep Used to Be",
-        "topic_key": "how sleep used to be",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Orcas Eat Ice But Why?",
-        "topic_key": "orcas eat ice but why",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "World's Fastest Animal on Earth! Cheetah vs Peregrine Falcon",
-        "topic_key": "worlds fastest animal on earth cheetah vs peregrine falcon",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "The Dark Side of 1880s Mechanical Coin Banks",
-        "topic_key": "the dark side of 1880s mechanical coin banks",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Unsolved Mystery of the 1964 Missing School Bus (Part 1)",
-        "topic_key": "unsolved mystery of the 1964 missing school bus part 1",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-11-03T04:03:46.185736+00:00",
-        "stage": "script_research",
-        "category": "no_depictable_source_asset"
-      },
-      {
-        "at": "2026-11-03T04:03:46.185875+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-03T04:09:06.324511+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-11-03T04:09:06.324640+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-03T04:11:51.808935+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 2
-      },
-      {
-        "at": "2026-11-03T04:11:51.809102+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-03T04:13:08.094929+00:00",
-        "stage": "script_draft",
-        "category": "script_or_review_gate",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-11-03T04:13:08.095070+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-03T04:13:12.265783+00:00",
-        "stage": "script_research",
-        "category": "source_subject_mismatch"
-      },
-      {
-        "at": "2026-11-03T04:13:12.265896+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-03T04:13:14.304200+00:00",
-        "stage": "script_research",
-        "category": "source_subject_mismatch"
-      },
-      {
-        "at": "2026-11-03T04:13:14.304321+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-03T04:13:14.304410+00:00",
-        "stage": "topic_selection",
-        "category": "topic_attempt_budget_exhausted",
-        "attempt": 6
-      },
-      {
-        "at": "2026-11-03T04:13:14.304474+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      },
-      {
-        "at": "2026-11-03T04:13:14.304493+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-11-03T04:03:11.513809+00:00",
-        "cooldown_until": "2026-11-03T06:02:00.087763+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-03T04:03:27.911196+00:00",
-        "retry_after_seconds": 1.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-03T04:03:39.193542+00:00",
-        "retry_after_seconds": 30.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_request_too_large",
-        "at": "2026-11-03T04:03:46.292665+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-03T04:05:32.610844+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-03T04:05:39.062682+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-03T04:09:06.324166+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261103-063826-3846",
     "workflow_run_id": "41590986558",
     "workflow_run_attempt": "1",
@@ -4990,5 +4746,32 @@
       "groq:qwen/qwen3.8-27b",
       "mistral:mistral-small-latest"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "42879164021",
+    "workflow_run_id": "42879164021",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-10T18:50:13.147283+00:00",
+    "finished_at": "2026-11-10T18:50:13.147283+00:00",
+    "duration_seconds": 0,
+    "mode": "workflow_fallback",
+    "top_up": true,
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "superseded",
+    "stage": "preflight",
+    "stage_entries": {
+      "preflight": 1
+    },
+    "retry_budgets": {},
+    "topic_attempts": [],
+    "failures": [],
+    "retry_events": [],
+    "provider_events": [],
+    "preflight_skip_reason": "delayed_schedule_superseded"
   }
 ]
