@@ -1,7 +1,7 @@
 {
-  "updated": "2026-11-10T04:47:56.485465+00:00",
-  "videos_total": 44,
-  "videos_7d": 0,
+  "updated": "2026-11-10T07:11:48.290625+00:00",
+  "videos_total": 45,
+  "videos_7d": 1,
   "views_7d": 0,
   "learned_this_run": 0,
   "strategy": {
@@ -375,10 +375,10 @@
     "assignment": "Randomized, shuffled two-variant blocks within each production run; each topic remains unique and both variants preserve the same factual/originality and publish criteria.",
     "status": "collecting",
     "minimum_mature_retention_videos_per_variant": 10,
-    "assigned_videos": 1,
+    "assigned_videos": 2,
     "by_variant": {
       "consequence_first": {
-        "assigned_videos": 1,
+        "assigned_videos": 2,
         "matured_videos": 1,
         "turn_score_n": 1,
         "turn_score_coverage": 1.0,
@@ -393,15 +393,16 @@
         "retention_n": 1,
         "median_average_view_percentage": 68.69,
         "over_internal_average_view_target": 0,
-        "turn_start_n": 1,
-        "median_turn_start_runtime_pct": 16.8,
+        "turn_start_n": 2,
+        "median_turn_start_runtime_pct": 16.25,
         "turn_strength_vs_average_view_percentage": {
           "n_pairs": 1,
           "spearman_r": null,
           "note": "Descriptive association only; uses matured videos with valid turn scores, clean averageViewPercentage, and at least the configured minimum engagedViews. Not a causal claim or publication gate."
         },
         "category_counts": {
-          "science": 1
+          "science": 1,
+          "nature": 1
         },
         "definition": "Beat two leads with a source-backed consequence, cost, exception, or reversal."
       },
@@ -433,7 +434,7 @@
       }
     },
     "all_variants": {
-      "assigned_videos": 1,
+      "assigned_videos": 2,
       "matured_videos": 1,
       "turn_score_n": 1,
       "turn_score_coverage": 1.0,
@@ -448,15 +449,16 @@
       "retention_n": 1,
       "median_average_view_percentage": 68.69,
       "over_internal_average_view_target": 0,
-      "turn_start_n": 1,
-      "median_turn_start_runtime_pct": 16.8,
+      "turn_start_n": 2,
+      "median_turn_start_runtime_pct": 16.25,
       "turn_strength_vs_average_view_percentage": {
         "n_pairs": 1,
         "spearman_r": null,
         "note": "Descriptive association only; uses matured videos with valid turn scores, clean averageViewPercentage, and at least the configured minimum engagedViews. Not a causal claim or publication gate."
       },
       "category_counts": {
-        "science": 1
+        "science": 1,
+        "nature": 1
       }
     },
     "interpretation": "Small samples and different trending topics, lanes, and posting times can affect outcomes. Treat these summaries as exploratory; no treatment is auto-selected and no score or retention metric adds a publication veto."
@@ -655,12 +657,12 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 10280,
-    "per_1k_views": 2.63,
-    "videos": 35,
-    "denominator_basis": "engaged_views",
+    "views_90d": 26393,
+    "per_1k_views": 1.02,
+    "videos": 36,
+    "denominator_basis": "public_views_fallback",
     "videos_with_engaged_views": 35,
-    "complete_engaged_view_coverage": true,
+    "complete_engaged_view_coverage": false,
     "days_to_500": 1666.7,
     "days_to_1000": 3333.3
   },
@@ -680,20 +682,20 @@
     "note": "Partial if coverage is below 100%; only YouTube Analytics engagedViews count toward this proxy."
   },
   "originality": {
-    "episodes_examined": 15,
+    "episodes_examined": 16,
     "window": 25,
     "mean_pairwise_similarity": 0.0,
     "max_pairwise_similarity": 0.0,
     "pairs_over_similarity_limit": 0,
     "most_common_format": {
       "name": "creepy_true",
-      "share": 0.267
+      "share": 0.25
     },
     "most_common_category": {
       "name": "nature",
-      "share": 0.333
+      "share": 0.375
     },
-    "share_with_narrator_commentary": 0.933,
+    "share_with_narrator_commentary": 0.875,
     "flags": [],
     "verdict": "looks like a show"
   }
