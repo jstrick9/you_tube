@@ -1,8 +1,8 @@
 {
-  "updated": "2026-11-10T08:48:53.128357+00:00",
+  "updated": "2026-11-10T17:57:57.277668+00:00",
   "videos_total": 45,
   "videos_7d": 1,
-  "views_7d": 0,
+  "views_7d": 186,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -31,7 +31,7 @@
         },
         {
           "arm": "history",
-          "mean": 0.481,
+          "mean": 0.482,
           "n": 5
         },
         {
@@ -102,7 +102,7 @@
         },
         {
           "arm": "backstory",
-          "mean": 0.431,
+          "mean": 0.432,
           "n": 5
         }
       ]
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 35,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 35,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -657,7 +657,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 26393,
+    "views_90d": 26579,
     "per_1k_views": 1.02,
     "videos": 36,
     "denominator_basis": "public_views_fallback",
@@ -675,10 +675,10 @@
     "expanded_threshold_progress": 0.003427,
     "current_full_threshold_progress": 0.001028,
     "feb_2027_full_threshold_progress": 0.000514,
-    "public_videos": 35,
+    "public_videos": 36,
     "videos_with_metric": 35,
-    "coverage": 1.0,
-    "complete": true,
+    "coverage": 0.972,
+    "complete": false,
     "note": "Partial if coverage is below 100%; only YouTube Analytics engagedViews count toward this proxy."
   },
   "originality": {
