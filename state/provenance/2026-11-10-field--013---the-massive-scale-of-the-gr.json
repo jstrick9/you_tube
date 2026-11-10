@@ -1,0 +1,161 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-11-10T04:58:53.346359+00:00",
+  "video": {
+    "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
+    "video_id": "NtWEKWFOlNk",
+    "series": "field",
+    "episode": 13,
+    "duration": 17.318049886621314,
+    "file": "20261110-0447-01-green-anaconda.mp4",
+    "published_at": "2026-11-10T16:26:00+00:00"
+  },
+  "selection": {
+    "topic": "Hé lộ bí ẩn cuối cùng của bá chủ rừng AmazoN (Anaconda)",
+    "category": "nature",
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "source_families": [
+      "youtube"
+    ],
+    "trend_score": 0.9759,
+    "wikipedia_spike": null,
+    "angle": "The anaconda is one of the largest snakes in the world, found in the Amazon rainforest.",
+    "why_trending": "YouTube Short: 626,963 views in 24.5h (~25,628 views/hour), 11.9x channel subscribers",
+    "viral_score": 9.0,
+    "evidence": [
+      "viral Short now: 626,963 views in 24h, 12x its channel's subscribers"
+    ],
+    "signals": [
+      {
+        "source": "youtube_outliers",
+        "source_family": "youtube",
+        "topic": "Hé lộ bí ẩn cuối cùng của bá chủ rừng AmazoN (Anaconda)",
+        "score": 0.9759,
+        "source_url": "https://www.youtube.com/watch?v=cDZZDCrQb7g",
+        "captured_at": "2026-11-10T04:48:06+00:00",
+        "context": [
+          "viral Short now: 626,963 views in 24h, 12x its channel's subscribers"
+        ],
+        "evidence": {
+          "views": 626963,
+          "hours": 24.5,
+          "vph": 25628,
+          "breakout": 11.9,
+          "video_id": "cDZZDCrQb7g",
+          "video_url": "https://www.youtube.com/watch?v=cDZZDCrQb7g",
+          "published_at": "2026-11-09T04:20:13Z",
+          "channel_title": "Sinh Tồn Ký",
+          "search_query": "animal facts",
+          "duration_seconds": 171,
+          "subscriber_count": 52900,
+          "channel_id": "UCxm-apjjeYmmmjgJXLWk8bA",
+          "lane": "science_nature"
+        }
+      }
+    ],
+    "format": "plot_twist",
+    "hook_style": "bold_claim",
+    "turn_experiment_id": "early_turn_v1",
+    "turn_variant": "consequence_first"
+  },
+  "early_turn": {
+    "turn_segment_index": 2,
+    "turn_start_seconds": 2.724,
+    "turn_start_runtime_pct": 15.7,
+    "turn_factual_word_count": 9
+  },
+  "grounding": {
+    "primary": {
+      "title": "Green anaconda",
+      "url": "https://en.wikipedia.org/wiki/Green_anaconda"
+    },
+    "corroboration": [],
+    "claims": [
+      {
+        "says": "One snake can reach 20 feet in length.",
+        "evidence": ""
+      },
+      {
+        "says": "This green anaconda is actually the world's heaviest snake.",
+        "evidence": "The green anaconda is the world's heaviest and one of the world's longest snakes"
+      },
+      {
+        "says": "Its bulk makes it far heavier than larger pythons.",
+        "evidence": "Although it is slightly shorter than the reticulated python, it is far bulkier"
+      },
+      {
+        "says": "Flexible ligaments let it swallow prey larger than its head.",
+        "evidence": "This allows it to swallow prey larger than the size of its head"
+      },
+      {
+        "says": "One specimen even ate a 5 foot caiman.",
+        "evidence": "One female, reportedly measuring 7.9 m (25 ft 11 in) in length, shot in 1963, contained a 1.5-metre (4 ft 11 in) caiman"
+      }
+    ]
+  },
+  "script": {
+    "title": "The Massive Scale of the Green Anaconda",
+    "segments": [
+      "One snake can reach 20 feet in length.",
+      "This green anaconda is actually the world's heaviest snake.",
+      "Its bulk makes it far heavier than larger pythons.",
+      "Flexible ligaments let it swallow prey larger than its head.",
+      "One specimen even ate a 5 foot caiman."
+    ],
+    "asides": [],
+    "commentary_ratio": 0.0
+  },
+  "review": {
+    "score": 8,
+    "coherence": 9.0,
+    "trend_alignment": 9.0,
+    "trend_alignment_reason": "The script clearly delivers the selected angle of the anaconda being one of the largest snakes in the world, found in the Amazon rainforest, and provides interesting facts about its size and abilities.",
+    "turn_strength": 8.0,
+    "turn_strength_status": "scored",
+    "turn_strength_reason": "The second segment immediately escalates the hook by revealing the anaconda as the world's heaviest snake, providing a clear and surprising consequence.",
+    "reviewer": "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "independent": true,
+    "issues": []
+  },
+  "pipeline": {
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "tts_engine": "edge-tts",
+    "voice": "en-US-AndrewNeural",
+    "run_id": "20261110-0447"
+  },
+  "originality": {
+    "sketch": [
+      "1520ab4516e03c58",
+      "1eed0cef3becfbbe",
+      "23f39d34e170a10d",
+      "2623f946e0909802",
+      "2f6d10a9ae6f66c2",
+      "31993fcba648a064",
+      "3e742255822d7520",
+      "42ac002d2594cba2",
+      "4ad5b5b7ac68f5d3",
+      "4ae5592a799d29c4",
+      "510f439c90b7b928",
+      "5b2ee14fd4c37299",
+      "638711ebed7ed6ce",
+      "6e2b847f1624a99f",
+      "73f56853f2cc5fc4",
+      "7e6a181436b7605c",
+      "8ee47e468a350476",
+      "91761bcdb27ee58f",
+      "95f1424e11d284cf",
+      "abd17e78a618c5b6",
+      "aceb9068118d5ed5",
+      "c0a3f1179d22a436",
+      "cef3523ed9571ea3",
+      "d17766304686246b",
+      "d54d6269bec71a1d",
+      "d6011b5cabe26e8c",
+      "f07a681b16ee71f7",
+      "f525d602d1a4dcc3"
+    ],
+    "max_similarity_to_prior": 0.0
+  }
+}

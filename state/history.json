@@ -30,12 +30,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1108.9,
+      "hours_live": 1116.8,
       "vph": 0.009,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -79,9 +79,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1103.4,
-      "vph": 0.542,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1111.3,
+      "vph": 0.538,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.4939,
       "watch_ratio_at_15pct": 1.0277,
@@ -101,7 +101,7 @@
       "first_below_half_watch_ratio_at": 0.99,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -156,9 +156,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1100.4,
-      "vph": 0.55,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1108.3,
+      "vph": 0.546,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.0814,
       "watch_ratio_at_15pct": 0.9136,
@@ -178,7 +178,7 @@
       "first_below_half_watch_ratio_at": 0.29,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -233,9 +233,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1084.9,
-      "vph": 0.431,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1092.8,
+      "vph": 0.428,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.2146,
       "watch_ratio_at_15pct": 1.118,
@@ -255,7 +255,7 @@
       "first_below_half_watch_ratio_at": 0.34,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -310,9 +310,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1079.4,
-      "vph": 0.329,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1087.3,
+      "vph": 0.326,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.291,
       "watch_ratio_at_15pct": 1.1271,
@@ -332,7 +332,7 @@
       "first_below_half_watch_ratio_at": 0.5,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -387,9 +387,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1076.4,
-      "vph": 0.462,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1084.3,
+      "vph": 0.458,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.0827,
       "watch_ratio_at_15pct": 0.6593,
@@ -409,7 +409,7 @@
       "first_below_half_watch_ratio_at": 0.19,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -464,9 +464,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1060.9,
-      "vph": 0.359,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1068.8,
+      "vph": 0.356,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.0971,
       "watch_ratio_at_15pct": 0.9554,
@@ -486,7 +486,7 @@
       "first_below_half_watch_ratio_at": 0.34,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -541,9 +541,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1055.4,
-      "vph": 0.518,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1063.3,
+      "vph": 0.514,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.3297,
       "watch_ratio_at_15pct": 1.0037,
@@ -563,7 +563,7 @@
       "first_below_half_watch_ratio_at": 0.45,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -618,9 +618,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1052.4,
-      "vph": 0.236,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1060.3,
+      "vph": 0.234,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.2379,
       "watch_ratio_at_15pct": 0.9637,
@@ -640,7 +640,7 @@
       "first_below_half_watch_ratio_at": 0.53,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -695,9 +695,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1036.9,
-      "vph": 0.304,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1044.8,
+      "vph": 0.301,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1186,
       "watch_ratio_at_15pct": 1.0032,
@@ -717,7 +717,7 @@
       "first_below_half_watch_ratio_at": 0.39,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -772,9 +772,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1031.4,
-      "vph": 0.521,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1039.3,
+      "vph": 0.517,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1556,
       "watch_ratio_at_15pct": 0.9013,
@@ -794,7 +794,7 @@
       "first_below_half_watch_ratio_at": 0.38,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -849,9 +849,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1028.4,
-      "vph": 0.264,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1036.3,
+      "vph": 0.262,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1623,
       "watch_ratio_at_15pct": 0.9434,
@@ -871,7 +871,7 @@
       "first_below_half_watch_ratio_at": 0.33,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -926,9 +926,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 1012.9,
-      "vph": 0.534,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 1020.8,
+      "vph": 0.53,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1571,
       "watch_ratio_at_15pct": 0.817,
@@ -948,7 +948,7 @@
       "first_below_half_watch_ratio_at": 0.25,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -1081,9 +1081,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 988.9,
-      "vph": 0.061,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 996.8,
+      "vph": 0.06,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.0702,
       "watch_ratio_at_15pct": 0.6491,
@@ -1103,7 +1103,7 @@
       "first_below_half_watch_ratio_at": 0.19,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -1258,12 +1258,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 959.4,
+      "hours_live": 967.3,
       "vph": 0.005,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -1313,12 +1313,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 956.4,
+      "hours_live": 964.3,
       "vph": 0.003,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -1368,12 +1368,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 940.9,
+      "hours_live": 948.8,
       "vph": 0.001,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -1424,13 +1424,13 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 935.4,
-      "vph": 0.462,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 943.3,
+      "vph": 0.458,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "first_below_half_watch_ratio_at": 0.41,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -1514,9 +1514,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 932.4,
-      "vph": 0.686,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 940.3,
+      "vph": 0.681,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.4121,
       "watch_ratio_at_15pct": 1.0065,
@@ -1536,7 +1536,7 @@
       "first_below_half_watch_ratio_at": 0.6,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -1598,9 +1598,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 916.9,
-      "vph": 0.099,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 924.8,
+      "vph": 0.098,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.2584,
       "watch_ratio_at_15pct": 1.1011,
@@ -1620,7 +1620,7 @@
       "first_below_half_watch_ratio_at": 0.5,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -1681,9 +1681,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 911.4,
-      "vph": 0.144,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 919.3,
+      "vph": 0.142,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.4188,
       "watch_ratio_at_15pct": 1.0427,
@@ -1703,7 +1703,7 @@
       "first_below_half_watch_ratio_at": 0.78,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -1795,9 +1795,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 892.9,
-      "vph": 0.484,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 900.8,
+      "vph": 0.48,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.2353,
       "watch_ratio_at_15pct": 1.0381,
@@ -1817,7 +1817,7 @@
       "first_below_half_watch_ratio_at": 0.45,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -1881,9 +1881,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 908.4,
-      "vph": 0.775,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 916.3,
+      "vph": 0.768,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.6677,
       "watch_ratio_at_15pct": 1.406,
@@ -1903,7 +1903,7 @@
       "first_below_half_watch_ratio_at": null,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -2151,9 +2151,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 839.5,
-      "vph": 0.244,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 847.5,
+      "vph": 0.242,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.3299,
       "watch_ratio_at_15pct": 1.2132,
@@ -2173,7 +2173,7 @@
       "first_below_half_watch_ratio_at": 0.68,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -2274,9 +2274,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 835.8,
-      "vph": 0.274,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 843.7,
+      "vph": 0.271,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.4677,
       "watch_ratio_at_15pct": 1.2339,
@@ -2296,7 +2296,7 @@
       "first_below_half_watch_ratio_at": 0.78,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -2406,9 +2406,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 814.8,
-      "vph": 0.447,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 822.7,
+      "vph": 0.442,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1853,
       "watch_ratio_at_15pct": 1.0799,
@@ -2428,7 +2428,7 @@
       "first_below_half_watch_ratio_at": 0.48,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -2527,9 +2527,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 812.2,
-      "vph": 0.813,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 820.1,
+      "vph": 0.805,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 1.177,
       "watch_ratio_at_15pct": 1.8053,
@@ -2549,7 +2549,7 @@
       "first_below_half_watch_ratio_at": null,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -2654,9 +2654,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 796.8,
-      "vph": 0.151,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 804.7,
+      "vph": 0.149,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.1842,
       "watch_ratio_at_15pct": 1.0965,
@@ -2676,7 +2676,7 @@
       "first_below_half_watch_ratio_at": 0.43,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -2783,9 +2783,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 791.2,
-      "vph": 0.11,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 799.1,
+      "vph": 0.109,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.6986,
       "watch_ratio_at_15pct": 1.5616,
@@ -2805,7 +2805,7 @@
       "first_below_half_watch_ratio_at": null,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -2903,9 +2903,9 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 789.0,
-      "vph": 0.303,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 796.9,
+      "vph": 0.3,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "curve_points": 100,
       "end_watch_ratio": 0.4183,
       "watch_ratio_at_15pct": 1.1961,
@@ -2925,7 +2925,7 @@
       "first_below_half_watch_ratio_at": 0.77,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -3028,12 +3028,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 768.0,
-      "vph": 0.163,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 775.9,
+      "vph": 0.161,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "watch_ratio_at_15pct": 4.2556,
@@ -3148,12 +3148,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 765.0,
-      "vph": 0.222,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 772.9,
+      "vph": 0.22,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -3260,12 +3260,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 748.2,
-      "vph": 0.035,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 756.1,
+      "vph": 0.034,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -3426,12 +3426,12 @@
       "privacy": "public",
       "upload_status": "processed",
       "rejection": null,
-      "hours_live": 720.0,
-      "vph": 0.05,
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "hours_live": 727.9,
+      "vph": 0.049,
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
       "vph_basis": "engaged_views",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
@@ -3579,12 +3579,12 @@
       "rejection": null,
       "engaged_views_window": {
         "start": "2026-09-24",
-        "end": "2026-11-09"
+        "end": "2026-11-10"
       },
-      "hours_live": 479.5,
-      "vph": 0.307,
+      "hours_live": 487.4,
+      "vph": 0.302,
       "vph_basis": "engaged_views",
-      "checked_at": "2026-11-09T20:52:01.307610+00:00",
+      "checked_at": "2026-11-10T04:47:56.485465+00:00",
       "retention_curve_last_attempt_at": "2026-11-09T20:52:01.307610+00:00",
       "a_views": 724,
       "engaged_views_90d": 147,
@@ -3605,5 +3605,130 @@
       "mode": "absolute"
     },
     "reward_version": 2
+  },
+  {
+    "created_at": "2026-11-10T04:58:50.669901+00:00",
+    "run_id": "20261110-0447",
+    "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
+    "topic": "Hé lộ bí ẩn cuối cùng của bá chủ rừng AmazoN (Anaconda)",
+    "topic_key": "h l b n cui cng ca b ch rng amazon anaconda",
+    "wiki_title": "Green anaconda",
+    "choice": {
+      "category": "nature",
+      "format": "plot_twist",
+      "hook_style": "bold_claim",
+      "voice": "en-US-AndrewNeural",
+      "comment_device": "challenge",
+      "turn_experiment_id": "early_turn_v1",
+      "turn_variant": "consequence_first",
+      "source": "youtube_outliers"
+    },
+    "trend_sources": [
+      "youtube_outliers"
+    ],
+    "trend_source_families": [
+      "youtube"
+    ],
+    "trend_score": 0.9759,
+    "trend_angle": "The anaconda is one of the largest snakes in the world, found in the Amazon rainforest.",
+    "wikipedia_spike": null,
+    "why_trending": "YouTube Short: 626,963 views in 24.5h (~25,628 views/hour), 11.9x channel subscribers",
+    "viral_score": 9.0,
+    "trend_evidence": [
+      "viral Short now: 626,963 views in 24h, 12x its channel's subscribers"
+    ],
+    "trend_signals": [
+      {
+        "source": "youtube_outliers",
+        "source_family": "youtube",
+        "topic": "Hé lộ bí ẩn cuối cùng của bá chủ rừng AmazoN (Anaconda)",
+        "score": 0.9759,
+        "source_url": "https://www.youtube.com/watch?v=cDZZDCrQb7g",
+        "captured_at": "2026-11-10T04:48:06+00:00",
+        "context": [
+          "viral Short now: 626,963 views in 24h, 12x its channel's subscribers"
+        ],
+        "evidence": {
+          "views": 626963,
+          "hours": 24.5,
+          "vph": 25628,
+          "breakout": 11.9,
+          "video_id": "cDZZDCrQb7g",
+          "video_url": "https://www.youtube.com/watch?v=cDZZDCrQb7g",
+          "published_at": "2026-11-09T04:20:13Z",
+          "channel_title": "Sinh Tồn Ký",
+          "search_query": "animal facts",
+          "duration_seconds": 171,
+          "subscriber_count": 52900,
+          "channel_id": "UCxm-apjjeYmmmjgJXLWk8bA",
+          "lane": "science_nature"
+        }
+      }
+    ],
+    "review_score": 8,
+    "naturalness_score": 9,
+    "turn_strength": 8.0,
+    "turn_strength_status": "scored",
+    "turn_strength_reason": "The second segment immediately escalates the hook by revealing the anaconda as the world's heaviest snake, providing a clear and surprising consequence.",
+    "early_turn": {
+      "turn_segment_index": 2,
+      "turn_start_seconds": 2.724,
+      "turn_start_runtime_pct": 15.7,
+      "turn_factual_word_count": 9
+    },
+    "trend_alignment": 9.0,
+    "trend_alignment_reason": "The script clearly delivers the selected angle of the anaconda being one of the largest snakes in the world, found in the Amazon rainforest, and provides interesting facts about its size and abilities.",
+    "reviewer": "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "review_independent": true,
+    "series": "field",
+    "episode": 13,
+    "sketch": [
+      "1520ab4516e03c58",
+      "1eed0cef3becfbbe",
+      "23f39d34e170a10d",
+      "2623f946e0909802",
+      "2f6d10a9ae6f66c2",
+      "31993fcba648a064",
+      "3e742255822d7520",
+      "42ac002d2594cba2",
+      "4ad5b5b7ac68f5d3",
+      "4ae5592a799d29c4",
+      "510f439c90b7b928",
+      "5b2ee14fd4c37299",
+      "638711ebed7ed6ce",
+      "6e2b847f1624a99f",
+      "73f56853f2cc5fc4",
+      "7e6a181436b7605c",
+      "8ee47e468a350476",
+      "91761bcdb27ee58f",
+      "95f1424e11d284cf",
+      "abd17e78a618c5b6",
+      "aceb9068118d5ed5",
+      "c0a3f1179d22a436",
+      "cef3523ed9571ea3",
+      "d17766304686246b",
+      "d54d6269bec71a1d",
+      "d6011b5cabe26e8c",
+      "f07a681b16ee71f7",
+      "f525d602d1a4dcc3"
+    ],
+    "max_similarity": 0.0,
+    "commentary_ratio": 0.0,
+    "duration": 17.318049886621314,
+    "words": 44,
+    "archetype": "condensed",
+    "tts_engine": "edge-tts",
+    "file": "20261110-0447-01-green-anaconda.mp4",
+    "publish_at": "2026-11-10T16:26:00+00:00",
+    "llm": "gemini:gemini-flash-lite-latest:vision",
+    "video_id": "NtWEKWFOlNk",
+    "youtube_status": {
+      "video_id": "NtWEKWFOlNk",
+      "privacy_status": "private",
+      "upload_status": "uploaded",
+      "publish_at": "2026-11-10T16:26:00Z"
+    },
+    "status": "scheduled",
+    "provenance": "/home/runner/work/you_tube/you_tube/state/provenance/2026-11-10-field--013---the-massive-scale-of-the-gr.json"
   }
 ]
