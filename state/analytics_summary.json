@@ -1,8 +1,8 @@
 {
-  "updated": "2026-11-11T00:16:24.569650+00:00",
+  "updated": "2026-11-11T08:22:05.361880+00:00",
   "videos_total": 45,
   "videos_7d": 1,
-  "views_7d": 1144,
+  "views_7d": 1196,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -296,6 +296,12 @@
       "avg_view_pct": 54.559999999999995
     },
     {
+      "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
+      "id": "NtWEKWFOlNk",
+      "views": 1196,
+      "avg_view_pct": null
+    },
+    {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
       "views": 1187,
@@ -306,12 +312,6 @@
       "id": "4WkKoRw9r00",
       "views": 1184,
       "avg_view_pct": 50.34
-    },
-    {
-      "title": "The Florence Cathedral Dome Built Without Knowing How #shorts",
-      "id": "M1QR18R35Bc",
-      "views": 1161,
-      "avg_view_pct": 59.43000000000001
     }
   ],
   "rejected": [],
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 35,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 35,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -503,7 +503,7 @@
         "hook_style": "bold_claim",
         "duration_seconds": 45.6,
         "avg_view_pct": 30.05,
-        "views": 1128,
+        "views": 1129,
         "engaged_views_90d": 497,
         "sample_size": 497,
         "sample_basis": "engaged_views_90d",
@@ -657,7 +657,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 27539,
+    "views_90d": 27592,
     "per_1k_views": 0.98,
     "videos": 36,
     "denominator_basis": "public_views_fallback",
