@@ -1,8 +1,8 @@
 {
-  "updated": "2026-11-11T08:22:05.361880+00:00",
+  "updated": "2026-11-11T17:58:01.986988+00:00",
   "videos_total": 45,
   "videos_7d": 1,
-  "views_7d": 1196,
+  "views_7d": 1242,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -36,12 +36,12 @@
         },
         {
           "arm": "science",
-          "mean": 0.46,
+          "mean": 0.461,
           "n": 7
         },
         {
           "arm": "geography",
-          "mean": 0.429,
+          "mean": 0.43,
           "n": 2
         },
         {
@@ -62,7 +62,7 @@
         },
         {
           "arm": "guess_reveal",
-          "mean": 0.533,
+          "mean": 0.532,
           "n": 1
         },
         {
@@ -97,7 +97,7 @@
         },
         {
           "arm": "myth_buster",
-          "mean": 0.461,
+          "mean": 0.462,
           "n": 2
         },
         {
@@ -284,6 +284,12 @@
       "avg_view_pct": 79.29
     },
     {
+      "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
+      "id": "NtWEKWFOlNk",
+      "views": 1242,
+      "avg_view_pct": null
+    },
+    {
       "title": "The Long Development of Ant-Man #shorts",
       "id": "tFm3Zuu2kGA",
       "views": 1204,
@@ -294,12 +300,6 @@
       "id": "1ed_FohPwqs",
       "views": 1204,
       "avg_view_pct": 54.559999999999995
-    },
-    {
-      "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
-      "id": "NtWEKWFOlNk",
-      "views": 1196,
-      "avg_view_pct": null
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 35,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 35,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -657,7 +657,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 27592,
+    "views_90d": 27640,
     "per_1k_views": 0.98,
     "videos": 36,
     "denominator_basis": "public_views_fallback",
