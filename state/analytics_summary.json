@@ -1,8 +1,8 @@
 {
-  "updated": "2026-11-12T01:41:57.312072+00:00",
+  "updated": "2026-11-12T08:49:03.851990+00:00",
   "videos_total": 45,
   "videos_7d": 1,
-  "views_7d": 1258,
+  "views_7d": 1264,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -16,7 +16,7 @@
         },
         {
           "arm": "space",
-          "mean": 0.526,
+          "mean": 0.525,
           "n": 1
         },
         {
@@ -57,7 +57,7 @@
       "arms": [
         {
           "arm": "scale_shock",
-          "mean": 0.544,
+          "mean": 0.543,
           "n": 3
         },
         {
@@ -72,7 +72,7 @@
         },
         {
           "arm": "would_you_survive",
-          "mean": 0.526,
+          "mean": 0.525,
           "n": 1
         },
         {
@@ -221,7 +221,7 @@
       "arms": [
         {
           "arm": "poll",
-          "mean": 0.517,
+          "mean": 0.516,
           "n": 4
         },
         {
@@ -278,16 +278,16 @@
       "avg_view_pct": 51.93
     },
     {
-      "title": "When the Catholic Church Banned Heliocentrism #shorts",
-      "id": "vBTIN-iRO9k",
-      "views": 1262,
-      "avg_view_pct": 79.29
-    },
-    {
       "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
       "id": "NtWEKWFOlNk",
-      "views": 1258,
+      "views": 1264,
       "avg_view_pct": null
+    },
+    {
+      "title": "When the Catholic Church Banned Heliocentrism #shorts",
+      "id": "vBTIN-iRO9k",
+      "views": 1263,
+      "avg_view_pct": 79.29
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 35,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 35,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -657,7 +657,7 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 27658,
+    "views_90d": 27665,
     "per_1k_views": 0.98,
     "videos": 36,
     "denominator_basis": "public_views_fallback",
