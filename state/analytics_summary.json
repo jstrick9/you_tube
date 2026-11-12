@@ -1,19 +1,14 @@
 {
-  "updated": "2026-11-12T08:49:03.851990+00:00",
+  "updated": "2026-11-12T18:25:26.727937+00:00",
   "videos_total": 45,
   "videos_7d": 1,
-  "views_7d": 1264,
-  "learned_this_run": 0,
+  "views_7d": 1291,
+  "learned_this_run": 1,
   "strategy": {
     "category": {
       "status": "learning",
-      "observations": 27,
+      "observations": 28,
       "arms": [
-        {
-          "arm": "nature",
-          "mean": 0.556,
-          "n": 6
-        },
         {
           "arm": "space",
           "mean": 0.525,
@@ -28,6 +23,11 @@
           "arm": "animals",
           "mean": 0.49,
           "n": 2
+        },
+        {
+          "arm": "nature",
+          "mean": 0.485,
+          "n": 7
         },
         {
           "arm": "history",
@@ -46,14 +46,14 @@
         },
         {
           "arm": "culture",
-          "mean": 0.414,
+          "mean": 0.415,
           "n": 3
         }
       ]
     },
     "format": {
       "status": "learning",
-      "observations": 18,
+      "observations": 19,
       "arms": [
         {
           "arm": "scale_shock",
@@ -86,13 +86,8 @@
           "n": 0
         },
         {
-          "arm": "plot_twist",
-          "mean": 0.49,
-          "n": 1
-        },
-        {
           "arm": "ranked_escalation",
-          "mean": 0.476,
+          "mean": 0.477,
           "n": 1
         },
         {
@@ -104,6 +99,11 @@
           "arm": "backstory",
           "mean": 0.432,
           "n": 5
+        },
+        {
+          "arm": "plot_twist",
+          "mean": 0.378,
+          "n": 2
         }
       ]
     },
@@ -217,7 +217,7 @@
     },
     "comment_device": {
       "status": "learning",
-      "observations": 10,
+      "observations": 11,
       "arms": [
         {
           "arm": "poll",
@@ -240,14 +240,14 @@
           "n": 0
         },
         {
-          "arm": "challenge",
-          "mean": 0.492,
-          "n": 1
-        },
-        {
           "arm": "hot_take",
           "mean": 0.483,
           "n": 1
+        },
+        {
+          "arm": "challenge",
+          "mean": 0.379,
+          "n": 2
         }
       ]
     }
@@ -272,16 +272,16 @@
       "avg_view_pct": 63.49
     },
     {
+      "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
+      "id": "NtWEKWFOlNk",
+      "views": 1291,
+      "avg_view_pct": null
+    },
+    {
       "title": "Surprising Facts About the Octopus #shorts",
       "id": "jnlRW0Ca1o8",
       "views": 1283,
       "avg_view_pct": 51.93
-    },
-    {
-      "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
-      "id": "NtWEKWFOlNk",
-      "views": 1264,
-      "avg_view_pct": null
     },
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
@@ -340,16 +340,16 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 35,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 35,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
     "status": "not_available_yet",
     "videos_with_segment_data": 0,
-    "matured_videos_eligible": 35,
+    "matured_videos_eligible": 36,
     "video_coverage": 0.0,
     "segment_metric_rows_reported": 0,
     "segment_rows_in_curve": 0,
@@ -379,17 +379,17 @@
     "by_variant": {
       "consequence_first": {
         "assigned_videos": 2,
-        "matured_videos": 1,
-        "turn_score_n": 1,
+        "matured_videos": 2,
+        "turn_score_n": 2,
         "turn_score_coverage": 1.0,
-        "turn_reason_n": 1,
+        "turn_reason_n": 2,
         "turn_reason_coverage": 1.0,
         "turn_telemetry_status_counts": {
-          "scored": 1,
+          "scored": 2,
           "missing": 0,
           "malformed": 0
         },
-        "median_turn_strength": 10.0,
+        "median_turn_strength": 9.0,
         "retention_n": 1,
         "median_average_view_percentage": 68.69,
         "over_internal_average_view_target": 0,
@@ -435,17 +435,17 @@
     },
     "all_variants": {
       "assigned_videos": 2,
-      "matured_videos": 1,
-      "turn_score_n": 1,
+      "matured_videos": 2,
+      "turn_score_n": 2,
       "turn_score_coverage": 1.0,
-      "turn_reason_n": 1,
+      "turn_reason_n": 2,
       "turn_reason_coverage": 1.0,
       "turn_telemetry_status_counts": {
-        "scored": 1,
+        "scored": 2,
         "missing": 0,
         "malformed": 0
       },
-      "median_turn_strength": 10.0,
+      "median_turn_strength": 9.0,
       "retention_n": 1,
       "median_average_view_percentage": 68.69,
       "over_internal_average_view_target": 0,
@@ -657,8 +657,8 @@
   },
   "subscribers": {
     "net_90d": 27,
-    "views_90d": 27665,
-    "per_1k_views": 0.98,
+    "views_90d": 27694,
+    "per_1k_views": 0.97,
     "videos": 36,
     "denominator_basis": "public_views_fallback",
     "videos_with_engaged_views": 35,
