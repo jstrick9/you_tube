@@ -1,9 +1,9 @@
 {
-  "updated": "2026-11-12T18:25:26.727937+00:00",
+  "updated": "2026-11-13T00:42:59.356583+00:00",
   "videos_total": 45,
   "videos_7d": 1,
-  "views_7d": 1291,
-  "learned_this_run": 1,
+  "views_7d": 1300,
+  "learned_this_run": 0,
   "strategy": {
     "category": {
       "status": "learning",
@@ -67,7 +67,7 @@
         },
         {
           "arm": "dumbest_decision",
-          "mean": 0.53,
+          "mean": 0.529,
           "n": 1
         },
         {
@@ -97,7 +97,7 @@
         },
         {
           "arm": "backstory",
-          "mean": 0.432,
+          "mean": 0.433,
           "n": 5
         },
         {
@@ -246,7 +246,7 @@
         },
         {
           "arm": "challenge",
-          "mean": 0.379,
+          "mean": 0.38,
           "n": 2
         }
       ]
@@ -274,8 +274,8 @@
     {
       "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
       "id": "NtWEKWFOlNk",
-      "views": 1291,
-      "avg_view_pct": null
+      "views": 1300,
+      "avg_view_pct": 75.33
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -287,7 +287,7 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1263,
-      "avg_view_pct": 79.29
+      "avg_view_pct": 79.17
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -318,7 +318,7 @@
   "retention": {
     "videos": 27,
     "where": "hook",
-    "verdict": "Largest relative watch-ratio drop: 20% of the opening level between 10% and 20% of runtime (opening). This is a ratio-curve change, not a percentage of viewers. Median average view percentage is 59% against the internal 70% target.",
+    "verdict": "Largest relative watch-ratio drop: 20% of the opening level between 10% and 20% of runtime (opening). This is a ratio-curve change, not a percentage of viewers. Median average view percentage is 60% against the internal 70% target.",
     "avg_curve": [
       1.4094,
       1.313,
@@ -332,7 +332,7 @@
       0.488,
       0.4303
     ],
-    "median_avg_view_pct": 59.43,
+    "median_avg_view_pct": 59.59,
     "worst_drop": {
       "size_of_opening_ratio": 0.2016,
       "from_pct": 10,
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 35,
+    "attempted_videos": 1,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 35,
+    "reports_without_usable_rows": 1,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -390,13 +390,13 @@
           "malformed": 0
         },
         "median_turn_strength": 9.0,
-        "retention_n": 1,
-        "median_average_view_percentage": 68.69,
-        "over_internal_average_view_target": 0,
+        "retention_n": 2,
+        "median_average_view_percentage": 72.01,
+        "over_internal_average_view_target": 1,
         "turn_start_n": 2,
         "median_turn_start_runtime_pct": 16.25,
         "turn_strength_vs_average_view_percentage": {
-          "n_pairs": 1,
+          "n_pairs": 2,
           "spearman_r": null,
           "note": "Descriptive association only; uses matured videos with valid turn scores, clean averageViewPercentage, and at least the configured minimum engagedViews. Not a causal claim or publication gate."
         },
@@ -446,13 +446,13 @@
         "malformed": 0
       },
       "median_turn_strength": 9.0,
-      "retention_n": 1,
-      "median_average_view_percentage": 68.69,
-      "over_internal_average_view_target": 0,
+      "retention_n": 2,
+      "median_average_view_percentage": 72.01,
+      "over_internal_average_view_target": 1,
       "turn_start_n": 2,
       "median_turn_start_runtime_pct": 16.25,
       "turn_strength_vs_average_view_percentage": {
-        "n_pairs": 1,
+        "n_pairs": 2,
         "spearman_r": null,
         "note": "Descriptive association only; uses matured videos with valid turn scores, clean averageViewPercentage, and at least the configured minimum engagedViews. Not a causal claim or publication gate."
       },
@@ -464,30 +464,30 @@
     "interpretation": "Small samples and different trending topics, lanes, and posting times can affect outcomes. Treat these summaries as exploratory; no treatment is auto-selected and no score or retention metric adds a publication veto."
   },
   "average_view_target": {
-    "n": 34,
+    "n": 35,
     "gate_pct": 70.0,
     "metric": "average_view_percentage",
-    "passing": 11,
-    "pass_rate": 0.324,
-    "median_avg_view_pct": 59.59,
+    "passing": 12,
+    "pass_rate": 0.343,
+    "median_avg_view_pct": 59.75,
     "learning_qualified": {
       "minimum_sample_views": 50,
       "sample_basis": "engaged_views_90d; public views are used only when engaged views are unavailable",
-      "n": 29,
-      "passing": 8,
-      "pass_rate": 0.276,
-      "median_avg_view_pct": 59.43
+      "n": 30,
+      "passing": 9,
+      "pass_rate": 0.3,
+      "median_avg_view_pct": 59.59
     },
     "provisional_n": 5,
     "provisional_below_target": 2,
-    "verdict": "11/34 measured videos clear the internal 70% average-view target (median 60%). This is average watch percentage, not the share of viewers who reached the end. 29/34 meet the configured ≥50-view learning sample; 5 low- or unknown-sample reading(s) are provisional."
+    "verdict": "12/35 measured videos clear the internal 70% average-view target (median 60%). This is average watch percentage, not the share of viewers who reached the end. 30/35 meet the configured ≥50-view learning sample; 5 low- or unknown-sample reading(s) are provisional."
   },
   "average_view_watchlist": {
     "gate_pct": 70.0,
     "minimum_sample_views": 50,
-    "evaluated": 34,
+    "evaluated": 35,
     "below_target": 23,
-    "qualified_evaluated": 29,
+    "qualified_evaluated": 30,
     "qualified_below_target": 21,
     "provisional_evaluated": 5,
     "provisional_below_target": 2,
@@ -656,29 +656,29 @@
     ]
   },
   "subscribers": {
-    "net_90d": 27,
-    "views_90d": 27694,
-    "per_1k_views": 0.97,
+    "net_90d": 28,
+    "views_90d": 10787,
+    "per_1k_views": 2.6,
     "videos": 36,
-    "denominator_basis": "public_views_fallback",
-    "videos_with_engaged_views": 35,
-    "complete_engaged_view_coverage": false,
-    "days_to_500": 1666.7,
-    "days_to_1000": 3333.3
+    "denominator_basis": "engaged_views",
+    "videos_with_engaged_views": 36,
+    "complete_engaged_view_coverage": true,
+    "days_to_500": 1607.1,
+    "days_to_1000": 3214.3
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10280,
+    "engaged_views_90d": 10787,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003427,
-    "current_full_threshold_progress": 0.001028,
-    "feb_2027_full_threshold_progress": 0.000514,
+    "expanded_threshold_progress": 0.003596,
+    "current_full_threshold_progress": 0.001079,
+    "feb_2027_full_threshold_progress": 0.000539,
     "public_videos": 36,
-    "videos_with_metric": 35,
-    "coverage": 0.972,
-    "complete": false,
+    "videos_with_metric": 36,
+    "coverage": 1.0,
+    "complete": true,
     "note": "Partial if coverage is below 100%; only YouTube Analytics engagedViews count toward this proxy."
   },
   "originality": {
