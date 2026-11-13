@@ -1,18 +1,24 @@
 {
   "schema_version": 1,
   "providers": {
-    "pollinations": {
-      "reason": "billing_or_entitlement",
-      "status_code": 402,
-      "recorded_at": "2026-11-12T01:47:50.564102+00:00",
-      "blocked_until": "2026-11-13T01:47:50.564102+00:00",
-      "retry_after_seconds": 23.0
+    "gemini": {
+      "reason": "repeated_http_5xx",
+      "status_code": 503,
+      "recorded_at": "2026-11-13T17:52:59.075289+00:00",
+      "blocked_until": "2026-11-13T18:02:59.075289+00:00"
     },
     "mistral": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-11-13T00:46:07.234170+00:00",
-      "blocked_until": "2026-11-13T01:06:07.234170+00:00"
+      "recorded_at": "2026-11-13T17:53:49.103692+00:00",
+      "blocked_until": "2026-11-13T18:13:49.103692+00:00"
+    },
+    "pollinations": {
+      "reason": "billing_or_entitlement",
+      "status_code": 402,
+      "recorded_at": "2026-11-13T17:57:35.749616+00:00",
+      "blocked_until": "2026-11-14T17:57:35.749616+00:00",
+      "retry_after_seconds": 23.0
     }
   },
   "failures_5xx": {}
