@@ -1,8 +1,8 @@
 {
-  "updated": "2026-11-14T07:59:26.803954+00:00",
+  "updated": "2026-11-14T16:39:25.379275+00:00",
   "videos_total": 45,
   "videos_7d": 1,
-  "views_7d": 1334,
+  "views_7d": 1335,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -41,7 +41,7 @@
         },
         {
           "arm": "geography",
-          "mean": 0.431,
+          "mean": 0.432,
           "n": 2
         },
         {
@@ -62,7 +62,7 @@
         },
         {
           "arm": "guess_reveal",
-          "mean": 0.532,
+          "mean": 0.531,
           "n": 1
         },
         {
@@ -92,7 +92,7 @@
         },
         {
           "arm": "myth_buster",
-          "mean": 0.462,
+          "mean": 0.463,
           "n": 2
         },
         {
@@ -274,7 +274,7 @@
     {
       "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
       "id": "NtWEKWFOlNk",
-      "views": 1334,
+      "views": 1335,
       "avg_view_pct": 75.01
     },
     {
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 1,
+    "attempted_videos": 35,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 1,
+    "reports_without_usable_rows": 35,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
