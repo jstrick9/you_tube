@@ -1,18 +1,12 @@
 {
   "schema_version": 1,
   "providers": {
-    "pollinations": {
-      "reason": "billing_or_entitlement",
-      "status_code": 402,
-      "recorded_at": "2026-11-13T17:57:35.749616+00:00",
-      "blocked_until": "2026-11-14T17:57:35.749616+00:00",
-      "retry_after_seconds": 23.0
+    "mistral": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-11-14T23:29:42.528874+00:00",
+      "blocked_until": "2026-11-14T23:49:42.528874+00:00"
     }
   },
-  "failures_5xx": {
-    "gemini": {
-      "count": 2,
-      "last_at": "2026-11-14T16:42:18.234935+00:00"
-    }
-  }
+  "failures_5xx": {}
 }
