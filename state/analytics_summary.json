@@ -1,8 +1,8 @@
 {
-  "updated": "2026-11-13T17:52:20.843421+00:00",
+  "updated": "2026-11-14T00:29:36.703560+00:00",
   "videos_total": 45,
   "videos_7d": 1,
-  "views_7d": 1333,
+  "views_7d": 1340,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -46,7 +46,7 @@
         },
         {
           "arm": "culture",
-          "mean": 0.415,
+          "mean": 0.416,
           "n": 3
         }
       ]
@@ -241,12 +241,12 @@
         },
         {
           "arm": "hot_take",
-          "mean": 0.483,
+          "mean": 0.484,
           "n": 1
         },
         {
           "arm": "challenge",
-          "mean": 0.38,
+          "mean": 0.381,
           "n": 2
         }
       ]
@@ -274,8 +274,8 @@
     {
       "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
       "id": "NtWEKWFOlNk",
-      "views": 1333,
-      "avg_view_pct": 75.33
+      "views": 1340,
+      "avg_view_pct": 75.01
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -286,7 +286,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1263,
+      "views": 1264,
       "avg_view_pct": 79.17
     },
     {
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 1,
+    "attempted_videos": 35,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 1,
+    "reports_without_usable_rows": 35,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -391,7 +391,7 @@
         },
         "median_turn_strength": 9.0,
         "retention_n": 2,
-        "median_average_view_percentage": 72.01,
+        "median_average_view_percentage": 71.85,
         "over_internal_average_view_target": 1,
         "turn_start_n": 2,
         "median_turn_start_runtime_pct": 16.25,
@@ -447,7 +447,7 @@
       },
       "median_turn_strength": 9.0,
       "retention_n": 2,
-      "median_average_view_percentage": 72.01,
+      "median_average_view_percentage": 71.85,
       "over_internal_average_view_target": 1,
       "turn_start_n": 2,
       "median_turn_start_runtime_pct": 16.25,
@@ -630,10 +630,10 @@
         "format": "facts3",
         "hook_style": "number_first",
         "duration_seconds": 29.7,
-        "avg_view_pct": 52.19,
+        "avg_view_pct": 52.36,
         "views": 917,
-        "engaged_views_90d": 315,
-        "sample_size": 315,
+        "engaged_views_90d": 316,
+        "sample_size": 316,
         "sample_basis": "engaged_views_90d",
         "sample_qualified": true
       },
@@ -657,8 +657,8 @@
   },
   "subscribers": {
     "net_90d": 28,
-    "views_90d": 10787,
-    "per_1k_views": 2.6,
+    "views_90d": 10811,
+    "per_1k_views": 2.59,
     "videos": 36,
     "denominator_basis": "engaged_views",
     "videos_with_engaged_views": 36,
@@ -668,13 +668,13 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10787,
+    "engaged_views_90d": 10811,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003596,
-    "current_full_threshold_progress": 0.001079,
-    "feb_2027_full_threshold_progress": 0.000539,
+    "expanded_threshold_progress": 0.003604,
+    "current_full_threshold_progress": 0.001081,
+    "feb_2027_full_threshold_progress": 0.000541,
     "public_videos": 36,
     "videos_with_metric": 36,
     "coverage": 1.0,
