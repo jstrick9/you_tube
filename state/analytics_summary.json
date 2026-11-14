@@ -1,8 +1,8 @@
 {
-  "updated": "2026-11-14T00:29:36.703560+00:00",
+  "updated": "2026-11-14T07:59:26.803954+00:00",
   "videos_total": 45,
   "videos_7d": 1,
-  "views_7d": 1340,
+  "views_7d": 1334,
   "learned_this_run": 0,
   "strategy": {
     "category": {
@@ -102,7 +102,7 @@
         },
         {
           "arm": "plot_twist",
-          "mean": 0.379,
+          "mean": 0.38,
           "n": 2
         }
       ]
@@ -274,7 +274,7 @@
     {
       "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
       "id": "NtWEKWFOlNk",
-      "views": 1340,
+      "views": 1334,
       "avg_view_pct": 75.01
     },
     {
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 35,
+    "attempted_videos": 1,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 35,
+    "reports_without_usable_rows": 1,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
