@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-15T17:16:51.840529+00:00",
+  "updated": "2026-11-15T23:31:58.702580+00:00",
   "videos_total": 45,
   "videos_7d": 1,
   "views_7d": 1336,
@@ -67,7 +67,7 @@
         },
         {
           "arm": "dumbest_decision",
-          "mean": 0.529,
+          "mean": 0.528,
           "n": 1
         },
         {
@@ -246,7 +246,7 @@
         },
         {
           "arm": "challenge",
-          "mean": 0.382,
+          "mean": 0.383,
           "n": 2
         }
       ]
@@ -275,7 +275,7 @@
       "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
       "id": "NtWEKWFOlNk",
       "views": 1336,
-      "avg_view_pct": 78.8
+      "avg_view_pct": 78.9
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -287,7 +287,7 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1266,
-      "avg_view_pct": 79.17
+      "avg_view_pct": 79.06
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 1,
+    "attempted_videos": 35,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 1,
+    "reports_without_usable_rows": 35,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -391,7 +391,7 @@
         },
         "median_turn_strength": 9.0,
         "retention_n": 2,
-        "median_average_view_percentage": 73.75,
+        "median_average_view_percentage": 73.8,
         "over_internal_average_view_target": 1,
         "turn_start_n": 2,
         "median_turn_start_runtime_pct": 16.25,
@@ -447,7 +447,7 @@
       },
       "median_turn_strength": 9.0,
       "retention_n": 2,
-      "median_average_view_percentage": 73.75,
+      "median_average_view_percentage": 73.8,
       "over_internal_average_view_target": 1,
       "turn_start_n": 2,
       "median_turn_start_runtime_pct": 16.25,
@@ -657,7 +657,7 @@
   },
   "subscribers": {
     "net_90d": 28,
-    "views_90d": 10838,
+    "views_90d": 10847,
     "per_1k_views": 2.58,
     "videos": 36,
     "denominator_basis": "engaged_views",
@@ -668,12 +668,12 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10838,
+    "engaged_views_90d": 10847,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003613,
-    "current_full_threshold_progress": 0.001084,
+    "expanded_threshold_progress": 0.003616,
+    "current_full_threshold_progress": 0.001085,
     "feb_2027_full_threshold_progress": 0.000542,
     "public_videos": 36,
     "videos_with_metric": 36,
