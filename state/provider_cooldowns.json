@@ -1,11 +1,17 @@
 {
   "schema_version": 1,
   "providers": {
+    "cloudflare": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-11-15T17:20:31.709952+00:00",
+      "blocked_until": "2026-11-15T17:40:31.709952+00:00"
+    },
     "mistral": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-11-15T06:26:25.621058+00:00",
-      "blocked_until": "2026-11-15T06:46:25.621058+00:00"
+      "recorded_at": "2026-11-15T17:25:36.439073+00:00",
+      "blocked_until": "2026-11-15T17:45:36.439073+00:00"
     }
   },
   "failures_5xx": {}
