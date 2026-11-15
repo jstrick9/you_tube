@@ -1,12 +1,5 @@
 {
   "schema_version": 1,
-  "providers": {
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-11-14T23:29:42.528874+00:00",
-      "blocked_until": "2026-11-14T23:49:42.528874+00:00"
-    }
-  },
+  "providers": {},
   "failures_5xx": {}
 }
