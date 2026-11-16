@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-16T08:33:59.031242+00:00",
+  "updated": "2026-11-16T20:34:55.571155+00:00",
   "videos_total": 45,
   "videos_7d": 1,
   "views_7d": 1333,
@@ -36,7 +36,7 @@
         },
         {
           "arm": "science",
-          "mean": 0.461,
+          "mean": 0.462,
           "n": 7
         },
         {
@@ -46,7 +46,7 @@
         },
         {
           "arm": "culture",
-          "mean": 0.417,
+          "mean": 0.418,
           "n": 3
         }
       ]
@@ -246,7 +246,7 @@
         },
         {
           "arm": "challenge",
-          "mean": 0.383,
+          "mean": 0.384,
           "n": 2
         }
       ]
@@ -262,7 +262,7 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1448,
+      "views": 1449,
       "avg_view_pct": 90.49
     },
     {
@@ -275,7 +275,7 @@
       "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
       "id": "NtWEKWFOlNk",
       "views": 1333,
-      "avg_view_pct": 78.9
+      "avg_view_pct": 78.83
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 36,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 36,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -391,7 +391,7 @@
         },
         "median_turn_strength": 9.0,
         "retention_n": 2,
-        "median_average_view_percentage": 73.8,
+        "median_average_view_percentage": 73.76,
         "over_internal_average_view_target": 1,
         "turn_start_n": 2,
         "median_turn_start_runtime_pct": 16.25,
@@ -447,7 +447,7 @@
       },
       "median_turn_strength": 9.0,
       "retention_n": 2,
-      "median_average_view_percentage": 73.8,
+      "median_average_view_percentage": 73.76,
       "over_internal_average_view_target": 1,
       "turn_start_n": 2,
       "median_turn_start_runtime_pct": 16.25,
@@ -657,7 +657,7 @@
   },
   "subscribers": {
     "net_90d": 28,
-    "views_90d": 10847,
+    "views_90d": 10852,
     "per_1k_views": 2.58,
     "videos": 36,
     "denominator_basis": "engaged_views",
@@ -668,13 +668,13 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10847,
+    "engaged_views_90d": 10852,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003616,
+    "expanded_threshold_progress": 0.003617,
     "current_full_threshold_progress": 0.001085,
-    "feb_2027_full_threshold_progress": 0.000542,
+    "feb_2027_full_threshold_progress": 0.000543,
     "public_videos": 36,
     "videos_with_metric": 36,
     "coverage": 1.0,
