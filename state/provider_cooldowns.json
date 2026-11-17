@@ -1,5 +1,18 @@
 {
   "schema_version": 1,
-  "providers": {},
-  "failures_5xx": {}
+  "providers": {
+    "pollinations": {
+      "reason": "billing_or_entitlement",
+      "status_code": 402,
+      "recorded_at": "2026-11-17T05:24:46.971824+00:00",
+      "blocked_until": "2026-11-18T05:24:46.971824+00:00",
+      "retry_after_seconds": 23.0
+    }
+  },
+  "failures_5xx": {
+    "gemini": {
+      "count": 2,
+      "last_at": "2026-11-17T05:17:03.168042+00:00"
+    }
+  }
 }
