@@ -9,10 +9,5 @@
       "retry_after_seconds": 23.0
     }
   },
-  "failures_5xx": {
-    "gemini": {
-      "count": 2,
-      "last_at": "2026-11-17T05:17:03.168042+00:00"
-    }
-  }
+  "failures_5xx": {}
 }
