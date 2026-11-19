@@ -1,184 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261111-175803-3700",
-    "workflow_run_id": "43072850260",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-11T17:58:03.269954+00:00",
-    "finished_at": "2026-11-11T17:59:29.819355+00:00",
-    "duration_seconds": 86.549,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 3,
-      "script_research": 6,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "JUPITER IS NOT OUR FRIEND!",
-        "topic_key": "jupiter is not our friend",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "How did Rome miss a whole fleet?",
-        "topic_key": "how did rome miss a whole fleet",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "El río escondido de GUADALAJARA",
-        "topic_key": "el ro escondido de guadalajara",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-11-11T17:58:36.854903+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-11-11T17:58:36.855038+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-11T17:59:21.499413+00:00",
-        "stage": "script_research",
-        "category": "source_subject_mismatch"
-      },
-      {
-        "at": "2026-11-11T17:59:21.499559+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-11T17:59:28.295717+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-11-11T17:59:29.814346+00:00",
-        "stage": "script_research",
-        "category": "source_subject_mismatch"
-      },
-      {
-        "at": "2026-11-11T17:59:29.814452+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-11T17:59:29.814566+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-11T17:58:17.973749+00:00",
-        "retry_after_seconds": 43.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-11T17:58:28.332651+00:00",
-        "retry_after_seconds": 31.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-11T17:58:30.948366+00:00",
-        "retry_after_seconds": 9.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-11-11T17:58:37.716736+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-11-11T17:58:46.383506+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-11-11T17:58:46.971495+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "route_circuit_open",
-        "at": "2026-11-11T17:58:46.972066+00:00",
-        "cooldown_until": "2026-11-11T18:08:46.971535+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-11T17:58:53.610449+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "groq:qwen/qwen3.8-27b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "43081909429",
     "workflow_run_id": "43081909429",
     "workflow_run_attempt": "1",
@@ -3933,6 +3755,269 @@
       "groq:openai/gpt-oss-120b",
       "groq:openai/gpt-oss-20b",
       "mistral:ministral-8b-2512",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261119-071633-3625",
+    "workflow_run_id": "44478049660",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-19T07:16:33.333720+00:00",
+    "finished_at": "2026-11-19T07:29:31.810953+00:00",
+    "duration_seconds": 778.477,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 6,
+      "script_research": 12,
+      "script_draft": 6,
+      "script_review": 4,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "The Lost Bell of Dhammazedi: 400-Year-Old Underwater Treasure Mystery",
+        "topic_key": "the lost bell of dhammazedi 400yearold underwater treasure mystery",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Why the Leonids Can Turn Into a Meteor Storm",
+        "topic_key": "why the leonids can turn into a meteor storm",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "How to Actually Survive a Tsunami !",
+        "topic_key": "how to actually survive a tsunami",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "99% of people don't know the truth about One Way Bulletproof Glass!",
+        "topic_key": "99 of people dont know the truth about one way bulletproof glass",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "This Is What Dinosaurs REALLY Sounded Like?!",
+        "topic_key": "this is what dinosaurs really sounded like",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Eggs So Strange, You’ll Think They’re Alien!",
+        "topic_key": "eggs so strange youll think theyre alien",
+        "outcome": "rejected",
+        "stage": "script_review",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-11-19T07:17:10.037339+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-11-19T07:17:10.037468+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-19T07:21:31.407896+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-19T07:21:31.408066+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-19T07:22:43.370985+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-19T07:22:43.371113+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-19T07:24:35.250502+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-11-19T07:24:35.250630+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-19T07:24:35.803446+00:00",
+        "stage": "script_research",
+        "category": "source_grounding_failed"
+      },
+      {
+        "at": "2026-11-19T07:24:35.803478+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-19T07:29:31.805699+00:00",
+        "stage": "script_review",
+        "category": "script_quality_rejected",
+        "attempt": 4
+      },
+      {
+        "at": "2026-11-19T07:29:31.805764+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-19T07:29:31.805879+00:00",
+        "stage": "topic_selection",
+        "category": "topic_attempt_budget_exhausted",
+        "attempt": 6
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 1,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 2,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      },
+      {
+        "stage": "script_review",
+        "attempt": 3,
+        "limit": 4,
+        "action": "rewrite_with_review_feedback"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-11-19T07:16:33.334489+00:00",
+        "cooldown_until": "2026-11-19T07:23:34.252317+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-19T07:16:47.733898+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-19T07:16:55.363400+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-19T07:18:12.851306+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-19T07:19:50.944017+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-19T07:19:57.376761+00:00"
+      },
+      {
+        "provider": "cloudflare",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-11-19T07:20:14.925368+00:00",
+        "cooldown_until": "2026-11-19T07:40:14.924695+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-19T07:22:06.116484+00:00",
+        "retry_after_seconds": 41.0
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-11-19T07:26:41.725308+00:00",
+        "cooldown_until": "2026-11-19T07:46:41.724637+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
+      "mistral:ministral-8b-latest",
       "mistral:mistral-small-latest"
     ]
   }
