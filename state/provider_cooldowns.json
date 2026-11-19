@@ -11,14 +11,9 @@
     "mistral": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-11-18T19:08:42.357866+00:00",
-      "blocked_until": "2026-11-18T19:28:42.357866+00:00"
+      "recorded_at": "2026-11-19T01:43:52.755784+00:00",
+      "blocked_until": "2026-11-19T02:03:52.755784+00:00"
     }
   },
-  "failures_5xx": {
-    "gemini": {
-      "count": 1,
-      "last_at": "2026-11-18T19:22:33.163266+00:00"
-    }
-  }
+  "failures_5xx": {}
 }

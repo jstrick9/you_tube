@@ -1,168 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261111-001625-3414",
-    "workflow_run_id": "42929829608",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-11T00:16:25.470514+00:00",
-    "finished_at": "2026-11-11T00:28:05.709286+00:00",
-    "duration_seconds": 700.239,
-    "mode": "upload",
-    "target_count": 3,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 1,
-      "script_research": 2,
-      "script_draft": 1,
-      "script_review": 1,
-      "tts": 1,
-      "visuals": 1,
-      "music": 1,
-      "render_qa": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "how did the us kill yamamoto isoroku?",
-        "topic_key": "how did the us kill yamamoto isoroku",
-        "outcome": "rejected",
-        "stage": "render_qa",
-        "failure_category": "no_verified_shot_replacement"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-11-11T00:27:23.400090+00:00",
-        "stage": "render_qa",
-        "category": "no_verified_shot_replacement",
-        "attempt": 1
-      },
-      {
-        "at": "2026-11-11T00:27:47.733390+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-11-11T00:28:05.694819+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-11-11T00:28:05.694851+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      },
-      {
-        "at": "2026-11-11T00:28:05.694894+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-11-11T00:16:25.471152+00:00",
-        "cooldown_until": "2026-11-11T04:54:57.171036+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-11T00:17:11.746365+00:00",
-        "retry_after_seconds": 29.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-11T00:17:22.110124+00:00",
-        "retry_after_seconds": 31.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-11T00:17:24.838549+00:00",
-        "retry_after_seconds": 16.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-11-11T00:17:50.998994+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-11T00:19:21.012797+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-11T00:19:27.433824+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-11-11T00:26:18.855715+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-11-11T00:27:30.000814+00:00",
-        "cooldown_until": "2026-11-11T00:47:30.000236+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "groq:qwen/qwen3.8-27b",
-      "mistral:ministral-8b-latest",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261111-175803-3700",
     "workflow_run_id": "43072850260",
     "workflow_run_attempt": "1",
@@ -3968,5 +3806,134 @@
     "retry_events": [],
     "provider_events": [],
     "preflight_skip_reason": "delayed_schedule_superseded"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261119-013108-4082",
+    "workflow_run_id": "44437296048",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-19T01:31:08.335525+00:00",
+    "finished_at": "2026-11-19T01:45:15.927614+00:00",
+    "duration_seconds": 847.592,
+    "mode": "upload",
+    "target_count": 1,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 1,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 1,
+      "script_research": 2,
+      "script_draft": 1,
+      "script_review": 1,
+      "tts": 1,
+      "visuals": 1,
+      "music": 1,
+      "render_qa": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Why Gecko Lizards Never Fall Down From Smooth Glass Roofs",
+        "topic_key": "why gecko lizards never fall down from smooth glass roofs",
+        "outcome": "rejected",
+        "stage": "render_qa",
+        "failure_category": "vision_unavailable"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-11-19T01:45:15.910362+00:00",
+        "stage": "visuals",
+        "category": "vision_unavailable",
+        "exception_type": "VisionUnavailable",
+        "attempt": 1
+      }
+    ],
+    "retry_events": [],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-11-19T01:31:08.336654+00:00",
+        "cooldown_until": "2026-11-19T07:23:34.252317+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-19T01:33:15.256501+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-19T01:33:38.575375+00:00",
+        "retry_after_seconds": 51.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-19T01:34:12.997625+00:00",
+        "retry_after_seconds": 43.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_request_too_large",
+        "at": "2026-11-19T01:34:15.976358+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-19T01:35:50.866304+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-19T01:35:57.384202+00:00"
+      },
+      {
+        "provider": "cloudflare",
+        "status_code": 429,
+        "action": "vision_model_rate_limited",
+        "at": "2026-11-19T01:42:39.666084+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-11-19T01:43:52.756785+00:00",
+        "cooldown_until": "2026-11-19T02:03:52.755784+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "cloudflare:@cf/meta/llama-4-scout-17b-16e-instruct",
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "mistral:ministral-8b-2512",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]
