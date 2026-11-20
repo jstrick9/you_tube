@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-20T09:09:31.421569+00:00",
+  "updated": "2026-11-20T19:04:57.344196+00:00",
   "videos_total": 45,
   "videos_7d": 0,
   "views_7d": 0,
@@ -26,7 +26,7 @@
         },
         {
           "arm": "nature",
-          "mean": 0.485,
+          "mean": 0.486,
           "n": 7
         },
         {
@@ -41,7 +41,7 @@
         },
         {
           "arm": "geography",
-          "mean": 0.435,
+          "mean": 0.436,
           "n": 2
         },
         {
@@ -57,7 +57,7 @@
       "arms": [
         {
           "arm": "scale_shock",
-          "mean": 0.541,
+          "mean": 0.54,
           "n": 3
         },
         {
@@ -246,7 +246,7 @@
         },
         {
           "arm": "challenge",
-          "mean": 0.387,
+          "mean": 0.388,
           "n": 2
         }
       ]
@@ -310,7 +310,7 @@
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
-      "views": 1186,
+      "views": 1187,
       "avg_view_pct": 50.4
     }
   ],
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 36,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 36,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -599,7 +599,7 @@
         "hook_style": "you_statement",
         "duration_seconds": 37.3,
         "avg_view_pct": 50.4,
-        "views": 1186,
+        "views": 1187,
         "engaged_views_90d": 538,
         "sample_size": 538,
         "sample_basis": "engaged_views_90d",
