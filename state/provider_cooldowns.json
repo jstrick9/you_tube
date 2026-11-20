@@ -1,14 +1,13 @@
 {
   "schema_version": 1,
-  "providers": {},
-  "failures_5xx": {
-    "gemini": {
-      "count": 1,
-      "last_at": "2026-11-19T19:04:14.035971+00:00"
-    },
-    "mistral": {
-      "count": 1,
-      "last_at": "2026-11-19T19:06:15.660867+00:00"
+  "providers": {
+    "pollinations": {
+      "reason": "billing_or_entitlement",
+      "status_code": 402,
+      "recorded_at": "2026-11-20T01:37:51.399678+00:00",
+      "blocked_until": "2026-11-21T01:37:51.399678+00:00",
+      "retry_after_seconds": 32.0
     }
-  }
+  },
+  "failures_5xx": {}
 }

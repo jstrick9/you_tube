@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-19T19:03:45.541379+00:00",
+  "updated": "2026-11-20T01:27:26.095551+00:00",
   "videos_total": 45,
   "videos_7d": 0,
   "views_7d": 0,
@@ -62,7 +62,7 @@
         },
         {
           "arm": "guess_reveal",
-          "mean": 0.53,
+          "mean": 0.529,
           "n": 1
         },
         {
@@ -87,7 +87,7 @@
         },
         {
           "arm": "ranked_escalation",
-          "mean": 0.478,
+          "mean": 0.479,
           "n": 1
         },
         {
@@ -97,12 +97,12 @@
         },
         {
           "arm": "backstory",
-          "mean": 0.435,
+          "mean": 0.436,
           "n": 5
         },
         {
           "arm": "plot_twist",
-          "mean": 0.385,
+          "mean": 0.386,
           "n": 2
         }
       ]
@@ -263,7 +263,7 @@
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
       "views": 1450,
-      "avg_view_pct": 90.5
+      "avg_view_pct": 90.44
     },
     {
       "title": "Why you are falling through space right now #shorts",
@@ -311,7 +311,7 @@
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
       "views": 1186,
-      "avg_view_pct": 50.34
+      "avg_view_pct": 50.4
     }
   ],
   "rejected": [],
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 36,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 36,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -598,10 +598,10 @@
         "format": "facts3",
         "hook_style": "you_statement",
         "duration_seconds": 37.3,
-        "avg_view_pct": 50.34,
+        "avg_view_pct": 50.4,
         "views": 1186,
-        "engaged_views_90d": 537,
-        "sample_size": 537,
+        "engaged_views_90d": 538,
+        "sample_size": 538,
         "sample_basis": "engaged_views_90d",
         "sample_qualified": true
       },
@@ -657,7 +657,7 @@
   },
   "subscribers": {
     "net_90d": 28,
-    "views_90d": 10853,
+    "views_90d": 10855,
     "per_1k_views": 2.58,
     "videos": 36,
     "denominator_basis": "engaged_views",
@@ -668,12 +668,12 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10853,
+    "engaged_views_90d": 10855,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
     "expanded_threshold_progress": 0.003618,
-    "current_full_threshold_progress": 0.001085,
+    "current_full_threshold_progress": 0.001086,
     "feb_2027_full_threshold_progress": 0.000543,
     "public_videos": 36,
     "videos_with_metric": 36,
