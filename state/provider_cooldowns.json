@@ -11,8 +11,14 @@
     "cloudflare": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-11-20T19:42:36.178026+00:00",
-      "blocked_until": "2026-11-20T20:02:36.178026+00:00"
+      "recorded_at": "2026-11-21T01:01:25.827507+00:00",
+      "blocked_until": "2026-11-21T01:21:25.827507+00:00"
+    },
+    "mistral": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-11-21T01:01:47.489685+00:00",
+      "blocked_until": "2026-11-21T01:21:47.489685+00:00"
     }
   },
   "failures_5xx": {}

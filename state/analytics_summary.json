@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-20T19:04:57.344196+00:00",
+  "updated": "2026-11-21T00:58:01.251869+00:00",
   "videos_total": 45,
   "videos_7d": 0,
   "views_7d": 0,
@@ -102,7 +102,7 @@
         },
         {
           "arm": "plot_twist",
-          "mean": 0.386,
+          "mean": 0.387,
           "n": 2
         }
       ]
@@ -221,7 +221,7 @@
       "arms": [
         {
           "arm": "poll",
-          "mean": 0.516,
+          "mean": 0.515,
           "n": 4
         },
         {
@@ -275,7 +275,7 @@
       "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
       "id": "NtWEKWFOlNk",
       "views": 1338,
-      "avg_view_pct": 78.83
+      "avg_view_pct": 78.63
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 36,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 36,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -391,7 +391,7 @@
         },
         "median_turn_strength": 9.0,
         "retention_n": 2,
-        "median_average_view_percentage": 73.76,
+        "median_average_view_percentage": 73.66,
         "over_internal_average_view_target": 1,
         "turn_start_n": 2,
         "median_turn_start_runtime_pct": 16.25,
@@ -447,7 +447,7 @@
       },
       "median_turn_strength": 9.0,
       "retention_n": 2,
-      "median_average_view_percentage": 73.76,
+      "median_average_view_percentage": 73.66,
       "over_internal_average_view_target": 1,
       "turn_start_n": 2,
       "median_turn_start_runtime_pct": 16.25,
@@ -657,7 +657,7 @@
   },
   "subscribers": {
     "net_90d": 28,
-    "views_90d": 10855,
+    "views_90d": 10856,
     "per_1k_views": 2.58,
     "videos": 36,
     "denominator_basis": "engaged_views",
@@ -668,11 +668,11 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10855,
+    "engaged_views_90d": 10856,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003618,
+    "expanded_threshold_progress": 0.003619,
     "current_full_threshold_progress": 0.001086,
     "feb_2027_full_threshold_progress": 0.000543,
     "public_videos": 36,
