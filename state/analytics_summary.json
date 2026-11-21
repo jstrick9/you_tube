@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-21T08:44:58.167414+00:00",
+  "updated": "2026-11-21T17:38:54.926408+00:00",
   "videos_total": 45,
   "videos_7d": 0,
   "views_7d": 0,
@@ -246,7 +246,7 @@
         },
         {
           "arm": "challenge",
-          "mean": 0.388,
+          "mean": 0.389,
           "n": 2
         }
       ]
@@ -275,7 +275,7 @@
       "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
       "id": "NtWEKWFOlNk",
       "views": 1338,
-      "avg_view_pct": 78.83
+      "avg_view_pct": 78.63
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -302,16 +302,16 @@
       "avg_view_pct": 54.559999999999995
     },
     {
+      "title": "Which Substance Has the Highest Melting Point? #shorts",
+      "id": "4WkKoRw9r00",
+      "views": 1189,
+      "avg_view_pct": 50.4
+    },
+    {
       "title": "The Surprising History of Barbie and Mattel #shorts",
       "id": "kM3myuf1c-Y",
       "views": 1188,
       "avg_view_pct": 41.76
-    },
-    {
-      "title": "Which Substance Has the Highest Melting Point? #shorts",
-      "id": "4WkKoRw9r00",
-      "views": 1187,
-      "avg_view_pct": 50.4
     }
   ],
   "rejected": [],
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 36,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 36,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -391,7 +391,7 @@
         },
         "median_turn_strength": 9.0,
         "retention_n": 2,
-        "median_average_view_percentage": 73.76,
+        "median_average_view_percentage": 73.66,
         "over_internal_average_view_target": 1,
         "turn_start_n": 2,
         "median_turn_start_runtime_pct": 16.25,
@@ -447,7 +447,7 @@
       },
       "median_turn_strength": 9.0,
       "retention_n": 2,
-      "median_average_view_percentage": 73.76,
+      "median_average_view_percentage": 73.66,
       "over_internal_average_view_target": 1,
       "turn_start_n": 2,
       "median_turn_start_runtime_pct": 16.25,
@@ -599,7 +599,7 @@
         "hook_style": "you_statement",
         "duration_seconds": 37.3,
         "avg_view_pct": 50.4,
-        "views": 1187,
+        "views": 1189,
         "engaged_views_90d": 538,
         "sample_size": 538,
         "sample_basis": "engaged_views_90d",
