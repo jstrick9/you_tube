@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-21T00:58:01.251869+00:00",
+  "updated": "2026-11-21T08:44:58.167414+00:00",
   "videos_total": 45,
   "videos_7d": 0,
   "views_7d": 0,
@@ -21,7 +21,7 @@
         },
         {
           "arm": "animals",
-          "mean": 0.49,
+          "mean": 0.491,
           "n": 2
         },
         {
@@ -46,7 +46,7 @@
         },
         {
           "arm": "culture",
-          "mean": 0.42,
+          "mean": 0.421,
           "n": 3
         }
       ]
@@ -256,7 +256,7 @@
     {
       "title": "CASE #005 — The Roman Army's Bizarre Punishment Ration #shorts",
       "id": "iEXe-QyrmkY",
-      "views": 1572,
+      "views": 1573,
       "avg_view_pct": 114.21999999999998
     },
     {
@@ -275,7 +275,7 @@
       "title": "FIELD #013 — The Massive Scale of the Green Anaconda #shorts",
       "id": "NtWEKWFOlNk",
       "views": 1338,
-      "avg_view_pct": 78.63
+      "avg_view_pct": 78.83
     },
     {
       "title": "Surprising Facts About the Octopus #shorts",
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 36,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 36,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -391,7 +391,7 @@
         },
         "median_turn_strength": 9.0,
         "retention_n": 2,
-        "median_average_view_percentage": 73.66,
+        "median_average_view_percentage": 73.76,
         "over_internal_average_view_target": 1,
         "turn_start_n": 2,
         "median_turn_start_runtime_pct": 16.25,
@@ -447,7 +447,7 @@
       },
       "median_turn_strength": 9.0,
       "retention_n": 2,
-      "median_average_view_percentage": 73.66,
+      "median_average_view_percentage": 73.76,
       "over_internal_average_view_target": 1,
       "turn_start_n": 2,
       "median_turn_start_runtime_pct": 16.25,
