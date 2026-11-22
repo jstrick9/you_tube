@@ -1,179 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261114-232506-3757",
-    "workflow_run_id": "43653014359",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-14T23:25:06.831809+00:00",
-    "finished_at": "2026-11-14T23:36:48.054970+00:00",
-    "duration_seconds": 701.223,
-    "mode": "upload",
-    "target_count": 3,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 2,
-      "script_research": 4,
-      "script_draft": 4,
-      "script_review": 4,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "Our ENTIRE Solar System Is Racing Through the Galaxy",
-        "topic_key": "our entire solar system is racing through the galaxy",
-        "outcome": "rejected",
-        "stage": "script_review",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 2,
-        "topic": "How Fishermen Catch Massive Amounts of Fish in the Deep Sea",
-        "topic_key": "how fishermen catch massive amounts of fish in the deep sea",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-11-14T23:36:14.873397+00:00",
-        "stage": "script_review",
-        "category": "script_quality_rejected",
-        "attempt": 4
-      },
-      {
-        "at": "2026-11-14T23:36:14.873466+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-14T23:36:30.693571+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-11-14T23:36:48.049898+00:00",
-        "stage": "script_research",
-        "category": "source_subject_mismatch"
-      },
-      {
-        "at": "2026-11-14T23:36:48.050014+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-14T23:36:48.050153+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      },
-      {
-        "at": "2026-11-14T23:36:48.050182+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 2,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 3,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-14T23:25:21.479955+00:00",
-        "retry_after_seconds": 27.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-14T23:25:28.227537+00:00",
-        "retry_after_seconds": 27.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_request_too_large",
-        "at": "2026-11-14T23:25:28.309847+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-14T23:27:46.797027+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-14T23:27:53.497469+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-11-14T23:29:42.529441+00:00",
-        "cooldown_until": "2026-11-14T23:49:42.528874+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "mistral:ministral-8b-latest",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261115-030643-3443",
     "workflow_run_id": "43670762459",
     "workflow_run_attempt": "1",
@@ -4216,6 +4043,296 @@
       "groq:openai/gpt-oss-120b",
       "groq:openai/gpt-oss-20b",
       "mistral:ministral-8b-latest",
+      "mistral:mistral-small-latest"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261122-175355-3456",
+    "workflow_run_id": "45051902525",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-22T17:53:55.121665+00:00",
+    "finished_at": "2026-11-22T18:12:24.864850+00:00",
+    "duration_seconds": 1109.743,
+    "mode": "upload",
+    "target_count": 2,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 8,
+      "script_research": 16,
+      "script_draft": 2,
+      "script_review": 1,
+      "tts": 1,
+      "visuals": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "The Sun Sounds TERRIFYING NASA Turned Its Signals Into Audio",
+        "topic_key": "the sun sounds terrifying nasa turned its signals into audio",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Ye 3 Sky Events November 2026 Ko Special Bana Denge!",
+        "topic_key": "ye 3 sky events november 2026 ko special bana denge",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "How Shrimp Carry Lakhs of Eggs & Hatch in Just 24 Hours!",
+        "topic_key": "how shrimp carry lakhs of eggs hatch in just 24 hours",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Why did Alexander the Great cry?",
+        "topic_key": "why did alexander the great cry",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Why Was Hitler Even Fighting in Africa?",
+        "topic_key": "why was hitler even fighting in africa",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "How Intelligent Is an Elephant?",
+        "topic_key": "how intelligent is an elephant",
+        "outcome": "rejected",
+        "stage": "visuals",
+        "failure_category": "no_verified_visual_match"
+      },
+      {
+        "index": 2,
+        "topic": "Does a Camel Really Store Water in Its Hump?",
+        "topic_key": "does a camel really store water in its hump",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 2,
+        "topic": "The Survivor Bias Mystery",
+        "topic_key": "the survivor bias mystery",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-11-22T17:55:02.828107+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-11-22T17:55:02.828216+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-22T17:56:00.712974+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-11-22T17:56:00.713101+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-22T17:56:18.323404+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-11-22T17:56:18.323517+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-22T17:57:00.462674+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-11-22T17:57:00.462809+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-22T17:57:04.669894+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-11-22T17:57:04.669949+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-22T18:06:23.209940+00:00",
+        "stage": "visuals",
+        "category": "no_verified_visual_match",
+        "exception_type": "NoVisualMatch"
+      },
+      {
+        "at": "2026-11-22T18:06:23.214000+00:00",
+        "stage": "topic_selection",
+        "category": "topic_attempt_budget_exhausted",
+        "attempt": 6
+      },
+      {
+        "at": "2026-11-22T18:07:03.300165+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-11-22T18:07:03.300310+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-22T18:12:24.857222+00:00",
+        "stage": "script_draft",
+        "category": "provider_transient_network",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-22T18:12:24.857463+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-22T18:12:24.857546+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-11-22T17:53:55.122242+00:00",
+        "cooldown_until": "2026-11-23T00:04:34.932755+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-22T17:54:15.044052+00:00",
+        "retry_after_seconds": 28.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-22T17:54:21.239161+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-22T17:57:15.263076+00:00",
+        "retry_after_seconds": 32.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-22T17:57:23.219012+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-22T17:57:34.655061+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-11-22T17:57:54.448224+00:00",
+        "cooldown_until": "2026-11-22T18:17:54.447641+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-22T17:59:54.602141+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-22T17:59:59.257957+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-22T18:00:14.769057+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-22T18:08:38.900729+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
       "mistral:mistral-small-latest"
     ]
   }

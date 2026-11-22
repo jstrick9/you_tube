@@ -11,8 +11,8 @@
     "mistral": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-11-22T00:09:38.238595+00:00",
-      "blocked_until": "2026-11-22T00:29:38.238595+00:00"
+      "recorded_at": "2026-11-22T17:57:54.447641+00:00",
+      "blocked_until": "2026-11-22T18:17:54.447641+00:00"
     }
   },
   "failures_5xx": {}
