@@ -1,5 +1,19 @@
 {
   "schema_version": 1,
-  "providers": {},
+  "providers": {
+    "pollinations": {
+      "reason": "billing_or_entitlement",
+      "status_code": 402,
+      "recorded_at": "2026-11-22T00:04:34.932755+00:00",
+      "blocked_until": "2026-11-23T00:04:34.932755+00:00",
+      "retry_after_seconds": 32.0
+    },
+    "mistral": {
+      "reason": "rate_limited",
+      "status_code": 429,
+      "recorded_at": "2026-11-22T00:09:38.238595+00:00",
+      "blocked_until": "2026-11-22T00:29:38.238595+00:00"
+    }
+  },
   "failures_5xx": {}
 }

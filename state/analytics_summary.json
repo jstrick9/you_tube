@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-21T17:38:54.926408+00:00",
+  "updated": "2026-11-21T23:56:19.230070+00:00",
   "videos_total": 45,
   "videos_7d": 0,
   "views_7d": 0,
@@ -36,7 +36,7 @@
         },
         {
           "arm": "science",
-          "mean": 0.462,
+          "mean": 0.463,
           "n": 7
         },
         {
@@ -67,7 +67,7 @@
         },
         {
           "arm": "dumbest_decision",
-          "mean": 0.527,
+          "mean": 0.526,
           "n": 1
         },
         {
@@ -102,7 +102,7 @@
         },
         {
           "arm": "plot_twist",
-          "mean": 0.387,
+          "mean": 0.388,
           "n": 2
         }
       ]
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 36,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 36,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
