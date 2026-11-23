@@ -1,239 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261115-061718-3413",
-    "workflow_run_id": "43684654839",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-15T06:17:18.771794+00:00",
-    "finished_at": "2026-11-15T06:40:28.704239+00:00",
-    "duration_seconds": 1389.932,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 5,
-      "script_research": 10,
-      "script_draft": 5,
-      "script_review": 4,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "The Discovery of the Sea-Rex: A Remarkable Pliosaur Skull",
-        "topic_key": "the discovery of the searex a remarkable pliosaur skull",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "How many folds to reach edge of universe",
-        "topic_key": "how many folds to reach edge of universe",
-        "outcome": "rejected",
-        "stage": "script_review",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "THE EMPEROR CARVED AS BUDDHA",
-        "topic_key": "the emperor carved as buddha",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "The Secret Engineering Behind Meenakshi Temple",
-        "topic_key": "the secret engineering behind meenakshi temple",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "Linotype Machine क अनख आवषकर! पर लइन एक सथ छपन वल मशन",
-        "topic_key": "linotype machine",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-11-15T06:17:49.152346+00:00",
-        "stage": "script_research",
-        "category": "source_subject_mismatch"
-      },
-      {
-        "at": "2026-11-15T06:17:49.152471+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-15T06:32:01.699302+00:00",
-        "stage": "script_review",
-        "category": "script_quality_rejected",
-        "attempt": 4
-      },
-      {
-        "at": "2026-11-15T06:32:01.699346+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-15T06:32:24.080189+00:00",
-        "stage": "script_research",
-        "category": "trend_angle_unsupported_by_source"
-      },
-      {
-        "at": "2026-11-15T06:32:24.080317+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-15T06:32:25.408898+00:00",
-        "stage": "script_research",
-        "category": "source_subject_mismatch"
-      },
-      {
-        "at": "2026-11-15T06:32:25.409029+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-15T06:40:28.700347+00:00",
-        "stage": "script_draft",
-        "category": "provider_transient_network",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-11-15T06:40:28.700481+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-15T06:40:28.700592+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 2,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 3,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-15T06:17:32.872771+00:00",
-        "retry_after_seconds": 31.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-15T06:17:43.107565+00:00",
-        "retry_after_seconds": 31.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-15T06:20:23.395957+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-15T06:20:29.849807+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-15T06:23:35.303454+00:00",
-        "retry_after_seconds": 41.0
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-11-15T06:26:25.621660+00:00",
-        "cooldown_until": "2026-11-15T06:46:25.621058+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-15T06:37:59.262603+00:00"
-      },
-      {
-        "provider": "pollinations",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-15T06:40:28.699986+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "groq:qwen/qwen3.8-27b",
-      "mistral:ministral-8b-latest",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261115-171653-3617",
     "workflow_run_id": "43740063717",
     "workflow_run_attempt": "1",
@@ -4205,5 +3972,231 @@
     "retry_events": [],
     "provider_events": [],
     "preflight_skip_reason": "delayed_schedule_superseded"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261123-003040-3629",
+    "workflow_run_id": "45089056639",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-23T00:30:40.958574+00:00",
+    "finished_at": "2026-11-23T00:46:05.655356+00:00",
+    "duration_seconds": 924.697,
+    "mode": "upload",
+    "target_count": 2,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "topic_production": 1,
+      "topic_validation": 5,
+      "script_research": 10,
+      "script_draft": 3,
+      "script_review": 2,
+      "tts": 2,
+      "visuals": 2,
+      "music": 1,
+      "render_qa": 3,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "How Induction Stoves Heat Without Fire",
+        "topic_key": "how induction stoves heat without fire",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "He Washed His Hands but His Name Was Carved in Stone The Pilate Stone",
+        "topic_key": "he washed his hands but his name was carved in stone the pilate stone",
+        "outcome": "rejected",
+        "stage": "render_qa",
+        "failure_category": "visual_repair_budget_exhausted"
+      },
+      {
+        "index": 1,
+        "topic": "The Owl’s Secret Nest Guard: A Live Snake!",
+        "topic_key": "the owls secret nest guard a live snake",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Puffin Sea Birds Funny Facts In Tamil",
+        "topic_key": "puffin sea birds funny facts in tamil",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Sugar Glider Animal Funny Facts In Tamil",
+        "topic_key": "sugar glider animal funny facts in tamil",
+        "outcome": "rejected",
+        "stage": "visuals",
+        "failure_category": "no_verified_visual_match"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-11-23T00:32:08.971703+00:00",
+        "stage": "topic_selection",
+        "category": "no_eligible_trending_topics"
+      },
+      {
+        "at": "2026-11-23T00:32:13.630322+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-11-23T00:32:13.630463+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-23T00:40:10.210081+00:00",
+        "stage": "render_qa",
+        "category": "visual_repair_budget_exhausted",
+        "attempt": 3
+      },
+      {
+        "at": "2026-11-23T00:43:03.582136+00:00",
+        "stage": "script_draft",
+        "category": "billing_or_entitlement",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-23T00:43:03.582364+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-23T00:43:34.337723+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-11-23T00:43:34.337865+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-23T00:46:05.637057+00:00",
+        "stage": "visuals",
+        "category": "no_verified_visual_match",
+        "exception_type": "NoVisualMatch"
+      },
+      {
+        "at": "2026-11-23T00:46:05.637806+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-11-23T00:46:05.637837+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "visual_repair",
+        "attempt": 1,
+        "limit": 3,
+        "action": "replace_rejected_shots_and_rerender"
+      },
+      {
+        "stage": "visual_repair",
+        "attempt": 2,
+        "limit": 3,
+        "action": "replace_rejected_shots_and_rerender"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-23T00:31:40.931223+00:00",
+        "retry_after_seconds": 24.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-23T00:32:06.521737+00:00",
+        "retry_after_seconds": 1.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-23T00:32:07.981979+00:00",
+        "retry_after_seconds": 8.0
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-11-23T00:32:35.438436+00:00",
+        "cooldown_until": "2026-11-23T00:52:35.437845+00:00"
+      },
+      {
+        "provider": "nvidia",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-23T00:34:35.600720+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-23T00:36:05.645681+00:00"
+      },
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "circuit_open",
+        "at": "2026-11-23T00:43:03.581780+00:00",
+        "cooldown_until": "2026-11-24T00:43:03.581112+00:00",
+        "retry_after_seconds": 30.0
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]
