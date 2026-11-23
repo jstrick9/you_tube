@@ -1,33 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "43744108354",
-    "workflow_run_id": "43744108354",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-15T17:59:00.145672+00:00",
-    "finished_at": "2026-11-15T17:59:00.145672+00:00",
-    "duration_seconds": 0,
-    "mode": "workflow_fallback",
-    "top_up": true,
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "superseded",
-    "stage": "preflight",
-    "stage_entries": {
-      "preflight": 1
-    },
-    "retry_budgets": {},
-    "topic_attempts": [],
-    "failures": [],
-    "retry_events": [],
-    "provider_events": [],
-    "preflight_skip_reason": "delayed_schedule_superseded"
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261115-233210-3624",
     "workflow_run_id": "43775207159",
     "workflow_run_attempt": "1",
@@ -4240,5 +4213,32 @@
       "groq:qwen/qwen3.8-27b",
       "mistral:mistral-small-latest"
     ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "45284121649",
+    "workflow_run_id": "45284121649",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-23T22:55:04.320600+00:00",
+    "finished_at": "2026-11-23T22:55:04.320600+00:00",
+    "duration_seconds": 0,
+    "mode": "workflow_fallback",
+    "top_up": true,
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "superseded",
+    "stage": "preflight",
+    "stage_entries": {
+      "preflight": 1
+    },
+    "retry_budgets": {},
+    "topic_attempts": [],
+    "failures": [],
+    "retry_events": [],
+    "provider_events": [],
+    "preflight_skip_reason": "delayed_schedule_superseded"
   }
 ]
