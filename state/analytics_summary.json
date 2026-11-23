@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-23T09:44:36.734452+00:00",
+  "updated": "2026-11-23T22:06:33.524362+00:00",
   "videos_total": 45,
   "videos_7d": 0,
   "views_7d": 0,
@@ -41,7 +41,7 @@
         },
         {
           "arm": "geography",
-          "mean": 0.437,
+          "mean": 0.438,
           "n": 2
         },
         {
@@ -57,7 +57,7 @@
       "arms": [
         {
           "arm": "scale_shock",
-          "mean": 0.54,
+          "mean": 0.539,
           "n": 3
         },
         {
@@ -87,7 +87,7 @@
         },
         {
           "arm": "ranked_escalation",
-          "mean": 0.479,
+          "mean": 0.48,
           "n": 1
         },
         {
@@ -102,7 +102,7 @@
         },
         {
           "arm": "plot_twist",
-          "mean": 0.389,
+          "mean": 0.39,
           "n": 2
         }
       ]
@@ -246,7 +246,7 @@
         },
         {
           "arm": "challenge",
-          "mean": 0.39,
+          "mean": 0.391,
           "n": 2
         }
       ]
@@ -286,7 +286,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1268,
+      "views": 1270,
       "avg_view_pct": 79.17
     },
     {
@@ -304,8 +304,8 @@
     {
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
-      "views": 1191,
-      "avg_view_pct": 50.4
+      "views": 1193,
+      "avg_view_pct": 50.5
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
@@ -341,9 +341,9 @@
   },
   "retention_curve_refresh": {
     "attempted_videos": 36,
-    "usable_reports_returned": 0,
+    "usable_reports_returned": 1,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 36,
+    "reports_without_usable_rows": 35,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -598,10 +598,10 @@
         "format": "facts3",
         "hook_style": "you_statement",
         "duration_seconds": 37.3,
-        "avg_view_pct": 50.4,
-        "views": 1191,
-        "engaged_views_90d": 538,
-        "sample_size": 538,
+        "avg_view_pct": 50.5,
+        "views": 1193,
+        "engaged_views_90d": 541,
+        "sample_size": 541,
         "sample_basis": "engaged_views_90d",
         "sample_qualified": true
       },
@@ -657,7 +657,7 @@
   },
   "subscribers": {
     "net_90d": 28,
-    "views_90d": 10857,
+    "views_90d": 10860,
     "per_1k_views": 2.58,
     "videos": 36,
     "denominator_basis": "engaged_views",
@@ -668,11 +668,11 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10857,
+    "engaged_views_90d": 10860,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003619,
+    "expanded_threshold_progress": 0.00362,
     "current_full_threshold_progress": 0.001086,
     "feb_2027_full_threshold_progress": 0.000543,
     "public_videos": 36,

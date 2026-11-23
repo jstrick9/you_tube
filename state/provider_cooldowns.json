@@ -1,12 +1,6 @@
 {
   "schema_version": 1,
   "providers": {
-    "mistral": {
-      "reason": "rate_limited",
-      "status_code": 429,
-      "recorded_at": "2026-11-23T00:32:35.437845+00:00",
-      "blocked_until": "2026-11-23T00:52:35.437845+00:00"
-    },
     "pollinations": {
       "reason": "billing_or_entitlement",
       "status_code": 402,
@@ -15,5 +9,10 @@
       "retry_after_seconds": 30.0
     }
   },
-  "failures_5xx": {}
+  "failures_5xx": {
+    "gemini": {
+      "count": 1,
+      "last_at": "2026-11-23T22:07:59.147814+00:00"
+    }
+  }
 }
