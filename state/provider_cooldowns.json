@@ -1,12 +1,6 @@
 {
   "schema_version": 1,
   "providers": {
-    "gemini": {
-      "reason": "repeated_http_5xx",
-      "status_code": 503,
-      "recorded_at": "2026-11-24T07:26:59.951400+00:00",
-      "blocked_until": "2026-11-24T07:36:59.951400+00:00"
-    },
     "pollinations": {
       "reason": "billing_or_entitlement",
       "status_code": 402,
@@ -17,8 +11,8 @@
   },
   "failures_5xx": {
     "gemini": {
-      "count": 3,
-      "last_at": "2026-11-24T07:26:59.951383+00:00"
+      "count": 2,
+      "last_at": "2026-11-24T09:46:21.095750+00:00"
     }
   }
 }
