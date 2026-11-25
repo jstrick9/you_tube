@@ -1,33 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "43957971695",
-    "workflow_run_id": "43957971695",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-16T21:14:34.712915+00:00",
-    "finished_at": "2026-11-16T21:14:34.712915+00:00",
-    "duration_seconds": 0,
-    "mode": "workflow_fallback",
-    "top_up": true,
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "superseded",
-    "stage": "preflight",
-    "stage_entries": {
-      "preflight": 1
-    },
-    "retry_budgets": {},
-    "topic_attempts": [],
-    "failures": [],
-    "retry_events": [],
-    "provider_events": [],
-    "preflight_skip_reason": "delayed_schedule_superseded"
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261117-051603-4099",
     "workflow_run_id": "44022706938",
     "workflow_run_attempt": "1",
@@ -4599,5 +4572,286 @@
     "retry_events": [],
     "provider_events": [],
     "preflight_skip_reason": "delayed_schedule_superseded"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261125-054214-3571",
+    "workflow_run_id": "45555215958",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-25T05:42:14.133350+00:00",
+    "finished_at": "2026-11-25T05:55:35.708896+00:00",
+    "duration_seconds": 801.576,
+    "mode": "upload",
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 7,
+      "script_research": 14,
+      "script_draft": 5,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Why Arctic Foxes Turn Bright White in Winter",
+        "topic_key": "why arctic foxes turn bright white in winter",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Hagfish: The Fish That Turns Water Into Slime! Deep Sea MysteryHelloAbhijit",
+        "topic_key": "hagfish the fish that turns water into slime deep sea mysteryhelloabhijit",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Why Do Scuba Divers Jump Backward Off Boats?",
+        "topic_key": "why do scuba divers jump backward off boats",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Priciest Cheese!",
+        "topic_key": "priciest cheese",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "What Happens If You Flush a Toilet in Space?",
+        "topic_key": "what happens if you flush a toilet in space",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "The Bird With an Unsolved Mystery American Woodcock",
+        "topic_key": "the bird with an unsolved mystery american woodcock",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 2,
+        "topic": "ఆకటపస తలల పలలల కస పరణలన ఎదక వదలకటద? Octopus Mother Story Telugu",
+        "topic_key": "octopus mother story telugu",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-11-25T05:48:07.662009+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-25T05:48:07.662163+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-25T05:51:51.901319+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-25T05:51:51.901445+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-25T05:53:05.876963+00:00",
+        "stage": "script_draft",
+        "category": "provider_rate_limited",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-25T05:53:05.877084+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-25T05:54:30.065427+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-25T05:54:30.065547+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-25T05:55:16.350179+00:00",
+        "stage": "script_research",
+        "category": "no_depictable_source_asset"
+      },
+      {
+        "at": "2026-11-25T05:55:16.350300+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-25T05:55:31.865750+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-25T05:55:31.865873+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-25T05:55:31.865940+00:00",
+        "stage": "topic_selection",
+        "category": "topic_attempt_budget_exhausted",
+        "attempt": 6
+      },
+      {
+        "at": "2026-11-25T05:55:35.705173+00:00",
+        "stage": "script_research",
+        "category": "source_subject_mismatch"
+      },
+      {
+        "at": "2026-11-25T05:55:35.705294+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-25T05:55:35.705364+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-11-25T05:55:35.705380+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "pollinations",
+        "status_code": 402,
+        "action": "cooldown_skip",
+        "at": "2026-11-25T05:42:14.134072+00:00",
+        "cooldown_until": "2026-11-25T07:35:21.283513+00:00"
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-25T05:42:55.117426+00:00",
+        "retry_after_seconds": 42.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-25T05:43:01.919665+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-25T05:43:08.574978+00:00",
+        "retry_after_seconds": 4.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-25T05:43:09.715379+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-25T05:44:02.210962+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-25T05:44:29.945639+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-25T05:46:08.037852+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-25T05:46:14.853266+00:00"
+      },
+      {
+        "provider": "cloudflare",
+        "status_code": 429,
+        "action": "circuit_open",
+        "at": "2026-11-25T05:53:04.361177+00:00",
+        "cooldown_until": "2026-11-25T06:13:04.360748+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b",
+      "mistral:mistral-small-latest"
+    ]
   }
 ]

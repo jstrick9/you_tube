@@ -8,23 +8,17 @@
       "blocked_until": "2026-11-25T07:35:21.283513+00:00",
       "retry_after_seconds": 25.0
     },
-    "gemini": {
-      "reason": "repeated_http_5xx",
-      "status_code": 503,
-      "recorded_at": "2026-11-24T20:50:51.251483+00:00",
-      "blocked_until": "2026-11-24T21:00:51.251483+00:00"
-    },
-    "mistral": {
+    "cloudflare": {
       "reason": "rate_limited",
       "status_code": 429,
-      "recorded_at": "2026-11-24T20:48:23.319977+00:00",
-      "blocked_until": "2026-11-24T21:08:23.319977+00:00"
+      "recorded_at": "2026-11-25T05:53:04.360748+00:00",
+      "blocked_until": "2026-11-25T06:13:04.360748+00:00"
     }
   },
   "failures_5xx": {
     "gemini": {
-      "count": 4,
-      "last_at": "2026-11-24T20:50:51.251467+00:00"
+      "count": 2,
+      "last_at": "2026-11-25T05:44:29.945664+00:00"
     }
   }
 }
