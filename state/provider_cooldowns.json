@@ -13,12 +13,13 @@
       "status_code": 402,
       "recorded_at": "2026-11-25T20:01:22.251694+00:00",
       "blocked_until": "2026-11-26T20:01:22.251694+00:00"
+    },
+    "gemini": {
+      "reason": "repeated_http_5xx",
+      "status_code": 503,
+      "recorded_at": "2026-11-26T08:06:50.611491+00:00",
+      "blocked_until": "2026-11-26T08:16:50.611491+00:00"
     }
   },
-  "failures_5xx": {
-    "gemini": {
-      "count": 2,
-      "last_at": "2026-11-26T05:37:42.962982+00:00"
-    }
-  }
+  "failures_5xx": {}
 }
