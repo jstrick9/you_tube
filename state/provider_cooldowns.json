@@ -1,12 +1,5 @@
 {
   "schema_version": 1,
-  "providers": {
-    "mistral": {
-      "reason": "billing_or_entitlement",
-      "status_code": 402,
-      "recorded_at": "2026-11-25T20:01:22.251694+00:00",
-      "blocked_until": "2026-11-26T20:01:22.251694+00:00"
-    }
-  },
+  "providers": {},
   "failures_5xx": {}
 }

@@ -1,221 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261118-185512-3702",
-    "workflow_run_id": "44374522668",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-18T18:55:12.412402+00:00",
-    "finished_at": "2026-11-18T19:35:13.211961+00:00",
-    "duration_seconds": 2400.8,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 2,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 2,
-      "script_research": 4,
-      "script_draft": 8,
-      "script_review": 8,
-      "tts": 1,
-      "visuals": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "How 400 men carved 60-foot faces into a mountain using dynamite",
-        "topic_key": "how 400 men carved 60foot faces into a mountain using dynamite",
-        "outcome": "rejected",
-        "stage": "script_review",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "She married a King but was never Queen",
-        "topic_key": "she married a king but was never queen",
-        "outcome": "rejected",
-        "stage": "visuals",
-        "failure_category": "vision_unavailable"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-11-18T19:08:35.833948+00:00",
-        "stage": "script_review",
-        "category": "script_quality_rejected",
-        "attempt": 4
-      },
-      {
-        "at": "2026-11-18T19:08:35.834007+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-18T19:35:13.205159+00:00",
-        "stage": "visuals",
-        "category": "vision_unavailable",
-        "exception_type": "VisionUnavailable",
-        "attempt": 2
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 2,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 3,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 1,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 2,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      },
-      {
-        "stage": "script_review",
-        "attempt": 3,
-        "limit": 4,
-        "action": "rewrite_with_review_feedback"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "cooldown_skip",
-        "at": "2026-11-18T18:55:12.412841+00:00",
-        "cooldown_until": "2026-11-19T07:23:34.252317+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-18T18:55:27.027720+00:00",
-        "retry_after_seconds": 26.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-18T18:55:34.091230+00:00",
-        "retry_after_seconds": 27.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-11-18T18:56:07.641572+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-11-18T18:56:19.695171+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-11-18T18:56:30.713661+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "route_circuit_open",
-        "at": "2026-11-18T18:56:30.714328+00:00",
-        "cooldown_until": "2026-11-18T19:06:30.713712+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-18T18:56:37.299478+00:00"
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-18T19:04:45.413527+00:00",
-        "retry_after_seconds": 35.0
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "circuit_open",
-        "at": "2026-11-18T19:08:42.358425+00:00",
-        "cooldown_until": "2026-11-18T19:28:42.357866+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-11-18T19:22:02.246770+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": 503,
-        "action": "transient_failure",
-        "at": "2026-11-18T19:22:33.163245+00:00"
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-18T19:24:03.241637+00:00"
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "groq:qwen/qwen3.8-27b",
-      "mistral:ministral-8b-latest",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "44382061079",
     "workflow_run_id": "44382061079",
     "workflow_run_attempt": "1",
@@ -4906,6 +4691,148 @@
       "groq:openai/gpt-oss-120b",
       "groq:openai/gpt-oss-20b",
       "groq:qwen/qwen3.8-27b"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261126-203426-3577",
+    "workflow_run_id": "45891757355",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-26T20:34:26.762236+00:00",
+    "finished_at": "2026-11-26T20:36:10.115743+00:00",
+    "duration_seconds": 103.354,
+    "mode": "upload",
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 1,
+      "script_research": 2,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Why Do Scuba Divers Jump Backward Off Boats?",
+        "topic_key": "why do scuba divers jump backward off boats",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-11-26T20:35:08.482074+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-11-26T20:35:08.482188+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-26T20:35:39.225225+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-11-26T20:36:10.112132+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-11-26T20:36:10.112156+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-11-26T20:36:10.112185+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-26T20:34:40.676151+00:00",
+        "retry_after_seconds": 24.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-26T20:34:47.269060+00:00",
+        "retry_after_seconds": 25.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_request_too_large",
+        "at": "2026-11-26T20:34:47.308550+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-26T20:35:14.726743+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-26T20:35:24.269164+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-26T20:35:44.839517+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-26T20:36:03.871205+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b"
     ]
   }
 ]
