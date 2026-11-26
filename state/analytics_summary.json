@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-26T10:01:45.587776+00:00",
+  "updated": "2026-11-26T19:43:32.233650+00:00",
   "videos_total": 45,
   "videos_7d": 0,
   "views_7d": 0,
@@ -36,7 +36,7 @@
         },
         {
           "arm": "science",
-          "mean": 0.463,
+          "mean": 0.464,
           "n": 7
         },
         {
@@ -57,7 +57,7 @@
       "arms": [
         {
           "arm": "scale_shock",
-          "mean": 0.539,
+          "mean": 0.538,
           "n": 3
         },
         {
@@ -102,7 +102,7 @@
         },
         {
           "arm": "plot_twist",
-          "mean": 0.392,
+          "mean": 0.393,
           "n": 2
         }
       ]
@@ -246,7 +246,7 @@
         },
         {
           "arm": "challenge",
-          "mean": 0.393,
+          "mean": 0.394,
           "n": 2
         }
       ]
@@ -286,7 +286,7 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1273,
+      "views": 1276,
       "avg_view_pct": 78.91
     },
     {
