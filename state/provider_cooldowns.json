@@ -8,12 +8,6 @@
       "blocked_until": "2026-11-26T08:24:31.582341+00:00",
       "retry_after_seconds": 31.0
     },
-    "gemini": {
-      "reason": "repeated_http_5xx",
-      "status_code": 503,
-      "recorded_at": "2026-11-25T20:01:21.922877+00:00",
-      "blocked_until": "2026-11-25T20:11:21.922877+00:00"
-    },
     "mistral": {
       "reason": "billing_or_entitlement",
       "status_code": 402,
@@ -23,8 +17,8 @@
   },
   "failures_5xx": {
     "gemini": {
-      "count": 3,
-      "last_at": "2026-11-25T20:01:21.922856+00:00"
+      "count": 2,
+      "last_at": "2026-11-26T05:37:42.962982+00:00"
     }
   }
 }

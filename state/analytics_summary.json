@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-25T19:59:36.434521+00:00",
+  "updated": "2026-11-26T05:36:25.546523+00:00",
   "videos_total": 45,
   "videos_7d": 0,
   "views_7d": 0,
@@ -92,7 +92,7 @@
         },
         {
           "arm": "myth_buster",
-          "mean": 0.466,
+          "mean": 0.467,
           "n": 2
         },
         {
@@ -286,8 +286,8 @@
     {
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
-      "views": 1272,
-      "avg_view_pct": 79.17
+      "views": 1273,
+      "avg_view_pct": 78.91
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -305,7 +305,7 @@
       "title": "Which Substance Has the Highest Melting Point? #shorts",
       "id": "4WkKoRw9r00",
       "views": 1193,
-      "avg_view_pct": 50.5
+      "avg_view_pct": 50.43
     },
     {
       "title": "The Surprising History of Barbie and Mattel #shorts",
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 35,
+    "attempted_videos": 0,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 35,
+    "reports_without_usable_rows": 0,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
@@ -598,10 +598,10 @@
         "format": "facts3",
         "hook_style": "you_statement",
         "duration_seconds": 37.3,
-        "avg_view_pct": 50.5,
+        "avg_view_pct": 50.43,
         "views": 1193,
-        "engaged_views_90d": 541,
-        "sample_size": 541,
+        "engaged_views_90d": 542,
+        "sample_size": 542,
         "sample_basis": "engaged_views_90d",
         "sample_qualified": true
       },
@@ -657,7 +657,7 @@
   },
   "subscribers": {
     "net_90d": 28,
-    "views_90d": 10862,
+    "views_90d": 10865,
     "per_1k_views": 2.58,
     "videos": 36,
     "denominator_basis": "engaged_views",
@@ -668,12 +668,12 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10862,
+    "engaged_views_90d": 10865,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
-    "expanded_threshold_progress": 0.003621,
-    "current_full_threshold_progress": 0.001086,
+    "expanded_threshold_progress": 0.003622,
+    "current_full_threshold_progress": 0.001087,
     "feb_2027_full_threshold_progress": 0.000543,
     "public_videos": 36,
     "videos_with_metric": 36,
