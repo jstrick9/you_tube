@@ -6,6 +6,12 @@
       "status_code": 402,
       "recorded_at": "2026-11-27T05:25:49.168474+00:00",
       "blocked_until": "2026-11-28T05:25:49.168474+00:00"
+    },
+    "gemini": {
+      "reason": "repeated_http_5xx",
+      "status_code": 503,
+      "recorded_at": "2026-11-27T08:15:03.119839+00:00",
+      "blocked_until": "2026-11-27T08:25:03.119839+00:00"
     }
   },
   "failures_5xx": {}
