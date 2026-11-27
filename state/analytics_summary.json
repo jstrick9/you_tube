@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-27T19:32:23.119395+00:00",
+  "updated": "2026-11-27T20:19:53.003655+00:00",
   "videos_total": 45,
   "videos_7d": 0,
   "views_7d": 0,
@@ -287,7 +287,7 @@
       "title": "When the Catholic Church Banned Heliocentrism #shorts",
       "id": "vBTIN-iRO9k",
       "views": 1276,
-      "avg_view_pct": 78.91
+      "avg_view_pct": 78.94
     },
     {
       "title": "The Long Development of Ant-Man #shorts",
@@ -657,7 +657,7 @@
   },
   "subscribers": {
     "net_90d": 28,
-    "views_90d": 10865,
+    "views_90d": 10866,
     "per_1k_views": 2.58,
     "videos": 36,
     "denominator_basis": "engaged_views",
@@ -668,7 +668,7 @@
   },
   "shorts_monetization": {
     "metric": "engaged_views",
-    "engaged_views_90d": 10865,
+    "engaged_views_90d": 10866,
     "expanded_ypp_threshold": 3000000,
     "current_full_ypp_threshold": 10000000,
     "feb_2027_full_ypp_threshold": 20000000,
