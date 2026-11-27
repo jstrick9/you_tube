@@ -1,33 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "44382061079",
-    "workflow_run_id": "44382061079",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-18T19:36:20.110404+00:00",
-    "finished_at": "2026-11-18T19:36:20.110404+00:00",
-    "duration_seconds": 0,
-    "mode": "workflow_fallback",
-    "top_up": true,
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "superseded",
-    "stage": "preflight",
-    "stage_entries": {
-      "preflight": 1
-    },
-    "retry_budgets": {},
-    "topic_attempts": [],
-    "failures": [],
-    "retry_events": [],
-    "provider_events": [],
-    "preflight_skip_reason": "delayed_schedule_superseded"
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261119-013108-4082",
     "workflow_run_id": "44437296048",
     "workflow_run_attempt": "1",
@@ -4833,6 +4806,151 @@
     "rate_limited_models": [
       "groq:openai/gpt-oss-120b",
       "groq:openai/gpt-oss-20b"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261127-052250-3395",
+    "workflow_run_id": "45945338378",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-27T05:22:50.887231+00:00",
+    "finished_at": "2026-11-27T05:27:59.187817+00:00",
+    "duration_seconds": 308.301,
+    "mode": "upload",
+    "target_count": 3,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 2,
+      "script_research": 4,
+      "script_draft": 1,
+      "script_review": 1,
+      "tts": 1,
+      "visuals": 1,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Why Do Fishermen Throw Deadly Sea Snakes Back Into the Ocean?",
+        "topic_key": "why do fishermen throw deadly sea snakes back into the ocean",
+        "outcome": "rejected",
+        "stage": "script_research",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Why Did Denmark Surrender in Just 6 Hours?",
+        "topic_key": "why did denmark surrender in just 6 hours",
+        "outcome": "rejected",
+        "stage": "visuals",
+        "failure_category": "no_verified_visual_match"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-11-27T05:24:29.292838+00:00",
+        "stage": "script_research",
+        "category": "trend_angle_unsupported_by_source"
+      },
+      {
+        "at": "2026-11-27T05:24:29.292946+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-27T05:27:56.808544+00:00",
+        "stage": "visuals",
+        "category": "no_verified_visual_match",
+        "exception_type": "NoVisualMatch"
+      },
+      {
+        "at": "2026-11-27T05:27:59.181110+00:00",
+        "stage": "topic_selection",
+        "category": "no_more_eligible_trending_topics"
+      },
+      {
+        "at": "2026-11-27T05:27:59.181143+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-11-27T05:27:59.181185+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-11-27T05:27:59.181198+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-27T05:23:10.456034+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-27T05:23:17.039228+00:00",
+        "retry_after_seconds": 28.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-27T05:23:19.885176+00:00",
+        "retry_after_seconds": 6.0
+      },
+      {
+        "provider": "mistral",
+        "status_code": 402,
+        "action": "circuit_open",
+        "at": "2026-11-27T05:25:49.169028+00:00",
+        "cooldown_until": "2026-11-28T05:25:49.168474+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b"
     ]
   }
 ]
