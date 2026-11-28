@@ -1,200 +1,6 @@
 [
   {
     "schema_version": 1,
-    "run_id": "20261120-012739-3402",
-    "workflow_run_id": "44653613849",
-    "workflow_run_attempt": "1",
-    "started_at": "2026-11-20T01:27:39.088367+00:00",
-    "finished_at": "2026-11-20T01:38:13.265483+00:00",
-    "duration_seconds": 634.177,
-    "mode": "upload",
-    "target_count": 1,
-    "target_count_known": true,
-    "produced_count": 0,
-    "scheduled_count": 0,
-    "upload_failure_count": 0,
-    "outcome": "no_output",
-    "stage": "cleanup",
-    "stage_entries": {
-      "initialization": 1,
-      "trends": 1,
-      "topic_selection": 3,
-      "vision_preflight": 1,
-      "topic_production": 1,
-      "topic_validation": 4,
-      "script_research": 8,
-      "script_draft": 1,
-      "upload": 1,
-      "cleanup": 1
-    },
-    "retry_budgets": {
-      "script_drafts": 4,
-      "visual_repairs": 2,
-      "selection_rounds": 3,
-      "topics_per_video": 6
-    },
-    "topic_attempts": [
-      {
-        "index": 1,
-        "topic": "What Happens When Sand Is Heated?",
-        "topic_key": "what happens when sand is heated",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "650 light-years away, Betelgeuse is one of the largest stars ever observed.",
-        "topic_key": "650 lightyears away betelgeuse is one of the largest stars ever observed",
-        "outcome": "rejected",
-        "stage": "script_draft",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "आखर समदर कतन गहर ह? 11 KM नच क रहसयमय दनय",
-        "topic_key": "11 km",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      },
-      {
-        "index": 1,
-        "topic": "20 लख जनवर क खतरनक सफर, नद म छप थ 3000 मगरमचछ!",
-        "topic_key": "20 3000",
-        "outcome": "rejected",
-        "stage": "script_research",
-        "failure_category": "script_or_grounding_rejected"
-      }
-    ],
-    "failures": [
-      {
-        "at": "2026-11-20T01:29:05.383039+00:00",
-        "stage": "script_research",
-        "category": "source_subject_mismatch"
-      },
-      {
-        "at": "2026-11-20T01:29:05.383190+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-20T01:29:12.395454+00:00",
-        "stage": "topic_selection",
-        "category": "no_more_eligible_trending_topics"
-      },
-      {
-        "at": "2026-11-20T01:37:51.400520+00:00",
-        "stage": "script_draft",
-        "category": "provider_rate_limited",
-        "exception_type": "LLMError",
-        "attempt": 1
-      },
-      {
-        "at": "2026-11-20T01:37:51.400628+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-20T01:38:06.513926+00:00",
-        "stage": "script_research",
-        "category": "source_subject_mismatch"
-      },
-      {
-        "at": "2026-11-20T01:38:06.514056+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-20T01:38:13.261799+00:00",
-        "stage": "script_research",
-        "category": "source_subject_mismatch"
-      },
-      {
-        "at": "2026-11-20T01:38:13.261925+00:00",
-        "stage": "script_research",
-        "category": "script_or_grounding_rejected"
-      },
-      {
-        "at": "2026-11-20T01:38:13.262001+00:00",
-        "stage": "topic_selection",
-        "category": "selection_round_budget_exhausted"
-      }
-    ],
-    "retry_events": [
-      {
-        "stage": "topic_selection",
-        "attempt": 1,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      },
-      {
-        "stage": "topic_selection",
-        "attempt": 2,
-        "limit": 3,
-        "action": "select_fresh_live_candidates"
-      }
-    ],
-    "provider_events": [
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-20T01:28:24.577817+00:00",
-        "retry_after_seconds": 28.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-20T01:28:28.398488+00:00",
-        "retry_after_seconds": 1.0
-      },
-      {
-        "provider": "groq",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-20T01:29:08.978971+00:00",
-        "retry_after_seconds": 31.0
-      },
-      {
-        "provider": "gemini",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-20T01:31:18.713618+00:00"
-      },
-      {
-        "provider": "mistral",
-        "status_code": 429,
-        "action": "model_rate_limited",
-        "at": "2026-11-20T01:31:25.901010+00:00"
-      },
-      {
-        "provider": "nvidia",
-        "status_code": null,
-        "action": "transient_network_failure",
-        "at": "2026-11-20T01:37:36.953513+00:00"
-      },
-      {
-        "provider": "pollinations",
-        "status_code": 402,
-        "action": "circuit_open",
-        "at": "2026-11-20T01:37:51.400255+00:00",
-        "cooldown_until": "2026-11-21T01:37:51.399678+00:00",
-        "retry_after_seconds": 32.0
-      }
-    ],
-    "grounding_repairs": [],
-    "top_up": true,
-    "rate_limited_models": [
-      "groq:openai/gpt-oss-120b",
-      "groq:openai/gpt-oss-20b",
-      "groq:qwen/qwen3.8-27b",
-      "mistral:mistral-small-latest"
-    ]
-  },
-  {
-    "schema_version": 1,
     "run_id": "20261120-070403-3592",
     "workflow_run_id": "44691937712",
     "workflow_run_attempt": "1",
@@ -5153,6 +4959,216 @@
         "status_code": 413,
         "action": "model_request_too_large",
         "at": "2026-11-28T05:03:59.695229+00:00"
+      }
+    ],
+    "grounding_repairs": [],
+    "top_up": true,
+    "rate_limited_models": [
+      "groq:openai/gpt-oss-120b",
+      "groq:openai/gpt-oss-20b",
+      "groq:qwen/qwen3.8-27b"
+    ]
+  },
+  {
+    "schema_version": 1,
+    "run_id": "20261128-073800-3668",
+    "workflow_run_id": "46122007554",
+    "workflow_run_attempt": "1",
+    "started_at": "2026-11-28T07:38:00.268352+00:00",
+    "finished_at": "2026-11-28T07:48:07.237729+00:00",
+    "duration_seconds": 606.969,
+    "mode": "upload",
+    "target_count": 2,
+    "target_count_known": true,
+    "produced_count": 0,
+    "scheduled_count": 0,
+    "upload_failure_count": 0,
+    "outcome": "no_output",
+    "stage": "cleanup",
+    "stage_entries": {
+      "initialization": 1,
+      "trends": 1,
+      "topic_selection": 3,
+      "vision_preflight": 1,
+      "topic_production": 1,
+      "topic_validation": 4,
+      "script_research": 8,
+      "script_draft": 4,
+      "upload": 1,
+      "cleanup": 1
+    },
+    "retry_budgets": {
+      "script_drafts": 4,
+      "visual_repairs": 2,
+      "selection_rounds": 3,
+      "topics_per_video": 6
+    },
+    "topic_attempts": [
+      {
+        "index": 1,
+        "topic": "Nakli Goli Se Asli Asar? Placebo Effect",
+        "topic_key": "nakli goli se asli asar placebo effect",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Why Did Denmark Surrender in Just 6 Hours?",
+        "topic_key": "why did denmark surrender in just 6 hours",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "Harvesting Giant Capybaras and the Discovery of a Strange Creature Inside a Burrow",
+        "topic_key": "harvesting giant capybaras and the discovery of a strange creature inside a burrow",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      },
+      {
+        "index": 1,
+        "topic": "You know this crab facts",
+        "topic_key": "you know this crab facts",
+        "outcome": "rejected",
+        "stage": "script_draft",
+        "failure_category": "script_or_grounding_rejected"
+      }
+    ],
+    "failures": [
+      {
+        "at": "2026-11-28T07:42:48.125188+00:00",
+        "stage": "script_draft",
+        "category": "billing_or_entitlement",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-28T07:42:48.125320+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-28T07:44:13.638442+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-28T07:44:13.638601+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-28T07:46:36.091649+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-28T07:46:36.091798+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-28T07:48:07.232463+00:00",
+        "stage": "script_draft",
+        "category": "script_or_review_gate",
+        "exception_type": "LLMError",
+        "attempt": 1
+      },
+      {
+        "at": "2026-11-28T07:48:07.232617+00:00",
+        "stage": "script_research",
+        "category": "script_or_grounding_rejected"
+      },
+      {
+        "at": "2026-11-28T07:48:07.232743+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      },
+      {
+        "at": "2026-11-28T07:48:07.232779+00:00",
+        "stage": "topic_selection",
+        "category": "selection_round_budget_exhausted"
+      }
+    ],
+    "retry_events": [
+      {
+        "stage": "topic_selection",
+        "attempt": 1,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      },
+      {
+        "stage": "topic_selection",
+        "attempt": 2,
+        "limit": 3,
+        "action": "select_fresh_live_candidates"
+      }
+    ],
+    "provider_events": [
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-28T07:38:12.987045+00:00",
+        "retry_after_seconds": 27.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-28T07:38:19.566889+00:00",
+        "retry_after_seconds": 29.0
+      },
+      {
+        "provider": "groq",
+        "status_code": 429,
+        "action": "model_rate_limited",
+        "at": "2026-11-28T07:38:22.261875+00:00",
+        "retry_after_seconds": 7.0
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-28T07:39:15.204376+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": 503,
+        "action": "transient_failure",
+        "at": "2026-11-28T07:39:28.336257+00:00"
+      },
+      {
+        "provider": "gemini",
+        "status_code": null,
+        "action": "transient_network_failure",
+        "at": "2026-11-28T07:41:44.466986+00:00"
+      },
+      {
+        "provider": "mistral",
+        "status_code": 402,
+        "action": "circuit_open",
+        "at": "2026-11-28T07:41:44.672538+00:00",
+        "cooldown_until": "2026-11-29T07:41:44.671988+00:00"
+      },
+      {
+        "provider": "pollinations",
+        "status_code": 413,
+        "action": "model_request_too_large",
+        "at": "2026-11-28T07:42:47.954475+00:00"
+      },
+      {
+        "provider": "pollinations",
+        "status_code": 413,
+        "action": "model_request_too_large",
+        "at": "2026-11-28T07:42:48.124840+00:00"
       }
     ],
     "grounding_repairs": [],

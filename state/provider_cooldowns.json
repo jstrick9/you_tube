@@ -4,9 +4,14 @@
     "mistral": {
       "reason": "billing_or_entitlement",
       "status_code": 402,
-      "recorded_at": "2026-11-27T05:25:49.168474+00:00",
-      "blocked_until": "2026-11-28T05:25:49.168474+00:00"
+      "recorded_at": "2026-11-28T07:41:44.671988+00:00",
+      "blocked_until": "2026-11-29T07:41:44.671988+00:00"
     }
   },
-  "failures_5xx": {}
+  "failures_5xx": {
+    "gemini": {
+      "count": 2,
+      "last_at": "2026-11-28T07:39:28.336285+00:00"
+    }
+  }
 }
