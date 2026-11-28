@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-27T20:19:53.003655+00:00",
+  "updated": "2026-11-28T04:59:13.383464+00:00",
   "videos_total": 45,
   "videos_7d": 0,
   "views_7d": 0,
@@ -31,7 +31,7 @@
         },
         {
           "arm": "history",
-          "mean": 0.483,
+          "mean": 0.484,
           "n": 5
         },
         {
@@ -67,7 +67,7 @@
         },
         {
           "arm": "dumbest_decision",
-          "mean": 0.525,
+          "mean": 0.524,
           "n": 1
         },
         {
@@ -87,7 +87,7 @@
         },
         {
           "arm": "ranked_escalation",
-          "mean": 0.48,
+          "mean": 0.481,
           "n": 1
         },
         {
@@ -262,7 +262,7 @@
     {
       "title": "Why Beavers Bully Trees #shorts",
       "id": "Rvls-5FVgdg",
-      "views": 1450,
+      "views": 1451,
       "avg_view_pct": 90.44
     },
     {
@@ -340,10 +340,10 @@
     }
   },
   "retention_curve_refresh": {
-    "attempted_videos": 0,
+    "attempted_videos": 35,
     "usable_reports_returned": 0,
     "reports_with_segment_metrics": 0,
-    "reports_without_usable_rows": 0,
+    "reports_without_usable_rows": 35,
     "note": "Current-pass query results only. Missing rows are not zeroes; this summary does not distinguish an empty report from a failed per-video query."
   },
   "retention_segments": {
